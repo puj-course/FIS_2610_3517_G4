@@ -1,12 +1,13 @@
-# SYNTIX TECH 🛡️ — Drive Control: Blindaje Operativo para Flotas
+# SYNTIX TECH  — Drive Control: Blindaje Operativo para Flotas
 
-![Logo SYNTIX](https://via.placeholder.com/150x150?text=SYNTIX+TECH+Logo)
+![WhatsApp Image 2026-02-05 at 1 45 04 PM](https://github.com/user-attachments/assets/70b5b3d2-98c2-4d25-995a-783896a2b28b)
+
 
 > **Propuesta de Valor:** Transformamos la gestión documental de flotas en una ventaja competitiva, eliminando el riesgo de inmovilizaciones y multas mediante la automatización de cumplimiento legal.
 
 ---
 
-## 🚦 ¿Por qué elegir Drive Control?
+##  ¿Por qué elegir Drive Control?
 
 En un mercado donde un camión parado cuesta millones, **Drive Control** actúa como un copiloto administrativo inteligente para empresas de logística y carga general.
 
@@ -16,7 +17,7 @@ En un mercado donde un camión parado cuesta millones, **Drive Control** actúa 
 
 ---
 
-## 📊 Información General del Proyecto
+##  Información General del Proyecto 
 
 | Elemento | Detalle |
 | :--- | :--- |
@@ -29,18 +30,18 @@ En un mercado donde un camión parado cuesta millones, **Drive Control** actúa 
 
 ---
 
-## 👥 Roles y Responsabilidades (Equipo SYNTIX)
+##  Roles y Responsabilidades (Equipo SYNTIX)
 
 | Miembro | Rol | Responsabilidad en Drive Control |
 | :--- | :--- | :--- |
-| **[Sebastian Ramirez]** | 🧑‍💼 Project Manager | Estrategia de marca, coordinación de sprints y validación de requerimientos de negocio. |
-| **[Samuel Freile]** | 🧠 Backend Developer | Integración de APIs de consulta (Runt/Fasecolda), lógica de alertas y persistencia de datos. |
-| **[Sebastian Ramirez]🎨 Frontend Developer | UI de alta fidelidad, implementación del dashboard de cumplimiento y vistas de usuario. |
-| **[Nombre 4]** | 📝 Doc / Repo Manager | Arquitectura de la información, diagramas de clases/secuencia y gestión de la Wiki. |
-| **[Nombre 5]** | 🧪 Tester / QA | Pruebas de integración, validación de lógica de fechas y soporte de calidad Nivel 2. |
+| **[Sebastian Ramirez]** |  Project Manager | Estrategia de marca, coordinación de sprints y validación de requerimientos de negocio. |
+| **[Samuel Freile]** |  Backend Developer | Integración de APIs de consulta (Runt/Fasecolda), lógica de alertas y persistencia de datos. |
+| **[Sebastian Ramirez] Frontend Developer | UI de alta fidelidad, implementación del dashboard de cumplimiento y vistas de usuario. |
+| **[Nombre 4]** |  Doc / Repo Manager | Arquitectura de la información, diagramas de clases/secuencia y gestión de la Wiki. |
+| **[Nombre 5]** |  Tester / QA | Pruebas de integración, validación de lógica de fechas y soporte de calidad Nivel 2. |
 ---
 
-## 🛠️ Alcance y Funcionalidad de la Demo
+##  Alcance y Funcionalidad de la Demo
 
 **Drive Control** presenta una solución técnica centrada en la eficiencia operativa:
 
@@ -56,7 +57,7 @@ En un mercado donde un camión parado cuesta millones, **Drive Control** actúa 
 
 ---
 
-## 📂 Estructura del Repositorio
+##  Estructura del Repositorio
 
 * `/backend`: Lógica de negocio y API REST.
 * `/frontend`: Dashboard interactivo (React/Vue/Angular).
