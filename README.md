@@ -36,7 +36,7 @@ En un mercado donde un camión parado cuesta millones, **Drive Control** actúa 
 | :--- | :--- | 
 | **[Sebastian Ramirez Maldonado]** |  Scrum Master | 
 | **[Samuel Freile]** |  Configuration Manager | 
-| **[Sebastian Rodriguez Ramirez]** | 
+| **[Sebastian Rodriguez Ramirez]** | Quality Assurance Lead (QA Lead) | 
 | **[Solon Losada]** |  DevOps Engineer | 
 | **[Sebastian Vargas]** |  Product Owner y Sprint Planner |
 ---
