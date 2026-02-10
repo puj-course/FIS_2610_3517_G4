@@ -32,7 +32,7 @@ En un mercado donde un camión parado cuesta millones, **Drive Control** actúa 
 
 ##  Roles y Responsabilidades (Equipo SYNTIX)
 
-| Miembro | Rol | Responsabilidad en Drive Control |
+| Miembro | Rol |
 | :--- | :--- | :--- |
 | **[Sebastian Ramirez Maldonado]** |  Scrum Master | 
 | **[Samuel Freile]** |  Configuration Manager | 
