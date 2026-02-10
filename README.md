@@ -34,11 +34,11 @@ En un mercado donde un camión parado cuesta millones, **Drive Control** actúa 
 
 | Miembro | Rol | Responsabilidad en Drive Control |
 | :--- | :--- | :--- |
-| **[Sebastian Ramirez]** |  Project Manager | Estrategia de marca, coordinación de sprints y validación de requerimientos de negocio. |
-| **[Samuel Freile]** |  Backend Developer | Integración de APIs de consulta (Runt/Fasecolda), lógica de alertas y persistencia de datos. |
-| **[Sebastian Ramirez]** | Frontend Developer | UI de alta fidelidad, implementación del dashboard de cumplimiento y vistas de usuario. |
-| **[Solon Lozada]** |  Doc / Repo Manager | Arquitectura de la información, diagramas de clases/secuencia y gestión de la Wiki. |
-| **[Sebastian Vargas]** |  Tester / QA | Pruebas de integración, validación de lógica de fechas y soporte de calidad Nivel 2. |
+| **[Sebastian Ramirez Maldonado]** |  Scrum Master | 
+| **[Samuel Freile]** |  Configuration Manager | 
+| **[Sebastian Rodriguez Ramirez]** | 
+| **[Solon Losada]** |  DevOps Engineer | 
+| **[Sebastian Vargas]** |  Product Owner y Sprint Planner |
 ---
 
 ##  Alcance y Funcionalidad de la Demo
