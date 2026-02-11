@@ -30,15 +30,16 @@ En un mercado donde un camión parado cuesta millones, **Drive Control** actúa 
 
 ---
 
-##  Roles y Responsabilidades (Equipo SYNTIX)
+## Roles y Responsabilidades (Equipo SYNTIX)
 
-| Miembro | Rol |
-| :--- | :--- | 
-| **[Sebastian Ramirez Maldonado]** |  Scrum Master | 
-| **[Samuel Freile]** |  Configuration Manager | 
-| **[Sebastian Rodriguez Ramirez]** | Quality Assurance Lead (QA Lead) | 
-| **[Solon Losada]** |  DevOps Engineer | 
-| **[Sebastian Vargas]** |  Product Owner y Sprint Planner |
+| Miembro | GitHub | Rol |
+| :--- | :--- | :--- |
+| **Sebastian Ramirez Maldonado** | [@Sarm-m](https://github.com/Sarm-m) | Scrum Master |
+| **Samuel Freile** | [@samuelfl680](https://github.com/samuelfl680) | Configuration Manager |
+| **Sebastian Rodriguez Ramirez** | [@juserora](https://github.com/juserora) | Quality Assurance Lead (QA Lead) |
+| **Solon Losada** | [@solonlosada2006](https://github.com/solonlosada2006) | DevOps Engineer |
+| **Sebastian Vargas** | [@juanvargax](https://github.com/juanvargax) | Product Owner y Sprint Planner |
+
 ---
 
 ##  Alcance y Funcionalidad de la Demo
