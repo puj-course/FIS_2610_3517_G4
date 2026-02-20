@@ -26,6 +26,7 @@ Para evitar conflictos y problemas en Git:
 Ejemplos:
 - `diagrama-secuencia-registro-vehiculo.png`
 - `diagrama-clases-dominio.png`
-- `diagrama-componentes-front.png`
+- `diagrama-componentes-front.png` -> proximamente 
 
 ---
+
