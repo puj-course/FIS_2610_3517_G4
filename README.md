@@ -1,4 +1,3 @@
-````markdown
 # DriveControl / AutoMinder Enterprise  
 ## SYNTIX TECH — Blindaje operativo para flotas mediante cumplimiento documental
 
@@ -12,19 +11,19 @@
 
 ## Roles y Responsabilidades (Equipo SYNTIX)
 
-| Miembro                      | GitHub                                         | Rol                              |
-|-----------------------------|-----------------------------------------------|----------------------------------|
-| Sebastian Ramirez Maldonado | [@Sarm-m](https://github.com/Sarm-m)           | Scrum Master                     |
-| Samuel Freile               | [@samuelfl680](https://github.com/samuelfl680) | Configuration Manager            |
-| Sebastian Rodriguez Ramirez | [@juserora](https://github.com/juserora)       | Quality Assurance Lead (QA Lead) |
-| Solon Losada                | [@solonlosada2006](https://github.com/solonlosada2006) | DevOps Engineer                  |
-| Sebastian Vargas            | [@juanvargax](https://github.com/juanvargax)   | Product Owner y Sprint Planner   |
+| Miembro                      | GitHub                                                      | Rol                              |
+|-----------------------------|-------------------------------------------------------------|----------------------------------|
+| Sebastian Ramirez Maldonado | [@Sarm-m](https://github.com/Sarm-m)                        | Scrum Master                     |
+| Samuel Freile               | [@samuelfl680](https://github.com/samuelfl680)              | Configuration Manager            |
+| Sebastian Rodriguez Ramirez | [@juserora](https://github.com/juserora)                    | Quality Assurance Lead (QA Lead) |
+| Solon Losada                | [@solonlosada2006](https://github.com/solonlosada2006)      | DevOps Engineer                  |
+| Sebastian Vargas            | [@juanvargax](https://github.com/juanvargax)                | Product Owner y Sprint Planner   |
 
 ### Roles y responsabilidades
 
 - **Scrum Master:** facilita ceremonias Scrum, seguimiento del sprint y gestión de impedimentos.  
-- **Product Owner y Sprint Planner:** prioriza el backlog, define alcance del sprint y valida entregables.  
-- **Configuration Manager:** administración del repositorio, control de versiones, Gitflow y consistencia documental.  
+- **Product Owner y Sprint Planner:** prioriza el backlog, define el alcance del sprint y valida entregables.  
+- **Configuration Manager:** administración del repositorio, control de versiones, GitFlow y consistencia documental.  
 - **DevOps Engineer:** soporte a automatización, integración y buenas prácticas de entrega.  
 - **QA Lead:** revisión de calidad funcional, técnica y documental; verificación de criterios de evaluación.
 
@@ -43,11 +42,9 @@
 9. [Estructura del repositorio](#-estructura-del-repositorio)  
 10. [Requisitos](#-requisitos)  
 11. [Instalación](#-instalación)  
-12. [Ejecución](#-ejecución)  
-13. [Pruebas](#-pruebas)  
-14. [Wiki y enlaces](#-wiki-y-enlaces)  
-15. [Licencia](#-licencia)  
-16. [Contexto académico](#-contexto-académico)  
+13. [Wiki y enlaces](#-wiki-y-enlaces)  
+14. [Licencia](#-licencia)  
+15. [Contexto académico](#-contexto-académico)  
 
 ---
 
@@ -55,7 +52,7 @@
 
 DriveControl / AutoMinder Enterprise es una solución orientada al seguimiento y control del cumplimiento documental de flotas de transporte (logística, carga y operación empresarial).
 
-Su objetivo es reducir riesgos operativos —multas e inmovilizaciones— asociados al vencimiento de documentos críticos como SOAT, Tecnomecánica y licencias.
+Su objetivo es reducir riesgos operativos —multas e inmovilizaciones— asociados al vencimiento de documentos críticos como **SOAT**, **Tecnomecánica** y **licencias**.
 
 En escenarios reales, el control documental suele gestionarse manualmente (hojas de cálculo, recordatorios dispersos o validación por memoria), generando errores y baja visibilidad. DriveControl centraliza la información y la transforma en una vista operativa accionable.
 
@@ -170,15 +167,15 @@ frontend/   → interfaz y dashboard
 backend/    → lógica de negocio (si aplica)  
 docs/       → documentación, UML y evidencias  
 assets/     → recursos gráficos  
-````
+```
 
 ---
 
 # 📋 Requisitos
 
-* Navegador actualizado (Chrome, Edge o Firefox)
-* Visual Studio Code (recomendado)
-* Git
+- Navegador actualizado (Chrome, Edge o Firefox)
+- Visual Studio Code (recomendado)
+- Git
 
 ---
 
@@ -189,13 +186,14 @@ git clone https://github.com/puj-course/FIS_2610_3517_G4.git
 cd FIS_2610_3517_G4
 ```
 
+---
 
 # 🔗 Wiki y enlaces
 
-* Repositorio: [https://github.com/puj-course/FIS_2610_3517_G4](https://github.com/puj-course/FIS_2610_3517_G4)
-* Wiki: [https://github.com/puj-course/FIS_2610_3517_G4/wiki](https://github.com/puj-course/FIS_2610_3517_G4/wiki)
-* Issues: [https://github.com/puj-course/FIS_2610_3517_G4/issues](https://github.com/puj-course/FIS_2610_3517_G4/issues)
-* Projects: [https://github.com/puj-course/FIS_2610_3517_G4/projects](https://github.com/puj-course/FIS_2610_3517_G4/projects)
+- Repositorio: [https://github.com/puj-course/FIS_2610_3517_G4](https://github.com/puj-course/FIS_2610_3517_G4)
+- Wiki: [https://github.com/puj-course/FIS_2610_3517_G4/wiki](https://github.com/puj-course/FIS_2610_3517_G4/wiki)
+- Issues: [https://github.com/puj-course/FIS_2610_3517_G4/issues](https://github.com/puj-course/FIS_2610_3517_G4/issues)
+- Projects: [https://github.com/puj-course/FIS_2610_3517_G4/projects](https://github.com/puj-course/FIS_2610_3517_G4/projects)
 
 ---
 
@@ -207,10 +205,10 @@ Proyecto desarrollado con fines académicos.
 
 # 🎓 Contexto académico
 
-* **Asignatura:** Fundamentos de Ingeniería de Software
-* **Institución:** Pontificia Universidad Javeriana
-* **Proyecto:** DriveControl / AutoMinder Enterprise
-* **Equipo:** SYNTIX TECH
-* **Año:** 2026
+- **Asignatura:** Fundamentos de Ingeniería de Software
+- **Institución:** Pontificia Universidad Javeriana
+- **Proyecto:** DriveControl / AutoMinder Enterprise
+- **Equipo:** SYNTIX TECH
+- **Año:** 2026
 
 © 2026 SYNTIX TECH
