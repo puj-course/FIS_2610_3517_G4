@@ -9,12 +9,12 @@
 
 ##  ¿Por qué elegir Drive Control?
 
-En un mercado donde un camión parado cuesta millones, **Drive Control** actúa como un copiloto administrativo inteligente para empresas de logística y carga general.
+En un mercado donde un camión parado cuesta millones, **Drive Control** actúa como un copiloto administrativo inteligente para empresas de logística y carga general, ofreciendo con esto muchas ventajas al comprador, algunas se muestran a continuación:
 
 * **Protección Financiera:** Evita el goteo de capital por multas de SOAT, Tecnomecánica y licencias vencidas (ahorro promedio de $7.1M COP por evento de inmovilización).
 * **Cumplimiento en Tiempo Real:** Dashboard centralizado con sistema de "semáforo" para visibilidad total del estado legal de la flota.
 * **Escalabilidad B2B:** Diseñado para gestionar desde 10 hasta 1,000+ vehículos con carga masiva de datos y roles administrativos.
-
+** información
 ---
 
 ##  Información General del Proyecto 
@@ -37,7 +37,7 @@ En un mercado donde un camión parado cuesta millones, **Drive Control** actúa 
 | **Sebastian Ramirez Maldonado** | [@Sarm-m](https://github.com/Sarm-m) | Scrum Master |
 | **Samuel Freile** | [@samuelfl680](https://github.com/samuelfl680) | Configuration Manager |
 | **Sebastian Rodriguez Ramirez** | [@juserora](https://github.com/juserora) | Quality Assurance Lead (QA Lead) |
-| **Solon Losada** | [@solonlosada2006](https://github.com/solonlosada2006) | DevOps Engineer |
+| **Solón Losada** | [@solonlosada2006](https://github.com/solonlosada2006) | DevOps Engineer |
 | **Sebastian Vargas** | [@juanvargax](https://github.com/juanvargax) | Product Owner y Sprint Planner |
 
 ---
