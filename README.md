@@ -58,12 +58,7 @@ En un mercado donde un camión parado cuesta millones, **Drive Control** actúa 
 
 ---
 
-##  Estructura del Repositorio
 
-* `/backend`: Lógica de negocio y API REST.
-* `/frontend`: Dashboard interactivo (React/Vue/Angular).
-* `/docs`: Especificaciones de Ingeniería de Software y Lean Canvas.
-* `/assets`: Recursos gráficos y logotipos de Drive Control.
 
 ---
 © 2026 SYNTIX TECH - Impulsando la legalidad en las carreteras de Colombia.
