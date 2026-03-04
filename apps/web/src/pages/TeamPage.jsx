@@ -20,10 +20,19 @@ export default function TeamPage() {
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-2xl font-bold text-syntix-navy">Nuestro Equipo</h1>
-        <p className="text-gray-600 mt-2">
-          Página en construcción para Sprint 3 (navegación desde el header).
-        </p>
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h1 className="text-4xl font-extrabold text-syntix-navy mb-4">
+            Conoce a Nuestro Equipo
+          </h1>
+          <p className="text-lg text-gray-600">
+            El talento detrás de SYNTIX TECH. Un equipo multidisciplinario comprometido con la excelencia
+            y la innovación en la gestión de flotas.
+          </p>
+        </div>
+
+        <div className="text-center text-gray-500">
+          (Cards de integrantes se agregan en la siguiente tarea del sprint)
+        </div>
       </div>
 
       <LoginModal
