@@ -1,11 +1,9 @@
 import React from 'react';
 import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-dom';
-
-// Estructura y Seguridad
 import { AuthProvider } from '@/contexts/AuthContext.jsx';
 import DashboardLayout from '@/layouts/DashboardLayout.jsx';
 
-// Páginas (Las dos principales)
+// Solo importamos lo necesario para que no de errores de archivos faltantes
 import HomePage from '@/pages/HomePage.jsx';
 import DashboardPage from '@/pages/DashboardPage.jsx';
 
@@ -14,16 +12,15 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* 1. HomePage: La que acabas de pasar */}
+          {/* LA PORTADA: Esto es lo primero que se verá en localhost:3000 */}
           <Route path="/" element={<HomePage />} />
 
-          {/* 2. Rutas Privadas: DashboardLayout con el Dashboard adentro */}
+          {/* ÁREA INTERNA: Solo accesible vía /dashboard */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            {/* Si necesitas más rutas como /vehiculos, agrégalas aquí debajo */}
           </Route>
 
-          {/* 3. Redirección global */}
+          {/* Si alguien se pierde, vuelve a la Portada */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>

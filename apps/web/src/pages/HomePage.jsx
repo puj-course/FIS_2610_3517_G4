@@ -32,15 +32,12 @@ export default function HomePage() {
 
       <PublicHeader onLoginClick={openLogin} onRegisterClick={openRegister} />
 
-      {/* Hero Section */}
-      <section id="inicio" className="relative pt-20 pb-32 lg:pt-32 lg:pb-48 overflow-hidden min-h-screen flex items-center">
+      {/* Hero Section - Modificada sin imagen */}
+      <section id="inicio" className="relative pt-20 pb-32 lg:pt-32 lg:pb-48 overflow-hidden min-h-screen flex items-center bg-syntix-navy">
+        {/* Decoración de fondo con círculos de luz en lugar de imagen */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1642132652866-6fa262d3161f?q=80&w=2070&auto=format&fit=crop" 
-            alt="Flota de vehículos comerciales" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-syntix-navy/95 via-syntix-navy/80 to-transparent"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(1,181,116,0.15)_0%,transparent_50%)]"></div>
+          <div className="absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(circle_at_80%_70%,rgba(1,181,116,0.1)_0%,transparent_50%)]"></div>
         </div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
