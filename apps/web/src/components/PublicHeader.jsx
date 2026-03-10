@@ -23,7 +23,7 @@ export default function PublicHeader({ onLoginClick, onRegisterClick }) {
             <a href="/#beneficios" className="text-gray-700 hover:text-syntix-green font-medium transition-colors">Beneficios</a>
             <Link to="/team" className="text-gray-700 hover:text-syntix-green font-medium transition-colors">Nuestro Equipo</Link>
             <a href="/#servicios" className="text-gray-700 hover:text-syntix-green font-medium transition-colors">Servicios</a>
-            <a href="/#planes" className="text-gray-700 hover:text-syntix-green font-medium transition-colors">Planes</a>
+            <Link to="/planes" className="text-gray-700 hover:text-syntix-green font-medium transition-colors">Planes</Link>
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">

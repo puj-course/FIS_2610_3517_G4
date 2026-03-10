@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+
+
+
+import HomePage from '@/pages/HomePage.jsx';
+import TeamPage from '@/pages/TeamPage.jsx';
+import PlanesPage from "@/pages/PlanesPage.jsx";
+=======
 import React from 'react';
 import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext.jsx';
@@ -29,3 +37,4 @@ function App() {
 }
 
 export default App;
+>>>>>>> main
