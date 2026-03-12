@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wireframe – Dashboard SOAT</title>
+</head>
+<body>
+
+  <h2>Dashboard SOAT – Estado de Flota</h2>
+  <hr>
+
+  <!-- CONTADORES -->
+  <p><strong>Resumen de flota:</strong></p>
+  <table border="1" cellpadding="8" cellspacing="0">
+    <tr>
+      <td align="center"><strong>Vigente</strong><br>[ N ]</td>
+      <td align="center"><strong>Por vencer</strong><br>[ N ]</td>
+      <td align="center"><strong>Vencido</strong><br>[ N ]</td>
+      <td align="center"><strong>Sin registro</strong><br>[ N ]</td>
+    </tr>
+  </table>
+
+  <br>
+
+  <!-- CONTROLES -->
+  <p>
+    <strong>Umbral "Por vencer":</strong>
+    [ 7 días ] [ 15 días* ] [ 30 días ]
+    &nbsp;&nbsp;|&nbsp;&nbsp;
+    <strong>Ordenar:</strong>
+    [ ↑ Más urgente* ] [ ↓ Más lejano ]
+  </p>
+  <small>* = opción activa por defecto</small>
+
+  <br><br>
+
+  <!-- LISTA -->
+  <p><strong>Vehículos en riesgo (Por vencer + Vencidos):</strong></p>
+  <table border="1" cellpadding="8" cellspacing="0">
+    <tr>
+      <th>Placa</th>
+      <th>Propietario</th>
+      <th>Vencimiento ↕</th>
+      <th>Días</th>
+      <th>Estado</th>
+      <th>Acción</th>
+    </tr>
+    <tr>
+      <td>ABC-123</td>
+      <td>Nombre propietario</td>
+      <td>DD/MM/AAAA</td>
+      <td>-N</td>
+      <td>Vencido</td>
+      <td>[Ver]</td>
+    </tr>
+    <tr>
+      <td>XYZ-456</td>
+      <td>Nombre propietario</td>
+      <td>DD/MM/AAAA</td>
+      <td>N</td>
+      <td>Por vencer</td>
+      <td>[Ver]</td>
+    </tr>
+  </table>
+
+  <br>
+
+</body>
+</html>
