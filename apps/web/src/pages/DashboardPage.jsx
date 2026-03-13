@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import DataPanel from '@/components/DataPanel.jsx';
 import { Link } from "react-router-dom";
 
 export default function DashboardPage() {
@@ -42,6 +43,7 @@ export default function DashboardPage() {
           </Link>
         </div>
       </div>
+      <DataPanel />
 
       {/* Stats */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginTop: 18 }}>
