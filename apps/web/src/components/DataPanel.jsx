@@ -13,7 +13,7 @@ export default function DataPanel() {
   const totalVehicles = vehiculos.length;
   const alDiaVehicles = vehiculos.filter(v => v.estadoGeneral === 'verde').length;
   const cumplimiento = totalVehicles > 0 ? Math.round((alDiaVehicles / totalVehicles) * 100) : 0;
-  
+
   let cumplimientoColor = 'text-syntix-red';
   if (cumplimiento >= 80) cumplimientoColor = 'text-syntix-green';
   else if (cumplimiento >= 50) cumplimientoColor = 'text-yellow-500';
@@ -26,10 +26,10 @@ export default function DataPanel() {
     acc[v.tipo] = (acc[v.tipo] || 0) + 1;
     return acc;
   }, {});
-  
+
   const chartData = Object.keys(typeCounts).map(tipo => ({
     name: tipo,
-    cantidad: typeCounts[tipo]
+    cantidad: typeCounts[tipo],
   }));
 
   return (
@@ -57,26 +57,35 @@ export default function DataPanel() {
             {yellowAlerts.length}
           </span>
         </div>
+
         <div className="flex items-end gap-2 mb-4">
           <span className="text-4xl font-black text-yellow-500">{yellowAlerts.length}</span>
           <span className="text-sm text-gray-500 mb-1">alertas</span>
         </div>
-        
+
         {yellowAlerts.length > 0 && (
           <div className="mt-auto">
-            <button 
+            <button
+              type="button"
+              aria-expanded={isExpanded}
+              aria-controls="yellow-alerts-details"
               onClick={() => setIsExpanded(!isExpanded)}
               className="flex items-center justify-between w-full text-xs font-bold text-gray-500 hover:text-syntix-navy transition-colors"
             >
               {isExpanded ? 'Ocultar detalles' : 'Ver detalles'}
               {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
-            
+
             {isExpanded && (
-              <div className="mt-3 space-y-2 max-h-32 overflow-y-auto pr-2">
+              <div id="yellow-alerts-details" className="mt-3 space-y-2 max-h-32 overflow-y-auto pr-2">
                 {yellowAlerts.map(alert => (
-                  <div key={alert.id} className="flex justify-between items-center text-xs p-2 bg-yellow-50 rounded-lg border border-yellow-100">
-                    <span className="font-medium text-yellow-900 truncate mr-2">{alert.tipo}: {alert.entidad}</span>
+                  <div
+                    key={alert.id}
+                    className="flex justify-between items-center text-xs p-2 bg-yellow-50 rounded-lg border border-yellow-100"
+                  >
+                    <span className="font-medium text-yellow-900 truncate mr-2">
+                      {alert.tipo}: {alert.entidad}
+                    </span>
                     <span className="font-bold text-yellow-700 whitespace-nowrap">{alert.diasRestantes} d</span>
                   </div>
                 ))}
@@ -95,10 +104,24 @@ export default function DataPanel() {
               <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f3f4f6" />
                 <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6b7280' }} width={80} />
-                <Tooltip cursor={{fill: '#f9fafb'}} contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}} />
+                <YAxis
+                  dataKey="name"
+                  type="category"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12, fill: '#6b7280' }}
+                  width={80}
+                />
+                <Tooltip
+                  cursor={{ fill: '#f9fafb' }}
+                  contentStyle={{
+                    borderRadius: '8px',
+                    border: 'none',
+                    boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  }}
+                />
                 <Bar dataKey="cantidad" radius={[0, 4, 4, 0]} barSize={20}>
-                  {chartData.map((entry, index) => (
+                  {chartData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill="#1B263B" />
                   ))}
                 </Bar>
