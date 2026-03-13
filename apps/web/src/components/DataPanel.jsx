@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useVehicles } from '@/hooks/useVehicles.js';
 import { useAlerts } from '@/hooks/useAlerts.js';
-import { AlertTriangle, Activity } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronUp, Activity } from 'lucide-react';
 
 export default function DataPanel() {
   const { vehiculos } = useVehicles();
   const { alerts } = useAlerts();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const totalVehicles = vehiculos.length;
   const alDiaVehicles = vehiculos.filter(v => v.estadoGeneral === 'verde').length;
@@ -41,10 +42,39 @@ export default function DataPanel() {
           </span>
         </div>
 
-        <div className="flex items-end gap-2">
+        <div className="flex items-end gap-2 mb-4">
           <span className="text-4xl font-black text-yellow-500">{yellowAlerts.length}</span>
           <span className="text-sm text-gray-500 mb-1">alertas</span>
         </div>
+
+        {yellowAlerts.length > 0 && (
+          <div className="mt-auto">
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex items-center justify-between w-full text-xs font-bold text-gray-500 hover:text-syntix-navy transition-colors"
+            >
+              {isExpanded ? 'Ocultar detalles' : 'Ver detalles'}
+              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+
+            {isExpanded && (
+              <div className="mt-3 space-y-2 max-h-32 overflow-y-auto pr-2">
+                {yellowAlerts.map(alert => (
+                  <div
+                    key={alert.id}
+                    className="flex justify-between items-center text-xs p-2 bg-yellow-50 rounded-lg border border-yellow-100"
+                  >
+                    <span className="font-medium text-yellow-900 truncate mr-2">
+                      {alert.tipo}: {alert.entidad}
+                    </span>
+                    <span className="font-bold text-yellow-700 whitespace-nowrap">{alert.diasRestantes} d</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
