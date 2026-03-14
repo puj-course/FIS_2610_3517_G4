@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, User, Save } from 'lucide-react';
 import { useConductors } from '@/hooks/useConductors.js';
 
+// Agregar Conductor
 export default function AddConductorModal({ isOpen, onClose }) {
   const { conductores, addConductor } = useConductors();
   const [formData, setFormData] = useState({
