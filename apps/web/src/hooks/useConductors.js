@@ -2,6 +2,7 @@ import { useLocalStorage } from './useLocalStorage.js';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
 
+//use state
 const initialConductors = [
   { id: 'c1', nombre: 'Juan Pérez', documento: '10203040', telefono: '3001234567', categoria: 'C2', fechaVencimiento: '2026-12-31' },
   { id: 'c2', nombre: 'María Gómez', documento: '50607080', telefono: '3109876543', categoria: 'C1', fechaVencimiento: '2026-03-01' },
