@@ -46,6 +46,7 @@ export default function DashboardPage() {
           </button>
         </div>
       </div>
+      <DataPanel />
 
       <DataPanel />
 
