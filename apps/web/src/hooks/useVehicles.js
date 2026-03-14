@@ -3,6 +3,7 @@ import { useConductors } from './useConductors.js';
 import { useDocuments } from './useDocuments.js';
 import { getWorstState } from '../utils/dateUtils.js';
 
+//use state
 const initialVehicles = [
   { id: 'v1', placa: 'ABC-123', marca: 'Toyota', modelo: 'Hilux', anio: 2022, tipo: 'Camioneta', conductorId: 'c1' },
   { id: 'v2', placa: 'XYZ-987', marca: 'Chevrolet', modelo: 'NPR', anio: 2020, tipo: 'Camión', conductorId: 'c2' },

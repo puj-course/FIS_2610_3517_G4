@@ -1,218 +1,176 @@
-import React, { useMemo } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from 'react';
+import { Helmet } from 'react-helmet';
+import { AlertTriangle, CheckCircle, Clock, Plus } from 'lucide-react';
+import { useVehicles } from '@/hooks/useVehicles.js';
+import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
+import StatusBadge from '@/components/StatusBadge.jsx';
+import DataPanel from '@/components/DataPanel.jsx';
+import AddVehicleModal from '@/components/AddVehicleModal.jsx';
+import AddConductorModal from '@/components/AddConductorModal.jsx';
 
 export default function DashboardPage() {
-  // Datos demo (puedes conectar luego a LocalStorage / backend)
-  const stats = useMemo(
-    () => [
-      { label: "Vehículos", value: 12, hint: "Registrados" },
-      { label: "Conductores", value: 8, hint: "Activos" },
-      { label: "Docs vencen pronto", value: 3, hint: "SOAT / Tecno" },
-      { label: "Alertas", value: 5, hint: "Pendientes" },
-    ],
-    []
-  );
+  const { vehiculos } = useVehicles();
+  const { simulatedDate } = useSimulatedDate();
+  const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
+  const [isConductorModalOpen, setIsConductorModalOpen] = useState(false);
 
-  const alerts = useMemo(
-    () => [
-      { level: "Alta", title: "SOAT vence en 3 días", desc: "Vehículo: ABC-123" },
-      { level: "Media", title: "Tecnomecánica vence en 12 días", desc: "Vehículo: XYZ-987" },
-      { level: "Baja", title: "Actualizar datos conductor", desc: "Conductor: Juan Pérez" },
-    ],
-    []
-  );
+  const stats = {
+    verde: vehiculos.filter(v => v.estadoGeneral === 'verde').length,
+    amarillo: vehiculos.filter(v => v.estadoGeneral === 'amarillo').length,
+    rojo: vehiculos.filter(v => v.estadoGeneral === 'rojo').length,
+    total: vehiculos.length
+  };
+
+  const proximosVencer = vehiculos.filter(v => v.estadoGeneral === 'amarillo');
+  const vencidos = vehiculos.filter(v => v.estadoGeneral === 'rojo');
 
   return (
-    <div style={{ padding: 20, fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial" }}>
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+    <div className="space-y-6">
+      <Helmet>
+        <title>Dashboard | SYNTIX Drive Control</title>
+      </Helmet>
+
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 style={{ margin: 0, fontSize: 26 }}>Dashboard</h1>
-          <p style={{ marginTop: 6, color: "#555" }}>
-            Resumen operativo de DriveControl (documentos, alertas y accesos rápidos).
+          <h1 className="text-2xl font-bold text-syntix-navy">Dashboard General</h1>
+          <p className="text-gray-500 text-sm mt-1">
+            Fecha del sistema: <span className="font-semibold text-gray-700">{simulatedDate}</span>
           </p>
         </div>
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <Link to="/vehiculos" style={btnPrimary}>
-            + Vehículo
-          </Link>
-          <Link to="/documentos" style={btnSecondary}>
-            + Documento
-          </Link>
+        <div className="flex gap-2">
+          <button onClick={() => setIsVehicleModalOpen(true)} className="bg-syntix-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2 shadow-sm">
+            <Plus className="w-4 h-4" /> Vehículo
+          </button>
+          <button onClick={() => setIsConductorModalOpen(true)} className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm">
+            <Plus className="w-4 h-4" /> Conductor
+          </button>
         </div>
       </div>
 
-      {/* Stats */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginTop: 18 }}>
-        {stats.map((s) => (
-          <div key={s.label} style={card}>
-            <div style={{ color: "#666", fontSize: 13 }}>{s.label}</div>
-            <div style={{ fontSize: 28, fontWeight: 700, marginTop: 6 }}>{s.value}</div>
-            <div style={{ color: "#888", fontSize: 12, marginTop: 4 }}>{s.hint}</div>
-          </div>
-        ))}
-      </div>
+      <DataPanel />
 
-      {/* Main grid */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: 12, marginTop: 14 }}>
-        {/* Accesos rápidos */}
-        <div style={card}>
-          <h2 style={h2}>Accesos rápidos</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 10 }}>
-            <Link to="/vehiculos" style={quickLink}>Vehículos</Link>
-            <Link to="/conductores" style={quickLink}>Conductores</Link>
-            <Link to="/documentos" style={quickLink}>Documentos</Link>
-            <Link to="/alertas" style={quickLink}>Alertas</Link>
-            <Link to="/validacion-runt" style={quickLink}>Validación RUNT</Link>
-            <Link to="/reportes" style={quickLink}>Reportes</Link>
-          </div>
-        </div>
-
-        {/* Alertas */}
-        <div style={card}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-            <h2 style={h2}>Alertas recientes</h2>
-            <Link to="/alertas" style={smallLink}>Ver todas →</Link>
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8 }}>
-            {alerts.map((a, idx) => (
-              <div key={idx} style={alertRow}>
-                <span style={badge(a.level)}>{a.level}</span>
-                <div>
-                  <div style={{ fontWeight: 600 }}>{a.title}</div>
-                  <div style={{ fontSize: 13, color: "#666", marginTop: 2 }}>{a.desc}</div>
-                </div>
+      {/* Semáforo Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-green-100 p-6 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-green-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-green-100 rounded-xl text-syntix-green">
+                <CheckCircle className="w-6 h-6" />
               </div>
-            ))}
+              <div>
+                <h3 className="font-bold text-gray-900">Al Día (Verde)</h3>
+                <p className="text-xs text-gray-500">&gt; 15 días restantes</p>
+              </div>
+            </div>
+            <div className="flex items-end gap-2">
+              <span className="text-4xl font-extrabold text-syntix-green">{stats.verde}</span>
+              <span className="text-sm text-gray-500 mb-1">/ {stats.total} veh.</span>
+            </div>
           </div>
         </div>
 
-        {/* Estado documental */}
-        <div style={card}>
-          <h2 style={h2}>Estado documental</h2>
-          <p style={{ marginTop: 6, color: "#666", fontSize: 13 }}>
-            Aquí puedes mostrar SOAT/Tecnomecánica por vehículo con semáforo (OK / Próximo / Vencido).
-          </p>
-
-          <div style={{ marginTop: 10, display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <span style={pill("#e8f5e9", "#2e7d32")}>OK</span>
-            <span style={pill("#fff8e1", "#a15c00")}>Próximo</span>
-            <span style={pill("#ffebee", "#b71c1c")}>Vencido</span>
-          </div>
-
-          <div style={{ marginTop: 12 }}>
-            <Link to="/documentos" style={btnSecondary}>Ir a Documentos</Link>
+        <div className="bg-white rounded-2xl shadow-sm border border-yellow-100 p-6 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-yellow-100 rounded-xl text-yellow-600">
+                <Clock className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">Por Vencer (Amarillo)</h3>
+                <p className="text-xs text-gray-500">0 - 15 días restantes</p>
+              </div>
+            </div>
+            <div className="flex items-end gap-2">
+              <span className="text-4xl font-extrabold text-yellow-500">{stats.amarillo}</span>
+              <span className="text-sm text-gray-500 mb-1">/ {stats.total} veh.</span>
+            </div>
           </div>
         </div>
 
-        {/* Configuración */}
-        <div style={card}>
-          <h2 style={h2}>Configuración</h2>
-          <p style={{ marginTop: 6, color: "#666", fontSize: 13 }}>
-            Ajusta preferencias, usuario y parámetros de alertas.
-          </p>
-
-          <div style={{ display: "flex", gap: 10, marginTop: 10, flexWrap: "wrap" }}>
-            <Link to="/configuracion" style={btnSecondary}>Configuración</Link>
-            <Link to="/ajustes-usuario" style={btnSecondary}>Ajustes usuario</Link>
+        <div className="bg-white rounded-2xl shadow-sm border border-red-100 p-6 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-red-50 rounded-bl-full -mr-8 -mt-8 transition-transform group-hover:scale-110"></div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-3 bg-red-100 rounded-xl text-syntix-red">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">Crítico (Rojo)</h3>
+                <p className="text-xs text-gray-500">Vencidos o Faltantes</p>
+              </div>
+            </div>
+            <div className="flex items-end gap-2">
+              <span className="text-4xl font-extrabold text-syntix-red">{stats.rojo}</span>
+              <span className="text-sm text-gray-500 mb-1">/ {stats.total} veh.</span>
+            </div>
           </div>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Vencidos List */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-gray-100 bg-red-50/50 flex justify-between items-center">
+            <h2 className="font-bold text-syntix-navy flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-syntix-red" /> Atención Inmediata
+            </h2>
+            <span className="bg-syntix-red text-white text-xs font-bold px-2.5 py-1 rounded-full">{vencidos.length}</span>
+          </div>
+          <div className="p-0 flex-1 overflow-y-auto max-h-96">
+            {vencidos.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">No hay vehículos en estado crítico.</div>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {vencidos.map(v => (
+                  <li key={v.id} className="p-4 hover:bg-gray-50 transition-colors flex justify-between items-center">
+                    <div>
+                      <p className="font-bold text-gray-900">{v.placa}</p>
+                      <p className="text-sm text-gray-500">{v.conductor ? v.conductor.nombre : 'Sin conductor'}</p>
+                    </div>
+                    <div className="text-right">
+                      <StatusBadge status="rojo" label="VENCIDO/FALTANTE" />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* Próximos a Vencer List */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+          <div className="p-5 border-b border-gray-100 bg-yellow-50/50 flex justify-between items-center">
+            <h2 className="font-bold text-syntix-navy flex items-center gap-2">
+              <Clock className="w-5 h-5 text-yellow-600" /> Próximos a Vencer
+            </h2>
+            <span className="bg-yellow-500 text-white text-xs font-bold px-2.5 py-1 rounded-full">{proximosVencer.length}</span>
+          </div>
+          <div className="p-0 flex-1 overflow-y-auto max-h-96">
+            {proximosVencer.length === 0 ? (
+              <div className="p-8 text-center text-gray-500">No hay documentos próximos a vencer.</div>
+            ) : (
+              <ul className="divide-y divide-gray-100">
+                {proximosVencer.map(v => (
+                  <li key={v.id} className="p-4 hover:bg-gray-50 transition-colors flex justify-between items-center">
+                    <div>
+                      <p className="font-bold text-gray-900">{v.placa}</p>
+                      <p className="text-sm text-gray-500">{v.conductor?.nombre}</p>
+                    </div>
+                    <div className="text-right">
+                      <StatusBadge status="amarillo" label="POR VENCER" />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <AddVehicleModal isOpen={isVehicleModalOpen} onClose={() => setIsVehicleModalOpen(false)} />
+      <AddConductorModal isOpen={isConductorModalOpen} onClose={() => setIsConductorModalOpen(false)} />
     </div>
   );
-}
-
-/* ---------- styles (inline, para que funcione aunque Tailwind no esté listo) ---------- */
-const card = {
-  border: "1px solid #eee",
-  borderRadius: 14,
-  padding: 14,
-  background: "#fff",
-  boxShadow: "0 1px 8px rgba(0,0,0,0.04)",
-};
-
-const h2 = { margin: 0, fontSize: 16 };
-
-const btnPrimary = {
-  textDecoration: "none",
-  background: "#111",
-  color: "#fff",
-  padding: "10px 12px",
-  borderRadius: 10,
-  fontWeight: 600,
-  fontSize: 13,
-};
-
-const btnSecondary = {
-  textDecoration: "none",
-  background: "#f3f4f6",
-  color: "#111",
-  padding: "10px 12px",
-  borderRadius: 10,
-  fontWeight: 600,
-  fontSize: 13,
-};
-
-const quickLink = {
-  textDecoration: "none",
-  border: "1px solid #eee",
-  borderRadius: 12,
-  padding: "12px 10px",
-  color: "#111",
-  fontWeight: 600,
-  fontSize: 13,
-  background: "#fafafa",
-  textAlign: "center",
-};
-
-const smallLink = {
-  textDecoration: "none",
-  color: "#111",
-  fontSize: 13,
-  fontWeight: 600,
-};
-
-const alertRow = {
-  display: "grid",
-  gridTemplateColumns: "64px 1fr",
-  gap: 10,
-  alignItems: "start",
-  padding: 10,
-  border: "1px solid #eee",
-  borderRadius: 12,
-  background: "#fafafa",
-};
-
-function badge(level) {
-  const map = {
-    Alta: { bg: "#ffebee", fg: "#b71c1c" },
-    Media: { bg: "#fff8e1", fg: "#a15c00" },
-    Baja: { bg: "#e3f2fd", fg: "#0d47a1" },
-  };
-  const c = map[level] || { bg: "#eee", fg: "#111" };
-  return {
-    display: "inline-block",
-    background: c.bg,
-    color: c.fg,
-    padding: "6px 10px",
-    borderRadius: 999,
-    fontSize: 12,
-    fontWeight: 700,
-    textAlign: "center",
-    width: "fit-content",
-  };
-}
-
-function pill(bg, fg) {
-  return {
-    background: bg,
-    color: fg,
-    borderRadius: 999,
-    padding: "6px 10px",
-    fontSize: 12,
-    fontWeight: 700,
-    border: "1px solid rgba(0,0,0,0.06)",
-  };
 }
