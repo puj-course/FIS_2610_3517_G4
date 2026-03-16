@@ -1,17 +1,11 @@
-<<<<<<< HEAD
-
-
-
-import HomePage from '@/pages/HomePage.jsx';
-import TeamPage from '@/pages/TeamPage.jsx';
-import PlanesPage from "@/pages/PlanesPage.jsx";
-=======
 import React from 'react';
 import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-dom';
+
+// Estructura y Seguridad
 import { AuthProvider } from '@/contexts/AuthContext.jsx';
 import DashboardLayout from '@/layouts/DashboardLayout.jsx';
 
-// Solo importamos lo necesario para que no de errores de archivos faltantes
+// Páginas (Las dos principales)
 import HomePage from '@/pages/HomePage.jsx';
 import DashboardPage from '@/pages/DashboardPage.jsx';
 
@@ -20,15 +14,16 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* LA PORTADA: Esto es lo primero que se verá en localhost:3000 */}
+          {/* 1. HomePage: La que acabas de pasar */}
           <Route path="/" element={<HomePage />} />
 
-          {/* ÁREA INTERNA: Solo accesible vía /dashboard */}
+          {/* 2. Rutas Privadas: DashboardLayout con el Dashboard adentro */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            {/* Si necesitas más rutas como /vehiculos, agrégalas aquí debajo */}
           </Route>
 
-          {/* Si alguien se pierde, vuelve a la Portada */}
+          {/* 3. Redirección global */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
@@ -37,4 +32,3 @@ function App() {
 }
 
 export default App;
->>>>>>> main
