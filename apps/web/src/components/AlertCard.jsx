@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertTriangle, Info, XCircle } from 'lucide-react';
 
+// Funcion de alerta
 export default function AlertCard({ title, description, type = 'warning', date }) {
   const styles = {
     warning: 'border-yellow-200 bg-yellow-50 text-yellow-800',
