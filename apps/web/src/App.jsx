@@ -11,6 +11,7 @@ import TeamPage from '@/pages/TeamPage.jsx';
 
 // Páginas Privadas
 import DashboardPage from '@/pages/DashboardPage.jsx';
+import AlertasPage from '@/pages/AlertasPage.jsx';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           {/* 2. Rutas Privadas (Dashboard habilitado) */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/alertas" element={<AlertasPage />} />
             {/* Aquí puedes agregar /vehiculos, /conductores, etc. en el futuro */}
           </Route>
 
