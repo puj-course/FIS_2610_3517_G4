@@ -17,26 +17,21 @@ export default function AlertasPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-syntix-navy">Centro de Alertas</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Notificaciones automáticas basadas en la Regla de Oro
-          </p>
+          <p className="text-gray-500 text-sm mt-1">Notificaciones automáticas basadas en la Regla de Oro</p>
         </div>
-
+        
         <div className="bg-white p-2 rounded-lg border border-gray-200 shadow-sm flex items-center gap-3">
           <Calendar className="w-5 h-5 text-gray-400 ml-2" />
           <div className="flex flex-col">
             <label className="text-xs font-bold text-gray-500 uppercase">Simular Fecha</label>
-            <input
-              type="date"
+            <input 
+              type="date" 
               value={simulatedDate}
               onChange={(e) => setSimulatedDate(e.target.value)}
               className="text-sm font-medium text-syntix-navy outline-none bg-transparent"
             />
           </div>
-          <button
-            onClick={resetDate}
-            className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded font-medium transition-colors"
-          >
+          <button onClick={resetDate} className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded font-medium transition-colors">
             Hoy
           </button>
         </div>
@@ -55,23 +50,23 @@ export default function AlertasPage() {
               No hay alertas activas para la fecha seleccionada.
             </div>
           ) : (
-            alerts.map((alert) => (
-              <div
-                key={alert.id}
-                className="p-4 rounded-xl border border-gray-200 flex items-start gap-4 shadow-sm"
-              >
-                <div className="p-2 rounded-lg bg-gray-100 text-syntix-navy">
+            alerts.map(alert => (
+              <div key={alert.id} className={`p-4 rounded-xl border flex items-start gap-4 shadow-sm ${
+                alert.prioridad === 'rojo' ? 'bg-red-50 border-red-100' : 'bg-yellow-50 border-yellow-100'
+              }`}>
+                <div className={`p-2 rounded-lg ${alert.prioridad === 'rojo' ? 'bg-red-100 text-syntix-red' : 'bg-yellow-100 text-yellow-600'}`}>
                   <BellRing className="w-5 h-5" />
                 </div>
-
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
-                    <h4 className="font-bold text-gray-900">{alert.mensaje}</h4>
-                    <span className="text-xs font-bold px-2 py-1 rounded-md bg-gray-100 text-gray-700">
+                    <h4 className={`font-bold ${alert.prioridad === 'rojo' ? 'text-red-900' : 'text-yellow-900'}`}>
+                      {alert.mensaje}
+                    </h4>
+                    <span className={`text-xs font-bold px-2 py-1 rounded-md ${alert.prioridad === 'rojo' ? 'bg-red-200 text-red-800' : 'bg-yellow-200 text-yellow-800'}`}>
                       {alert.diasRestantes} días
                     </span>
                   </div>
-                  <p className="text-sm mt-1 text-gray-600">
+                  <p className={`text-sm mt-1 ${alert.prioridad === 'rojo' ? 'text-red-700' : 'text-yellow-700'}`}>
                     <span className="font-semibold">{alert.tipo}:</span> {alert.entidad}
                   </p>
                 </div>
