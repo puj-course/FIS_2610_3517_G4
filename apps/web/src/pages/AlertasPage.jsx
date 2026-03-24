@@ -1,9 +1,11 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
-import { Calendar } from 'lucide-react';
+import { BellRing, Calendar } from 'lucide-react';
+import { useAlerts } from '@/hooks/useAlerts.js';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
 
 export default function AlertasPage() {
+  const { alerts } = useAlerts();
   const { simulatedDate, setSimulatedDate, resetDate } = useSimulatedDate();
 
   return (
@@ -37,6 +39,45 @@ export default function AlertasPage() {
           >
             Hoy
           </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <BellRing className="w-5 h-5 text-syntix-navy" /> Alertas Activas ({alerts.length})
+          </h2>
+        </div>
+
+        <div className="space-y-4">
+          {alerts.length === 0 ? (
+            <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+              No hay alertas activas para la fecha seleccionada.
+            </div>
+          ) : (
+            alerts.map((alert) => (
+              <div
+                key={alert.id}
+                className="p-4 rounded-xl border border-gray-200 flex items-start gap-4 shadow-sm"
+              >
+                <div className="p-2 rounded-lg bg-gray-100 text-syntix-navy">
+                  <BellRing className="w-5 h-5" />
+                </div>
+
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <h4 className="font-bold text-gray-900">{alert.mensaje}</h4>
+                    <span className="text-xs font-bold px-2 py-1 rounded-md bg-gray-100 text-gray-700">
+                      {alert.diasRestantes} días
+                    </span>
+                  </div>
+                  <p className="text-sm mt-1 text-gray-600">
+                    <span className="font-semibold">{alert.tipo}:</span> {alert.entidad}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
