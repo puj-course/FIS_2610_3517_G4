@@ -1,45 +1,48 @@
 import React from 'react';
 import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-dom';
-
-// Estructura y Seguridad
 import { AuthProvider } from '@/contexts/AuthContext.jsx';
+import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 import DashboardLayout from '@/layouts/DashboardLayout.jsx';
 
-// Páginas Públicas
 import HomePage from '@/pages/HomePage.jsx';
 import TeamPage from '@/pages/TeamPage.jsx';
-import ValidacionRUNTPage from '@/pages/ValidacionRUNTPage.jsx';
+
+import DashboardPage from '@/pages/DashboardPage.jsx';
 import VehiculosPage from '@/pages/VehiculosPage.jsx';
 import ConductoresPage from '@/pages/ConductoresPage.jsx';
-import ReportesPage from '@/pages/ReportesPage.jsx';
-
-// Páginas Privadas
-import DashboardPage from '@/pages/DashboardPage.jsx';
+import DocumentosPage from '@/pages/DocumentosPage.jsx';
 import AlertasPage from '@/pages/AlertasPage.jsx';
-
+import ValidacionRUNTPage from '@/pages/ValidacionRUNTPage.jsx';
+import ReportesPage from '@/pages/ReportesPage.jsx';
+import ConfiguracionPage from '@/pages/ConfiguracionPage.jsx';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          {/* 1. Rutas Públicas */}
+          {/* Públicas */}
           <Route path="/" element={<HomePage />} />
           <Route path="/team" element={<TeamPage />} />
 
-          {/* 2. Rutas Privadas (Dashboard habilitado) */}
-          <Route element={<DashboardLayout />}>
+          {/* Protegidas (wrapper SIN path) */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/vehiculos" element={<VehiculosPage />} />
+            <Route path="/conductores" element={<ConductoresPage />} />
+            <Route path="/documentos" element={<DocumentosPage />} />
             <Route path="/alertas" element={<AlertasPage />} />
-            {/* Aquí puedes agregar /vehiculos, /conductores, etc. en el futuro */}
+            <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
+            <Route path="/reportes" element={<ReportesPage />} />
+            <Route path="/configuracion" element={<ConfiguracionPage />} />
           </Route>
-          <Route path="/vehiculos" element={<VehiculosPage />} />
-          <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
-          <Route path="/conductores" element={<ConductoresPage />} />
-          <Route path="/reportes" element={<ReportesPage />} />
 
-
-          {/* 3. Redirección global: Si la URL no existe, vuelve al inicio */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
