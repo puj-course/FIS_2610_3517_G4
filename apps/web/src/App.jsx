@@ -8,13 +8,11 @@ import DashboardLayout from '@/layouts/DashboardLayout.jsx';
 // Páginas Públicas
 import HomePage from '@/pages/HomePage.jsx';
 import TeamPage from '@/pages/TeamPage.jsx';
-import ValidacionRUNTPage from '@/pages/ValidacionRUNTPage.jsx';
+import ValidacionRUNTPage from '@/pages/validacionRUNTPage.jsx'; //falta agregar la página
 
 // Páginas Privadas
 import DashboardPage from '@/pages/DashboardPage.jsx';
 
-// Páginas Privadas
-import DashboardPage from '@/pages/DashboardPage.jsx';
 
 function App() {
   return (
