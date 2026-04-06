@@ -8,10 +8,10 @@ import HomePage from '@/pages/HomePage.jsx';
 import TeamPage from '@/pages/TeamPage.jsx';
 
 import DashboardPage from '@/pages/DashboardPage.jsx';
+import AlertasPage from '@/pages/AlertasPage.jsx';
 import VehiculosPage from '@/pages/VehiculosPage.jsx';
 import ConductoresPage from '@/pages/ConductoresPage.jsx';
 import DocumentosPage from '@/pages/DocumentosPage.jsx';
-import AlertasPage from '@/pages/AlertasPage.jsx';
 import ValidacionRUNTPage from '@/pages/ValidacionRUNTPage.jsx';
 import ReportesPage from '@/pages/ReportesPage.jsx';
 import ConfiguracionPage from '@/pages/ConfiguracionPage.jsx';
@@ -25,7 +25,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/team" element={<TeamPage />} />
 
-          {/* Protegidas (wrapper SIN path) */}
+          {/* Protegidas */}
           <Route
             element={
               <ProtectedRoute>
