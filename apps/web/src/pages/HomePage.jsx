@@ -1,20 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Helmet } from 'react-helmet';
 import { ShieldCheck, TrendingDown, Zap, FileCheck } from 'lucide-react';
 import PublicHeader from '@/components/PublicHeader.jsx';
-import LoginModal from '@/components/LoginModal.jsx';
-import RegisterModal from '@/components/RegisterModal.jsx';
+import ModalFactory from '@/components/ModalFactory.jsx';
+import useModalManager from '@/hooks/useModalManager.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 
 export default function HomePage() {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const { activeModal, openModal, closeModal } = useModalManager();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  const openLogin = () => { setIsRegisterOpen(false); setIsLoginOpen(true); };
-  const openRegister = () => { setIsLoginOpen(false); setIsRegisterOpen(true); };
+  const openLogin = () => openModal('login');
+  const openRegister = () => openModal('register');
 
   const handleCtaClick = () => {
     if (isAuthenticated) {
@@ -100,8 +99,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} onSwitchToRegister={openRegister} />
-      <RegisterModal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} onSwitchToLogin={openLogin} />
+      <ModalFactory
+        modalType={activeModal}
+        onClose={closeModal}
+        onSwitchToRegister={openRegister}
+        onSwitchToLogin={openLogin}
+      />
     </div>
   );
 }
