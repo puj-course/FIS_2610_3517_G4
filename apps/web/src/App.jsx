@@ -2,17 +2,16 @@ import React from 'react';
 import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-dom';
 
 // Estructura y Seguridad
-import { AuthProvider } from '@/contexts/AuthContext.jsx';
-import DashboardLayout from '@/layouts/DashboardLayout.jsx';
+import { AuthProvider } from './contexts/AuthContext';
+import DashboardLayout from './layouts/DashboardLayout';
 
-// Páginas Públicas
-import HomePage from '@/pages/HomePage.jsx';
-import TeamPage from '@/pages/TeamPage.jsx';
-import ValidacionRUNTPage from '@/pages/validacionRUNTPage.jsx'; //falta agregar la página
 
-// Páginas Privadas
-import DashboardPage from '@/pages/DashboardPage.jsx';
+import HomePage from './pages/HomePage';
+import TeamPage from './pages/TeamPage';
 
+
+import DashboardPage from './pages/DashboardPage';
+//import ValidacionRUNTPage from "./pages/validacionRunt.jsx";
 
 function App() {
   return (
@@ -23,14 +22,14 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/team" element={<TeamPage />} />
 
-          {/* 2. Rutas Privadas (Dashboard habilitado) */}
+          {/* 2. Rutas Privadas */}
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            {/* Aquí puedes agregar /vehiculos, /conductores, etc. en el futuro */}
           </Route>
-          <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
+          
+          
 
-          {/* 3. Redirección global: Si la URL no existe, vuelve al inicio */}
+          {/* 4. Redirección global */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
