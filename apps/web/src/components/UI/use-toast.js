@@ -8,4 +8,7 @@ const toastStore = {
         toasts: [],
     },
     listeners: [],
+
+	getState: () => toastStore.state,
 }
+
