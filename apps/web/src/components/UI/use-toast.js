@@ -2,6 +2,11 @@ import { useState, useEffect } from "react"
 
 const TOAST_LIMIT = 1
 
+let count = 0
+function generateId() {
+	count = (count + 1) % Number.MAX_VALUE
+	return count.toString()
+}
 
 const toastStore = {
     state: {
