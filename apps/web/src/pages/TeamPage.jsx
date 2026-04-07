@@ -1,13 +1,11 @@
 import React from 'react';
 import { Helmet } from 'react-helmet';
 import PublicHeader from '@/components/PublicHeader.jsx';
-import LoginModal from '@/components/LoginModal.jsx';
-import RegisterModal from '@/components/RegisterModal.jsx';
-import { useState } from 'react';
+import ModalFactory from '@/components/ModalFactory.jsx';
+import useModalManager from '@/hooks/useModalManager.js';
 
 export default function TeamPage() {
-  const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const { activeModal, openModal, closeModal } = useModalManager();
 
   const team = [
     { name: 'Sebastian Ramirez Maldonado', role: 'Scrum Master', desc: 'Facilitador del equipo, asegura que se sigan las prácticas ágiles y elimina impedimentos.' },
@@ -24,8 +22,8 @@ export default function TeamPage() {
       </Helmet>
 
       <PublicHeader 
-        onLoginClick={() => setIsLoginOpen(true)} 
-        onRegisterClick={() => setIsRegisterOpen(true)} 
+        onLoginClick={() => openModal('login')} 
+        onRegisterClick={() => openModal('register')} 
       />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -50,8 +48,12 @@ export default function TeamPage() {
         </div>
       </div>
 
-      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} onSwitchToRegister={() => { setIsLoginOpen(false); setIsRegisterOpen(true); }} />
-      <RegisterModal isOpen={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} onSwitchToLogin={() => { setIsRegisterOpen(false); setIsLoginOpen(true); }} />
+      <ModalFactory
+        modalType={activeModal}
+        onClose={closeModal}
+        onSwitchToRegister={() => openModal('register')}
+        onSwitchToLogin={() => openModal('login')}
+      />
     </div>
   );
 }

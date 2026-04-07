@@ -5,13 +5,14 @@ import { useAlerts } from '@/hooks/useAlerts.js';
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
   const { alerts } = useAlerts();
-  
+  const alertCount = alerts.length;
+
   const navItems = [
     { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/vehiculos', icon: Car, label: 'Vehículos' },
     { path: '/conductores', icon: Users, label: 'Conductores' },
     { path: '/documentos', icon: FileText, label: 'Documentos' },
-    { path: '/alertas', icon: BellRing, label: 'Alertas', badge: alerts.length },
+    { path: '/alertas', icon: BellRing, label: 'Alertas', badge: alertCount },
     { path: '/validacion-runt', icon: Search, label: 'Validación RUNT' },
     { path: '/reportes', icon: BarChart3, label: 'Reportes' },
     { path: '/configuracion', icon: Settings, label: 'Configuración' },
