@@ -65,3 +65,19 @@ export const toast = ({ ...props }) => {
         update,
     }
 }
+
+export function useToast() {
+    const [state, setState] = useState(toastStore.getState())
+
+    useEffect(() => {
+        const unsubscribe = toastStore.subscribe((state) => {
+            setState(state)
+        })
+        return unsubscribe
+    }, [])
+
+    return {
+        toast,
+        toasts: state.toasts,
+    }
+}
