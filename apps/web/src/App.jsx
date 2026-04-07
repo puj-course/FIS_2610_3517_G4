@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 import { routesConfig } from './Routes/routesConfig'; 
 
+
 function App() {
   return (
     <AuthProvider>
@@ -17,16 +18,25 @@ function App() {
           
           {routesConfig.map((route) => {
             
+            const elementToRender = route.protected ? (
+              <ProtectedRoute>
+                <DashboardLayout>
+                  {route.element}
+                </DashboardLayout>
+              </ProtectedRoute>
+            ) : (
+              route.element
+            );
+
             return (
               <Route 
                 key={route.path} 
                 path={route.path} 
-                element={route.element} 
+                element={elementToRender} 
               />
             );
           })}
 
-          
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
