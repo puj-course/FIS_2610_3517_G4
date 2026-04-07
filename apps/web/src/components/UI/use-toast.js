@@ -19,5 +19,12 @@ const toastStore = {
 
     toastStore.listeners.forEach(listener => listener(toastStore.state))
 },
+subscribe: (listener) => {
+    toastStore.listeners.push(listener)
+    return () => {
+        toastStore.listeners = toastStore.listeners.filter(l => l !== listener)
+    }
+}
+
 }
 
