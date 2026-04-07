@@ -8,6 +8,8 @@ function generateId() {
 	return count.toString()
 }
 
+
+
 const toastStore = {
     state: {
         toasts: [],
@@ -33,3 +35,33 @@ subscribe: (listener) => {
 
 }
 
+export const toast = ({ ...props }) => {
+    const id = generateId()
+
+    const update = (props) =>
+        toastStore.setState((state) => ({
+            ...state,
+            toasts: state.toasts.map((t) =>
+                t.id === id ? { ...t, ...props } : t
+            ),
+        }))
+
+    const dismiss = () => toastStore.setState((state) => ({
+        ...state,
+        toasts: state.toasts.filter((t) => t.id !== id),
+    }))
+
+    toastStore.setState((state) => ({
+        ...state,
+        toasts: [
+            { ...props, id, dismiss },
+            ...state.toasts,
+        ].slice(0, TOAST_LIMIT),
+    }))
+
+    return {
+        id,
+        dismiss,
+        update,
+    }
+}
