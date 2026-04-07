@@ -76,8 +76,30 @@ export function useToast() {
         return unsubscribe
     }, [])
 
+	useEffect(() => {
+    const timeouts = []
+
+    state.toasts.forEach((toast) => {
+        if (toast.duration === Infinity) {
+            return
+        }
+
+        const timeout = setTimeout(() => {
+            toast.dismiss()
+        }, toast.duration || 5000)
+
+        timeouts.push(timeout)
+    })
+
+    return () => {
+        timeouts.forEach((timeout) => clearTimeout(timeout))
+    }
+}, [state.toasts])
+
     return {
         toast,
         toasts: state.toasts,
     }
+
+
 }
