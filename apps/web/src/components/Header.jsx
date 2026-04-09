@@ -8,7 +8,10 @@ export default function Header({ toggleSidebar }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const { alerts } = useAlerts();
-  
+
+  const alertCount = alerts.length;
+  const hasActiveAlerts = alertCount > 0;
+
   const pathNames = location.pathname.split('/').filter(x => x);
   const currentPage = pathNames.length > 0 ? pathNames[pathNames.length - 1] : 'Dashboard';
 
@@ -28,7 +31,7 @@ export default function Header({ toggleSidebar }) {
       <div className="flex items-center gap-4">
         <button className="p-2 text-gray-300 hover:bg-white/10 rounded-full relative">
           <Bell className="w-5 h-5" />
-          {alerts.length > 0 && (
+          {hasActiveAlerts && (
             <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-syntix-red rounded-full border-2 border-syntix-navy"></span>
           )}
         </button>
