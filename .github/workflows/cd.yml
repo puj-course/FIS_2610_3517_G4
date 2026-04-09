@@ -23,6 +23,13 @@ jobs:
       - name: Ejecutar build (si existe)
         run: npm run build --if-present
 
+      - name: Prueba en español
+        run: |
+          echo "¡Pipeline funcionando correctamente!"
+          echo "Rama: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Fecha de ejecución: $(date)"
+
       - name: Guardar artefacto (opcional)
         uses: actions/upload-artifact@v4
         with:
