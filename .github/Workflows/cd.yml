@@ -1,1 +1,30 @@
+name: CD - Build JS Project
 
+on:
+  push:
+    branches: [ "feature/pipelines" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Ejecutar build (si existe)
+        run: npm run build --if-present
+
+      - name: Guardar artefacto (opcional)
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: .
