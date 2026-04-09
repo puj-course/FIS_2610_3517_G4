@@ -1,27 +1,27 @@
-name: CI - Test JS Project
+name: CI - Pruebas del proyecto JS
 
 on:
   pull_request:
     branches: [ "develop" ]
 
 jobs:
-  test:
+  pruebas:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v3
+      - name: Obtener código fuente
+        uses: actions/checkout@v4
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Instalar dependencias
         run: npm install
 
-      - name: Ejecutar tests (si existen)
+      - name: Ejecutar pruebas
         run: npm test --if-present
 
       - name: Validación final
-        run: echo "CI ejecutado correctamente"
+        run: echo "Integración continua ejecutada correctamente"

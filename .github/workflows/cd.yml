@@ -1,37 +1,37 @@
-name: CD - Build JS Project
+name: CD - Construcción del proyecto JS
 
 on:
   push:
     branches: [ "feature/pipelines" ]
 
 jobs:
-  build:
+  construccion:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout del código
-        uses: actions/checkout@v3
+      - name: Obtener código fuente
+        uses: actions/checkout@v4
 
       - name: Configurar Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Instalar dependencias
         run: npm install
 
-      - name: Ejecutar build (si existe)
+      - name: Construir el proyecto
         run: npm run build --if-present
 
-      - name: Prueba en español
+      - name: Verificar información del entorno
         run: |
-          echo "¡Pipeline funcionando correctamente!"
+          echo "¡Construcción completada exitosamente!"
           echo "Rama: ${{ github.ref_name }}"
           echo "Commit: ${{ github.sha }}"
           echo "Fecha de ejecución: $(date)"
 
-      - name: Guardar artefacto (opcional)
+      - name: Guardar artefacto generado
         uses: actions/upload-artifact@v4
         with:
-          name: build
+          name: artefacto-construccion
           path: .
