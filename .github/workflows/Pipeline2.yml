@@ -1,0 +1,37 @@
+name: "Pipeline 2: Gestion de Desarrollo"
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  gestion-tareas:
+    name: Automatizacion de Issues
+    runs-on: ubuntu-latest
+  
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Asignar responsable automaticamente
+        uses: pozil/auto-assign-issue@v2
+        with:
+          assignees: solonlosada2006
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Añadir criterios de aceptacion (DoD)
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Para que esta tarea se considere terminada, debe cumplir:
+            - [ ] El código sigue los estándares del proyecto.
+            - [ ] Se realizaron pruebas unitarias.
+            - [ ] Pull Request revisado por el DevOps Engineer.
+            - [ ] Documentación actualizada.
+            
+           
