@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Search, Plus, Trash2 } from 'lucide-react';
+import { Search, Plus, Trash2, Car } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge.jsx';
 import AddVehicleModal from '@/components/AddVehicleModal.jsx';
 import { useVehicles } from '@/hooks/useVehicles.js';
@@ -11,14 +11,16 @@ export default function VehiculosPage() {
   const [filterState, setFilterState] = useState('todos');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const filteredVehiculos = vehiculos.filter((v) => {
-    const matchesSearch = [v.placa, v.marca, v.modelo]
-      .filter(Boolean)
-      .some((value) => value.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredVehiculos = useMemo(() => {
+    return vehiculos.filter((v) => {
+      const matchesSearch = [v.placa, v.marca, v.modelo, v.ownerLabel]
+        .filter(Boolean)
+        .some((value) => value.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesState = filterState === 'todos' || v.estadoGeneral === filterState;
-    return matchesSearch && matchesState;
-  });
+      const matchesState = filterState === 'todos' || v.estadoGeneral === filterState;
+      return matchesSearch && matchesState;
+    });
+  }, [vehiculos, searchTerm, filterState]);
 
   return (
     <div className="space-y-6">
@@ -30,7 +32,7 @@ export default function VehiculosPage() {
         <div>
           <h1 className="text-2xl font-bold text-syntix-navy">Gestión de Vehículos</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Consulta el estado actual de la flota y registra nuevos vehículos desde esta vista.
+            Consulta, registra y valida los vehículos asociados al usuario dentro del sistema.
           </p>
         </div>
 
@@ -49,7 +51,7 @@ export default function VehiculosPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por placa, marca o modelo..."
+              placeholder="Buscar por placa, marca, modelo o usuario..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none"
@@ -74,6 +76,7 @@ export default function VehiculosPage() {
               <tr>
                 <th className="px-6 py-4">Placa</th>
                 <th className="px-6 py-4">Vehículo</th>
+                <th className="px-6 py-4">Usuario asociado</th>
                 <th className="px-6 py-4">Conductor asignado</th>
                 <th className="px-6 py-4">Estado general</th>
                 <th className="px-6 py-4 text-right">Acciones</th>
@@ -86,6 +89,12 @@ export default function VehiculosPage() {
                   <td className="px-6 py-4">
                     <div className="font-medium text-gray-900">{v.marca} {v.modelo}</div>
                     <div className="text-xs text-gray-500">{v.tipo} - {v.anio}</div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-gray-900">{v.ownerLabel}</div>
+                    {v.ownerEmail && (
+                      <div className="text-xs text-gray-500">{v.ownerEmail}</div>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     {v.conductor ? (
@@ -112,8 +121,14 @@ export default function VehiculosPage() {
 
               {filteredVehiculos.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
-                    No se encontraron vehículos.
+                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                    <div className="flex flex-col items-center gap-3">
+                      <Car className="w-8 h-8 text-gray-300" />
+                      <div>
+                        <p className="font-medium text-gray-700">Aún no hay vehículos para mostrar.</p>
+                        <p className="text-sm text-gray-500">Agrega un vehículo para comenzar a gestionar la flota.</p>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               )}
