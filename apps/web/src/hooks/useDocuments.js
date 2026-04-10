@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage.js';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
+import { registerSourceAlerts, clearSourceAlerts } from './useAlertHub.js';
 
 const initialSoats = [
   { id: 's1', vehiculoId: 'v1', numeroPoliza: 'SOAT-1001', fechaInicio: '2025-01-01', fechaVencimiento: '2026-01-01' },
@@ -34,8 +36,27 @@ export function useDocuments() {
     setSoats(soats.filter(s => s.id !== id));
   };
 
+  const soatsWithState = getSoatsWithState();
+
+  useEffect(() => {
+    const alerts = soatsWithState
+      .filter((soat) => soat.estado === 'rojo' || soat.estado === 'amarillo')
+      .map((soat) => ({
+        id: `soat-${soat.id}`,
+        tipo: 'SOAT',
+        entidad: `Vehículo ${soat.vehiculoId}`,
+        mensaje: soat.estado === 'rojo' ? 'SOAT Vencido' : 'SOAT Próximo a Vencer',
+        diasRestantes: soat.diasRestantes,
+        prioridad: soat.estado,
+        fecha: new Date().toISOString()
+      }));
+
+    registerSourceAlerts('documentos', alerts);
+    return () => clearSourceAlerts('documentos');
+  }, [soats, simulatedDate, threshold]);
+
   return {
-    soats: getSoatsWithState(),
+    soats: soatsWithState,
     addSoat,
     deleteSoat
   };

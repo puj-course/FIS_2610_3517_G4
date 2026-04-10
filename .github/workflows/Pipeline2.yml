@@ -1,0 +1,95 @@
+name: "Pipeline 2: Integración Continua y Gestión SYNTIX TECH"
+
+on:
+
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+  issues:
+    types: [opened]
+  
+  workflow_dispatch:
+
+jobs:
+ 
+  build-and-test:
+    name: Build y Validación Técnica
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20 (Dependencia necesaria)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalación de dependencias
+        run: |
+          cd apps/web
+          npm ci
+
+      - name: Proceso de Construcción (Build)
+        run: |
+          cd apps/web
+          npm run build
+
+      - name: Ejecución de Linter (Pruebas estáticas)
+        run: |
+          cd apps/web
+          npm run lint
+
+
+  gestion-tareas:
+    name: Automatización de Issues y DoD
+    runs-on: ubuntu-latest
+    if: github.event_name == 'issues'
+    permissions:
+      issues: write
+    steps:
+      - name: Asignar responsable automáticamente
+        uses: pozil/auto-assign-issue@v2
+        with:
+          assignees: solonlosada2006
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Inyectar DoD e INVEST
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ### 🛠️ Control de Calidad SYNTIX TECH
+            Esta tarea ha sido procesada por el pipeline de CI. Para su cierre, debe cumplir con:
+            
+            **Criterios INVEST:**
+            - [ ] **I**ndependiente | **N**egociable | **V**aliosa.
+            - [ ] **E**stimable | **S**mall (Pequeña) | **T**esteable.
+            
+            **Definition of Done (DoD):**
+            - [ ] El código pasa `npm run build` sin errores.
+            - [ ] Pull Request revisado y aprobado.
+            - [ ] Criterios de aceptación verificados.
+
+  reportes-proyecto:
+    name: Reportes de Sprint y Commits
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    permissions:
+      contents: read
+      issues: read
+    steps:
+      - name: Checkout
+        uses: checkout/checkout@v4
+
+      - name: Generar Reporte de Avance
+        run: |
+          echo "### 📊 Reporte Automático de Proyecto - DriveControl" >> $GITHUB_STEP_SUMMARY
+          echo "#### Últimos Commits en este Sprint:" >> $GITHUB_STEP_SUMMARY
+          git log --oneline -n 10 >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "#### Resumen de Tareas:" >> $GITHUB_STEP_SUMMARY
+          echo "- Generado por: Pipeline 2" >> $GITHUB_STEP_SUMMARY

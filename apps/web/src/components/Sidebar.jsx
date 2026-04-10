@@ -1,10 +1,10 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Car, Users, FileText, BellRing, Search, BarChart3, Settings, X } from 'lucide-react';
-import { useAlerts } from '@/hooks/useAlerts.js';
+import { useAlertHub } from '@/hooks/useAlertHub.js';
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
-  const { alerts } = useAlerts();
+  const { alerts } = useAlertHub();
   const alertCount = alerts.length;
 
   const navItems = [

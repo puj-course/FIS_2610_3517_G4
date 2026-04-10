@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage.js';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
+import { registerSourceAlerts, clearSourceAlerts } from './useAlertHub.js';
 
 //use state
 const initialConductors = [
@@ -37,8 +39,27 @@ export function useConductors() {
     setConductores(conductores.filter(c => c.id !== id));
   };
 
+  const conductoresWithState = getConductorsWithState();
+
+  useEffect(() => {
+    const alerts = conductoresWithState
+      .filter((conductor) => conductor.estado === 'rojo' || conductor.estado === 'amarillo')
+      .map((conductor) => ({
+        id: `lic-${conductor.id}`,
+        tipo: 'Licencia',
+        entidad: `Conductor ${conductor.nombre}`,
+        mensaje: conductor.estado === 'rojo' ? 'Licencia Vencida' : 'Licencia Próxima a Vencer',
+        diasRestantes: conductor.diasRestantes,
+        prioridad: conductor.estado,
+        fecha: new Date().toISOString()
+      }));
+
+    registerSourceAlerts('conductores', alerts);
+    return () => clearSourceAlerts('conductores');
+  }, [conductores, simulatedDate, threshold]);
+
   return {
-    conductores: getConductorsWithState(),
+    conductores: conductoresWithState,
     addConductor,
     updateConductor,
     deleteConductor

@@ -1,0 +1,9 @@
+{
+  "name": "test-ci-cd",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo Build funcionando correctamente",
+    "test": "echo Test funcionando correctamente"
+  }
+}

@@ -1,7 +1,7 @@
-import { useAlertsFacade } from './useAlertsFacade.js';
+import { useAlertHub } from './useAlertHub.js';
 
 export function useAlerts() {
-  const { alerts } = useAlertsFacade();
+  const { alerts } = useAlertHub();
 
   return { alerts };
 }
