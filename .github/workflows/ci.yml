@@ -1,0 +1,41 @@
+name: CI - Verificación del proyecto
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+  push:
+    branches: [ "feature/**" ]
+
+jobs:
+  verificacion:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: apps/web
+
+    steps:
+      - name: Obtener código fuente
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Verificar calidad del código
+        run: npm run lint
+
+      - name: Ejecutar pruebas
+        run: npm test --if-present
+
+      - name: Resumen de verificación
+        run: |
+          echo "Rama: ${{ github.ref_name }}"
+          echo "Autor: ${{ github.actor }}"
+          echo "Verificación exitosa"
