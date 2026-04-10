@@ -28,86 +28,18 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
 
           {/* Protegidas */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout>
-                  <DashboardPage />
-                </DashboardLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/vehiculos"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout>
-                  <VehiculosPage />
-                </DashboardLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/conductores"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout>
-                  <ConductoresPage />
-                </DashboardLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/documentos"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout>
-                  <DocumentosPage />
-                </DashboardLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/alertas"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout>
-                  <AlertasPage />
-                </DashboardLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/validacion-runt"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout>
-                  <ValidacionRUNTPage />
-                </DashboardLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reportes"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout>
-                  <ReportesPage />
-                </DashboardLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/configuracion"
-            element={
-              <ProtectedRoute>
-                <DashboardLayout>
-                  <ConfiguracionPage />
-                </DashboardLayout>
-              </ProtectedRoute>
-            }
-          />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<DashboardLayout />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/vehiculos" element={<VehiculosPage />} />
+              <Route path="/conductores" element={<ConductoresPage />} />
+              <Route path="/documentos" element={<DocumentosPage />} />
+              <Route path="/alertas" element={<AlertasPage />} />
+              <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
+              <Route path="/reportes" element={<ReportesPage />} />
+              <Route path="/configuracion" element={<ConfiguracionPage />} />
+            </Route>
+          </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
