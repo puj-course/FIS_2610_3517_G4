@@ -45,10 +45,14 @@ export default function DashboardPage() {
           </Link>
           <button type="button" onClick={openVehicleModal} style={btnPrimary}>
             + Vehículo
-          </button>
-          <Link to="/documentos" style={btnSecondary}>
-            + Documento
-          </Link>
+          </button> 
+          <button
+              type="button"
+              onClick={() => openModal('addDocument')}
+              style={btnSecondary}
+            >
+              + Documento
+            </button>
         </div>
       </div>
 

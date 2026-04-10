@@ -2,6 +2,7 @@ import React from 'react';
 import LoginModal from '@/components/LoginModal.jsx';
 import RegisterModal from '@/components/RegisterModal.jsx';
 import AddVehicleModal from '@/components/AddVehicleModal.jsx';
+import AddDocumentModal from '@/components/AddDocumentModal.jsx';
 
 /**
  * ModalFactory centraliza la renderización de modales según el tipo.
@@ -21,6 +22,8 @@ export default function ModalFactory({ modalType, ...props }) {
       return <RegisterModal {...commonProps} />;
     case 'addVehicle':
       return <AddVehicleModal {...commonProps} />;
+    case 'addDocument':
+      return <AddDocumentModal {...commonProps} />;
     default:
       return null;
   }
