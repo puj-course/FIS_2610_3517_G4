@@ -13,6 +13,7 @@ import VehiculosPage from '@/pages/VehiculosPage.jsx';
 import ConductoresPage from '@/pages/ConductoresPage.jsx';
 import DocumentosPage from '@/pages/DocumentosPage.jsx';
 import ValidacionRUNTPage from '@/pages/ValidacionRUNTPage.jsx';
+import HistorialValidacionesPage from '@/pages/HistorialValidacionesPage.jsx';
 import ReportesPage from '@/pages/ReportesPage.jsx';
 import ConfiguracionPage from '@/pages/ConfiguracionPage.jsx';
 
@@ -39,6 +40,7 @@ function App() {
             <Route path="/documentos" element={<DocumentosPage />} />
             <Route path="/alertas" element={<AlertasPage />} />
             <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
+            <Route path="/historial-validaciones" element={<HistorialValidacionesPage />} />
             <Route path="/reportes" element={<ReportesPage />} />
             <Route path="/configuracion" element={<ConfiguracionPage />} />
           </Route>
