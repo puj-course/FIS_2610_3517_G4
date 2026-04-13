@@ -15,9 +15,9 @@ function calcularDiasRestantes(fechaVencimiento) {
 }
 
 function calcularEstado(diasRestantes) {
-  if (diasRestantes < 0) return 'ROJO';
-  if (diasRestantes <= 30) return 'AMARILLO';
-  return 'VERDE';
+  if (diasRestantes < 0) return 'rojo';
+  if (diasRestantes <= 30) return 'amarillo';
+  return 'verde';
 }
 
 export function DocumentsProvider({ children }) {
