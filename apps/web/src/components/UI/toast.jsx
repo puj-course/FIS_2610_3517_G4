@@ -55,7 +55,7 @@ const ToastClose = React.forwardRef(({ className, ...props }, ref) => (
 			'group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600',
 			className
 		)}
-		toast-close=""
+		data-toast-close=""
 		{...props}
 	>
 		✕
