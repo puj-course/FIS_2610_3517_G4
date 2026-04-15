@@ -13,55 +13,82 @@
  * de alertas, permitiendo agregar nuevas fuentes de alerta sin tocar
  * el hook central de visualización.
  */
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
-class AlertHub {
-  constructor() {
-    this.listeners = new Set();
-    this.sourceAlerts = new Map();
-  }
+const listeners = new Set();
+const sourceAlerts = new Map();
+let currentAlerts = [];
 
-  subscribe(listener) {
-    this.listeners.add(listener);
-    return () => this.listeners.delete(listener);
-  }
-
-  notify() {
-    this.listeners.forEach((listener) => listener());
-  }
-
-  registerSourceAlerts(source, alerts) {
-    this.sourceAlerts.set(source, alerts);
-    this.notify();
-  }
-
-  clearSource(source) {
-    this.sourceAlerts.delete(source);
-    this.notify();
-  }
-
-  getAllAlerts() {
-    return Array.from(this.sourceAlerts.values()).flat();
-  }
+function sortAlerts(alerts) {
+  return [...alerts].sort((a, b) => {
+    if (a.prioridad === 'rojo' && b.prioridad !== 'rojo') return -1;
+    if (a.prioridad !== 'rojo' && b.prioridad === 'rojo') return 1;
+    return a.diasRestantes - b.diasRestantes;
+  });
 }
 
-// Singleton
-const alertHub = new AlertHub();
+function buildAlerts() {
+  const merged = [];
+  const seen = new Set();
+
+  Array.from(sourceAlerts.values()).flat().forEach((alert) => {
+    if (!alert || !alert.id) return;
+    if (!seen.has(alert.id)) {
+      seen.add(alert.id);
+      merged.push(alert);
+    }
+  });
+
+  return sortAlerts(merged);
+}
+
+function notifyListeners() {
+  currentAlerts = buildAlerts();
+  listeners.forEach((listener) => listener(currentAlerts));
+}
+
+const alertHub = {
+  subscribe(listener) {
+    listeners.add(listener);
+    listener(currentAlerts);
+    return () => listeners.delete(listener);
+  },
+
+  registerSourceAlerts(sourceKey, alerts = []) {
+    sourceAlerts.set(sourceKey, Array.isArray(alerts) ? alerts : []);
+    notifyListeners();
+  },
+
+  clearSourceAlerts(sourceKey) {
+    sourceAlerts.delete(sourceKey);
+    notifyListeners();
+  }
+};
 
 export function useAlertHub() {
-  const [alerts, setAlerts] = useState(alertHub.getAllAlerts());
+  const [alerts, setAlerts] = useState(currentAlerts);
 
   useEffect(() => {
-    const unsubscribe = alertHub.subscribe(() => {
-      setAlerts(alertHub.getAllAlerts());
-    });
+    return alertHub.subscribe(setAlerts);
+  }, []);
 
-    return unsubscribe;
+  const registerSourceAlerts = useCallback((sourceKey, alerts = []) => {
+    alertHub.registerSourceAlerts(sourceKey, alerts);
+  }, []);
+
+  const clearSourceAlerts = useCallback((sourceKey) => {
+    alertHub.clearSourceAlerts(sourceKey);
   }, []);
 
   return {
     alerts,
-    registerSourceAlerts: alertHub.registerSourceAlerts.bind(alertHub),
-    clearSource: alertHub.clearSource.bind(alertHub),
+    registerSourceAlerts,
+    clearSourceAlerts
   };
 }
+
+export const registerSourceAlerts = (sourceKey, alerts = []) =>
+  alertHub.registerSourceAlerts(sourceKey, alerts);
+
+export const clearSourceAlerts = (sourceKey) =>
+  alertHub.clearSourceAlerts(sourceKey);

@@ -1,35 +1,29 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useLocalStorage } from '@/hooks/useLocalStorage.js';
+import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
+import { calculateDaysRemaining, calculateDocumentState } from '@/utils/dateUtils.js';
 import { registerSourceAlerts, clearSourceAlerts } from '@/hooks/useAlertHub.js';
 
 const STORAGE_KEY = 'syntix_soats';
 const DocumentsContext = createContext(null);
 
-function calcularDiasRestantes(fechaVencimiento) {
-  const hoy = new Date();
-  const vencimiento = new Date(fechaVencimiento);
-
-  hoy.setHours(0, 0, 0, 0);
-  vencimiento.setHours(0, 0, 0, 0);
-
-  const diffMs = vencimiento - hoy;
-  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-}
-
-function calcularEstado(diasRestantes) {
-  if (diasRestantes < 0) return 'rojo';
-  if (diasRestantes <= 30) return 'amarillo';
-  return 'verde';
-}
-
 export function DocumentsProvider({ children }) {
-  const [soats, setSoats] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [storedSoats, setStoredSoats] = useLocalStorage(STORAGE_KEY, []);
+  const { simulatedDate } = useSimulatedDate();
+  const [threshold] = useLocalStorage('syntix_threshold', 15);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(soats));
-  }, [soats]);
+  const soats = useMemo(() => {
+    return storedSoats.map((soat) => {
+      const diasRestantes = calculateDaysRemaining(soat.fechaVencimiento, simulatedDate);
+      const estado = calculateDocumentState(diasRestantes, threshold);
+
+      return {
+        ...soat,
+        diasRestantes,
+        estado
+      };
+    });
+  }, [storedSoats, simulatedDate, threshold]);
 
   useEffect(() => {
     const alerts = soats
@@ -50,24 +44,19 @@ export function DocumentsProvider({ children }) {
   }, [soats]);
 
   const addSoat = (nuevoSoat) => {
-    const diasRestantes = calcularDiasRestantes(nuevoSoat.fechaVencimiento);
-    const estado = calcularEstado(diasRestantes);
-
     const soatConDatos = {
       id: Date.now().toString(),
-      ...nuevoSoat,
-      diasRestantes,
-      estado,
+      ...nuevoSoat
     };
 
-    setSoats((prev) => {
+    setStoredSoats((prev) => {
       const filtrados = prev.filter((s) => s.vehiculoId !== nuevoSoat.vehiculoId);
       return [...filtrados, soatConDatos];
     });
   };
 
   const removeSoat = (id) => {
-    setSoats((prev) => prev.filter((s) => s.id !== id));
+    setStoredSoats((prev) => prev.filter((s) => s.id !== id));
   };
 
   return (
