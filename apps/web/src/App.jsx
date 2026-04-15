@@ -3,9 +3,11 @@ import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-d
 import { AuthProvider } from '@/contexts/AuthContext.jsx';
 import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 import DashboardLayout from '@/layouts/DashboardLayout.jsx';
+import { DocumentsProvider } from '@/contexts/DocumentsContext.jsx';
 
 import HomePage from '@/pages/HomePage.jsx';
 import TeamPage from '@/pages/TeamPage.jsx';
+import LoginPage from '@/pages/LoginPage.jsx';
 
 import DashboardPage from '@/pages/DashboardPage.jsx';
 import AlertasPage from '@/pages/AlertasPage.jsx';
@@ -20,12 +22,15 @@ import ConfiguracionPage from '@/pages/ConfiguracionPage.jsx';
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Públicas */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/team" element={<TeamPage />} />
+      <DocumentsProvider>
+        <Router>
+          <Routes>
+            {/* Públicas */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/team" element={<TeamPage />} />
+            <Route path="/login" element={<LoginPage />} />
 
+<<<<<<< HEAD
           {/* Protegidas */}
           <Route
             element={
@@ -44,10 +49,26 @@ function App() {
             <Route path="/reportes" element={<ReportesPage />} />
             <Route path="/configuracion" element={<ConfiguracionPage />} />
           </Route>
+=======
+            {/* Protegidas */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/vehiculos" element={<VehiculosPage />} />
+                <Route path="/conductores" element={<ConductoresPage />} />
+                <Route path="/documentos" element={<DocumentosPage />} />
+                <Route path="/alertas" element={<AlertasPage />} />
+                <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
+                <Route path="/reportes" element={<ReportesPage />} />
+                <Route path="/configuracion" element={<ConfiguracionPage />} />
+              </Route>
+            </Route>
+>>>>>>> 523f4179d34949cd98cf7b84ba8a95e447def451
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </DocumentsProvider>
     </AuthProvider>
   );
 }
