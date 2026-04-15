@@ -1,8 +1,9 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
 import { calculateDaysRemaining, calculateDocumentState } from '@/utils/dateUtils.js';
 import { registerSourceAlerts, clearSourceAlerts } from '@/hooks/useAlertHub.js';
+import SoatAlertAdapter from '@/patterns/adapters/SoatAlertAdapter.js';
 
 const STORAGE_KEY = 'syntix_soats';
 const DocumentsContext = createContext(null);
@@ -25,21 +26,11 @@ export function DocumentsProvider({ children }) {
     });
   }, [storedSoats, simulatedDate, threshold]);
 
+  const soatAlertAdapter = new SoatAlertAdapter();
+
   useEffect(() => {
-    const alerts = soats
-      .filter((soat) => soat.estado === 'rojo' || soat.estado === 'amarillo')
-      .map((soat) => ({
-        id: `soat-${soat.id}`,
-        tipo: 'SOAT',
-        entidad: `Vehículo ${soat.vehiculoId}`,
-        mensaje: soat.estado === 'rojo' ? 'SOAT vencido' : 'SOAT próximo a vencer',
-        diasRestantes: soat.diasRestantes,
-        prioridad: soat.estado,
-        fecha: new Date().toISOString()
-      }));
-
+    const alerts = soatAlertAdapter.adaptMany(soats);
     registerSourceAlerts('soats', alerts);
-
     return () => clearSourceAlerts('soats');
   }, [soats]);
 

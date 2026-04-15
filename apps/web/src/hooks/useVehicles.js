@@ -5,6 +5,7 @@ import { useDocuments } from './useDocuments.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { getWorstState } from '../utils/dateUtils.js';
 import { registerSourceAlerts, clearSourceAlerts } from './useAlertHub.js';
+import VehicleAlertAdapter from '@/patterns/adapters/VehicleAlertAdapter.js';
 
 const initialVehicles = [
   {
@@ -101,39 +102,13 @@ export function useVehicles() {
   };
 
   const vehiculosWithState = getVehiclesWithState();
+  const vehicleAlertAdapter = new VehicleAlertAdapter();
 
   useEffect(() => {
-    const alerts = [];
-
-    vehiculosWithState.forEach((vehiculo) => {
-      if (!vehiculo.conductorId) {
-        alerts.push({
-          id: `missing-cond-${vehiculo.id}`,
-          tipo: 'Asignación',
-          entidad: `Vehículo ${vehiculo.placa}`,
-          mensaje: 'Sin conductor asignado',
-          diasRestantes: 0,
-          prioridad: 'rojo',
-          fecha: new Date().toISOString()
-        });
-      }
-
-      if (!vehiculo.soat) {
-        alerts.push({
-          id: `missing-soat-${vehiculo.id}`,
-          tipo: 'Documento Faltante',
-          entidad: `Vehículo ${vehiculo.placa}`,
-          mensaje: 'Sin SOAT registrado',
-          diasRestantes: 0,
-          prioridad: 'rojo',
-          fecha: new Date().toISOString()
-        });
-      }
-    });
-
+    const alerts = vehicleAlertAdapter.adaptMany(vehiculosWithState);
     registerSourceAlerts('vehiculos', alerts);
     return () => clearSourceAlerts('vehiculos');
-  }, [vehiculos, soats, conductores]);
+  }, [vehiculosWithState]);
 
   const assignConductor = (vehiculoId, conductorId) => {
     updateVehicle(vehiculoId, { conductorId });
