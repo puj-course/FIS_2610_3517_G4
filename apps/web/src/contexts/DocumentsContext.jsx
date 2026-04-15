@@ -2,8 +2,9 @@ import React, { createContext, useContext, useEffect, useMemo } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
 import { calculateDaysRemaining, calculateDocumentState } from '@/utils/dateUtils.js';
-import { registerSourceAlerts, clearSourceAlerts } from '@/hooks/useAlertHub.js';
+import { clearSourceAlerts } from '@/hooks/useAlertHub.js';
 import SoatAlertAdapter from '@/patterns/adapters/SoatAlertAdapter.js';
+import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
 
 const STORAGE_KEY = 'syntix_soats';
 const DocumentsContext = createContext(null);
@@ -29,8 +30,7 @@ export function DocumentsProvider({ children }) {
   const soatAlertAdapter = new SoatAlertAdapter();
 
   useEffect(() => {
-    const alerts = soatAlertAdapter.adaptMany(soats);
-    registerSourceAlerts('soats', alerts);
+    publishAdaptedAlerts(soatAlertAdapter, 'soats', soats);
     return () => clearSourceAlerts('soats');
   }, [soats]);
 

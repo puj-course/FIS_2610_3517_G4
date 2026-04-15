@@ -1,4 +1,6 @@
-export default class VehicleAlertAdapter {
+import BaseAlertAdapter from './BaseAlertAdapter.js';
+
+export default class VehicleAlertAdapter extends BaseAlertAdapter {
   adapt(vehiculo) {
     const alerts = [];
     const currentDate = new Date().toISOString();
@@ -28,9 +30,5 @@ export default class VehicleAlertAdapter {
     }
 
     return alerts;
-  }
-
-  adaptMany(vehiculos = []) {
-    return vehiculos.flatMap((vehiculo) => this.adapt(vehiculo));
   }
 }

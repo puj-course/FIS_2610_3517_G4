@@ -4,8 +4,9 @@ import { useConductors } from './useConductors.js';
 import { useDocuments } from './useDocuments.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { getWorstState } from '../utils/dateUtils.js';
-import { registerSourceAlerts, clearSourceAlerts } from './useAlertHub.js';
+import { clearSourceAlerts } from './useAlertHub.js';
 import VehicleAlertAdapter from '@/patterns/adapters/VehicleAlertAdapter.js';
+import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
 
 const initialVehicles = [
   {
@@ -105,8 +106,7 @@ export function useVehicles() {
   const vehicleAlertAdapter = new VehicleAlertAdapter();
 
   useEffect(() => {
-    const alerts = vehicleAlertAdapter.adaptMany(vehiculosWithState);
-    registerSourceAlerts('vehiculos', alerts);
+    publishAdaptedAlerts(vehicleAlertAdapter, 'vehiculos', vehiculosWithState);
     return () => clearSourceAlerts('vehiculos');
   }, [vehiculosWithState]);
 

@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage.js';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
-import { registerSourceAlerts, clearSourceAlerts } from './useAlertHub.js';
+import { clearSourceAlerts } from './useAlertHub.js';
 import ConductorAlertAdapter from '@/patterns/adapters/ConductorAlertAdapter.js';
+import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
 
 const initialConductors = [
   { id: 'c1', nombre: 'Juan Pérez', documento: '10203040', telefono: '3001234567', categoria: 'C2', fechaVencimiento: '2026-12-31' },
@@ -43,8 +44,7 @@ export function useConductors() {
   const conductorAlertAdapter = new ConductorAlertAdapter();
 
   useEffect(() => {
-    const alerts = conductorAlertAdapter.adaptMany(conductoresWithState);
-    registerSourceAlerts('conductores', alerts);
+    publishAdaptedAlerts(conductorAlertAdapter, 'conductores', conductoresWithState);
     return () => clearSourceAlerts('conductores');
   }, [conductoresWithState]);
 

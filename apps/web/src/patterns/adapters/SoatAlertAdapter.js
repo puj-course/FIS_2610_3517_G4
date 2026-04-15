@@ -1,4 +1,6 @@
-export default class SoatAlertAdapter {
+import BaseAlertAdapter from './BaseAlertAdapter.js';
+
+export default class SoatAlertAdapter extends BaseAlertAdapter {
   adapt(soat) {
     if (soat.estado !== 'rojo' && soat.estado !== 'amarillo') {
       return null;
@@ -10,15 +12,11 @@ export default class SoatAlertAdapter {
       entidad: `Vehículo ${soat.vehiculoId}`,
       mensaje:
         soat.estado === 'rojo'
-          ? 'SOAT vencido'
-          : 'SOAT próximo a vencer',
+          ? 'SOAT Vencido'
+          : 'SOAT Próximo a Vencer',
       diasRestantes: soat.diasRestantes,
       prioridad: soat.estado,
-      fecha: new Date().toISOString(),
+      fecha: new Date().toISOString()
     };
-  }
-
-  adaptMany(soats = []) {
-    return soats.map((soat) => this.adapt(soat)).filter(Boolean);
   }
 }

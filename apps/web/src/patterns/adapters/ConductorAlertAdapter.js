@@ -1,4 +1,6 @@
-export default class ConductorAlertAdapter {
+import BaseAlertAdapter from './BaseAlertAdapter.js';
+
+export default class ConductorAlertAdapter extends BaseAlertAdapter {
   adapt(conductor) {
     if (conductor.estado !== 'rojo' && conductor.estado !== 'amarillo') {
       return null;
@@ -16,9 +18,5 @@ export default class ConductorAlertAdapter {
       prioridad: conductor.estado,
       fecha: new Date().toISOString()
     };
-  }
-
-  adaptMany(conductores = []) {
-    return conductores.map((conductor) => this.adapt(conductor)).filter(Boolean);
   }
 }

@@ -1,30 +1,20 @@
 import React from 'react';
-import LoginModal from '@/components/LoginModal.jsx';
-import RegisterModal from '@/components/RegisterModal.jsx';
-import AddVehicleModal from '@/components/AddVehicleModal.jsx';
-import AddDocumentModal from '@/components/AddDocumentModal.jsx';
+import AuthModalFactory from '@/patterns/factory/AuthModalFactory.jsx';
+import FleetModalFactory from '@/patterns/factory/FleetModalFactory.jsx';
 
-/**
- * ModalFactory centraliza la renderización de modales según el tipo.
- *
- * Este patrón Factory Method ayuda a mantener un solo punto de control
- * para decidir qué modal se muestra y reduce duplicación de estado en páginas.
- */
 export default function ModalFactory({ modalType, ...props }) {
   if (!modalType) return null;
 
   const commonProps = { isOpen: true, ...props };
 
-  switch (modalType) {
-    case 'login':
-      return <LoginModal {...commonProps} />;
-    case 'register':
-      return <RegisterModal {...commonProps} />;
-    case 'addVehicle':
-      return <AddVehicleModal {...commonProps} />;
-    case 'addDocument':
-      return <AddDocumentModal {...commonProps} />;
-    default:
-      return null;
-  }
+  const factories = [
+    new AuthModalFactory(),
+    new FleetModalFactory(),
+  ];
+
+  const factory = factories.find((item) => item.canHandle(modalType));
+
+  if (!factory) return null;
+
+  return factory.createModal(modalType, commonProps);
 }
