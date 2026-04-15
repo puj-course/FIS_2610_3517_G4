@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useVehicles } from './useVehicles.js';
 import { useConductors } from './useConductors.js';
 import { useDocuments } from './useDocuments.js';
@@ -13,8 +14,8 @@ function buildSoatAlerts(soats, vehiculos) {
       return {
         id: `soat-${soat.id}`,
         tipo: 'SOAT',
-        entidad: vehiculo ? `Vehículo ${vehiculo.placa}` : 'Vehículo Desconocido',
-        mensaje: soat.estado === 'rojo' ? 'SOAT Vencido' : 'SOAT Próximo a Vencer',
+        entidad: vehiculo ? `Vehículo ${vehiculo.placa}` : 'Vehículo desconocido',
+        mensaje: soat.estado === 'rojo' ? 'SOAT vencido' : 'SOAT próximo a vencer',
         diasRestantes: soat.diasRestantes,
         prioridad: soat.estado,
         fecha: currentDate
@@ -31,7 +32,7 @@ function buildLicenseAlerts(conductores) {
       id: `lic-${conductor.id}`,
       tipo: 'Licencia',
       entidad: `Conductor ${conductor.nombre}`,
-      mensaje: conductor.estado === 'rojo' ? 'Licencia Vencida' : 'Licencia Próxima a Vencer',
+      mensaje: conductor.estado === 'rojo' ? 'Licencia vencida' : 'Licencia próxima a vencer',
       diasRestantes: conductor.diasRestantes,
       prioridad: conductor.estado,
       fecha: currentDate
@@ -58,7 +59,7 @@ function buildMissingAssignmentAlerts(vehiculos) {
     if (!vehiculo.soat) {
       alerts.push({
         id: `missing-soat-${vehiculo.id}`,
-        tipo: 'Documento Faltante',
+        tipo: 'Documento faltante',
         entidad: `Vehículo ${vehiculo.placa}`,
         mensaje: 'Sin SOAT registrado',
         diasRestantes: 0,
@@ -96,11 +97,28 @@ export function useAlertsFacade() {
   const { conductores } = useConductors();
   const { soats } = useDocuments();
 
-  const alerts = buildAllAlerts({
-    vehiculos,
-    conductores,
-    soats
-  });
+  const alerts = useMemo(() => {
+    return buildAllAlerts({
+      vehiculos,
+      conductores,
+      soats
+    });
+  }, [vehiculos, conductores, soats]);
 
-  return { alerts };
+  const criticalAlerts = useMemo(
+    () => alerts.filter((alert) => alert.prioridad === 'rojo'),
+    [alerts]
+  );
+
+  const warningAlerts = useMemo(
+    () => alerts.filter((alert) => alert.prioridad === 'amarillo'),
+    [alerts]
+  );
+
+  return {
+    alerts,
+    totalAlerts: alerts.length,
+    criticalAlerts,
+    warningAlerts
+  };
 }
