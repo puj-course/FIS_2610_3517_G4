@@ -13,79 +13,55 @@
  * de alertas, permitiendo agregar nuevas fuentes de alerta sin tocar
  * el hook central de visualización.
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 
-const listeners = new Set();
-const sourceAlerts = new Map();
-let currentAlerts = [];
-
-function sortAlerts(alerts) {
-  return [...alerts].sort((a, b) => {
-    if (a.prioridad === 'rojo' && b.prioridad !== 'rojo') return -1;
-    if (a.prioridad !== 'rojo' && b.prioridad === 'rojo') return 1;
-    return a.diasRestantes - b.diasRestantes;
-  });
-}
-
-function buildAlerts() {
-  const merged = [];
-  const seen = new Set();
-
-  Array.from(sourceAlerts.values()).flat().forEach((alert) => {
-    if (!alert || !alert.id) return;
-    if (!seen.has(alert.id)) {
-      seen.add(alert.id);
-      merged.push(alert);
-    }
-  });
-
-  return sortAlerts(merged);
-}
-
-function notifyListeners() {
-  currentAlerts = buildAlerts();
-  listeners.forEach((listener) => listener(currentAlerts));
-}
-
-const alertHub = {
-  subscribe(listener) {
-    listeners.add(listener);
-    listener(currentAlerts);
-    return () => listeners.delete(listener);
-  },
-
-  registerSourceAlerts(sourceKey, alerts = []) {
-    sourceAlerts.set(sourceKey, Array.isArray(alerts) ? alerts : []);
-    notifyListeners();
-  },
-
-  clearSourceAlerts(sourceKey) {
-    sourceAlerts.delete(sourceKey);
-    notifyListeners();
+class AlertHub {
+  constructor() {
+    this.listeners = new Set();
+    this.sourceAlerts = new Map();
   }
-};
+
+  subscribe(listener) {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  notify() {
+    this.listeners.forEach((listener) => listener());
+  }
+
+  registerSourceAlerts(source, alerts) {
+    this.sourceAlerts.set(source, alerts);
+    this.notify();
+  }
+
+  clearSource(source) {
+    this.sourceAlerts.delete(source);
+    this.notify();
+  }
+
+  getAllAlerts() {
+    return Array.from(this.sourceAlerts.values()).flat();
+  }
+}
+
+// Singleton
+const alertHub = new AlertHub();
 
 export function useAlertHub() {
-  const [alerts, setAlerts] = useState(currentAlerts);
+  const [alerts, setAlerts] = useState(alertHub.getAllAlerts());
 
   useEffect(() => {
-    return alertHub.subscribe(setAlerts);
-  }, []);
+    const unsubscribe = alertHub.subscribe(() => {
+      setAlerts(alertHub.getAllAlerts());
+    });
 
-  const registerSourceAlerts = useCallback((sourceKey, alerts = []) => {
-    alertHub.registerSourceAlerts(sourceKey, alerts);
-  }, []);
-
-  const clearSourceAlerts = useCallback((sourceKey) => {
-    alertHub.clearSourceAlerts(sourceKey);
+    return unsubscribe;
   }, []);
 
   return {
     alerts,
-    registerSourceAlerts,
-    clearSourceAlerts
+    registerSourceAlerts: alertHub.registerSourceAlerts.bind(alertHub),
+    clearSource: alertHub.clearSource.bind(alertHub),
   };
 }
-
-export const registerSourceAlerts = alertHub.registerSourceAlerts;
-export const clearSourceAlerts = alertHub.clearSourceAlerts;
