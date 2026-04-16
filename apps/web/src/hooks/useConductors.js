@@ -1,57 +1,44 @@
-import { useEffect } from 'react';
-import { useLocalStorage } from './useLocalStorage.js';
+import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import { useAuth } from '@/contexts/AuthContext.jsx';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
 import { clearSourceAlerts } from './useAlertHub.js';
 import ConductorAlertAdapter from '@/patterns/adapters/ConductorAlertAdapter.js';
 import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
 
-const initialConductors = [
-  { id: 'c1', nombre: 'Juan Pérez', documento: '10203040', telefono: '3001234567', categoria: 'C2', fechaVencimiento: '2026-12-31' },
-  { id: 'c2', nombre: 'María Gómez', documento: '50607080', telefono: '3109876543', categoria: 'C1', fechaVencimiento: '2026-03-01' },
-  { id: 'c3', nombre: 'Carlos Ruiz', documento: '90102030', telefono: '3205554444', categoria: 'C3', fechaVencimiento: '2026-02-25' },
-];
+const API_URL = 'http://localhost:5000/api/conductores';
 
 export function useConductors() {
-  const [conductores, setConductores] = useLocalStorage('syntix_conductores', initialConductors);
+  const [conductores, setConductores] = useState([]);
+  const { user } = useAuth();
   const { simulatedDate } = useSimulatedDate();
-  const [threshold] = useLocalStorage('syntix_threshold', 15);
+  const threshold = 15;
 
-  const getConductorsWithState = () => {
-    return conductores.map((c) => {
-      const days = calculateDaysRemaining(c.fechaVencimiento, simulatedDate);
-      return {
-        ...c,
-        diasRestantes: days,
-        estado: calculateDocumentState(days, threshold)
-      };
-    });
+  const fetchConductors = useCallback(async () => {
+    if (!user?.email) return;
+    try {
+      const res = await axios.get(`${API_URL}?email=${user.email}`);
+      setConductores(res.data.map(c => ({ ...c, id: c._id })));
+    } catch (err) { console.error("Error cargando conductores", err); }
+  }, [user]);
+
+  useEffect(() => { fetchConductors(); }, [fetchConductors]);
+
+  const addConductor = async (data) => {
+    await axios.post(API_URL, { ...data, ownerEmail: user.email });
+    fetchConductors();
   };
 
-  const addConductor = (conductor) => {
-    setConductores([...conductores, { ...conductor, id: Date.now().toString() }]);
+  const deleteConductor = async (id) => {
+    await axios.delete(`${API_URL}/${id}`);
+    fetchConductors();
   };
 
-  const updateConductor = (id, data) => {
-    setConductores(conductores.map((c) => (c.id === id ? { ...c, ...data } : c)));
-  };
+  const conductorsWithState = conductores.map(c => {
+    const days = calculateDaysRemaining(c.fechaVencimiento, simulatedDate);
+    return { ...c, diasRestantes: days, estado: calculateDocumentState(days, threshold) };
+  });
 
-  const deleteConductor = (id) => {
-    setConductores(conductores.filter((c) => c.id !== id));
-  };
-
-  const conductoresWithState = getConductorsWithState();
-  const conductorAlertAdapter = new ConductorAlertAdapter();
-
-  useEffect(() => {
-    publishAdaptedAlerts(conductorAlertAdapter, 'conductores', conductoresWithState);
-    return () => clearSourceAlerts('conductores');
-  }, [conductoresWithState]);
-
-  return {
-    conductores: conductoresWithState,
-    addConductor,
-    updateConductor,
-    deleteConductor
-  };
+  return { conductores: conductorsWithState, addConductor, deleteConductor };
 }
