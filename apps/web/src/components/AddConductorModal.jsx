@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
 import { X, User, Save } from 'lucide-react';
 import { useConductors } from '@/hooks/useConductors.js';
+import { useVehicles } from '@/hooks/useVehicles.js';
 
-// Agregar Conductor
 export default function AddConductorModal({ isOpen, onClose }) {
   const { conductores, addConductor } = useConductors();
+  const { vehiculos } = useVehicles();
+
   const [formData, setFormData] = useState({
-    nombre: '', documento: '', telefono: '', categoria: 'B1', fechaVencimiento: ''
+    nombre: '',
+    documento: '',
+    telefono: '',
+    categoria: 'B1',
+    fechaVencimiento: '',
+    vehiculoId: ''
   });
+
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -21,9 +29,11 @@ export default function AddConductorModal({ isOpen, onClose }) {
       return;
     }
 
-    addConductor(formData);
+    await addConductor(formData);
     onClose();
   };
+
+  const vehiculosDisponibles = vehiculos.filter((v) => !v.conductorId);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -36,45 +46,66 @@ export default function AddConductorModal({ isOpen, onClose }) {
             <X className="w-6 h-6" />
           </button>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}
-          
+          {error && (
+            <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">
+              {error}
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-bold text-gray-700 mb-1">Nombre Completo</label>
-            <input 
-              type="text" 
-              required 
-              value={formData.nombre} 
-              onChange={e => setFormData({...formData, nombre: e.target.value})} 
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900" 
-              placeholder="Juan Pérez" 
+            <input
+              type="text"
+              required
+              value={formData.nombre}
+              onChange={e => setFormData({ ...formData, nombre: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
+              placeholder="Juan Pérez"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">Documento</label>
-              <input 
-                type="text" 
-                required 
-                value={formData.documento} 
-                onChange={e => setFormData({...formData, documento: e.target.value})} 
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900" 
-                placeholder="1234567890" 
+              <input
+                type="text"
+                required
+                value={formData.documento}
+                onChange={e => setFormData({ ...formData, documento: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
+                placeholder="1234567890"
               />
             </div>
+
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">Teléfono</label>
-              <input 
-                type="tel" 
-                required 
-                value={formData.telefono} 
-                onChange={e => setFormData({...formData, telefono: e.target.value})} 
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900" 
-                placeholder="300 123 4567" 
+              <input
+                type="tel"
+                required
+                value={formData.telefono}
+                onChange={e => setFormData({ ...formData, telefono: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
+                placeholder="300 123 4567"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Vehículo a asignar</label>
+            <select
+              value={formData.vehiculoId}
+              onChange={e => setFormData({ ...formData, vehiculoId: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 bg-white"
+            >
+              <option value="">Sin asignar</option>
+              {vehiculosDisponibles.map((vehiculo) => (
+                <option key={vehiculo.id} value={vehiculo.id}>
+                  {vehiculo.placa} - {vehiculo.marca} {vehiculo.modelo}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="pt-2 border-t border-gray-100">
@@ -82,9 +113,9 @@ export default function AddConductorModal({ isOpen, onClose }) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Categoría</label>
-                <select 
-                  value={formData.categoria} 
-                  onChange={e => setFormData({...formData, categoria: e.target.value})} 
+                <select
+                  value={formData.categoria}
+                  onChange={e => setFormData({ ...formData, categoria: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 bg-white"
                 >
                   <option value="A1">A1</option>
@@ -97,24 +128,33 @@ export default function AddConductorModal({ isOpen, onClose }) {
                   <option value="C3">C3</option>
                 </select>
               </div>
+
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Fecha Vencimiento</label>
-                <input 
-                  type="date" 
-                  required 
-                  value={formData.fechaVencimiento} 
-                  onChange={e => setFormData({...formData, fechaVencimiento: e.target.value})} 
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900" 
+                <input
+                  type="date"
+                  required
+                  value={formData.fechaVencimiento}
+                  onChange={e => setFormData({ ...formData, fechaVencimiento: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
                 />
               </div>
             </div>
           </div>
 
           <div className="pt-4 flex justify-end gap-3">
-            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+            >
               Cancelar
             </button>
-            <button type="submit" className="bg-syntix-navy text-white px-6 py-2 rounded-lg font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2">
+
+            <button
+              type="submit"
+              className="bg-syntix-navy text-white px-6 py-2 rounded-lg font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2"
+            >
               <Save className="w-4 h-4" /> Guardar
             </button>
           </div>
