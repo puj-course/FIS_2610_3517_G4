@@ -46,7 +46,7 @@ export default function AddConductorModal({ isOpen, onClose }) {
       return;
     }
 
-    if (conductores.some(c => c.documento.trim() === documento)) {
+    if (conductores.some(c => String(c.documento ?? '').trim() === documento)) {
       setError('Ya existe un conductor con este documento.');
       return;
     }
