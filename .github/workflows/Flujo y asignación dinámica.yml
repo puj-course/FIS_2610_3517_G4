@@ -20,7 +20,7 @@ jobs:
           - name: Asignar al Proyecto FIS y mover a Ready
             uses: actions/add-to-project@v1.0.2
             with:
-              project-url: https://github.com/orgs/puj-course/projects/NUMERO_DE_TU_PROYECTO
+              project-url: 
               github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Asignar al Proyecto del Grupo 4
