@@ -9,37 +9,26 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       issues: write
+      pull-requests: write
+
     steps:
       - name: Asignar al creador del Issue
-        run: |
-          curl -X POST \
-          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          -H "Accept: application/vnd.github.v3+json" \
-          https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/assignees \
-          -d '{"assignees":["${{ github.actor }}"]}'
-          - name: Asignar al Proyecto FIS y mover a Ready
-            uses: actions/add-to-project@v1.0.2
-            with:
-              project-url: 
-              github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Asignar al Proyecto del Grupo 4
-        uses: actions/add-to-project@v1.0.2
+        uses: actions/github-script@v6
         with:
-          project-url: https://github.com/puj-course/FIS_2610_3517_G4
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Mover a columna Ready
-        uses: alex-page/github-project-automation-plus@v0.9.0
-        with:
-          project: FIS_2610_3517_G4  
-          column: Ready
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              assignees: [context.payload.issue.user.login]
+            })
 
       - name: Comentar confirmación de flujo
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            Se ha generado una asignación automática 
+            ###  Organización Hecha
+            Hola @${{ github.actor }}, se ha generado una asignación automática para esta tarea.
+            
             
