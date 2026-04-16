@@ -1,26 +1,38 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, Building, Phone } from 'lucide-react';
+import { X, Mail, Lock, Building, Phone, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const [formData, setFormData] = useState({ email: '', password: '', empresa: '', telefono: '' });
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register } = useAuth();
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
     if (formData.password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres');
       return;
     }
-    const res = register(formData.email, formData.password, formData.empresa, formData.telefono);
-    if (res.success) {
-      onClose();
-    } else {
-      setError(res.message);
+    
+    setIsSubmitting(true);
+    
+    try {
+      const res = await register(formData.email, formData.password, formData.empresa, formData.telefono);
+      if (res.success) {
+        onClose();
+      } else {
+        setError(res.message || 'Error al registrar usuario');
+      }
+    } catch (err) {
+      setError('Error inesperado al registrar. Intente nuevamente.');
+      console.error('Error en registro:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -68,8 +80,19 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
             </div>
           </div>
 
-          <button type="submit" className="w-full bg-syntix-green text-white py-2.5 rounded-lg font-medium hover:bg-syntix-green/90 transition-colors mt-6">
-            Registrarse
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="w-full bg-syntix-green text-white py-2.5 rounded-lg font-medium hover:bg-syntix-green/90 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Registrando...
+              </>
+            ) : (
+              'Registrarse'
+            )}
           </button>
           <p className="text-center text-sm text-gray-600 mt-4">
             ¿Ya tienes cuenta? <button type="button" onClick={onSwitchToLogin} className="text-syntix-navy font-semibold hover:underline">Inicia Sesión</button>
