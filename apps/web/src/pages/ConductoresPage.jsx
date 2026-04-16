@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Search, Plus, User, Trash2 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge.jsx';
+import AddConductorModal from '@/components/AddConductorModal.jsx';
 import { useConductors } from '@/hooks/useConductors.js';
 
 export default function ConductoresPage() {
   const { conductores, deleteConductor } = useConductors();
   const [searchTerm, setSearchTerm] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-  const filtered = conductores.filter(c => 
-    c.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filtered = conductores.filter(c =>
+    c.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.documento.includes(searchTerm)
   );
 
@@ -21,7 +23,11 @@ export default function ConductoresPage() {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-syntix-navy">Gestión de Conductores</h1>
-        <button className="bg-syntix-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2 shadow-sm">
+        <button
+          type="button"
+          onClick={() => setIsAddModalOpen(true)}
+          className="bg-syntix-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2 shadow-sm"
+        >
           <Plus className="w-4 h-4" /> Nuevo Conductor
         </button>
       </div>
@@ -30,9 +36,9 @@ export default function ConductoresPage() {
         <div className="p-4 border-b border-gray-100 bg-gray-50/50">
           <div className="relative w-full sm:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input 
-              type="text" 
-              placeholder="Buscar por nombre o documento..." 
+            <input
+              type="text"
+              placeholder="Buscar por nombre o documento..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none"
@@ -69,7 +75,11 @@ export default function ConductoresPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button onClick={() => deleteConductor(c.id)} className="p-2 text-gray-400 hover:text-syntix-red hover:bg-red-50 rounded-lg transition-colors">
+                    <button
+                      type="button"
+                      onClick={() => deleteConductor(c.id)}
+                      className="p-2 text-gray-400 hover:text-syntix-red hover:bg-red-50 rounded-lg transition-colors"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
@@ -79,6 +89,11 @@ export default function ConductoresPage() {
           </table>
         </div>
       </div>
+
+      <AddConductorModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </div>
   );
 }
