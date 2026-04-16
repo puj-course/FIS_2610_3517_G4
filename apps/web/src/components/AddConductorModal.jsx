@@ -1,35 +1,77 @@
-import React, { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { X, User, Save } from 'lucide-react';
 import { useConductors } from '@/hooks/useConductors.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
 
-export default function AddConductorModal({ isOpen, onClose }) {
-  const { conductores, addConductor } = useConductors();
+const createInitialFormData = () => ({
+  nombre: '',
+  documento: '',
+  telefono: '',
+  categoria: 'B1',
+  fechaVencimiento: '',
+  vehiculoId: '',
+});
+
+export default function AddConductorModal({
+  isOpen,
+  onClose,
+  conductorToEdit = null,
+}) {
+  const { conductores, addConductor, updateConductor } = useConductors();
   const { vehiculos, assignConductor } = useVehicles();
-
-  const [formData, setFormData] = useState({
-    nombre: '',
-    documento: '',
-    telefono: '',
-    categoria: 'B1',
-    fechaVencimiento: '',
-    vehiculoId: ''
-  });
-
+  const [formData, setFormData] = useState(createInitialFormData);
   const [error, setError] = useState('');
+
+  const isEditing = Boolean(conductorToEdit?.id);
+  const currentAssignedVehicle = isEditing
+    ? vehiculos.find((vehiculo) => String(vehiculo.conductorId) === String(conductorToEdit.id)) ||
+      null
+    : null;
+  const currentAssignedVehicleId = currentAssignedVehicle?.id || '';
+  const modalTitle = isEditing ? 'Editar Conductor' : 'Agregar Conductor';
+  const submitLabel = isEditing ? 'Actualizar' : 'Guardar';
+
+  const vehiculosDisponibles = useMemo(
+    () =>
+      vehiculos.filter(
+        (vehiculo) =>
+          !vehiculo.conductorId || String(vehiculo.id) === String(currentAssignedVehicleId)
+      ),
+    [currentAssignedVehicleId, vehiculos]
+  );
+
+  const resetForm = () => {
+    setFormData(createInitialFormData());
+    setError('');
+  };
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    if (isEditing) {
+      setFormData({
+        nombre: conductorToEdit.nombre ?? '',
+        documento: conductorToEdit.documento ?? '',
+        telefono: conductorToEdit.telefono ?? '',
+        categoria: conductorToEdit.categoria || 'B1',
+        fechaVencimiento: conductorToEdit.fechaVencimiento ?? '',
+        vehiculoId: currentAssignedVehicleId,
+      });
+      setError('');
+      return;
+    }
+
+    setFormData(createInitialFormData());
+    setError('');
+  }, [conductorToEdit, currentAssignedVehicleId, isEditing, isOpen]);
 
   if (!isOpen) return null;
 
-  const resetForm = () => {
-    setFormData({
-      nombre: '',
-      documento: '',
-      telefono: '',
-      categoria: 'B1',
-      fechaVencimiento: '',
-      vehiculoId: ''
-    });
-    setError('');
+  const handleClose = () => {
+    resetForm();
+    onClose();
   };
 
   const handleSubmit = async (e) => {
@@ -46,62 +88,83 @@ export default function AddConductorModal({ isOpen, onClose }) {
       return;
     }
 
-    if (conductores.some(c => String(c.documento ?? '').trim() === documento)) {
+    const isDuplicateDocument = conductores.some((conductor) => {
+      const sameDocument = String(conductor.documento ?? '').trim() === documento;
+      const isSameConductor =
+        isEditing && String(conductor.id) === String(conductorToEdit.id);
+      return sameDocument && !isSameConductor;
+    });
+
+    if (isDuplicateDocument) {
       setError('Ya existe un conductor con este documento.');
       return;
     }
 
     if (!/^\d{7,15}$/.test(documento)) {
-      setError('El documento debe contener solo números y tener entre 7 y 15 dígitos.');
+      setError('El documento debe contener solo numeros y tener entre 7 y 15 digitos.');
       return;
     }
 
     if (!/^[0-9+\s-]{7,20}$/.test(telefono)) {
-      setError('Ingresa un teléfono válido.');
+      setError('Ingresa un telefono valido.');
       return;
     }
 
     try {
-      const newConductor = await addConductor({
+      const payload = {
         nombre,
         documento,
         telefono,
         categoria: formData.categoria,
-        fechaVencimiento
-      });
+        fechaVencimiento,
+      };
 
-      if (formData.vehiculoId) {
-        await assignConductor(formData.vehiculoId, newConductor.id);
+      if (isEditing) {
+        const oldVehicleId = currentAssignedVehicleId;
+        const newVehicleId = formData.vehiculoId;
+
+        await updateConductor(conductorToEdit.id, payload);
+
+        if (oldVehicleId !== newVehicleId) {
+          if (oldVehicleId) {
+            await assignConductor(oldVehicleId, null);
+          }
+
+          if (newVehicleId) {
+            await assignConductor(newVehicleId, conductorToEdit.id);
+          }
+        }
+      } else {
+        const newConductor = await addConductor(payload);
+
+        if (formData.vehiculoId) {
+          await assignConductor(formData.vehiculoId, newConductor.id);
+        }
       }
 
-      resetForm();
-      onClose();
+      handleClose();
     } catch (err) {
-      console.error('Error registrando conductor', err);
+      console.error('Error guardando conductor', err);
 
       if (err.response?.data?.error) {
         setError(err.response.data.error);
         return;
       }
 
-      setError('No fue posible registrar el conductor. Intenta nuevamente.');
+      setError('No fue posible guardar el conductor. Intenta nuevamente.');
     }
   };
-
-  const vehiculosDisponibles = vehiculos.filter((v) => !v.conductorId);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
           <h2 className="text-xl font-bold text-syntix-navy flex items-center gap-2">
-            <User className="w-5 h-5" /> Agregar Conductor
+            <User className="w-5 h-5" /> {modalTitle}
           </h2>
           <button
-            onClick={() => {
-              resetForm();
-              onClose();
-            }}
+            type="button"
+            onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <X className="w-6 h-6" />
@@ -121,9 +184,9 @@ export default function AddConductorModal({ isOpen, onClose }) {
               type="text"
               required
               value={formData.nombre}
-              onChange={e => setFormData({ ...formData, nombre: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
-              placeholder="Juan Pérez"
+              placeholder="Juan Perez"
             />
           </div>
 
@@ -134,19 +197,19 @@ export default function AddConductorModal({ isOpen, onClose }) {
                 type="text"
                 required
                 value={formData.documento}
-                onChange={e => setFormData({ ...formData, documento: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, documento: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
                 placeholder="1234567890"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Teléfono</label>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Telefono</label>
               <input
                 type="tel"
                 required
                 value={formData.telefono}
-                onChange={e => setFormData({ ...formData, telefono: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
                 placeholder="3001234567"
               />
@@ -154,10 +217,10 @@ export default function AddConductorModal({ isOpen, onClose }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Vehículo a asignar</label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Vehiculo a asignar</label>
             <select
               value={formData.vehiculoId}
-              onChange={e => setFormData({ ...formData, vehiculoId: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, vehiculoId: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 bg-white"
             >
               <option value="">Sin asignar</option>
@@ -170,13 +233,13 @@ export default function AddConductorModal({ isOpen, onClose }) {
           </div>
 
           <div className="pt-2 border-t border-gray-100">
-            <h3 className="text-sm font-bold text-gray-900 mb-3">Información de Licencia</h3>
+            <h3 className="text-sm font-bold text-gray-900 mb-3">Informacion de Licencia</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Categoría</label>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Categoria</label>
                 <select
                   value={formData.categoria}
-                  onChange={e => setFormData({ ...formData, categoria: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 bg-white"
                 >
                   <option value="A1">A1</option>
@@ -196,7 +259,9 @@ export default function AddConductorModal({ isOpen, onClose }) {
                   type="date"
                   required
                   value={formData.fechaVencimiento}
-                  onChange={e => setFormData({ ...formData, fechaVencimiento: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, fechaVencimiento: e.target.value })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
                 />
               </div>
@@ -206,10 +271,7 @@ export default function AddConductorModal({ isOpen, onClose }) {
           <div className="pt-4 flex justify-end gap-3">
             <button
               type="button"
-              onClick={() => {
-                resetForm();
-                onClose();
-              }}
+              onClick={handleClose}
               className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
             >
               Cancelar
@@ -219,7 +281,7 @@ export default function AddConductorModal({ isOpen, onClose }) {
               type="submit"
               className="bg-syntix-navy text-white px-6 py-2 rounded-lg font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2"
             >
-              <Save className="w-4 h-4" /> Guardar
+              <Save className="w-4 h-4" /> {submitLabel}
             </button>
           </div>
         </form>

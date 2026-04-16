@@ -7,6 +7,7 @@ import { useSimulatedDate } from './useSimulatedDate.js';
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const API_URL = `${API_BASE_URL}/api/conductores`;
 const CONDUCTORS_UPDATED_EVENT = 'syntix:conductors-updated';
+const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
 const normalizeConductor = (conductor) => ({
   ...conductor,
@@ -16,6 +17,12 @@ const normalizeConductor = (conductor) => ({
 const notifyConductorsUpdated = () => {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(CONDUCTORS_UPDATED_EVENT));
+  }
+};
+
+const notifyVehiclesUpdated = () => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(VEHICLES_UPDATED_EVENT));
   }
 };
 
@@ -75,10 +82,24 @@ export function useConductors() {
     return normalizeConductor(response.data);
   };
 
+  const updateConductor = async (id, data) => {
+    const response = await axios.put(`${API_URL}/${id}`, {
+      ...data,
+      documento: String(data.documento ?? '').trim(),
+      telefono: String(data.telefono ?? '').trim(),
+    });
+
+    await fetchConductors();
+    notifyConductorsUpdated();
+
+    return normalizeConductor(response.data);
+  };
+
   const deleteConductor = async (id) => {
     await axios.delete(`${API_URL}/${id}`);
     await fetchConductors();
     notifyConductorsUpdated();
+    notifyVehiclesUpdated();
   };
 
   const conductorsWithState = conductores.map((conductor) => {
@@ -94,6 +115,7 @@ export function useConductors() {
   return {
     conductores: conductorsWithState,
     addConductor,
+    updateConductor,
     deleteConductor,
     fetchConductors,
   };

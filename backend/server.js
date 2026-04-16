@@ -49,6 +49,10 @@ const UsuarioSchema = new mongoose.Schema({
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
 
 const normalizeText = (value) => String(value ?? '').trim();
+const normalizeNullableText = (value) => {
+  const normalized = normalizeText(value);
+  return normalized || null;
+};
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
 app.post('/api/auth/register', async (req, res) => {
@@ -112,15 +116,24 @@ app.get('/api/conductores', async (req, res) => {
 app.post('/api/conductores', async (req, res) => {
   try {
     const { nombre, documento, telefono, categoria, fechaVencimiento, ownerEmail } = req.body;
+    const nombreNormalizado = normalizeText(nombre);
+    const documentoNormalizado = normalizeText(documento);
+    const telefonoNormalizado = normalizeText(telefono);
+    const categoriaNormalizada = normalizeText(categoria);
+    const fechaVencimientoNormalizada = normalizeText(fechaVencimiento);
+    const ownerEmailNormalizado = normalizeText(ownerEmail);
 
-    if (!nombre || !documento || !telefono || !fechaVencimiento || !ownerEmail) {
+    if (
+      !nombreNormalizado ||
+      !documentoNormalizado ||
+      !telefonoNormalizado ||
+      !fechaVencimientoNormalizada ||
+      !ownerEmailNormalizado
+    ) {
       return res
         .status(400)
         .json({ error: 'Todos los campos obligatorios deben estar completos.' });
     }
-
-    const documentoNormalizado = normalizeText(documento);
-    const ownerEmailNormalizado = normalizeText(ownerEmail);
 
     const existente = await Conductor.findOne({
       documento: documentoNormalizado,
@@ -132,16 +145,64 @@ app.post('/api/conductores', async (req, res) => {
     }
 
     const nuevo = new Conductor({
-      nombre: normalizeText(nombre),
+      nombre: nombreNormalizado,
       documento: documentoNormalizado,
-      telefono: normalizeText(telefono),
-      categoria: normalizeText(categoria),
-      fechaVencimiento: normalizeText(fechaVencimiento),
+      telefono: telefonoNormalizado,
+      categoria: categoriaNormalizada,
+      fechaVencimiento: fechaVencimientoNormalizada,
       ownerEmail: ownerEmailNormalizado,
     });
 
     await nuevo.save();
     res.status(201).json(nuevo);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/conductores/:id', async (req, res) => {
+  try {
+    const conductorExistente = await Conductor.findById(req.params.id);
+
+    if (!conductorExistente) {
+      return res.status(404).json({ error: 'Conductor no encontrado' });
+    }
+
+    const nombreNormalizado = normalizeText(req.body.nombre);
+    const documentoNormalizado = normalizeText(req.body.documento);
+    const telefonoNormalizado = normalizeText(req.body.telefono);
+    const categoriaNormalizada = normalizeText(req.body.categoria);
+    const fechaVencimientoNormalizada = normalizeText(req.body.fechaVencimiento);
+
+    if (
+      !nombreNormalizado ||
+      !documentoNormalizado ||
+      !telefonoNormalizado ||
+      !fechaVencimientoNormalizada
+    ) {
+      return res
+        .status(400)
+        .json({ error: 'Todos los campos obligatorios deben estar completos.' });
+    }
+
+    const duplicado = await Conductor.findOne({
+      documento: documentoNormalizado,
+      ownerEmail: conductorExistente.ownerEmail,
+      _id: { $ne: conductorExistente._id },
+    });
+
+    if (duplicado) {
+      return res.status(400).json({ error: 'Ya existe un conductor con este documento.' });
+    }
+
+    conductorExistente.nombre = nombreNormalizado;
+    conductorExistente.documento = documentoNormalizado;
+    conductorExistente.telefono = telefonoNormalizado;
+    conductorExistente.categoria = categoriaNormalizada;
+    conductorExistente.fechaVencimiento = fechaVencimientoNormalizada;
+
+    await conductorExistente.save();
+    res.json(conductorExistente);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -180,16 +241,27 @@ app.get('/api/vehiculos', async (req, res) => {
 app.post('/api/vehiculos', async (req, res) => {
   try {
     const { placa, marca, modelo, anio, tipo, conductorId, ownerEmail, ownerEmpresa } = req.body;
+    const placaNormalizada = normalizeText(placa).toUpperCase();
+    const marcaNormalizada = normalizeText(marca);
+    const modeloNormalizado = normalizeText(modelo);
+    const anioNormalizado = normalizeText(anio);
+    const tipoNormalizado = normalizeText(tipo);
+    const ownerEmailNormalizado = normalizeText(ownerEmail);
+    const ownerEmpresaNormalizada = normalizeText(ownerEmpresa);
+    const anioNumero = Number(anio);
 
-    if (!placa || !marca || !modelo || !anio || !tipo || !ownerEmail) {
+    if (
+      !placaNormalizada ||
+      !marcaNormalizada ||
+      !modeloNormalizado ||
+      !anioNormalizado ||
+      !tipoNormalizado ||
+      !ownerEmailNormalizado
+    ) {
       return res
         .status(400)
         .json({ error: 'Todos los campos obligatorios deben estar completos.' });
     }
-
-    const placaNormalizada = normalizeText(placa).toUpperCase();
-    const ownerEmailNormalizado = normalizeText(ownerEmail);
-    const anioNumero = Number(anio);
 
     if (!Number.isInteger(anioNumero)) {
       return res.status(400).json({ error: 'El anio del vehiculo no es valido.' });
@@ -206,17 +278,71 @@ app.post('/api/vehiculos', async (req, res) => {
 
     const nuevo = new Vehiculo({
       placa: placaNormalizada,
-      marca: normalizeText(marca),
-      modelo: normalizeText(modelo),
+      marca: marcaNormalizada,
+      modelo: modeloNormalizado,
       anio: anioNumero,
-      tipo: normalizeText(tipo),
-      conductorId: conductorId ? normalizeText(conductorId) : null,
+      tipo: tipoNormalizado,
+      conductorId: normalizeNullableText(conductorId),
       ownerEmail: ownerEmailNormalizado,
-      ownerEmpresa: normalizeText(ownerEmpresa),
+      ownerEmpresa: ownerEmpresaNormalizada,
     });
 
     await nuevo.save();
     res.status(201).json(nuevo);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/vehiculos/:id', async (req, res) => {
+  try {
+    const vehiculoExistente = await Vehiculo.findById(req.params.id);
+
+    if (!vehiculoExistente) {
+      return res.status(404).json({ error: 'Vehiculo no encontrado' });
+    }
+
+    const placaNormalizada = normalizeText(req.body.placa).toUpperCase();
+    const marcaNormalizada = normalizeText(req.body.marca);
+    const modeloNormalizado = normalizeText(req.body.modelo);
+    const anioNormalizado = normalizeText(req.body.anio);
+    const tipoNormalizado = normalizeText(req.body.tipo);
+    const anioNumero = Number(req.body.anio);
+
+    if (
+      !placaNormalizada ||
+      !marcaNormalizada ||
+      !modeloNormalizado ||
+      !anioNormalizado ||
+      !tipoNormalizado
+    ) {
+      return res
+        .status(400)
+        .json({ error: 'Todos los campos obligatorios deben estar completos.' });
+    }
+
+    if (!Number.isInteger(anioNumero)) {
+      return res.status(400).json({ error: 'El anio del vehiculo no es valido.' });
+    }
+
+    const duplicado = await Vehiculo.findOne({
+      placa: placaNormalizada,
+      ownerEmail: vehiculoExistente.ownerEmail,
+      _id: { $ne: vehiculoExistente._id },
+    });
+
+    if (duplicado) {
+      return res.status(400).json({ error: 'Ya existe un vehiculo con esta placa.' });
+    }
+
+    vehiculoExistente.placa = placaNormalizada;
+    vehiculoExistente.marca = marcaNormalizada;
+    vehiculoExistente.modelo = modeloNormalizado;
+    vehiculoExistente.anio = anioNumero;
+    vehiculoExistente.tipo = tipoNormalizado;
+
+    await vehiculoExistente.save();
+    res.json(vehiculoExistente);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -242,7 +368,7 @@ app.put('/api/vehiculos/:id/conductor', async (req, res) => {
       return res.status(400).json({ error: 'El conductorId es obligatorio.' });
     }
 
-    const conductorId = normalizeText(req.body.conductorId) || null;
+    const conductorId = normalizeNullableText(req.body.conductorId);
     const vehiculo = await Vehiculo.findById(req.params.id);
 
     if (!vehiculo) {
@@ -261,6 +387,15 @@ app.put('/api/vehiculos/:id/conductor', async (req, res) => {
           .status(400)
           .json({ error: 'El conductor no pertenece al mismo usuario del vehiculo.' });
       }
+
+      await Vehiculo.updateMany(
+        {
+          ownerEmail: vehiculo.ownerEmail,
+          conductorId,
+          _id: { $ne: vehiculo._id },
+        },
+        { $set: { conductorId: null } }
+      );
     }
 
     vehiculo.conductorId = conductorId;
