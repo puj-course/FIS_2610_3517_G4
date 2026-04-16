@@ -5,18 +5,17 @@ require('dotenv').config();
 
 const app = express();
 
-// --- MIDDLEWARES ---
 app.use(cors());
 app.use(express.json());
 
-// --- CONEXIÓN A MONGODB ATLAS ---
-const MONGO_URI = "mongodb+srv://juansebastianvd_db_user:UcgkGfBgvUkgEVcF@cluster0.45cqzzh.mongodb.net/logistica_db?retryWrites=true&w=majority";
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb+srv://juansebastianvd_db_user:UcgkGfBgvUkgEVcF@cluster0.45cqzzh.mongodb.net/logistica_db?retryWrites=true&w=majority';
 
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅ Conexión exitosa a MongoDB Atlas'))
-  .catch(err => console.error('❌ Error de conexión:', err));
-
-// --- MODELOS DE DATOS ---
+mongoose
+  .connect(MONGO_URI)
+  .then(() => console.log('Conexion exitosa a MongoDB Atlas'))
+  .catch((err) => console.error('Error de conexion:', err));
 
 const ConductorSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
@@ -24,7 +23,7 @@ const ConductorSchema = new mongoose.Schema({
   telefono: String,
   categoria: String,
   fechaVencimiento: { type: String, required: true },
-  ownerEmail: { type: String, required: true }
+  ownerEmail: { type: String, required: true },
 });
 const Conductor = mongoose.model('Conductor', ConductorSchema);
 
@@ -36,36 +35,42 @@ const VehiculoSchema = new mongoose.Schema({
   tipo: String,
   conductorId: { type: String, default: null },
   ownerEmail: { type: String, required: true },
-  ownerEmpresa: String
+  ownerEmpresa: String,
 });
 const Vehiculo = mongoose.model('Vehiculo', VehiculoSchema);
 
-// --- MODELO DE USUARIO ---
 const UsuarioSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   empresa: String,
   telefono: String,
-  role: { type: String, default: 'admin' }
+  role: { type: String, default: 'admin' },
 });
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
 
-// --- RUTAS DE AUTENTICACIÓN ---
+const normalizeText = (value) => String(value ?? '').trim();
+const normalizeNullableText = (value) => {
+  const normalized = normalizeText(value);
+  return normalized || null;
+};
+const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
-// Registro de usuario
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, empresa, telefono } = req.body; // ✅ FIX: era req.query
+    const { email, password, empresa, telefono } = req.body;
+
     if (!email || !password) {
-      return res.status(400).json({ message: 'Email y contraseña son requeridos' });
+      return res.status(400).json({ message: 'Email y contrasena son requeridos' });
     }
+
     const existe = await Usuario.findOne({ email });
-    if (existe) return res.status(400).json({ message: 'El correo ya está registrado' });
+    if (existe) {
+      return res.status(400).json({ message: 'El correo ya esta registrado' });
+    }
 
     const nuevoUsuario = new Usuario({ email, password, empresa, telefono });
     await nuevoUsuario.save();
 
-    // ✅ FIX: devolver { user: ... } sin la contraseña
     const { password: _, ...userSinPassword } = nuevoUsuario.toObject();
     res.status(201).json({ user: userSinPassword });
   } catch (err) {
@@ -73,17 +78,19 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// Login de usuario
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email y contraseña son requeridos' });
-    }
-    const usuario = await Usuario.findOne({ email, password }); // usar bcrypt en producción
-    if (!usuario) return res.status(401).json({ message: 'Credenciales inválidas' });
 
-    // ✅ FIX: devolver { user: ... } sin la contraseña
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email y contrasena son requeridos' });
+    }
+
+    const usuario = await Usuario.findOne({ email, password });
+    if (!usuario) {
+      return res.status(401).json({ message: 'Credenciales invalidas' });
+    }
+
     const { password: _, ...userSinPassword } = usuario.toObject();
     res.json({ user: userSinPassword });
   } catch (err) {
@@ -91,43 +98,316 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// --- RUTAS PARA CONDUCTORES ---
-
 app.get('/api/conductores', async (req, res) => {
   try {
-    const { email } = req.query;
+    const email = normalizeText(req.query.email);
+
+    if (!email) {
+      return res.status(400).json({ error: 'El email es obligatorio.' });
+    }
+
     const data = await Conductor.find({ ownerEmail: email });
     res.json(data);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post('/api/conductores', async (req, res) => {
   try {
-    const nuevo = new Conductor(req.body);
+    const { nombre, documento, telefono, categoria, fechaVencimiento, ownerEmail } = req.body;
+    const nombreNormalizado = normalizeText(nombre);
+    const documentoNormalizado = normalizeText(documento);
+    const telefonoNormalizado = normalizeText(telefono);
+    const categoriaNormalizada = normalizeText(categoria);
+    const fechaVencimientoNormalizada = normalizeText(fechaVencimiento);
+    const ownerEmailNormalizado = normalizeText(ownerEmail);
+
+    if (
+      !nombreNormalizado ||
+      !documentoNormalizado ||
+      !telefonoNormalizado ||
+      !fechaVencimientoNormalizada ||
+      !ownerEmailNormalizado
+    ) {
+      return res
+        .status(400)
+        .json({ error: 'Todos los campos obligatorios deben estar completos.' });
+    }
+
+    const existente = await Conductor.findOne({
+      documento: documentoNormalizado,
+      ownerEmail: ownerEmailNormalizado,
+    });
+
+    if (existente) {
+      return res.status(400).json({ error: 'Ya existe un conductor con este documento.' });
+    }
+
+    const nuevo = new Conductor({
+      nombre: nombreNormalizado,
+      documento: documentoNormalizado,
+      telefono: telefonoNormalizado,
+      categoria: categoriaNormalizada,
+      fechaVencimiento: fechaVencimientoNormalizada,
+      ownerEmail: ownerEmailNormalizado,
+    });
+
     await nuevo.save();
     res.status(201).json(nuevo);
-  } catch (err) { res.status(400).json({ error: err.message }); }
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
-// --- RUTAS PARA VEHÍCULOS ---
+app.put('/api/conductores/:id', async (req, res) => {
+  try {
+    const conductorExistente = await Conductor.findById(req.params.id);
+
+    if (!conductorExistente) {
+      return res.status(404).json({ error: 'Conductor no encontrado' });
+    }
+
+    const nombreNormalizado = normalizeText(req.body.nombre);
+    const documentoNormalizado = normalizeText(req.body.documento);
+    const telefonoNormalizado = normalizeText(req.body.telefono);
+    const categoriaNormalizada = normalizeText(req.body.categoria);
+    const fechaVencimientoNormalizada = normalizeText(req.body.fechaVencimiento);
+
+    if (
+      !nombreNormalizado ||
+      !documentoNormalizado ||
+      !telefonoNormalizado ||
+      !fechaVencimientoNormalizada
+    ) {
+      return res
+        .status(400)
+        .json({ error: 'Todos los campos obligatorios deben estar completos.' });
+    }
+
+    const duplicado = await Conductor.findOne({
+      documento: documentoNormalizado,
+      ownerEmail: conductorExistente.ownerEmail,
+      _id: { $ne: conductorExistente._id },
+    });
+
+    if (duplicado) {
+      return res.status(400).json({ error: 'Ya existe un conductor con este documento.' });
+    }
+
+    conductorExistente.nombre = nombreNormalizado;
+    conductorExistente.documento = documentoNormalizado;
+    conductorExistente.telefono = telefonoNormalizado;
+    conductorExistente.categoria = categoriaNormalizada;
+    conductorExistente.fechaVencimiento = fechaVencimientoNormalizada;
+
+    await conductorExistente.save();
+    res.json(conductorExistente);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete('/api/conductores/:id', async (req, res) => {
+  try {
+    const conductorEliminado = await Conductor.findByIdAndDelete(req.params.id);
+
+    if (!conductorEliminado) {
+      return res.status(404).json({ error: 'Conductor no encontrado' });
+    }
+
+    await Vehiculo.updateMany({ conductorId: req.params.id }, { conductorId: null });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 app.get('/api/vehiculos', async (req, res) => {
   try {
-    const { email } = req.query;
+    const email = normalizeText(req.query.email);
+
+    if (!email) {
+      return res.status(400).json({ error: 'El email es obligatorio.' });
+    }
+
     const data = await Vehiculo.find({ ownerEmail: email });
     res.json(data);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post('/api/vehiculos', async (req, res) => {
   try {
-    const nuevo = new Vehiculo(req.body);
+    const { placa, marca, modelo, anio, tipo, conductorId, ownerEmail, ownerEmpresa } = req.body;
+    const placaNormalizada = normalizeText(placa).toUpperCase();
+    const marcaNormalizada = normalizeText(marca);
+    const modeloNormalizado = normalizeText(modelo);
+    const anioNormalizado = normalizeText(anio);
+    const tipoNormalizado = normalizeText(tipo);
+    const ownerEmailNormalizado = normalizeText(ownerEmail);
+    const ownerEmpresaNormalizada = normalizeText(ownerEmpresa);
+    const anioNumero = Number(anio);
+
+    if (
+      !placaNormalizada ||
+      !marcaNormalizada ||
+      !modeloNormalizado ||
+      !anioNormalizado ||
+      !tipoNormalizado ||
+      !ownerEmailNormalizado
+    ) {
+      return res
+        .status(400)
+        .json({ error: 'Todos los campos obligatorios deben estar completos.' });
+    }
+
+    if (!Number.isInteger(anioNumero)) {
+      return res.status(400).json({ error: 'El anio del vehiculo no es valido.' });
+    }
+
+    const existente = await Vehiculo.findOne({
+      placa: placaNormalizada,
+      ownerEmail: ownerEmailNormalizado,
+    });
+
+    if (existente) {
+      return res.status(400).json({ error: 'Ya existe un vehiculo con esta placa.' });
+    }
+
+    const nuevo = new Vehiculo({
+      placa: placaNormalizada,
+      marca: marcaNormalizada,
+      modelo: modeloNormalizado,
+      anio: anioNumero,
+      tipo: tipoNormalizado,
+      conductorId: normalizeNullableText(conductorId),
+      ownerEmail: ownerEmailNormalizado,
+      ownerEmpresa: ownerEmpresaNormalizada,
+    });
+
     await nuevo.save();
     res.status(201).json(nuevo);
-  } catch (err) { res.status(400).json({ error: err.message }); }
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/vehiculos/:id', async (req, res) => {
+  try {
+    const vehiculoExistente = await Vehiculo.findById(req.params.id);
+
+    if (!vehiculoExistente) {
+      return res.status(404).json({ error: 'Vehiculo no encontrado' });
+    }
+
+    const placaNormalizada = normalizeText(req.body.placa).toUpperCase();
+    const marcaNormalizada = normalizeText(req.body.marca);
+    const modeloNormalizado = normalizeText(req.body.modelo);
+    const anioNormalizado = normalizeText(req.body.anio);
+    const tipoNormalizado = normalizeText(req.body.tipo);
+    const anioNumero = Number(req.body.anio);
+
+    if (
+      !placaNormalizada ||
+      !marcaNormalizada ||
+      !modeloNormalizado ||
+      !anioNormalizado ||
+      !tipoNormalizado
+    ) {
+      return res
+        .status(400)
+        .json({ error: 'Todos los campos obligatorios deben estar completos.' });
+    }
+
+    if (!Number.isInteger(anioNumero)) {
+      return res.status(400).json({ error: 'El anio del vehiculo no es valido.' });
+    }
+
+    const duplicado = await Vehiculo.findOne({
+      placa: placaNormalizada,
+      ownerEmail: vehiculoExistente.ownerEmail,
+      _id: { $ne: vehiculoExistente._id },
+    });
+
+    if (duplicado) {
+      return res.status(400).json({ error: 'Ya existe un vehiculo con esta placa.' });
+    }
+
+    vehiculoExistente.placa = placaNormalizada;
+    vehiculoExistente.marca = marcaNormalizada;
+    vehiculoExistente.modelo = modeloNormalizado;
+    vehiculoExistente.anio = anioNumero;
+    vehiculoExistente.tipo = tipoNormalizado;
+
+    await vehiculoExistente.save();
+    res.json(vehiculoExistente);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete('/api/vehiculos/:id', async (req, res) => {
+  try {
+    const vehiculoEliminado = await Vehiculo.findByIdAndDelete(req.params.id);
+
+    if (!vehiculoEliminado) {
+      return res.status(404).json({ error: 'Vehiculo no encontrado' });
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/vehiculos/:id/conductor', async (req, res) => {
+  try {
+    if (!hasOwn(req.body, 'conductorId')) {
+      return res.status(400).json({ error: 'El conductorId es obligatorio.' });
+    }
+
+    const conductorId = normalizeNullableText(req.body.conductorId);
+    const vehiculo = await Vehiculo.findById(req.params.id);
+
+    if (!vehiculo) {
+      return res.status(404).json({ error: 'Vehiculo no encontrado' });
+    }
+
+    if (conductorId) {
+      const conductor = await Conductor.findById(conductorId);
+
+      if (!conductor) {
+        return res.status(404).json({ error: 'Conductor no encontrado' });
+      }
+
+      if (conductor.ownerEmail !== vehiculo.ownerEmail) {
+        return res
+          .status(400)
+          .json({ error: 'El conductor no pertenece al mismo usuario del vehiculo.' });
+      }
+
+      await Vehiculo.updateMany(
+        {
+          ownerEmail: vehiculo.ownerEmail,
+          conductorId,
+          _id: { $ne: vehiculo._id },
+        },
+        { $set: { conductorId: null } }
+      );
+    }
+
+    vehiculo.conductorId = conductorId;
+    await vehiculo.save();
+
+    res.json(vehiculo);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor backend listo en http://localhost:${PORT}`);
+  console.log(`Servidor backend listo en http://localhost:${PORT}`);
 });
