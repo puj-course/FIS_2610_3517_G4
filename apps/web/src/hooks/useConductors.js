@@ -2,9 +2,10 @@ import { useEffect } from 'react';
 import { useLocalStorage } from './useLocalStorage.js';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
-import { registerSourceAlerts, clearSourceAlerts } from './useAlertHub.js';
+import { clearSourceAlerts } from './useAlertHub.js';
+import ConductorAlertAdapter from '@/patterns/adapters/ConductorAlertAdapter.js';
+import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
 
-//use state
 const initialConductors = [
   { id: 'c1', nombre: 'Juan Pérez', documento: '10203040', telefono: '3001234567', categoria: 'C2', fechaVencimiento: '2026-12-31' },
   { id: 'c2', nombre: 'María Gómez', documento: '50607080', telefono: '3109876543', categoria: 'C1', fechaVencimiento: '2026-03-01' },
@@ -17,7 +18,7 @@ export function useConductors() {
   const [threshold] = useLocalStorage('syntix_threshold', 15);
 
   const getConductorsWithState = () => {
-    return conductores.map(c => {
+    return conductores.map((c) => {
       const days = calculateDaysRemaining(c.fechaVencimiento, simulatedDate);
       return {
         ...c,
@@ -32,31 +33,20 @@ export function useConductors() {
   };
 
   const updateConductor = (id, data) => {
-    setConductores(conductores.map(c => c.id === id ? { ...c, ...data } : c));
+    setConductores(conductores.map((c) => (c.id === id ? { ...c, ...data } : c)));
   };
 
   const deleteConductor = (id) => {
-    setConductores(conductores.filter(c => c.id !== id));
+    setConductores(conductores.filter((c) => c.id !== id));
   };
 
   const conductoresWithState = getConductorsWithState();
+  const conductorAlertAdapter = new ConductorAlertAdapter();
 
   useEffect(() => {
-    const alerts = conductoresWithState
-      .filter((conductor) => conductor.estado === 'rojo' || conductor.estado === 'amarillo')
-      .map((conductor) => ({
-        id: `lic-${conductor.id}`,
-        tipo: 'Licencia',
-        entidad: `Conductor ${conductor.nombre}`,
-        mensaje: conductor.estado === 'rojo' ? 'Licencia Vencida' : 'Licencia Próxima a Vencer',
-        diasRestantes: conductor.diasRestantes,
-        prioridad: conductor.estado,
-        fecha: new Date().toISOString()
-      }));
-
-    registerSourceAlerts('conductores', alerts);
+    publishAdaptedAlerts(conductorAlertAdapter, 'conductores', conductoresWithState);
     return () => clearSourceAlerts('conductores');
-  }, [conductores, simulatedDate, threshold]);
+  }, [conductoresWithState]);
 
   return {
     conductores: conductoresWithState,

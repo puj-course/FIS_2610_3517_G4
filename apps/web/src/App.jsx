@@ -3,9 +3,11 @@ import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-d
 import { AuthProvider } from '@/contexts/AuthContext.jsx';
 import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 import DashboardLayout from '@/layouts/DashboardLayout.jsx';
+import { DocumentsProvider } from '@/contexts/DocumentsContext.jsx';
 
 import HomePage from '@/pages/HomePage.jsx';
 import TeamPage from '@/pages/TeamPage.jsx';
+import LoginPage from '@/pages/LoginPage.jsx';
 
 import DashboardPage from '@/pages/DashboardPage.jsx';
 import AlertasPage from '@/pages/AlertasPage.jsx';
@@ -20,34 +22,33 @@ import ConfiguracionPage from '@/pages/ConfiguracionPage.jsx';
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          {/* Públicas */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/team" element={<TeamPage />} />
+      <DocumentsProvider>
+        <Router>
+          <Routes>
+            {/* Públicas */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/team" element={<TeamPage />} />
+            <Route path="/login" element={<LoginPage />} />
 
-          {/* Protegidas */}
-          <Route
-            element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/vehiculos" element={<VehiculosPage />} />
-            <Route path="/conductores" element={<ConductoresPage />} />
-            <Route path="/documentos" element={<DocumentosPage />} />
-            <Route path="/alertas" element={<AlertasPage />} />
-            <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
-            <Route path="/historial-validaciones" element={<HistorialValidacionesPage />} />
-            <Route path="/reportes" element={<ReportesPage />} />
-            <Route path="/configuracion" element={<ConfiguracionPage />} />
-          </Route>
+            {/* Protegidas */}
+            <Route element={<ProtectedRoute />}>
+              <Route element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/vehiculos" element={<VehiculosPage />} />
+                <Route path="/conductores" element={<ConductoresPage />} />
+                <Route path="/documentos" element={<DocumentosPage />} />
+                <Route path="/alertas" element={<AlertasPage />} />
+                <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
+                <Route path="/historial-validaciones" element={<HistorialValidacionesPage />} />
+                <Route path="/reportes" element={<ReportesPage />} />
+                <Route path="/configuracion" element={<ConfiguracionPage />} />
+              </Route>
+            </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Router>
+      </DocumentsProvider>
     </AuthProvider>
   );
 }

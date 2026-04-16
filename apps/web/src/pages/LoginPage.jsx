@@ -18,10 +18,11 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     
-    if (login(email, password)) {
+    const result = login(email, password);
+    if (result.success) {
       navigate(from, { replace: true });
     } else {
-      setError('Credenciales inválidas. Intente de nuevo.');
+      setError(result.message || 'Credenciales inválidas. Intente de nuevo.');
     }
   };
 
