@@ -15,6 +15,7 @@ import VehiculosPage from '@/pages/VehiculosPage.jsx';
 import ConductoresPage from '@/pages/ConductoresPage.jsx';
 import DocumentosPage from '@/pages/DocumentosPage.jsx';
 import ValidacionRUNTPage from '@/pages/ValidacionRUNTPage.jsx';
+import HistorialValidacionesPage from '@/pages/HistorialValidacionesPage.jsx';
 import ReportesPage from '@/pages/ReportesPage.jsx';
 import ConfiguracionPage from '@/pages/ConfiguracionPage.jsx';
 
