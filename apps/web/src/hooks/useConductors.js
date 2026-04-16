@@ -3,7 +3,9 @@ import axios from 'axios';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
-import { registerSourceAlerts, clearSourceAlerts } from './useAlertHub.js';
+import { clearSourceAlerts } from './useAlertHub.js';
+import ConductorAlertAdapter from '@/patterns/adapters/ConductorAlertAdapter.js';
+import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
 
 const API_URL = 'http://localhost:5000/api/conductores';
 

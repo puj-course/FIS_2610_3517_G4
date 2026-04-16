@@ -2,7 +2,7 @@ name: CI - Verificación del proyecto
 
 on:
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "develop","main" ]
   push:
     branches: [ "feature/**" ]
 
