@@ -1,58 +1,74 @@
 import React, { createContext, useContext } from 'react';
+import axios from 'axios';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 
 const AuthContext = createContext(null);
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useLocalStorage('syntix_user', null);
-  const [usersDb, setUsersDb] = useLocalStorage('syntix_users_db', []);
 
-  const register = (email, password, empresa, telefono) => {
-    if (usersDb.find(u => u.email === email)) {
-      return { success: false, message: 'El correo ya está registrado' };
+  // ── login ──────────────────────────────────────────────────────────────────
+  const login = async (email, password) => {
+    try {
+      const { data } = await axios.post(`${API_URL}/api/auth/login`, {
+        email,
+        password,
+      });
+      // El backend debe devolver: { success: true, user: { email, empresa, ... } }
+      setUser(data.user);
+      return { success: true };
+    } catch (err) {
+      const message =
+        err.response?.data?.message || 'Error al conectar con el servidor';
+      return { success: false, message };
     }
-    const newUser = { email, password, empresa, telefono, role: 'admin' };
-    setUsersDb([...usersDb, newUser]);
-    setUser({ email, empresa, telefono, role: 'admin' });
-    return { success: true };
   };
 
-  const login = (email, password) => {
-    const foundUser = usersDb.find(u => u.email === email && u.password === password);
-    if (foundUser) {
-      const { password: _, ...userWithoutPass } = foundUser;
-      setUser(userWithoutPass);
+  // ── register ───────────────────────────────────────────────────────────────
+  const register = async (email, password, empresa, telefono) => {
+    try {
+      const { data } = await axios.post(`${API_URL}/api/auth/register`, {
+        email,
+        password,
+        empresa,
+        telefono,
+      });
+      setUser(data.user);
       return { success: true };
+    } catch (err) {
+      const message =
+        err.response?.data?.message || 'Error al conectar con el servidor';
+      return { success: false, message };
     }
-    // Fallback mock for testing if db is empty
-    if (email === 'admin@syntix.tech' && password === 'admin123') {
-      setUser({ email, empresa: 'SYNTIX Demo', telefono: '3000000000', role: 'admin' });
-      return { success: true };
-    }
-    return { success: false, message: 'Credenciales inválidas' };
   };
 
-  const updateUser = (newEmail, newPassword) => {
+  // ── updateUser ─────────────────────────────────────────────────────────────
+  const updateUser = async (newEmail, newPassword) => {
     if (!user) return { success: false, message: 'No hay usuario autenticado' };
-    
-    const updatedUsersDb = usersDb.map(u => {
-      if (u.email === user.email) {
-        return { ...u, email: newEmail || u.email, password: newPassword || u.password };
-      }
-      return u;
-    });
-    
-    setUsersDb(updatedUsersDb);
-    setUser({ ...user, email: newEmail || user.email });
-    return { success: true };
+    try {
+      const { data } = await axios.put(
+        `${API_URL}/api/auth/update`,
+        { email: newEmail, password: newPassword },
+        { headers: { 'x-user-email': user.email } }   // ajusta al auth que uses
+      );
+      setUser({ ...user, email: data.user?.email || newEmail || user.email });
+      return { success: true };
+    } catch (err) {
+      const message =
+        err.response?.data?.message || 'Error al actualizar usuario';
+      return { success: false, message };
+    }
   };
 
-  const logout = () => {
-    setUser(null);
-  };
+  // ── logout ─────────────────────────────────────────────────────────────────
+  const logout = () => setUser(null);
 
   return (
-    <AuthContext.Provider value={{ user, login, register, updateUser, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider
+      value={{ user, login, register, updateUser, logout, isAuthenticated: !!user }}
+    >
       {children}
     </AuthContext.Provider>
   );
