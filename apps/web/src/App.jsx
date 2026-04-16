@@ -15,7 +15,6 @@ import VehiculosPage from '@/pages/VehiculosPage.jsx';
 import ConductoresPage from '@/pages/ConductoresPage.jsx';
 import DocumentosPage from '@/pages/DocumentosPage.jsx';
 import ValidacionRUNTPage from '@/pages/ValidacionRUNTPage.jsx';
-import HistorialValidacionesPage from '@/pages/HistorialValidacionesPage.jsx';
 import ReportesPage from '@/pages/ReportesPage.jsx';
 import ConfiguracionPage from '@/pages/ConfiguracionPage.jsx';
 
@@ -30,26 +29,6 @@ function App() {
             <Route path="/team" element={<TeamPage />} />
             <Route path="/login" element={<LoginPage />} />
 
-<<<<<<< HEAD
-          {/* Protegidas */}
-          <Route
-            element={
-              <ProtectedRoute>
-                <DashboardLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/vehiculos" element={<VehiculosPage />} />
-            <Route path="/conductores" element={<ConductoresPage />} />
-            <Route path="/documentos" element={<DocumentosPage />} />
-            <Route path="/alertas" element={<AlertasPage />} />
-            <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
-            <Route path="/historial-validaciones" element={<HistorialValidacionesPage />} />
-            <Route path="/reportes" element={<ReportesPage />} />
-            <Route path="/configuracion" element={<ConfiguracionPage />} />
-          </Route>
-=======
             {/* Protegidas */}
             <Route element={<ProtectedRoute />}>
               <Route element={<DashboardLayout />}>
@@ -63,7 +42,6 @@ function App() {
                 <Route path="/configuracion" element={<ConfiguracionPage />} />
               </Route>
             </Route>
->>>>>>> 523f4179d34949cd98cf7b84ba8a95e447def451
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
