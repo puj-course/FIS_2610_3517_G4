@@ -17,10 +17,29 @@ jobs:
           -H "Accept: application/vnd.github.v3+json" \
           https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/assignees \
           -d '{"assignees":["${{ github.actor }}"]}'
+          - name: Asignar al Proyecto FIS y mover a Ready
+            uses: actions/add-to-project@v1.0.2
+            with:
+              project-url: https://github.com/orgs/puj-course/projects/NUMERO_DE_TU_PROYECTO
+              github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Asignar al Proyecto del Grupo 4
+        uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/puj-course/FIS_2610_3517_G4
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Mover a columna Ready
+        uses: alex-page/github-project-automation-plus@v0.9.0
+        with:
+          project: FIS_2610_3517_G4  
+          column: Ready
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comentar confirmación de flujo
         uses: peter-evans/create-or-update-comment@v4
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
-            Se ha generado una asignación automática-
+            Se ha generado una asignación automática 
+            
