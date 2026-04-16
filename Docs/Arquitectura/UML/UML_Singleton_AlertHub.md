@@ -14,3 +14,5 @@ classDiagram
     class useAlertHub
 
     useAlertHub --> AlertHubSingleton : obtiene instancia unica
+
+    ```

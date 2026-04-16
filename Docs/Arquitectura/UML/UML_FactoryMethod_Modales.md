@@ -16,3 +16,4 @@ classDiagram
 
     ModalFactory --> AuthModalFactory
     ModalFactory --> FleetModalFactory
+    ```
