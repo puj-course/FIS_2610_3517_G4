@@ -1,27 +1,34 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
-import { Car, Lock, Mail } from 'lucide-react';
+import { Car, Lock, Mail, Loader2 } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);   // ← nuevo
 
-  const from = location.state?.from?.pathname || "/";
+  const { login }    = useAuth();
+  const navigate     = useNavigate();
+  const location     = useLocation();
+  const from         = location.state?.from?.pathname || '/';
 
-  const handleSubmit = (e) => {
+  // ── KEY FIX: handleSubmit debe ser async ────────────────────────────────────
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
-    if (login(email, password)) {
+    setLoading(true);
+
+    const result = await login(email, password);   // ← await aquí
+
+    setLoading(false);
+
+    if (result.success) {
       navigate(from, { replace: true });
     } else {
-      setError('Credenciales inválidas. Intente de nuevo.');
+      setError(result.message || 'Credenciales inválidas. Intente de nuevo.');
     }
   };
 
@@ -30,7 +37,7 @@ export default function LoginPage() {
       <Helmet>
         <title>Login | SYNTIX Drive Control</title>
       </Helmet>
-      
+
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="w-16 h-16 bg-syntix-navy rounded-2xl flex items-center justify-center shadow-lg">
@@ -53,7 +60,7 @@ export default function LoginPage() {
                 {error}
               </div>
             )}
-            
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Correo Electrónico
@@ -99,9 +106,17 @@ export default function LoginPage() {
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-syntix-navy hover:bg-syntix-navy/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-syntix-navy transition-colors"
+                disabled={loading}
+                className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-syntix-navy hover:bg-syntix-navy/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-syntix-navy transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Iniciar Sesión
+                {loading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Iniciando sesión...
+                  </>
+                ) : (
+                  'Iniciar Sesión'
+                )}
               </button>
             </div>
           </form>
