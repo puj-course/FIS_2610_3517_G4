@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Search, Plus, User, Trash2 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge.jsx';
@@ -8,11 +8,28 @@ import { useConductors } from '@/hooks/useConductors.js';
 export default function ConductoresPage() {
   const { conductores, deleteConductor } = useConductors();
   const [searchTerm, setSearchTerm] = useState('');
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isConductorModalOpen, setIsConductorModalOpen] = useState(false);
+  const [conductorToEdit, setConductorToEdit] = useState(null);
 
-  const filtered = conductores.filter(c =>
-    c.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.documento.includes(searchTerm)
+  const openCreateModal = () => {
+    setConductorToEdit(null);
+    setIsConductorModalOpen(true);
+  };
+
+  const openEditModal = (conductor) => {
+    setConductorToEdit(conductor);
+    setIsConductorModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsConductorModalOpen(false);
+    setConductorToEdit(null);
+  };
+
+  const filtered = conductores.filter(
+    (c) =>
+      c.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.documento.includes(searchTerm)
   );
 
   return (
@@ -22,10 +39,10 @@ export default function ConductoresPage() {
       </Helmet>
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-bold text-syntix-navy">Gestión de Conductores</h1>
+        <h1 className="text-2xl font-bold text-syntix-navy">Gestion de Conductores</h1>
         <button
           type="button"
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={openCreateModal}
           className="bg-syntix-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2 shadow-sm"
         >
           <Plus className="w-4 h-4" /> Nuevo Conductor
@@ -54,6 +71,7 @@ export default function ConductoresPage() {
                 <th className="px-6 py-4">Documento</th>
                 <th className="px-6 py-4">Contacto</th>
                 <th className="px-6 py-4">Licencia</th>
+                <th className="px-6 py-4 text-center">Editar</th>
                 <th className="px-6 py-4 text-right">Acciones</th>
               </tr>
             </thead>
@@ -74,11 +92,22 @@ export default function ConductoresPage() {
                       <StatusBadge status={c.estado} />
                     </div>
                   </td>
+                  <td className="px-6 py-4 text-center">
+                    <button
+                      type="button"
+                      onClick={() => openEditModal(c)}
+                      className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-syntix-navy bg-syntix-navy/5 hover:bg-syntix-navy/10 rounded-lg transition-colors"
+                      aria-label={`Editar conductor ${c.nombre}`}
+                    >
+                      Editar
+                    </button>
+                  </td>
                   <td className="px-6 py-4 text-right">
                     <button
                       type="button"
                       onClick={() => deleteConductor(c.id)}
                       className="p-2 text-gray-400 hover:text-syntix-red hover:bg-red-50 rounded-lg transition-colors"
+                      aria-label={`Eliminar conductor ${c.nombre}`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -91,8 +120,9 @@ export default function ConductoresPage() {
       </div>
 
       <AddConductorModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
+        isOpen={isConductorModalOpen}
+        onClose={handleCloseModal}
+        conductorToEdit={conductorToEdit}
       />
     </div>
   );

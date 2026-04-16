@@ -78,6 +78,19 @@ export function useVehicles() {
     return normalizeVehicle(response.data);
   };
 
+  const updateVehicle = async (id, data) => {
+    const response = await axios.put(`${API_URL}/${id}`, {
+      ...data,
+      placa: String(data.placa ?? '').trim().toUpperCase(),
+      anio: Number(data.anio),
+    });
+
+    await fetchVehicles();
+    notifyVehiclesUpdated();
+
+    return normalizeVehicle(response.data);
+  };
+
   const deleteVehicle = async (id) => {
     await axios.delete(`${API_URL}/${id}`);
     await fetchVehicles();
@@ -115,6 +128,7 @@ export function useVehicles() {
   return {
     vehiculos: vehiculosCompletos,
     addVehicle,
+    updateVehicle,
     deleteVehicle,
     assignConductor,
     fetchVehicles,

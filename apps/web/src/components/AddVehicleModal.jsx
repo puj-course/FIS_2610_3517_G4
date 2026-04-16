@@ -1,30 +1,56 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Car, Save } from 'lucide-react';
 import { useVehicles } from '@/hooks/useVehicles.js';
 
-export default function AddVehicleModal({ isOpen, onClose }) {
-  const { vehiculos, addVehicle } = useVehicles();
+const createInitialFormData = (currentYear) => ({
+  placa: '',
+  marca: '',
+  modelo: '',
+  anio: currentYear,
+  tipo: 'Automovil',
+});
+
+export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null }) {
+  const { vehiculos, addVehicle, updateVehicle } = useVehicles();
   const currentYear = new Date().getFullYear();
-  const [formData, setFormData] = useState({
-    placa: '',
-    marca: '',
-    modelo: '',
-    anio: currentYear,
-    tipo: 'Automovil',
-  });
+  const [formData, setFormData] = useState(() => createInitialFormData(currentYear));
   const [error, setError] = useState('');
+
+  const isEditing = Boolean(vehicleToEdit?.id);
+  const modalTitle = isEditing ? 'Editar Vehiculo' : 'Agregar Vehiculo';
+  const submitLabel = isEditing ? 'Actualizar' : 'Guardar';
+
+  const resetForm = () => {
+    setFormData(createInitialFormData(currentYear));
+    setError('');
+  };
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    if (isEditing) {
+      setFormData({
+        placa: vehicleToEdit.placa ?? '',
+        marca: vehicleToEdit.marca ?? '',
+        modelo: vehicleToEdit.modelo ?? '',
+        anio: vehicleToEdit.anio ?? currentYear,
+        tipo: vehicleToEdit.tipo ?? 'Automovil',
+      });
+      setError('');
+      return;
+    }
+
+    setFormData(createInitialFormData(currentYear));
+    setError('');
+  }, [currentYear, isEditing, isOpen, vehicleToEdit]);
 
   if (!isOpen) return null;
 
-  const resetForm = () => {
-    setFormData({
-      placa: '',
-      marca: '',
-      modelo: '',
-      anio: currentYear,
-      tipo: 'Automovil',
-    });
-    setError('');
+  const handleClose = () => {
+    resetForm();
+    onClose();
   };
 
   const handleSubmit = async (e) => {
@@ -32,30 +58,42 @@ export default function AddVehicleModal({ isOpen, onClose }) {
     setError('');
 
     const placaUpper = formData.placa.trim().toUpperCase();
+    const isDuplicatePlate = vehiculos.some((vehiculo) => {
+      const samePlate = vehiculo.placa?.toUpperCase() === placaUpper;
+      const isSameVehicle = isEditing && String(vehiculo.id) === String(vehicleToEdit.id);
+      return samePlate && !isSameVehicle;
+    });
 
-    if (vehiculos.some((vehiculo) => vehiculo.placa?.toUpperCase() === placaUpper)) {
+    if (isDuplicatePlate) {
       setError('Ya existe un vehiculo con esta placa.');
       return;
     }
 
     try {
-      await addVehicle({
+      const payload = {
         ...formData,
         placa: placaUpper,
-        conductorId: null,
-      });
+      };
 
-      resetForm();
-      onClose();
+      if (isEditing) {
+        await updateVehicle(vehicleToEdit.id, payload);
+      } else {
+        await addVehicle({
+          ...payload,
+          conductorId: null,
+        });
+      }
+
+      handleClose();
     } catch (err) {
-      console.error('Error registrando vehiculo', err);
+      console.error('Error guardando vehiculo', err);
 
       if (err.response?.data?.error) {
         setError(err.response.data.error);
         return;
       }
 
-      setError('No fue posible registrar el vehiculo. Intenta nuevamente.');
+      setError('No fue posible guardar el vehiculo. Intenta nuevamente.');
     }
   };
 
@@ -64,13 +102,11 @@ export default function AddVehicleModal({ isOpen, onClose }) {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
           <h2 className="text-xl font-bold text-syntix-navy flex items-center gap-2">
-            <Car className="w-5 h-5" /> Agregar Vehiculo
+            <Car className="w-5 h-5" /> {modalTitle}
           </h2>
           <button
-            onClick={() => {
-              resetForm();
-              onClose();
-            }}
+            type="button"
+            onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
           >
             <X className="w-6 h-6" />
@@ -158,10 +194,7 @@ export default function AddVehicleModal({ isOpen, onClose }) {
           <div className="pt-4 flex justify-end gap-3">
             <button
               type="button"
-              onClick={() => {
-                resetForm();
-                onClose();
-              }}
+              onClick={handleClose}
               className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
             >
               Cancelar
@@ -170,7 +203,7 @@ export default function AddVehicleModal({ isOpen, onClose }) {
               type="submit"
               className="bg-syntix-navy text-white px-6 py-2 rounded-lg font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2"
             >
-              <Save className="w-4 h-4" /> Guardar
+              <Save className="w-4 h-4" /> {submitLabel}
             </button>
           </div>
         </form>
