@@ -8,6 +8,7 @@ import { DocumentsProvider } from '@/contexts/DocumentsContext.jsx';
 import HomePage from '@/pages/HomePage.jsx';
 import TeamPage from '@/pages/TeamPage.jsx';
 import LoginPage from '@/pages/LoginPage.jsx';
+import PlanesPage from '@/pages/PlanesPage.jsx'; // Importación agregada
 
 import DashboardPage from '@/pages/DashboardPage.jsx';
 import AlertasPage from '@/pages/AlertasPage.jsx';
@@ -29,6 +30,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/planes" element={<PlanesPage />} /> {/* Ruta agregada */}
 
             {/* Protegidas */}
             <Route element={<ProtectedRoute />}>

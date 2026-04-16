@@ -1,0 +1,41 @@
+name: CD - Generación de Artefacto y Entrega Continua
+on:
+  push:
+    branches: [ "main", "develop" ] 
+
+jobs:
+  entrega:
+    name: Empaquetado y Generación de Entregable
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+
+    steps:
+      - name: Descargar código fuente
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js (v20)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Instalar dependencias limpias
+        run: npm ci
+
+      - name: Construir aplicación de producción (Build)
+        run: npm run build
+
+      - name: Confirmación de la entrega
+        run: |
+          echo "El software ha sido empaquetado exitosamente"
+         
+
+      - name: Guardar Artefacto (Entregable Final)
+        uses: actions/upload-artifact@v4
+        with:
+          name: DriveControl-Build-Produccion
+          path: apps/web/dist 
+          retention-days: 7
