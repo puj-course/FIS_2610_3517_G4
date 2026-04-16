@@ -30,7 +30,7 @@ jobs:
 
       - name: Confirmación de la entrega
         run: |
-          echo "El software ha sido empaquetado exitosamente 
+          echo "El software ha sido empaquetado exitosamente"
          
 
       - name: Guardar Artefacto (Entregable Final)
