@@ -1,13 +1,14 @@
 import React from 'react';
+import { Helmet } from 'react-helmet';
 import { Shield } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
 
 function getBadgeClasses(estado) {
-  if (estado === 'ROJO') {
+  if (estado === 'rojo') {
     return 'bg-red-50 text-red-500 border border-red-200';
   }
-  if (estado === 'AMARILLO') {
+  if (estado === 'amarillo') {
     return 'bg-yellow-50 text-yellow-600 border border-yellow-200';
   }
   return 'bg-green-50 text-green-600 border border-green-200';
@@ -19,6 +20,9 @@ export default function DocumentosPage() {
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
+      <Helmet>
+        <title>Documentos | SYNTIX Drive Control</title>
+      </Helmet>
       <div className="mb-8">
         <h1 className="text-4xl font-extrabold text-syntix-navy mb-2">
           Gestión de Documentos
