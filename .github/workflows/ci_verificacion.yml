@@ -1,4 +1,4 @@
-name: CI - Verificación del proyecto
+name: Entrega CI - Verificación del proyecto
 
 on:
   pull_request:
