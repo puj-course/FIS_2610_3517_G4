@@ -1,4 +1,4 @@
-# UML - Strategy de ordenamiento de alertas
+# UML - Strategy de ordenamiento de alertass
 
 ```mermaid
 classDiagram
