@@ -103,10 +103,37 @@ app.get('/api/conductores', async (req, res) => {
 
 app.post('/api/conductores', async (req, res) => {
   try {
-    const nuevo = new Conductor(req.body);
+    const { nombre, documento, telefono, categoria, fechaVencimiento, ownerEmail } = req.body;
+
+    if (!nombre || !documento || !telefono || !fechaVencimiento || !ownerEmail) {
+      return res.status(400).json({ error: 'Todos los campos obligatorios deben estar completos.' });
+    }
+
+    const documentoNormalizado = String(documento).trim();
+
+    const existente = await Conductor.findOne({
+      documento: documentoNormalizado,
+      ownerEmail
+    });
+
+    if (existente) {
+      return res.status(400).json({ error: 'Ya existe un conductor con este documento.' });
+    }
+
+    const nuevo = new Conductor({
+      nombre: String(nombre).trim(),
+      documento: documentoNormalizado,
+      telefono: String(telefono).trim(),
+      categoria,
+      fechaVencimiento,
+      ownerEmail
+    });
+
     await nuevo.save();
     res.status(201).json(nuevo);
-  } catch (err) { res.status(400).json({ error: err.message }); }
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
 
 // --- RUTAS PARA VEHÍCULOS ---

@@ -36,18 +36,38 @@ export default function AddConductorModal({ isOpen, onClose }) {
     e.preventDefault();
     setError('');
 
-    if (conductores.some(c => c.documento === formData.documento.trim())) {
+    const nombre = formData.nombre.trim();
+    const documento = formData.documento.trim();
+    const telefono = formData.telefono.trim();
+    const fechaVencimiento = formData.fechaVencimiento;
+
+    if (!nombre || !documento || !telefono || !fechaVencimiento) {
+      setError('Completa todos los campos obligatorios.');
+      return;
+    }
+
+    if (conductores.some(c => c.documento.trim() === documento)) {
       setError('Ya existe un conductor con este documento.');
+      return;
+    }
+
+    if (!/^\d{7,15}$/.test(documento)) {
+      setError('El documento debe contener solo números y tener entre 7 y 15 dígitos.');
+      return;
+    }
+
+    if (!/^[0-9+\s-]{7,20}$/.test(telefono)) {
+      setError('Ingresa un teléfono válido.');
       return;
     }
 
     try {
       const newConductor = await addConductor({
-        nombre: formData.nombre.trim(),
-        documento: formData.documento.trim(),
-        telefono: formData.telefono.trim(),
+        nombre,
+        documento,
+        telefono,
         categoria: formData.categoria,
-        fechaVencimiento: formData.fechaVencimiento
+        fechaVencimiento
       });
 
       if (formData.vehiculoId) {
@@ -58,6 +78,12 @@ export default function AddConductorModal({ isOpen, onClose }) {
       onClose();
     } catch (err) {
       console.error('Error registrando conductor', err);
+
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+        return;
+      }
+
       setError('No fue posible registrar el conductor. Intenta nuevamente.');
     }
   };
@@ -122,7 +148,7 @@ export default function AddConductorModal({ isOpen, onClose }) {
                 value={formData.telefono}
                 onChange={e => setFormData({ ...formData, telefono: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
-                placeholder="300 123 4567"
+                placeholder="3001234567"
               />
             </div>
           </div>
