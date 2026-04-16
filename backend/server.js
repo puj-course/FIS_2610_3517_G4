@@ -126,6 +126,24 @@ app.post('/api/vehiculos', async (req, res) => {
     res.status(201).json(nuevo);
   } catch (err) { res.status(400).json({ error: err.message }); }
 });
+app.put('/api/vehiculos/:id/conductor', async (req, res) => {
+  try {
+    const { conductorId } = req.body;
+    const vehiculoActualizado = await Vehiculo.findByIdAndUpdate(
+      req.params.id,
+      { conductorId },
+      { new: true }
+    );
+
+    if (!vehiculoActualizado) {
+      return res.status(404).json({ error: 'Vehículo no encontrado' });
+    }
+
+    res.json(vehiculoActualizado);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

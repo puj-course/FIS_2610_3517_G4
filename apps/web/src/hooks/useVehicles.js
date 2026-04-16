@@ -15,19 +15,28 @@ export function useVehicles() {
     try {
       const res = await axios.get(`${API_URL}?email=${user.email}`);
       setVehiculos(res.data.map(v => ({ ...v, id: v._id })));
-    } catch (err) { console.error("Error cargando vehículos", err); }
+    } catch (err) {
+      console.error('Error cargando vehículos', err);
+    }
   }, [user]);
 
-  useEffect(() => { fetchVehicles(); }, [fetchVehicles]);
+  useEffect(() => {
+    fetchVehicles();
+  }, [fetchVehicles]);
 
   const addVehicle = async (data) => {
     await axios.post(API_URL, { ...data, ownerEmail: user.email });
-    fetchVehicles();
+    await fetchVehicles();
   };
 
   const deleteVehicle = async (id) => {
     await axios.delete(`${API_URL}/${id}`);
-    fetchVehicles();
+    await fetchVehicles();
+  };
+
+  const assignConductor = async (vehicleId, conductorId) => {
+    await axios.put(`${API_URL}/${vehicleId}/conductor`, { conductorId });
+    await fetchVehicles();
   };
 
   const vehiculosCompletos = vehiculos.map(v => ({
@@ -35,5 +44,11 @@ export function useVehicles() {
     conductor: conductores.find(c => c.id === v.conductorId)
   }));
 
-  return { vehiculos: vehiculosCompletos, addVehicle, deleteVehicle };
+  return {
+    vehiculos: vehiculosCompletos,
+    addVehicle,
+    deleteVehicle,
+    assignConductor,
+    fetchVehicles
+  };
 }

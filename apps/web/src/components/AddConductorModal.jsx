@@ -5,7 +5,7 @@ import { useVehicles } from '@/hooks/useVehicles.js';
 
 export default function AddConductorModal({ isOpen, onClose }) {
   const { conductores, addConductor } = useConductors();
-  const { vehiculos } = useVehicles();
+  const { vehiculos, assignConductor } = useVehicles();
 
   const [formData, setFormData] = useState({
     nombre: '',
@@ -20,17 +20,46 @@ export default function AddConductorModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
+  const resetForm = () => {
+    setFormData({
+      nombre: '',
+      documento: '',
+      telefono: '',
+      categoria: 'B1',
+      fechaVencimiento: '',
+      vehiculoId: ''
+    });
+    setError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (conductores.some(c => c.documento === formData.documento)) {
+    if (conductores.some(c => c.documento === formData.documento.trim())) {
       setError('Ya existe un conductor con este documento.');
       return;
     }
 
-    await addConductor(formData);
-    onClose();
+    try {
+      const newConductor = await addConductor({
+        nombre: formData.nombre.trim(),
+        documento: formData.documento.trim(),
+        telefono: formData.telefono.trim(),
+        categoria: formData.categoria,
+        fechaVencimiento: formData.fechaVencimiento
+      });
+
+      if (formData.vehiculoId) {
+        await assignConductor(formData.vehiculoId, newConductor.id);
+      }
+
+      resetForm();
+      onClose();
+    } catch (err) {
+      console.error('Error registrando conductor', err);
+      setError('No fue posible registrar el conductor. Intenta nuevamente.');
+    }
   };
 
   const vehiculosDisponibles = vehiculos.filter((v) => !v.conductorId);
@@ -42,7 +71,13 @@ export default function AddConductorModal({ isOpen, onClose }) {
           <h2 className="text-xl font-bold text-syntix-navy flex items-center gap-2">
             <User className="w-5 h-5" /> Agregar Conductor
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <button
+            onClick={() => {
+              resetForm();
+              onClose();
+            }}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+          >
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -145,7 +180,10 @@ export default function AddConductorModal({ isOpen, onClose }) {
           <div className="pt-4 flex justify-end gap-3">
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => {
+                resetForm();
+                onClose();
+              }}
               className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
             >
               Cancelar
