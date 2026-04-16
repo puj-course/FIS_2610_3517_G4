@@ -27,3 +27,4 @@ classDiagram
     AlertSortStrategy <|-- UrgencyAlertSortStrategy
     AlertHubSingleton --> AlertSortStrategy
     useAlertsFacade --> AlertHubSingleton
+    ```

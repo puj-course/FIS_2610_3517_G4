@@ -37,3 +37,5 @@ classDiagram
     useAlerts --> useAlertsFacade
     useAlertsFacade --> useAlertHub
     useAlertHub --> AlertHubSingleton
+
+    ```

@@ -26,3 +26,4 @@ classDiagram
     DocumentsProvider --> publishAdaptedAlerts
 
     publishAdaptedAlerts --> BaseAlertAdapter
+    ```

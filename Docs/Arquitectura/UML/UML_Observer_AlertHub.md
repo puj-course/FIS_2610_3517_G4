@@ -24,3 +24,4 @@ classDiagram
 
     useAlertHub --> AlertHubSingleton : se suscribe
     useAlertsFacade --> useAlertHub : consume alertas
+    ```

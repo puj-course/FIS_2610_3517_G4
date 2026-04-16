@@ -60,3 +60,5 @@ classDiagram
     BaseModalFactory <|-- FleetModalFactory
     ModalFactory --> AuthModalFactory
     ModalFactory --> FleetModalFactory
+
+    ```
