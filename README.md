@@ -210,5 +210,6 @@ Proyecto desarrollado con fines académicos.
 - **Proyecto:** DriveControl / AutoMinder Enterprise
 - **Equipo:** SYNTIX TECH
 - **Año:** 2026
+- .
 
 © 2026 SYNTIX TECH
