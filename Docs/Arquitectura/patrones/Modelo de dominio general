@@ -1,0 +1,89 @@
+Modelo de dominio general  
+Diagrama del modelo de dominio donde se ubiquen los patrones
+
+```mermaid
+classDiagram
+    class UI {
+        Sidebar
+        Header
+        AlertasPage
+        DataPanel
+        DashboardPage
+    }
+
+    class useAlerts {
+        <<Access Point>>
+        +useAlerts()
+    }
+
+    class useAlertsFacade {
+        <<Facade>>
+        +useAlertsFacade()
+    }
+
+    class AlertHubSingleton {
+        <<Singleton>>
+        +getInstance()
+        +subscribe()
+        +registerSourceAlerts()
+        +clearSourceAlerts()
+    }
+
+    class AlertSortStrategy {
+        <<Strategy>>
+        +sort(alerts)
+    }
+
+    class PriorityAlertSortStrategy
+    class UrgencyAlertSortStrategy
+
+    class BaseAlertAdapter {
+        <<Adapter>>
+        +adapt()
+        +adaptMany()
+    }
+
+    class VehicleAlertAdapter
+    class ConductorAlertAdapter
+    class SoatAlertAdapter
+
+    class publishAdaptedAlerts
+
+    class Fuentes {
+        useVehicles
+        useConductors
+        DocumentsProvider
+    }
+
+    class BaseModalFactory {
+        <<Factory Method>>
+        +createModal()
+    }
+
+    class AuthModalFactory
+    class FleetModalFactory
+    class ModalFactory
+
+    UI --> useAlerts : consume
+    useAlerts --> useAlertsFacade : delega
+    useAlertsFacade --> AlertHubSingleton : consulta estado
+
+    AlertHubSingleton --> AlertSortStrategy : usa
+    AlertSortStrategy <|-- PriorityAlertSortStrategy
+    AlertSortStrategy <|-- UrgencyAlertSortStrategy
+
+    BaseAlertAdapter <|-- VehicleAlertAdapter
+    BaseAlertAdapter <|-- ConductorAlertAdapter
+    BaseAlertAdapter <|-- SoatAlertAdapter
+
+    Fuentes --> publishAdaptedAlerts : usa
+    publishAdaptedAlerts --> BaseAlertAdapter : adapta
+    publishAdaptedAlerts --> AlertHubSingleton : publica alertas
+
+    BaseModalFactory <|-- AuthModalFactory
+    BaseModalFactory <|-- FleetModalFactory
+    ModalFactory --> BaseModalFactory : delega creación
+```
+
+**Observación breve del modelo de dominio:**  
+El modelo de dominio se concentra en dos partes principales: el **subsistema de alertas** y la **creación de modales**. En alertas, la interfaz entra por `useAlerts`, que delega en la fachada `useAlertsFacade`, mientras el estado centralizado se mantiene en `AlertHubSingleton`. Las fuentes de datos publican alertas adaptadas a un formato común y el hub aplica una estrategia de ordenamiento. En la creación de modales, `ModalFactory` delega la construcción en fábricas concretas. Así se evidencian de forma integrada los patrones `Facade`, `Singleton`, `Strategy`, `Adapter`, `Observer` y `Factory Method`.
