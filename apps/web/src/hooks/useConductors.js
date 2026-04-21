@@ -1,46 +1,122 @@
-import { useLocalStorage } from './useLocalStorage.js';
+import { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import { useAuth } from '@/contexts/AuthContext.jsx';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
 
-//use state
-const initialConductors = [
-  { id: 'c1', nombre: 'Juan Pérez', documento: '10203040', telefono: '3001234567', categoria: 'C2', fechaVencimiento: '2026-12-31' },
-  { id: 'c2', nombre: 'María Gómez', documento: '50607080', telefono: '3109876543', categoria: 'C1', fechaVencimiento: '2026-03-01' },
-  { id: 'c3', nombre: 'Carlos Ruiz', documento: '90102030', telefono: '3205554444', categoria: 'C3', fechaVencimiento: '2026-02-25' },
-];
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = `${API_BASE_URL}/api/conductores`;
+const CONDUCTORS_UPDATED_EVENT = 'syntix:conductors-updated';
+const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
+
+const normalizeConductor = (conductor) => ({
+  ...conductor,
+  id: conductor._id || conductor.id,
+});
+
+const notifyConductorsUpdated = () => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(CONDUCTORS_UPDATED_EVENT));
+  }
+};
+
+const notifyVehiclesUpdated = () => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(VEHICLES_UPDATED_EVENT));
+  }
+};
 
 export function useConductors() {
-  const [conductores, setConductores] = useLocalStorage('syntix_conductores', initialConductors);
+  const [conductores, setConductores] = useState([]);
+  const { user } = useAuth();
   const { simulatedDate } = useSimulatedDate();
-  const [threshold] = useLocalStorage('syntix_threshold', 15);
+  const threshold = 15;
 
-  const getConductorsWithState = () => {
-    return conductores.map(c => {
-      const days = calculateDaysRemaining(c.fechaVencimiento, simulatedDate);
-      return {
-        ...c,
-        diasRestantes: days,
-        estado: calculateDocumentState(days, threshold)
-      };
+  const fetchConductors = useCallback(async () => {
+    if (!user?.email) {
+      setConductores([]);
+      return;
+    }
+
+    try {
+      const res = await axios.get(API_URL, {
+        params: { email: user.email },
+      });
+
+      setConductores(res.data.map(normalizeConductor));
+    } catch (err) {
+      console.error('Error cargando conductores', err);
+    }
+  }, [user?.email]);
+
+  useEffect(() => {
+    fetchConductors();
+  }, [fetchConductors]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const handleConductorsUpdated = () => {
+      fetchConductors();
+    };
+
+    window.addEventListener(CONDUCTORS_UPDATED_EVENT, handleConductorsUpdated);
+    return () => window.removeEventListener(CONDUCTORS_UPDATED_EVENT, handleConductorsUpdated);
+  }, [fetchConductors]);
+
+  const addConductor = async (data) => {
+    if (!user?.email) {
+      throw new Error('No hay usuario autenticado');
+    }
+
+    const response = await axios.post(API_URL, {
+      ...data,
+      documento: String(data.documento ?? '').trim(),
+      telefono: String(data.telefono ?? '').trim(),
+      ownerEmail: user.email,
     });
+
+    await fetchConductors();
+    notifyConductorsUpdated();
+
+    return normalizeConductor(response.data);
   };
 
-  const addConductor = (conductor) => {
-    setConductores([...conductores, { ...conductor, id: Date.now().toString() }]);
+  const updateConductor = async (id, data) => {
+    const response = await axios.put(`${API_URL}/${id}`, {
+      ...data,
+      documento: String(data.documento ?? '').trim(),
+      telefono: String(data.telefono ?? '').trim(),
+    });
+
+    await fetchConductors();
+    notifyConductorsUpdated();
+
+    return normalizeConductor(response.data);
   };
 
-  const updateConductor = (id, data) => {
-    setConductores(conductores.map(c => c.id === id ? { ...c, ...data } : c));
+  const deleteConductor = async (id) => {
+    await axios.delete(`${API_URL}/${id}`);
+    await fetchConductors();
+    notifyConductorsUpdated();
+    notifyVehiclesUpdated();
   };
 
-  const deleteConductor = (id) => {
-    setConductores(conductores.filter(c => c.id !== id));
-  };
+  const conductorsWithState = conductores.map((conductor) => {
+    const days = calculateDaysRemaining(conductor.fechaVencimiento, simulatedDate);
+
+    return {
+      ...conductor,
+      diasRestantes: days,
+      estado: calculateDocumentState(days, threshold),
+    };
+  });
 
   return {
-    conductores: getConductorsWithState(),
+    conductores: conductorsWithState,
     addConductor,
     updateConductor,
-    deleteConductor
+    deleteConductor,
+    fetchConductors,
   };
 }

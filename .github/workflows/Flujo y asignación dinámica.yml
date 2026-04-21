@@ -1,0 +1,34 @@
+name: "Kanban 1 - Flujo y Asignación Dinámica"
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  auto-organizar:
+    name: Asignación al Autor y Logística
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Asignar al creador del Issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              assignees: [context.payload.issue.user.login]
+            })
+
+      - name: Comentar confirmación de flujo
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ###  Organización Hecha
+            Hola @${{ github.actor }}, se ha generado una asignación automática para esta tarea.
+            
+            

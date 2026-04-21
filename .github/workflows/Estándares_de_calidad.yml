@@ -1,0 +1,30 @@
+name: "Kanban 2 - Estándares de Calidad"
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  inyectar-calidad:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Agregar INVEST y Definition of Done
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            Control de Calidad SYNTIX TECH
+            Para que esta tarea sea aceptada, debe cumplir con:
+
+            **Criterios INVEST:**
+            - [ ] **I**ndependiente | **N**egociable | **V**aliosa.
+            - [ ] **E**stimable | **S**mall | **T**esteable.
+
+            **Definition of Done (DoD):**
+            - [ ] **Código:** Pasa `npm run lint` y `npm run build`.
+            - [ ] **Revisión:** Aprobado por un par (Peer Review).
+            - [ ] **UX:** Verificado en pantallas móviles y escritorio.
+            - [ ] **Consola:** Cero errores de ejecución en el navegador.
+            - [ ] **Trazabilidad:** Commits vinculados a este Issue.
+            
