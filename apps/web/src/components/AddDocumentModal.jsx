@@ -15,10 +15,11 @@ export default function AddDocumentModal({ isOpen, onClose }) {
   });
 
   const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -37,21 +38,28 @@ export default function AddDocumentModal({ isOpen, onClose }) {
       return;
     }
 
-    addSoat({
-      vehiculoId: formData.vehiculoId,
-      numeroPoliza: formData.numeroPoliza,
-      fechaInicio: formData.fechaInicio,
-      fechaVencimiento: formData.fechaVencimiento,
-    });
+    try {
+      setSaving(true);
+      await addSoat({
+        vehiculoId: formData.vehiculoId,
+        numeroPoliza: formData.numeroPoliza,
+        fechaInicio: formData.fechaInicio,
+        fechaVencimiento: formData.fechaVencimiento,
+      });
 
-    setFormData({
-      vehiculoId: '',
-      numeroPoliza: '',
-      fechaInicio: '',
-      fechaVencimiento: '',
-    });
+      setFormData({
+        vehiculoId: '',
+        numeroPoliza: '',
+        fechaInicio: '',
+        fechaVencimiento: '',
+      });
 
-    onClose();
+      onClose();
+    } catch (err) {
+      setError('Error al guardar el documento. Intenta de nuevo.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -159,10 +167,11 @@ export default function AddDocumentModal({ isOpen, onClose }) {
 
             <button
               type="submit"
-              className="bg-syntix-navy text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 flex items-center gap-2"
+              disabled={saving}
+              className="bg-syntix-navy text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 flex items-center gap-2 disabled:opacity-60"
             >
               <Save className="w-4 h-4" />
-              Guardar
+              {saving ? 'Guardando...' : 'Guardar'}
             </button>
           </div>
         </form>
