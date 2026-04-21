@@ -3,8 +3,6 @@ import { Helmet } from 'react-helmet';
 import { Shield } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
-import ModalFactory from '@/components/ModalFactory.jsx';
-import useModalManager from '@/hooks/useModalManager.js';
 
 function getBadgeClasses(estado) {
   if (estado === 'rojo') {
@@ -19,36 +17,17 @@ function getBadgeClasses(estado) {
 export default function DocumentosPage() {
   const { soats } = useDocuments();
   const { vehiculos } = useVehicles();
-  const { activeModal, openModal, closeModal } = useModalManager();
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       <Helmet>
         <title>Documentos | SYNTIX Drive Control</title>
       </Helmet>
-      <div className="mb-8 flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <h1 className="text-4xl font-extrabold text-syntix-navy mb-2">
-            Gestión de Documentos
-          </h1>
-          <p className="text-gray-500 text-lg">Control de SOAT y pólizas</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => openModal('addDocument')}
-          style={{
-            background: '#111',
-            color: '#fff',
-            padding: '10px 16px',
-            borderRadius: 10,
-            fontWeight: 600,
-            fontSize: 13,
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          + Documento
-        </button>
+      <div className="mb-8">
+        <h1 className="text-4xl font-extrabold text-syntix-navy mb-2">
+          Gestión de Documentos
+        </h1>
+        <p className="text-gray-500 text-lg">Control de SOAT y pólizas</p>
       </div>
 
       <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -105,8 +84,6 @@ export default function DocumentosPage() {
           </table>
         </div>
       </div>
-
-      <ModalFactory modalType={activeModal} onClose={closeModal} />
     </div>
   );
 }
