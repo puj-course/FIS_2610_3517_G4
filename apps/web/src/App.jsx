@@ -4,6 +4,7 @@ import { AuthProvider } from '@/contexts/AuthContext.jsx';
 import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 import DashboardLayout from '@/layouts/DashboardLayout.jsx';
 import { DocumentsProvider } from '@/contexts/DocumentsContext.jsx';
+import { RtmProvider } from '@/contexts/RtmContext.jsx';
 
 import HomePage from '@/pages/HomePage.jsx';
 import TeamPage from '@/pages/TeamPage.jsx';
@@ -24,6 +25,7 @@ function App() {
   return (
     <AuthProvider>
       <DocumentsProvider>
+        <RtmProvider>
         <Router>
           <Routes>
             {/* Públicas */}
@@ -50,6 +52,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
+        </RtmProvider>
       </DocumentsProvider>
     </AuthProvider>
   );
