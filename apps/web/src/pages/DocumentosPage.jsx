@@ -51,7 +51,7 @@ export default function DocumentosPage() {
             type="button"
             onClick={() => openModal('addRtm')}
             style={{
-              background: '#1a6b3c', color: '#fff', padding: '10px 16px',
+              background: '#f3f4f6', color: '#111', padding: '10px 16px',
               borderRadius: 10, fontWeight: 600, fontSize: 13, border: 'none', cursor: 'pointer',
             }}
           >
