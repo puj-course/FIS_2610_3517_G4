@@ -48,27 +48,24 @@ export function AuthProvider({ children }) {
       const apiResult = await authService.register({ email, password, empresa, telefono });
       
       if (apiResult.useLocalStorage) {
-        // Backend no disponible, usar localStorage
-        const localResult = registerLocal(email, password, empresa, telefono);
+        // Backend no disponible - NO registrar sin OTP
         setLoading(false);
-        return localResult;
+        return { success: false, message: 'El servidor no está disponible. Intenta nuevamente en unos momentos.' };
       }
       
       if (apiResult.success) {
-        const userData = apiResult.data?.user || { email, empresa, telefono, role: 'admin' };
-        setUser(userData);
+        // Registro exitoso pero requiere verificacion OTP - NO logueamos aun
         setLoading(false);
-        return { success: true };
+        return { success: true, needsVerification: true };
       }
       
       setLoading(false);
       return { success: false, message: apiResult.message };
     } catch (err) {
-      // En caso de error, intentar con localStorage
-      console.warn('Error en API, usando localStorage:', err);
-      const localResult = registerLocal(email, password, empresa, telefono);
+      // En caso de error de red, NO registrar sin OTP
+      console.warn('Error en API durante registro:', err);
       setLoading(false);
-      return localResult;
+      return { success: false, message: 'No se pudo conectar al servidor. Verifica tu conexión.' };
     }
   }, [registerLocal, setUser]);
 
@@ -153,6 +150,10 @@ export function AuthProvider({ children }) {
     setError(null);
   }, [setUser]);
 
+  const loginAfterVerification = useCallback((userData) => {
+    if (userData) setUser(userData);
+  }, [setUser]);
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -163,7 +164,8 @@ export function AuthProvider({ children }) {
       login, 
       register, 
       updateUser, 
-      logout, 
+      logout,
+      loginAfterVerification,
       isAuthenticated: !!user,
       loading,
       error,
