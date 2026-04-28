@@ -29,19 +29,34 @@ if (missingEmailVars.length > 0) {
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const bcrypt = require('bcrypt');
-const crypto = require('crypto');
-const { enviarCodigoVerificacion, verificarServicioCorreo } = require('./services/emailService');
-
-const DB_UNAVAILABLE_MESSAGE =
-  'Base de datos no disponible. Verifica la IP permitida en MongoDB Atlas y la variable MONGO_URI.';
-
-// Parametros de seguridad y UX del flujo OTP.
-const OTP_EXPIRACION_MINUTOS = parseInt(process.env.OTP_EXPIRACION_MINUTOS || '10');
-const OTP_MAX_INTENTOS = parseInt(process.env.OTP_MAX_INTENTOS || '5');
-const OTP_COOLDOWN_SEGUNDOS = parseInt(process.env.OTP_COOLDOWN_SEGUNDOS || '60');
+require('dotenv').config();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const helmet = require('helmet');
 
 const app = express();
+
+// BLINDAJE DE SEGURIDAD
+app.use(helmet());
+
+// Sanitización manual contra inyección MongoDB
+// (express-mongo-sanitize es incompatible con Express moderno donde req.query es read-only)
+app.use((req, _res, next) => {
+  const sanitize = (obj) => {
+    if (obj && typeof obj === 'object') {
+      for (const key of Object.keys(obj)) {
+        if (key.startsWith('$') || key.includes('.')) {
+          delete obj[key];
+        } else {
+          sanitize(obj[key]);
+        }
+      }
+    }
+  };
+  sanitize(req.body);
+  sanitize(req.params);
+  next();
+});
 
 app.use(cors());
 app.use(express.json());
@@ -124,20 +139,32 @@ const UsuarioSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
 });
+
+// Hook: encripta la contraseña antes de guardar
+// Hook: encripta la contraseña antes de guardar
+UsuarioSchema.pre('save', async function () {
+  // Si la contraseña no ha sido modificada, simplemente salimos de la función
+  if (!this.isModified('password')) return;
+  
+  // Como es una función 'async', los errores de bcrypt se propagan automáticamente,
+  // por lo que podemos eliminar el bloque try/catch y las llamadas a next()
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Método: compara contraseña candidata con el hash
+UsuarioSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
 
-// Almacena OTP hasheado, expiracion e intentos para verificar cuentas.
-const VerificacionOTPSchema = new mongoose.Schema({
-  email: { type: String, required: true },
-  codigoHash: { type: String, required: true },
-  expiresAt: { type: Date, required: true },
-  intentos: { type: Number, default: 0 },
-  ultimoEnvio: { type: Date, default: Date.now },
-  createdAt: { type: Date, default: Date.now },
-});
-VerificacionOTPSchema.index({ email: 1 });
-VerificacionOTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-const VerificacionOTP = mongoose.model('VerificacionOTP', VerificacionOTPSchema);
+// Generador de Token JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET || 'syntix_super_secret_key', {
+    expiresIn: '30d',
+  });
+};
 
 const SoatSchema = new mongoose.Schema({
   vehiculoId: { type: String, required: true },
@@ -232,35 +259,13 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
 
     const verificacion = await VerificacionOTP.findOne({ email });
 
-    if (!verificacion) {
-      return res.status(400).json({ message: 'No hay un codigo pendiente para este correo. Vuelve a registrarte.' });
-    }
-
-    if (new Date() > verificacion.expiresAt) {
-      await VerificacionOTP.findOneAndDelete({ email });
-      return res.status(400).json({ message: 'El codigo ha expirado. Solicita uno nuevo.' });
-    }
-
-    if (verificacion.intentos >= OTP_MAX_INTENTOS) {
-      await VerificacionOTP.findOneAndDelete({ email });
-      return res.status(400).json({ message: 'Demasiados intentos fallidos. Solicita un nuevo codigo.' });
-    }
-
-    const codigoCorrecto = await bcrypt.compare(String(codigo), verificacion.codigoHash);
-
-    if (!codigoCorrecto) {
-      verificacion.intentos += 1;
-      await verificacion.save();
-      const restantes = OTP_MAX_INTENTOS - verificacion.intentos;
-      return res.status(400).json({ message: `Codigo incorrecto. Intentos restantes: ${restantes}` });
-    }
-
-    await Usuario.findOneAndUpdate({ email }, { isVerified: true });
-    await VerificacionOTP.findOneAndDelete({ email });
-
-    const usuario = await Usuario.findOne({ email });
-    const { password: _, ...userSinPassword } = usuario.toObject();
-    res.json({ message: 'Cuenta verificada exitosamente.', user: userSinPassword });
+    res.status(201).json({
+      success: true,
+      data: {
+        user: { _id: nuevoUsuario._id, email: nuevoUsuario.email, empresa: nuevoUsuario.empresa, role: nuevoUsuario.role },
+        token: generateToken(nuevoUsuario._id),
+      },
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -321,21 +326,18 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     const usuario = await Usuario.findOne({ email });
-    if (!usuario) {
-      return res.status(401).json({ message: 'Credenciales invalidas' });
-    }
 
-    const passwordValida = await bcrypt.compare(password, usuario.password);
-    if (!passwordValida) {
-      return res.status(401).json({ message: 'Credenciales invalidas' });
+    if (usuario && (await usuario.comparePassword(password))) {
+      res.json({
+        success: true,
+        data: {
+          user: { _id: usuario._id, email: usuario.email, empresa: usuario.empresa, role: usuario.role },
+          token: generateToken(usuario._id),
+        },
+      });
+    } else {
+      res.status(401).json({ success: false, message: 'Credenciales invalidas' });
     }
-
-    if (!usuario.isVerified) {
-      return res.status(403).json({ message: 'Debes verificar tu correo antes de iniciar sesion.', needsVerification: true, email });
-    }
-
-    const { password: _, ...userSinPassword } = usuario.toObject();
-    res.json({ user: userSinPassword });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -676,7 +678,6 @@ app.post('/api/soats', async (req, res) => {
       return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
 
-    // Un vehículo solo puede tener un SOAT activo — reemplazar si ya existe
     await Soat.deleteMany({ vehiculoId: vehiculoIdNorm, ownerEmail: ownerEmailNorm });
 
     const nuevo = new Soat({
@@ -730,7 +731,6 @@ app.post('/api/rtms', async (req, res) => {
       return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
 
-    // Un vehículo solo puede tener una RTM activa — reemplazar si ya existe
     await Rtm.deleteMany({ vehiculoId: vehiculoIdNorm, ownerEmail: ownerEmailNorm });
 
     const nuevo = new Rtm({
