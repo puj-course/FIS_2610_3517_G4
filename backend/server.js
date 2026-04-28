@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { enviarCodigoVerificacion } = require('./services/emailService');
 
+// Parametros de seguridad y UX del flujo OTP.
 const OTP_EXPIRACION_MINUTOS = parseInt(process.env.OTP_EXPIRACION_MINUTOS || '10');
 const OTP_MAX_INTENTOS = parseInt(process.env.OTP_MAX_INTENTOS || '5');
 const OTP_COOLDOWN_SEGUNDOS = parseInt(process.env.OTP_COOLDOWN_SEGUNDOS || '60');
@@ -59,6 +60,7 @@ const UsuarioSchema = new mongoose.Schema({
 });
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
 
+// Almacena OTP hasheado, expiracion e intentos para verificar cuentas.
 const VerificacionOTPSchema = new mongoose.Schema({
   email: { type: String, required: true },
   codigoHash: { type: String, required: true },
@@ -96,6 +98,7 @@ const normalizeNullableText = (value) => {
 };
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
+// Registro: crea/actualiza usuario no verificado y dispara envio de OTP al correo.
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { email, password, nombre, empresa, telefono } = req.body;
@@ -239,6 +242,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
   }
 });
 
+// Login restringido: solo permite acceso cuando isVerified es true.
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;

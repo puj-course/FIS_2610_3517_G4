@@ -16,6 +16,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   if (!isOpen) return null;
 
+  // Paso 1: registro base. Si el backend responde OK, se avanza al paso OTP.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -40,6 +41,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     }
   };
 
+  // Cooldown visual para evitar spam de reenvios.
   const startCooldown = () => {
     setResendCooldown(60);
     const interval = setInterval(() => {
@@ -50,6 +52,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     }, 1000);
   };
 
+  // Permite solo digitos y avanza automaticamente entre inputs.
   const handleOtpChange = (index, value) => {
     if (!/^\d*$/.test(value)) return;
     const newOtp = [...otp];
@@ -58,12 +61,14 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     if (value && index < 5) inputRefs.current[index + 1]?.focus();
   };
 
+  // Si el campo esta vacio y se borra, vuelve al input anterior.
   const handleOtpKeyDown = (index, e) => {
     if (e.key === 'Backspace' && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
 
+  // Paso 2: valida OTP y activa sesion del usuario verificado.
   const handleVerify = async (e) => {
     e.preventDefault();
     const codigo = otp.join('');
@@ -85,6 +90,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     }
   };
 
+  // Solicita un OTP nuevo respetando el cooldown configurado.
   const handleResend = async () => {
     if (resendCooldown > 0) return;
     setError('');

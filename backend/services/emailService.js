@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 
+// Transporter SMTP reutilizable para todos los correos transaccionales.
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST || 'smtp.gmail.com',
   port: parseInt(process.env.EMAIL_PORT || '587'),
@@ -11,6 +12,7 @@ const transporter = nodemailer.createTransport({
 });
 
 async function enviarCodigoVerificacion(email, nombre, codigo) {
+  // Plantilla de bienvenida con OTP temporal para activacion de cuenta.
   const mailOptions = {
     from: `"Drive Control" <${process.env.EMAIL_USER}>`,
     to: email,
