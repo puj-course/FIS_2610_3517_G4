@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { X, FileText, Save } from 'lucide-react';
-import { useDocuments } from '@/hooks/useDocuments.js';
+import { useRtm } from '@/contexts/RtmContext.jsx';
 import { useVehicles } from '@/hooks/useVehicles.js';
 
-export default function AddDocumentModal({ isOpen, onClose }) {
+export default function AddRtmModal({ isOpen, onClose }) {
   const { vehiculos } = useVehicles();
-  const { addSoat } = useDocuments();
+  const { addRtm } = useRtm();
 
   const [formData, setFormData] = useState({
     vehiculoId: '',
-    numeroPoliza: '',
+    numeroRtm: '',
     fechaInicio: '',
     fechaVencimiento: '',
   });
@@ -23,12 +23,7 @@ export default function AddDocumentModal({ isOpen, onClose }) {
     e.preventDefault();
     setError('');
 
-    if (
-      !formData.vehiculoId ||
-      !formData.numeroPoliza ||
-      !formData.fechaInicio ||
-      !formData.fechaVencimiento
-    ) {
+    if (!formData.vehiculoId || !formData.numeroRtm || !formData.fechaInicio || !formData.fechaVencimiento) {
       setError('Todos los campos son obligatorios.');
       return;
     }
@@ -40,23 +35,16 @@ export default function AddDocumentModal({ isOpen, onClose }) {
 
     try {
       setSaving(true);
-      await addSoat({
+      await addRtm({
         vehiculoId: formData.vehiculoId,
-        numeroPoliza: formData.numeroPoliza,
+        numeroRtm: formData.numeroRtm,
         fechaInicio: formData.fechaInicio,
         fechaVencimiento: formData.fechaVencimiento,
       });
-
-      setFormData({
-        vehiculoId: '',
-        numeroPoliza: '',
-        fechaInicio: '',
-        fechaVencimiento: '',
-      });
-
+      setFormData({ vehiculoId: '', numeroRtm: '', fechaInicio: '', fechaVencimiento: '' });
       onClose();
     } catch (err) {
-      setError('Error al guardar el documento. Intenta de nuevo.');
+      setError('Error al guardar la RTM. Intenta de nuevo.');
     } finally {
       setSaving(false);
     }
@@ -68,14 +56,9 @@ export default function AddDocumentModal({ isOpen, onClose }) {
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
           <h2 className="text-xl font-bold text-syntix-navy flex items-center gap-2">
             <FileText className="w-5 h-5" />
-            Agregar Documento
+            Agregar Tecnomecánica
           </h2>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-          >
+          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -88,15 +71,11 @@ export default function AddDocumentModal({ isOpen, onClose }) {
           )}
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">
-              Vehículo
-            </label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Vehículo</label>
             <select
               required
               value={formData.vehiculoId}
-              onChange={(e) =>
-                setFormData({ ...formData, vehiculoId: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, vehiculoId: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none"
             >
               <option value="">Selecciona un vehículo</option>
@@ -109,62 +88,44 @@ export default function AddDocumentModal({ isOpen, onClose }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">
-              Número de póliza
-            </label>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Número de RTM</label>
             <input
               type="text"
               required
-              value={formData.numeroPoliza}
-              onChange={(e) =>
-                setFormData({ ...formData, numeroPoliza: e.target.value })
-              }
+              value={formData.numeroRtm}
+              onChange={(e) => setFormData({ ...formData, numeroRtm: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none"
-              placeholder="SOAT-1004"
+              placeholder="RTM-2025-001"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">
-                Fecha inicio
-              </label>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Fecha inicio</label>
               <input
                 type="date"
                 required
                 value={formData.fechaInicio}
-                onChange={(e) =>
-                  setFormData({ ...formData, fechaInicio: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, fechaInicio: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none"
               />
             </div>
-
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">
-                Fecha vencimiento
-              </label>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Fecha vencimiento</label>
               <input
                 type="date"
                 required
                 value={formData.fechaVencimiento}
-                onChange={(e) =>
-                  setFormData({ ...formData, fechaVencimiento: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, fechaVencimiento: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none"
               />
             </div>
           </div>
 
           <div className="pt-4 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg"
-            >
+            <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg">
               Cancelar
             </button>
-
             <button
               type="submit"
               disabled={saving}

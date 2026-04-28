@@ -48,6 +48,24 @@ const UsuarioSchema = new mongoose.Schema({
 });
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
 
+const SoatSchema = new mongoose.Schema({
+  vehiculoId: { type: String, required: true },
+  numeroPoliza: { type: String, required: true },
+  fechaInicio: { type: String, required: true },
+  fechaVencimiento: { type: String, required: true },
+  ownerEmail: { type: String, required: true },
+});
+const Soat = mongoose.model('Soat', SoatSchema);
+
+const RtmSchema = new mongoose.Schema({
+  vehiculoId: { type: String, required: true },
+  numeroRtm: { type: String, required: true },
+  fechaInicio: { type: String, required: true },
+  fechaVencimiento: { type: String, required: true },
+  ownerEmail: { type: String, required: true },
+});
+const Rtm = mongoose.model('Rtm', RtmSchema);
+
 const normalizeText = (value) => String(value ?? '').trim();
 const normalizeNullableText = (value) => {
   const normalized = normalizeText(value);
@@ -402,6 +420,114 @@ app.put('/api/vehiculos/:id/conductor', async (req, res) => {
     await vehiculo.save();
 
     res.json(vehiculo);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// ── SOATs ──────────────────────────────────────────────────────────────────
+
+app.get('/api/soats', async (req, res) => {
+  try {
+    const email = normalizeText(req.query.email);
+    if (!email) return res.status(400).json({ error: 'El email es obligatorio.' });
+    const data = await Soat.find({ ownerEmail: email });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/soats', async (req, res) => {
+  try {
+    const { vehiculoId, numeroPoliza, fechaInicio, fechaVencimiento, ownerEmail } = req.body;
+    const vehiculoIdNorm = normalizeText(vehiculoId);
+    const numeroPolizaNorm = normalizeText(numeroPoliza);
+    const fechaInicioNorm = normalizeText(fechaInicio);
+    const fechaVencimientoNorm = normalizeText(fechaVencimiento);
+    const ownerEmailNorm = normalizeText(ownerEmail);
+
+    if (!vehiculoIdNorm || !numeroPolizaNorm || !fechaInicioNorm || !fechaVencimientoNorm || !ownerEmailNorm) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    // Un vehículo solo puede tener un SOAT activo — reemplazar si ya existe
+    await Soat.deleteMany({ vehiculoId: vehiculoIdNorm, ownerEmail: ownerEmailNorm });
+
+    const nuevo = new Soat({
+      vehiculoId: vehiculoIdNorm,
+      numeroPoliza: numeroPolizaNorm,
+      fechaInicio: fechaInicioNorm,
+      fechaVencimiento: fechaVencimientoNorm,
+      ownerEmail: ownerEmailNorm,
+    });
+
+    await nuevo.save();
+    res.status(201).json(nuevo);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete('/api/soats/:id', async (req, res) => {
+  try {
+    const eliminado = await Soat.findByIdAndDelete(req.params.id);
+    if (!eliminado) return res.status(404).json({ error: 'SOAT no encontrado.' });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// ── RTMs ───────────────────────────────────────────────────────────────────
+
+app.get('/api/rtms', async (req, res) => {
+  try {
+    const email = normalizeText(req.query.email);
+    if (!email) return res.status(400).json({ error: 'El email es obligatorio.' });
+    const data = await Rtm.find({ ownerEmail: email });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/rtms', async (req, res) => {
+  try {
+    const { vehiculoId, numeroRtm, fechaInicio, fechaVencimiento, ownerEmail } = req.body;
+    const vehiculoIdNorm = normalizeText(vehiculoId);
+    const numeroRtmNorm = normalizeText(numeroRtm);
+    const fechaInicioNorm = normalizeText(fechaInicio);
+    const fechaVencimientoNorm = normalizeText(fechaVencimiento);
+    const ownerEmailNorm = normalizeText(ownerEmail);
+
+    if (!vehiculoIdNorm || !numeroRtmNorm || !fechaInicioNorm || !fechaVencimientoNorm || !ownerEmailNorm) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    // Un vehículo solo puede tener una RTM activa — reemplazar si ya existe
+    await Rtm.deleteMany({ vehiculoId: vehiculoIdNorm, ownerEmail: ownerEmailNorm });
+
+    const nuevo = new Rtm({
+      vehiculoId: vehiculoIdNorm,
+      numeroRtm: numeroRtmNorm,
+      fechaInicio: fechaInicioNorm,
+      fechaVencimiento: fechaVencimientoNorm,
+      ownerEmail: ownerEmailNorm,
+    });
+
+    await nuevo.save();
+    res.status(201).json(nuevo);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete('/api/rtms/:id', async (req, res) => {
+  try {
+    const eliminado = await Rtm.findByIdAndDelete(req.params.id);
+    if (!eliminado) return res.status(404).json({ error: 'RTM no encontrada.' });
+    res.json({ ok: true });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
