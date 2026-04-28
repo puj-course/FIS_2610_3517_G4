@@ -34,6 +34,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
 const crypto = require('crypto');
+const { enviarCodigoVerificacion, verificarServicioCorreo } = require('./services/emailService');
+
+const DB_UNAVAILABLE_MESSAGE =
+  'Base de datos no disponible. Verifica la IP permitida en MongoDB Atlas y la variable MONGO_URI.';
+
+const OTP_EXPIRACION_MINUTOS = parseInt(process.env.OTP_EXPIRACION_MINUTOS || '10');
+const OTP_MAX_INTENTOS = parseInt(process.env.OTP_MAX_INTENTOS || '5');
+const OTP_COOLDOWN_SEGUNDOS = parseInt(process.env.OTP_COOLDOWN_SEGUNDOS || '60');
 
 // Genera un entero criptograficamente seguro en [min, max).
 // Usa crypto.randomInt (Node >= 14.10) con fallback a crypto.randomBytes
@@ -202,6 +210,18 @@ const RtmSchema = new mongoose.Schema({
 });
 const Rtm = mongoose.model('Rtm', RtmSchema);
 
+const VerificacionOTPSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  codigoHash: { type: String, required: true },
+  expiresAt: { type: Date, required: true },
+  intentos: { type: Number, default: 0 },
+  ultimoEnvio: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
+});
+VerificacionOTPSchema.index({ email: 1 });
+VerificacionOTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+const VerificacionOTP = mongoose.model('VerificacionOTP', VerificacionOTPSchema);
+
 const normalizeText = (value) => String(value ?? '').trim();
 const normalizeNullableText = (value) => {
   const normalized = normalizeText(value);
@@ -277,12 +297,36 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
 
     const verificacion = await VerificacionOTP.findOne({ email });
 
-    res.status(201).json({
-      success: true,
-      data: {
-        user: { _id: nuevoUsuario._id, email: nuevoUsuario.email, empresa: nuevoUsuario.empresa, role: nuevoUsuario.role },
-        token: generateToken(nuevoUsuario._id),
-      },
+    if (!verificacion) {
+      return res.status(400).json({ message: 'No hay un codigo pendiente para este correo. Vuelve a registrarte.' });
+    }
+
+    if (new Date() > verificacion.expiresAt) {
+      await VerificacionOTP.findOneAndDelete({ email });
+      return res.status(400).json({ message: 'El codigo ha expirado. Solicita uno nuevo.' });
+    }
+
+    if (verificacion.intentos >= OTP_MAX_INTENTOS) {
+      await VerificacionOTP.findOneAndDelete({ email });
+      return res.status(400).json({ message: 'Demasiados intentos fallidos. Solicita un nuevo codigo.' });
+    }
+
+    const codigoCorrecto = await bcrypt.compare(String(codigo), verificacion.codigoHash);
+
+    if (!codigoCorrecto) {
+      verificacion.intentos += 1;
+      await verificacion.save();
+      const restantes = OTP_MAX_INTENTOS - verificacion.intentos;
+      return res.status(400).json({ message: `Codigo incorrecto. Intentos restantes: ${restantes}` });
+    }
+
+    await Usuario.findOneAndUpdate({ email }, { isVerified: true });
+    await VerificacionOTP.findOneAndDelete({ email });
+
+    const usuario = await Usuario.findOne({ email });
+    res.json({
+      message: 'Cuenta verificada exitosamente.',
+      user: { _id: usuario._id, email: usuario.email, empresa: usuario.empresa, role: usuario.role },
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
