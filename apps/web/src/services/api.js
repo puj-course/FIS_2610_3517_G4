@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Base URL para el backend API (configurar cuando esté disponible)
+// Base URL para el backend API
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // Crear instancia de axios con configuración base
@@ -15,11 +15,16 @@ const api = axios.create({
 // Interceptor para agregar token de autenticación
 api.interceptors.request.use(
   (config) => {
-    const user = localStorage.getItem('syntix_user');
-    if (user) {
-      const parsed = JSON.parse(user);
-      if (parsed?.token) {
-        config.headers.Authorization = `Bearer ${parsed.token}`;
+    const userStr = localStorage.getItem('syntix_user');
+    if (userStr) {
+      try {
+        const parsed = JSON.parse(userStr);
+        // Si el usuario tiene un token de sesión seguro, lo enviamos en los headers
+        if (parsed && parsed.token) {
+          config.headers.Authorization = `Bearer ${parsed.token}`;
+        }
+      } catch (error) {
+        console.error('Error al leer el token:', error);
       }
     }
     return config;
@@ -32,8 +37,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
-      // Backend no disponible - se manejará con localStorage
-      console.warn('Backend no disponible, usando almacenamiento local');
+      console.warn('Backend no disponible, activando modo local (fallback)');
     }
     return Promise.reject(error);
   }
@@ -41,16 +45,14 @@ api.interceptors.response.use(
 
 // Servicios de autenticación
 export const authService = {
-  /**
-   * Registrar un nuevo usuario
-   */
   async register(userData) {
     try {
+      // Nota: Asumiendo que tu backend usa las rutas /auth/register y /auth/login
       const response = await api.post('/auth/register', userData);
-      return { success: true, data: response.data };
+      // Extraemos la propiedad 'data' que viene de la respuesta de Express
+      return { success: true, data: response.data.data }; 
     } catch (error) {
-      if (error.code === 'ERR_NETWORK') {
-        // Backend no disponible - usar localStorage
+      if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED') {
         return { success: false, useLocalStorage: true };
       }
       return {
@@ -60,16 +62,12 @@ export const authService = {
     }
   },
 
-  /**
-   * Iniciar sesión
-   */
   async login(email, password) {
     try {
       const response = await api.post('/auth/login', { email, password });
-      return { success: true, data: response.data };
+      return { success: true, data: response.data.data };
     } catch (error) {
-      if (error.code === 'ERR_NETWORK') {
-        // Backend no disponible - usar localStorage
+      if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED') {
         return { success: false, useLocalStorage: true };
       }
       return {
@@ -79,15 +77,12 @@ export const authService = {
     }
   },
 
-  /**
-   * Actualizar datos del usuario
-   */
   async updateUser(userData) {
     try {
       const response = await api.put('/auth/user', userData);
-      return { success: true, data: response.data };
+      return { success: true, data: response.data.data };
     } catch (error) {
-      if (error.code === 'ERR_NETWORK') {
+      if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED') {
         return { success: false, useLocalStorage: true };
       }
       return {
