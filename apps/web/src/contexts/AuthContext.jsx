@@ -48,10 +48,9 @@ export function AuthProvider({ children }) {
       const apiResult = await authService.register({ email, password, empresa, telefono });
       
       if (apiResult.useLocalStorage) {
-        // Backend no disponible, usar localStorage
-        const localResult = registerLocal(email, password, empresa, telefono);
+        // Backend no disponible - NO registrar sin OTP
         setLoading(false);
-        return localResult;
+        return { success: false, message: 'El servidor no está disponible. Intenta nuevamente en unos momentos.' };
       }
       
       if (apiResult.success) {
@@ -63,11 +62,10 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return { success: false, message: apiResult.message };
     } catch (err) {
-      // En caso de error, intentar con localStorage
-      console.warn('Error en API, usando localStorage:', err);
-      const localResult = registerLocal(email, password, empresa, telefono);
+      // En caso de error de red, NO registrar sin OTP
+      console.warn('Error en API durante registro:', err);
       setLoading(false);
-      return localResult;
+      return { success: false, message: 'No se pudo conectar al servidor. Verifica tu conexión.' };
     }
   }, [registerLocal, setUser]);
 

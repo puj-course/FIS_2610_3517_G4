@@ -1,10 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { enviarCodigoVerificacion } = require('./services/emailService');
-require('dotenv').config();
 
 const OTP_EXPIRACION_MINUTOS = parseInt(process.env.OTP_EXPIRACION_MINUTOS || '10');
 const OTP_MAX_INTENTOS = parseInt(process.env.OTP_MAX_INTENTOS || '5');
