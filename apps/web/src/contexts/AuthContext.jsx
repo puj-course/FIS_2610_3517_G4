@@ -55,10 +55,9 @@ export function AuthProvider({ children }) {
       }
       
       if (apiResult.success) {
-        const userData = apiResult.data?.user || { email, empresa, telefono, role: 'admin' };
-        setUser(userData);
+        // Registro exitoso pero requiere verificacion OTP - NO logueamos aun
         setLoading(false);
-        return { success: true };
+        return { success: true, needsVerification: true };
       }
       
       setLoading(false);
@@ -153,6 +152,10 @@ export function AuthProvider({ children }) {
     setError(null);
   }, [setUser]);
 
+  const loginAfterVerification = useCallback((userData) => {
+    if (userData) setUser(userData);
+  }, [setUser]);
+
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -163,7 +166,8 @@ export function AuthProvider({ children }) {
       login, 
       register, 
       updateUser, 
-      logout, 
+      logout,
+      loginAfterVerification,
       isAuthenticated: !!user,
       loading,
       error,
