@@ -2,8 +2,33 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const helmet = require('helmet');
 
 const app = express();
+
+// BLINDAJE DE SEGURIDAD
+app.use(helmet());
+
+// Sanitización manual contra inyección MongoDB
+// (express-mongo-sanitize es incompatible con Express moderno donde req.query es read-only)
+app.use((req, _res, next) => {
+  const sanitize = (obj) => {
+    if (obj && typeof obj === 'object') {
+      for (const key of Object.keys(obj)) {
+        if (key.startsWith('$') || key.includes('.')) {
+          delete obj[key];
+        } else {
+          sanitize(obj[key]);
+        }
+      }
+    }
+  };
+  sanitize(req.body);
+  sanitize(req.params);
+  next();
+});
 
 app.use(cors());
 app.use(express.json());
@@ -46,7 +71,32 @@ const UsuarioSchema = new mongoose.Schema({
   telefono: String,
   role: { type: String, default: 'admin' },
 });
+
+// Hook: encripta la contraseña antes de guardar
+// Hook: encripta la contraseña antes de guardar
+UsuarioSchema.pre('save', async function () {
+  // Si la contraseña no ha sido modificada, simplemente salimos de la función
+  if (!this.isModified('password')) return;
+  
+  // Como es una función 'async', los errores de bcrypt se propagan automáticamente,
+  // por lo que podemos eliminar el bloque try/catch y las llamadas a next()
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+});
+
+// Método: compara contraseña candidata con el hash
+UsuarioSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
+
+// Generador de Token JWT
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET || 'syntix_super_secret_key', {
+    expiresIn: '30d',
+  });
+};
 
 const SoatSchema = new mongoose.Schema({
   vehiculoId: { type: String, required: true },
@@ -89,8 +139,13 @@ app.post('/api/auth/register', async (req, res) => {
     const nuevoUsuario = new Usuario({ email, password, empresa, telefono });
     await nuevoUsuario.save();
 
-    const { password: _, ...userSinPassword } = nuevoUsuario.toObject();
-    res.status(201).json({ user: userSinPassword });
+    res.status(201).json({
+      success: true,
+      data: {
+        user: { _id: nuevoUsuario._id, email: nuevoUsuario.email, empresa: nuevoUsuario.empresa, role: nuevoUsuario.role },
+        token: generateToken(nuevoUsuario._id),
+      },
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -104,13 +159,19 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ message: 'Email y contrasena son requeridos' });
     }
 
-    const usuario = await Usuario.findOne({ email, password });
-    if (!usuario) {
-      return res.status(401).json({ message: 'Credenciales invalidas' });
-    }
+    const usuario = await Usuario.findOne({ email });
 
-    const { password: _, ...userSinPassword } = usuario.toObject();
-    res.json({ user: userSinPassword });
+    if (usuario && (await usuario.comparePassword(password))) {
+      res.json({
+        success: true,
+        data: {
+          user: { _id: usuario._id, email: usuario.email, empresa: usuario.empresa, role: usuario.role },
+          token: generateToken(usuario._id),
+        },
+      });
+    } else {
+      res.status(401).json({ success: false, message: 'Credenciales invalidas' });
+    }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -451,7 +512,6 @@ app.post('/api/soats', async (req, res) => {
       return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
 
-    // Un vehículo solo puede tener un SOAT activo — reemplazar si ya existe
     await Soat.deleteMany({ vehiculoId: vehiculoIdNorm, ownerEmail: ownerEmailNorm });
 
     const nuevo = new Soat({
@@ -505,7 +565,6 @@ app.post('/api/rtms', async (req, res) => {
       return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
 
-    // Un vehículo solo puede tener una RTM activa — reemplazar si ya existe
     await Rtm.deleteMany({ vehiculoId: vehiculoIdNorm, ownerEmail: ownerEmailNorm });
 
     const nuevo = new Rtm({
