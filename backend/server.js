@@ -1,3 +1,31 @@
+const fs = require('fs');
+const path = require('path');
+const dotenv = require('dotenv');
+
+const envPath = path.resolve(__dirname, '.env');
+const envExamplePath = path.resolve(__dirname, '.env.example');
+let envLoadedFrom = null;
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+  envLoadedFrom = '.env';
+} else if (fs.existsSync(envExamplePath)) {
+  dotenv.config({ path: envExamplePath });
+  envLoadedFrom = '.env.example';
+  console.warn('[ENV] No se encontro backend/.env. Se cargo backend/.env.example como respaldo.');
+} else {
+  console.error('[ENV] No se encontro backend/.env ni backend/.env.example');
+}
+
+if (envLoadedFrom) {
+  console.log(`[ENV] Variables cargadas desde backend/${envLoadedFrom}`);
+}
+
+const missingEmailVars = ['EMAIL_USER', 'EMAIL_PASS'].filter((key) => !process.env[key]);
+if (missingEmailVars.length > 0) {
+  console.error(`[ENV] Faltan variables SMTP: ${missingEmailVars.join(', ')}`);
+}
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -33,14 +61,51 @@ app.use((req, _res, next) => {
 app.use(cors());
 app.use(express.json());
 
+app.get('/api/health/email', async (_req, res) => {
+  const smtp = await verificarServicioCorreo();
+  if (!smtp.ok) {
+    return res.status(500).json({ ok: false, smtp });
+  }
+
+  return res.json({ ok: true, smtp });
+});
+
 const MONGO_URI =
   process.env.MONGO_URI ||
   'mongodb+srv://juansebastianvd_db_user:UcgkGfBgvUkgEVcF@cluster0.45cqzzh.mongodb.net/logistica_db?retryWrites=true&w=majority';
 
+mongoose.set('bufferCommands', false);
+
 mongoose
-  .connect(MONGO_URI)
+  .connect(MONGO_URI, { serverSelectionTimeoutMS: 10000 })
   .then(() => console.log('Conexion exitosa a MongoDB Atlas'))
   .catch((err) => console.error('Error de conexion:', err));
+
+const isDbConnected = () => mongoose.connection.readyState === 1;
+
+app.get('/api/health/db', (_req, res) => {
+  if (isDbConnected()) {
+    return res.json({ ok: true, state: mongoose.connection.readyState });
+  }
+
+  return res.status(503).json({
+    ok: false,
+    state: mongoose.connection.readyState,
+    message: DB_UNAVAILABLE_MESSAGE,
+  });
+});
+
+app.use('/api', (req, res, next) => {
+  if (req.path === '/health/email' || req.path === '/health/db') {
+    return next();
+  }
+
+  if (!isDbConnected()) {
+    return res.status(503).json({ message: DB_UNAVAILABLE_MESSAGE, code: 'DB_UNAVAILABLE' });
+  }
+
+  return next();
+});
 
 const ConductorSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
@@ -65,11 +130,14 @@ const VehiculoSchema = new mongoose.Schema({
 const Vehiculo = mongoose.model('Vehiculo', VehiculoSchema);
 
 const UsuarioSchema = new mongoose.Schema({
+  nombre: { type: String, default: '' },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   empresa: String,
   telefono: String,
   role: { type: String, default: 'admin' },
+  isVerified: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
 });
 
 // Hook: encripta la contraseña antes de guardar
@@ -123,21 +191,73 @@ const normalizeNullableText = (value) => {
 };
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
+// Registro: crea/actualiza usuario no verificado y dispara envio de OTP al correo.
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, empresa, telefono } = req.body;
+    const { email, password, nombre, empresa, telefono } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email y contrasena son requeridos' });
     }
 
     const existe = await Usuario.findOne({ email });
-    if (existe) {
+    if (existe && existe.isVerified) {
       return res.status(400).json({ message: 'El correo ya esta registrado' });
     }
 
-    const nuevoUsuario = new Usuario({ email, password, empresa, telefono });
-    await nuevoUsuario.save();
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    if (existe && !existe.isVerified) {
+      existe.password = passwordHash;
+      existe.nombre = nombre || '';
+      existe.empresa = empresa;
+      existe.telefono = telefono;
+      await existe.save();
+    } else {
+      const nuevoUsuario = new Usuario({
+        nombre: nombre || '',
+        email,
+        password: passwordHash,
+        empresa,
+        telefono,
+        isVerified: false,
+      });
+      await nuevoUsuario.save();
+    }
+
+    // Generar OTP de 6 digitos
+    const codigo = String(crypto.randomInt(100000, 999999));
+    const codigoHash = await bcrypt.hash(codigo, 10);
+    const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
+
+    await VerificacionOTP.findOneAndDelete({ email });
+    await new VerificacionOTP({ email, codigoHash, expiresAt }).save();
+
+    try {
+      await enviarCodigoVerificacion(email, nombre, codigo);
+    } catch (emailErr) {
+      console.error('Error al enviar correo:', emailErr.message);
+      return res.status(500).json({ message: `No se pudo enviar el correo de verificacion: ${emailErr.message}` });
+    }
+
+    res.status(201).json({ message: 'Registro exitoso. Revisa tu correo para verificar tu cuenta.', email });
+  } catch (err) {
+    if (err?.name === 'MongooseServerSelectionError' || err?.name === 'MongoServerSelectionError') {
+      return res.status(503).json({ message: DB_UNAVAILABLE_MESSAGE, code: 'DB_UNAVAILABLE' });
+    }
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.post('/api/auth/verificar-codigo', async (req, res) => {
+  try {
+    const { email, codigo } = req.body;
+
+    if (!email || !codigo) {
+      return res.status(400).json({ message: 'Email y codigo son requeridos' });
+    }
+
+    const verificacion = await VerificacionOTP.findOne({ email });
 
     res.status(201).json({
       success: true,
@@ -151,6 +271,52 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
+app.post('/api/auth/reenviar-codigo', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email es requerido' });
+    }
+
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    if (usuario.isVerified) {
+      return res.status(400).json({ message: 'Esta cuenta ya esta verificada' });
+    }
+
+    const verificacionExistente = await VerificacionOTP.findOne({ email });
+    if (verificacionExistente) {
+      const segundosDesdeUltimoEnvio = (Date.now() - new Date(verificacionExistente.ultimoEnvio).getTime()) / 1000;
+      if (segundosDesdeUltimoEnvio < OTP_COOLDOWN_SEGUNDOS) {
+        const espera = Math.ceil(OTP_COOLDOWN_SEGUNDOS - segundosDesdeUltimoEnvio);
+        return res.status(429).json({ message: `Espera ${espera} segundos antes de solicitar otro codigo.` });
+      }
+    }
+
+    const codigo = String(crypto.randomInt(100000, 999999));
+    const codigoHash = await bcrypt.hash(codigo, 10);
+    const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
+
+    await VerificacionOTP.findOneAndDelete({ email });
+    await new VerificacionOTP({ email, codigoHash, expiresAt, ultimoEnvio: new Date() }).save();
+
+    try {
+      await enviarCodigoVerificacion(email, usuario.nombre, codigo);
+    } catch (emailErr) {
+      console.error('Error al enviar correo:', emailErr.message);
+      return res.status(500).json({ message: `Error al enviar el correo: ${emailErr.message}` });
+    }
+
+    res.json({ message: 'Codigo reenviado exitosamente. Revisa tu correo.' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Login restringido: solo permite acceso cuando isVerified es true.
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;

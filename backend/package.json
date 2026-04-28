@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prestart": "node scripts/ensure-env.js",
+    "doctor:auth": "node scripts/auth-doctor.js",
+    "doctor:auth:ci": "node scripts/auth-doctor.js --ci --no-connect --env-file=.env.example",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start:checked": "node scripts/auth-doctor.js && node server.js",
     "start": "node server.js"
   },
   "keywords": [],

@@ -47,14 +47,14 @@ export function AuthProvider({ children }) {
       if (apiResult.useLocalStorage) {
         const localResult = registerLocal(email, password, empresa, telefono);
         setLoading(false);
-        return localResult;
+        return { success: false, message: 'El servidor no está disponible. Intenta nuevamente en unos momentos.' };
       }
       
       if (apiResult.success) {
         setUser(apiResult.data.user);
         setToken(apiResult.data.token); // Guardamos el JWT
         setLoading(false);
-        return { success: true };
+        return { success: true, needsVerification: true };
       }
       
       setLoading(false);
@@ -63,7 +63,7 @@ export function AuthProvider({ children }) {
       console.warn('Error en API, usando localStorage:', err);
       const localResult = registerLocal(email, password, empresa, telefono);
       setLoading(false);
-      return localResult;
+      return { success: false, message: 'No se pudo conectar al servidor. Verifica tu conexión.' };
     }
   }, [registerLocal, setUser, setToken]);
 
