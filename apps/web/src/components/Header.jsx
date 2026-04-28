@@ -1,16 +1,22 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { LogOut, Menu, Bell, User } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAlerts } from '@/hooks/useAlerts.js';
 
 export default function Header({ toggleSidebar }) {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const { alerts } = useAlerts();
 
   const alertCount = alerts.length;
   const hasActiveAlerts = alertCount > 0;
+  const handleAlertsClick = () => navigate('/alertas');
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const pathNames = location.pathname.split('/').filter(x => x);
   const currentPage = pathNames.length > 0 ? pathNames[pathNames.length - 1] : 'Dashboard';
@@ -29,7 +35,11 @@ export default function Header({ toggleSidebar }) {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="p-2 text-gray-300 hover:bg-white/10 rounded-full relative">
+        <button
+          onClick={handleAlertsClick}
+          className="p-2 text-gray-300 hover:bg-white/10 rounded-full relative"
+          title="Ver alertas"
+        >
           <Bell className="w-5 h-5" />
           {hasActiveAlerts && (
             <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-syntix-red rounded-full border-2 border-syntix-navy"></span>
@@ -43,7 +53,7 @@ export default function Header({ toggleSidebar }) {
           <div className="w-8 h-8 bg-syntix-green text-white rounded-full flex items-center justify-center font-bold text-sm">
             <User className="w-4 h-4" />
           </div>
-          <button onClick={logout} className="p-2 text-gray-400 hover:text-syntix-red hover:bg-white/5 rounded-md transition-colors" title="Cerrar Sesión">
+          <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-syntix-red hover:bg-white/5 rounded-md transition-colors" title="Cerrar Sesión">
             <LogOut className="w-5 h-5" />
           </button>
         </div>
