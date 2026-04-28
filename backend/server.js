@@ -16,12 +16,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const MONGO_URI = process.env.MONGO_URI;
-
-if (!MONGO_URI) {
-  console.error('Error: MONGO_URI no esta definida en las variables de entorno.');
-  process.exit(1);
-}
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  'mongodb+srv://juansebastianvd_db_user:UcgkGfBgvUkgEVcF@cluster0.45cqzzh.mongodb.net/logistica_db?retryWrites=true&w=majority';
 
 mongoose
   .connect(MONGO_URI)
