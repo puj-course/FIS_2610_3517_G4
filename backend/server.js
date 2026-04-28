@@ -1,11 +1,37 @@
+const fs = require('fs');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+const dotenv = require('dotenv');
+
+const envPath = path.resolve(__dirname, '.env');
+const envExamplePath = path.resolve(__dirname, '.env.example');
+let envLoadedFrom = null;
+
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+  envLoadedFrom = '.env';
+} else if (fs.existsSync(envExamplePath)) {
+  dotenv.config({ path: envExamplePath });
+  envLoadedFrom = '.env.example';
+  console.warn('[ENV] No se encontro backend/.env. Se cargo backend/.env.example como respaldo.');
+} else {
+  console.error('[ENV] No se encontro backend/.env ni backend/.env.example');
+}
+
+if (envLoadedFrom) {
+  console.log(`[ENV] Variables cargadas desde backend/${envLoadedFrom}`);
+}
+
+const missingEmailVars = ['EMAIL_USER', 'EMAIL_PASS'].filter((key) => !process.env[key]);
+if (missingEmailVars.length > 0) {
+  console.error(`[ENV] Faltan variables SMTP: ${missingEmailVars.join(', ')}`);
+}
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const { enviarCodigoVerificacion } = require('./services/emailService');
+const { enviarCodigoVerificacion, verificarServicioCorreo } = require('./services/emailService');
 
 // Parametros de seguridad y UX del flujo OTP.
 const OTP_EXPIRACION_MINUTOS = parseInt(process.env.OTP_EXPIRACION_MINUTOS || '10');
@@ -16,6 +42,15 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+app.get('/api/health/email', async (_req, res) => {
+  const smtp = await verificarServicioCorreo();
+  if (!smtp.ok) {
+    return res.status(500).json({ ok: false, smtp });
+  }
+
+  return res.json({ ok: true, smtp });
+});
 
 const MONGO_URI =
   process.env.MONGO_URI ||
@@ -144,7 +179,7 @@ app.post('/api/auth/register', async (req, res) => {
       await enviarCodigoVerificacion(email, nombre, codigo);
     } catch (emailErr) {
       console.error('Error al enviar correo:', emailErr.message);
-      // No falla el registro, solo avisa
+      return res.status(500).json({ message: `No se pudo enviar el correo de verificacion: ${emailErr.message}` });
     }
 
     res.status(201).json({ message: 'Registro exitoso. Revisa tu correo para verificar tu cuenta.', email });
@@ -233,7 +268,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
       await enviarCodigoVerificacion(email, usuario.nombre, codigo);
     } catch (emailErr) {
       console.error('Error al enviar correo:', emailErr.message);
-      return res.status(500).json({ message: 'Error al enviar el correo. Intenta nuevamente.' });
+      return res.status(500).json({ message: `Error al enviar el correo: ${emailErr.message}` });
     }
 
     res.json({ message: 'Codigo reenviado exitosamente. Revisa tu correo.' });
