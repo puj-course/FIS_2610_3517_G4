@@ -1,20 +1,66 @@
 const nodemailer = require('nodemailer');
 
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASS;
+const EMAIL_HOST = process.env.EMAIL_HOST || 'smtp.gmail.com';
+const EMAIL_PORT = parseInt(process.env.EMAIL_PORT || '587');
+const EMAIL_SECURE = process.env.EMAIL_SECURE === 'true' || EMAIL_PORT === 465;
+const EMAIL_ENABLED = Boolean(EMAIL_USER && EMAIL_PASS);
+
 // Transporter SMTP reutilizable para todos los correos transaccionales.
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.EMAIL_PORT || '587'),
-  secure: false,
+  host: EMAIL_HOST,
+  port: EMAIL_PORT,
+  secure: EMAIL_SECURE,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: EMAIL_USER,
+    pass: EMAIL_PASS,
   },
 });
 
+async function verificarServicioCorreo() {
+  if (!EMAIL_ENABLED) {
+    return {
+      ok: false,
+      reason: 'missing_credentials',
+      message: 'Faltan EMAIL_USER y/o EMAIL_PASS',
+      host: EMAIL_HOST,
+      port: EMAIL_PORT,
+      secure: EMAIL_SECURE,
+    };
+  }
+
+  try {
+    await transporter.verify();
+    return {
+      ok: true,
+      host: EMAIL_HOST,
+      port: EMAIL_PORT,
+      secure: EMAIL_SECURE,
+      user: EMAIL_USER,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      reason: 'verify_failed',
+      message: error.message,
+      code: error.code,
+      host: EMAIL_HOST,
+      port: EMAIL_PORT,
+      secure: EMAIL_SECURE,
+      user: EMAIL_USER,
+    };
+  }
+}
+
 async function enviarCodigoVerificacion(email, nombre, codigo) {
+  if (!EMAIL_ENABLED) {
+    throw new Error('Servicio de correo no configurado: faltan EMAIL_USER y/o EMAIL_PASS en backend/.env');
+  }
+
   // Plantilla de bienvenida con OTP temporal para activacion de cuenta.
   const mailOptions = {
-    from: `"Drive Control" <${process.env.EMAIL_USER}>`,
+    from: `"Drive Control" <${EMAIL_USER}>`,
     to: email,
     subject: 'Código de verificación - Drive Control',
     html: `
@@ -32,7 +78,15 @@ async function enviarCodigoVerificacion(email, nombre, codigo) {
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  const info = await transporter.sendMail(mailOptions);
+  const accepted = Array.isArray(info.accepted) ? info.accepted : [];
+  const rejected = Array.isArray(info.rejected) ? info.rejected : [];
+
+  if (accepted.length === 0 || rejected.length > 0) {
+    throw new Error(`SMTP no confirmo entrega. accepted=${accepted.length} rejected=${rejected.length}`);
+  }
+
+  console.log(`[EMAIL] OTP enviado a ${email}. messageId=${info.messageId}`);
 }
 
-module.exports = { enviarCodigoVerificacion };
+module.exports = { enviarCodigoVerificacion, verificarServicioCorreo };
