@@ -54,7 +54,7 @@ export function AuthProvider({ children }) {
       }
       
       if (apiResult.success) {
-        // Registro exitoso pero requiere verificacion OTP - NO logueamos aun
+        // Registro exitoso pero requiere verificacion OTP; la sesion se activa tras validar codigo.
         setLoading(false);
         return { success: true, needsVerification: true };
       }
@@ -150,6 +150,7 @@ export function AuthProvider({ children }) {
     setError(null);
   }, [setUser]);
 
+  // Entrada de sesion explicita cuando el backend confirma OTP valido.
   const loginAfterVerification = useCallback((userData) => {
     if (userData) setUser(userData);
   }, [setUser]);
