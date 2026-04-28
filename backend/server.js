@@ -33,6 +33,24 @@ require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
+const crypto = require('crypto');
+
+// Genera un entero criptograficamente seguro en [min, max).
+// Usa crypto.randomInt (Node >= 14.10) con fallback a crypto.randomBytes
+// para compatibilidad con versiones anteriores de Node.
+const secureRandomInt = (min, max) => {
+  if (typeof crypto.randomInt === 'function') {
+    return crypto.randomInt(min, max);
+  }
+  const range = max - min;
+  const bytesNeeded = Math.ceil(Math.log2(range) / 8) + 1;
+  const maxValid = Math.floor(256 ** bytesNeeded / range) * range;
+  let value;
+  do {
+    value = parseInt(crypto.randomBytes(bytesNeeded).toString('hex'), 16);
+  } while (value >= maxValid);
+  return min + (value % range);
+};
 
 const app = express();
 
@@ -226,7 +244,7 @@ app.post('/api/auth/register', async (req, res) => {
     }
 
     // Generar OTP de 6 digitos
-    const codigo = String(crypto.randomInt(100000, 999999));
+    const codigo = String(secureRandomInt(100000, 999999));
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
 
@@ -296,7 +314,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
       }
     }
 
-    const codigo = String(crypto.randomInt(100000, 999999));
+    const codigo = String(secureRandomInt(100000, 999999));
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
 
