@@ -33,6 +33,9 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { enviarCodigoVerificacion, verificarServicioCorreo } = require('./services/emailService');
 
+const DB_UNAVAILABLE_MESSAGE =
+  'Base de datos no disponible. Verifica la IP permitida en MongoDB Atlas y la variable MONGO_URI.';
+
 // Parametros de seguridad y UX del flujo OTP.
 const OTP_EXPIRACION_MINUTOS = parseInt(process.env.OTP_EXPIRACION_MINUTOS || '10');
 const OTP_MAX_INTENTOS = parseInt(process.env.OTP_MAX_INTENTOS || '5');
@@ -56,10 +59,38 @@ const MONGO_URI =
   process.env.MONGO_URI ||
   'mongodb+srv://juansebastianvd_db_user:UcgkGfBgvUkgEVcF@cluster0.45cqzzh.mongodb.net/logistica_db?retryWrites=true&w=majority';
 
+mongoose.set('bufferCommands', false);
+
 mongoose
-  .connect(MONGO_URI)
+  .connect(MONGO_URI, { serverSelectionTimeoutMS: 10000 })
   .then(() => console.log('Conexion exitosa a MongoDB Atlas'))
   .catch((err) => console.error('Error de conexion:', err));
+
+const isDbConnected = () => mongoose.connection.readyState === 1;
+
+app.get('/api/health/db', (_req, res) => {
+  if (isDbConnected()) {
+    return res.json({ ok: true, state: mongoose.connection.readyState });
+  }
+
+  return res.status(503).json({
+    ok: false,
+    state: mongoose.connection.readyState,
+    message: DB_UNAVAILABLE_MESSAGE,
+  });
+});
+
+app.use('/api', (req, res, next) => {
+  if (req.path === '/health/email' || req.path === '/health/db') {
+    return next();
+  }
+
+  if (!isDbConnected()) {
+    return res.status(503).json({ message: DB_UNAVAILABLE_MESSAGE, code: 'DB_UNAVAILABLE' });
+  }
+
+  return next();
+});
 
 const ConductorSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
@@ -184,6 +215,9 @@ app.post('/api/auth/register', async (req, res) => {
 
     res.status(201).json({ message: 'Registro exitoso. Revisa tu correo para verificar tu cuenta.', email });
   } catch (err) {
+    if (err?.name === 'MongooseServerSelectionError' || err?.name === 'MongoServerSelectionError') {
+      return res.status(503).json({ message: DB_UNAVAILABLE_MESSAGE, code: 'DB_UNAVAILABLE' });
+    }
     res.status(500).json({ message: err.message });
   }
 });

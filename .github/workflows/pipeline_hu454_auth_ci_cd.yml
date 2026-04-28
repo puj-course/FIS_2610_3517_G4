@@ -76,6 +76,9 @@ jobs:
       - name: Verificar sintaxis backend
         run: node --check server.js
 
+      - name: Preflight de autenticacion (env + DNS)
+        run: npm run doctor:auth:ci
+
   deploy_backend:
     name: CD Backend (hook externo)
     runs-on: ubuntu-latest

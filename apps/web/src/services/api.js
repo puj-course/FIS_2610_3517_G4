@@ -39,6 +39,34 @@ api.interceptors.response.use(
   }
 );
 
+const normalizeApiErrorMessage = (error, fallbackMessage) => {
+  const status = error?.response?.status;
+  const backendMessage = error?.response?.data?.message;
+  const requestPath = error?.config?.url || '';
+
+  if (backendMessage) {
+    return backendMessage;
+  }
+
+  if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED') {
+    return 'No se pudo conectar con el servidor backend. Verifica que este ejecutandose.';
+  }
+
+  if (error.code === 'ECONNABORTED') {
+    return 'El servidor tardo demasiado en responder. Intenta nuevamente.';
+  }
+
+  if (status === 404 && requestPath.startsWith('/auth/')) {
+    return 'Ruta de autenticacion no encontrada. Revisa VITE_API_URL y asegúrate de incluir /api.';
+  }
+
+  if (status === 503) {
+    return 'El backend no tiene acceso a la base de datos en este momento.';
+  }
+
+  return fallbackMessage;
+};
+
 // Servicios de autenticación
 export const authService = {
   /**
@@ -55,7 +83,7 @@ export const authService = {
       }
       return {
         success: false,
-        message: error.response?.data?.message || 'Error al registrar usuario',
+        message: normalizeApiErrorMessage(error, 'Error al registrar usuario'),
       };
     }
   },
@@ -74,7 +102,7 @@ export const authService = {
       }
       return {
         success: false,
-        message: error.response?.data?.message || 'Credenciales inválidas',
+        message: normalizeApiErrorMessage(error, 'Credenciales inválidas'),
       };
     }
   },
@@ -92,7 +120,7 @@ export const authService = {
       }
       return {
         success: false,
-        message: error.response?.data?.message || 'Codigo incorrecto',
+        message: normalizeApiErrorMessage(error, 'Codigo incorrecto'),
       };
     }
   },
@@ -110,7 +138,7 @@ export const authService = {
       }
       return {
         success: false,
-        message: error.response?.data?.message || 'Error al reenviar codigo',
+        message: normalizeApiErrorMessage(error, 'Error al reenviar codigo'),
       };
     }
   },
@@ -128,7 +156,7 @@ export const authService = {
       }
       return {
         success: false,
-        message: error.response?.data?.message || 'Error al actualizar usuario',
+        message: normalizeApiErrorMessage(error, 'Error al actualizar usuario'),
       };
     }
   },
