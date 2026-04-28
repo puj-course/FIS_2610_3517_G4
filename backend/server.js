@@ -1,7 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
+const crypto = require('crypto');
+const { enviarCodigoVerificacion } = require('./services/emailService');
 require('dotenv').config();
+
+const OTP_EXPIRACION_MINUTOS = parseInt(process.env.OTP_EXPIRACION_MINUTOS || '10');
+const OTP_MAX_INTENTOS = parseInt(process.env.OTP_MAX_INTENTOS || '5');
+const OTP_COOLDOWN_SEGUNDOS = parseInt(process.env.OTP_COOLDOWN_SEGUNDOS || '60');
 
 const app = express();
 
@@ -40,13 +47,28 @@ const VehiculoSchema = new mongoose.Schema({
 const Vehiculo = mongoose.model('Vehiculo', VehiculoSchema);
 
 const UsuarioSchema = new mongoose.Schema({
+  nombre: { type: String, default: '' },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   empresa: String,
   telefono: String,
   role: { type: String, default: 'admin' },
+  isVerified: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now },
 });
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
+
+const VerificacionOTPSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  codigoHash: { type: String, required: true },
+  expiresAt: { type: Date, required: true },
+  intentos: { type: Number, default: 0 },
+  ultimoEnvio: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
+});
+VerificacionOTPSchema.index({ email: 1 });
+VerificacionOTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+const VerificacionOTP = mongoose.model('VerificacionOTP', VerificacionOTPSchema);
 
 const SoatSchema = new mongoose.Schema({
   vehiculoId: { type: String, required: true },
@@ -75,22 +97,142 @@ const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key
 
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, empresa, telefono } = req.body;
+    const { email, password, nombre, empresa, telefono } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Email y contrasena son requeridos' });
     }
 
     const existe = await Usuario.findOne({ email });
-    if (existe) {
+    if (existe && existe.isVerified) {
       return res.status(400).json({ message: 'El correo ya esta registrado' });
     }
 
-    const nuevoUsuario = new Usuario({ email, password, empresa, telefono });
-    await nuevoUsuario.save();
+    const passwordHash = await bcrypt.hash(password, 10);
 
-    const { password: _, ...userSinPassword } = nuevoUsuario.toObject();
-    res.status(201).json({ user: userSinPassword });
+    if (existe && !existe.isVerified) {
+      existe.password = passwordHash;
+      existe.nombre = nombre || '';
+      existe.empresa = empresa;
+      existe.telefono = telefono;
+      await existe.save();
+    } else {
+      const nuevoUsuario = new Usuario({
+        nombre: nombre || '',
+        email,
+        password: passwordHash,
+        empresa,
+        telefono,
+        isVerified: false,
+      });
+      await nuevoUsuario.save();
+    }
+
+    // Generar OTP de 6 digitos
+    const codigo = String(crypto.randomInt(100000, 999999));
+    const codigoHash = await bcrypt.hash(codigo, 10);
+    const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
+
+    await VerificacionOTP.findOneAndDelete({ email });
+    await new VerificacionOTP({ email, codigoHash, expiresAt }).save();
+
+    try {
+      await enviarCodigoVerificacion(email, nombre, codigo);
+    } catch (emailErr) {
+      console.error('Error al enviar correo:', emailErr.message);
+      // No falla el registro, solo avisa
+    }
+
+    res.status(201).json({ message: 'Registro exitoso. Revisa tu correo para verificar tu cuenta.', email });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.post('/api/auth/verificar-codigo', async (req, res) => {
+  try {
+    const { email, codigo } = req.body;
+
+    if (!email || !codigo) {
+      return res.status(400).json({ message: 'Email y codigo son requeridos' });
+    }
+
+    const verificacion = await VerificacionOTP.findOne({ email });
+
+    if (!verificacion) {
+      return res.status(400).json({ message: 'No hay un codigo pendiente para este correo. Vuelve a registrarte.' });
+    }
+
+    if (new Date() > verificacion.expiresAt) {
+      await VerificacionOTP.findOneAndDelete({ email });
+      return res.status(400).json({ message: 'El codigo ha expirado. Solicita uno nuevo.' });
+    }
+
+    if (verificacion.intentos >= OTP_MAX_INTENTOS) {
+      await VerificacionOTP.findOneAndDelete({ email });
+      return res.status(400).json({ message: 'Demasiados intentos fallidos. Solicita un nuevo codigo.' });
+    }
+
+    const codigoCorrecto = await bcrypt.compare(String(codigo), verificacion.codigoHash);
+
+    if (!codigoCorrecto) {
+      verificacion.intentos += 1;
+      await verificacion.save();
+      const restantes = OTP_MAX_INTENTOS - verificacion.intentos;
+      return res.status(400).json({ message: `Codigo incorrecto. Intentos restantes: ${restantes}` });
+    }
+
+    await Usuario.findOneAndUpdate({ email }, { isVerified: true });
+    await VerificacionOTP.findOneAndDelete({ email });
+
+    const usuario = await Usuario.findOne({ email });
+    const { password: _, ...userSinPassword } = usuario.toObject();
+    res.json({ message: 'Cuenta verificada exitosamente.', user: userSinPassword });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.post('/api/auth/reenviar-codigo', async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: 'Email es requerido' });
+    }
+
+    const usuario = await Usuario.findOne({ email });
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+    if (usuario.isVerified) {
+      return res.status(400).json({ message: 'Esta cuenta ya esta verificada' });
+    }
+
+    const verificacionExistente = await VerificacionOTP.findOne({ email });
+    if (verificacionExistente) {
+      const segundosDesdeUltimoEnvio = (Date.now() - new Date(verificacionExistente.ultimoEnvio).getTime()) / 1000;
+      if (segundosDesdeUltimoEnvio < OTP_COOLDOWN_SEGUNDOS) {
+        const espera = Math.ceil(OTP_COOLDOWN_SEGUNDOS - segundosDesdeUltimoEnvio);
+        return res.status(429).json({ message: `Espera ${espera} segundos antes de solicitar otro codigo.` });
+      }
+    }
+
+    const codigo = String(crypto.randomInt(100000, 999999));
+    const codigoHash = await bcrypt.hash(codigo, 10);
+    const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
+
+    await VerificacionOTP.findOneAndDelete({ email });
+    await new VerificacionOTP({ email, codigoHash, expiresAt, ultimoEnvio: new Date() }).save();
+
+    try {
+      await enviarCodigoVerificacion(email, usuario.nombre, codigo);
+    } catch (emailErr) {
+      console.error('Error al enviar correo:', emailErr.message);
+      return res.status(500).json({ message: 'Error al enviar el correo. Intenta nuevamente.' });
+    }
+
+    res.json({ message: 'Codigo reenviado exitosamente. Revisa tu correo.' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -104,9 +246,18 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ message: 'Email y contrasena son requeridos' });
     }
 
-    const usuario = await Usuario.findOne({ email, password });
+    const usuario = await Usuario.findOne({ email });
     if (!usuario) {
       return res.status(401).json({ message: 'Credenciales invalidas' });
+    }
+
+    const passwordValida = await bcrypt.compare(password, usuario.password);
+    if (!passwordValida) {
+      return res.status(401).json({ message: 'Credenciales invalidas' });
+    }
+
+    if (!usuario.isVerified) {
+      return res.status(403).json({ message: 'Debes verificar tu correo antes de iniciar sesion.', needsVerification: true, email });
     }
 
     const { password: _, ...userSinPassword } = usuario.toObject();
