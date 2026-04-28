@@ -6,23 +6,23 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useLocalStorage('syntix_user', null);
+  // Nuevo: Guardamos el token de sesión industrial para rutas protegidas
+  const [token, setToken] = useLocalStorage('syntix_token', null); 
   const [usersDb, setUsersDb] = useLocalStorage('syntix_users_db', []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Función auxiliar para registro local (fallback)
+  // --- FALLBACKS LOCALES (Se mantienen igual) ---
   const registerLocal = useCallback((email, password, empresa, telefono) => {
     if (usersDb.find(u => u.email === email)) {
       return { success: false, message: 'El correo ya está registrado' };
     }
     const newUser = { email, password, empresa, telefono, role: 'admin' };
-    const updatedUsersDb = [...usersDb, newUser];
-    setUsersDb(updatedUsersDb);
+    setUsersDb([...usersDb, newUser]);
     setUser({ email, empresa, telefono, role: 'admin' });
     return { success: true };
   }, [usersDb, setUsersDb, setUser]);
 
-  // Función auxiliar para login local (fallback)
   const loginLocal = useCallback((email, password) => {
     const foundUser = usersDb.find(u => u.email === email && u.password === password);
     if (foundUser) {
@@ -30,7 +30,6 @@ export function AuthProvider({ children }) {
       setUser(userWithoutPass);
       return { success: true };
     }
-    // Fallback mock for testing if db is empty
     if (email === 'admin@syntix.tech' && password === 'admin123') {
       setUser({ email, empresa: 'SYNTIX Demo', telefono: '3000000000', role: 'admin' });
       return { success: true };
@@ -38,25 +37,22 @@ export function AuthProvider({ children }) {
     return { success: false, message: 'Credenciales inválidas' };
   }, [usersDb, setUser]);
 
-  // Registro con soporte para API y fallback a localStorage
+  // --- MÉTODOS PRINCIPALES CON API ---
   const register = useCallback(async (email, password, empresa, telefono) => {
     setLoading(true);
     setError(null);
-    
     try {
-      // Intentar registro con API
       const apiResult = await authService.register({ email, password, empresa, telefono });
       
       if (apiResult.useLocalStorage) {
-        // Backend no disponible, usar localStorage
         const localResult = registerLocal(email, password, empresa, telefono);
         setLoading(false);
         return localResult;
       }
       
       if (apiResult.success) {
-        const userData = apiResult.data?.user || { email, empresa, telefono, role: 'admin' };
-        setUser(userData);
+        setUser(apiResult.data.user);
+        setToken(apiResult.data.token); // Guardamos el JWT
         setLoading(false);
         return { success: true };
       }
@@ -64,33 +60,28 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return { success: false, message: apiResult.message };
     } catch (err) {
-      // En caso de error, intentar con localStorage
       console.warn('Error en API, usando localStorage:', err);
       const localResult = registerLocal(email, password, empresa, telefono);
       setLoading(false);
       return localResult;
     }
-  }, [registerLocal, setUser]);
+  }, [registerLocal, setUser, setToken]);
 
-  // Login con soporte para API y fallback a localStorage
   const login = useCallback(async (email, password) => {
     setLoading(true);
     setError(null);
-    
     try {
-      // Intentar login con API
       const apiResult = await authService.login(email, password);
       
       if (apiResult.useLocalStorage) {
-        // Backend no disponible, usar localStorage
         const localResult = loginLocal(email, password);
         setLoading(false);
         return localResult;
       }
       
       if (apiResult.success) {
-        const userData = apiResult.data?.user || { email, role: 'admin' };
-        setUser(userData);
+        setUser(apiResult.data.user);
+        setToken(apiResult.data.token); // Guardamos el JWT
         setLoading(false);
         return { success: true };
       }
@@ -98,76 +89,25 @@ export function AuthProvider({ children }) {
       setLoading(false);
       return { success: false, message: apiResult.message };
     } catch (err) {
-      // En caso de error, intentar con localStorage
       console.warn('Error en API, usando localStorage:', err);
       const localResult = loginLocal(email, password);
       setLoading(false);
       return localResult;
     }
-  }, [loginLocal, setUser]);
-
-  const updateUser = useCallback(async (newEmail, newPassword) => {
-    if (!user) return { success: false, message: 'No hay usuario autenticado' };
-    
-    setLoading(true);
-    
-    try {
-      const apiResult = await authService.updateUser({ email: newEmail, password: newPassword });
-      
-      if (apiResult.useLocalStorage || !apiResult.success) {
-        // Usar localStorage
-        const updatedUsersDb = usersDb.map(u => {
-          if (u.email === user.email) {
-            return { ...u, email: newEmail || u.email, password: newPassword || u.password };
-          }
-          return u;
-        });
-        
-        setUsersDb(updatedUsersDb);
-        setUser({ ...user, email: newEmail || user.email });
-        setLoading(false);
-        return { success: true };
-      }
-      
-      setUser({ ...user, email: newEmail || user.email });
-      setLoading(false);
-      return { success: true };
-    } catch (err) {
-      // Fallback a localStorage
-      const updatedUsersDb = usersDb.map(u => {
-        if (u.email === user.email) {
-          return { ...u, email: newEmail || u.email, password: newPassword || u.password };
-        }
-        return u;
-      });
-      
-      setUsersDb(updatedUsersDb);
-      setUser({ ...user, email: newEmail || user.email });
-      setLoading(false);
-      return { success: true };
-    }
-  }, [user, usersDb, setUsersDb, setUser]);
+  }, [loginLocal, setUser, setToken]);
 
   const logout = useCallback(() => {
     setUser(null);
+    setToken(null);
     setError(null);
-  }, [setUser]);
+  }, [setUser, setToken]);
 
-  const clearError = useCallback(() => {
-    setError(null);
-  }, []);
+  const clearError = useCallback(() => setError(null), []);
 
   return (
     <AuthContext.Provider value={{ 
-      user, 
-      login, 
-      register, 
-      updateUser, 
-      logout, 
-      isAuthenticated: !!user,
-      loading,
-      error,
-      clearError
+      user, token, login, register, logout, 
+      isAuthenticated: !!user, loading, error, clearError
     }}>
       {children}
     </AuthContext.Provider>
