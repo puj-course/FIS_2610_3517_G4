@@ -1,23 +1,33 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock } from 'lucide-react';
+import { X, Mail, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 
 export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const res = login(email, password);
-    if (res.success) {
-      onClose();
-    } else {
-      setError(res.message);
+    setIsSubmitting(true);
+    
+    try {
+      const res = await login(email, password);
+      if (res.success) {
+        onClose();
+      } else {
+        setError(res.message || 'Credenciales inválidas');
+      }
+    } catch (err) {
+      setError('Error inesperado al iniciar sesión. Intente nuevamente.');
+      console.error('Error en login:', err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -46,8 +56,19 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
               <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
             </div>
           </div>
-          <button type="submit" className="w-full bg-syntix-navy text-white py-2.5 rounded-lg font-medium hover:bg-syntix-navy/90 transition-colors mt-6">
-            Acceder
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="w-full bg-syntix-navy text-white py-2.5 rounded-lg font-medium hover:bg-syntix-navy/90 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Accediendo...
+              </>
+            ) : (
+              'Acceder'
+            )}
           </button>
           <p className="text-center text-sm text-gray-600 mt-4">
             ¿No tienes cuenta? <button type="button" onClick={onSwitchToRegister} className="text-syntix-green font-semibold hover:underline">Regístrate</button>

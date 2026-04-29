@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prestart": "node scripts/ensure-env.js",
+    "doctor:auth": "node scripts/auth-doctor.js",
+    "doctor:auth:ci": "node scripts/auth-doctor.js --ci --no-connect --env-file=.env.example",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "start:checked": "node scripts/auth-doctor.js && node server.js",
     "start": "node server.js"
   },
   "keywords": [],
@@ -12,9 +16,20 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "axios": "^1.15.2",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.4.1"
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.4.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^1.11.0",
+    "mongoose": "^9.5.0",
+    "nodemailer": "^7.0.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }
