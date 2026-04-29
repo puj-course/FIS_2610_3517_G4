@@ -1,7 +1,12 @@
 import axios from 'axios';
 
 // Base URL para el backend API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const normalizeApiBaseUrl = (value) => {
+  const baseUrl = String(value || 'http://localhost:5000/api').replace(/\/+$/, '');
+  return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
+};
+
+export const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_URL);
 
 // Crear instancia de axios con configuración base
 const api = axios.create({
@@ -15,18 +20,32 @@ const api = axios.create({
 // Interceptor para agregar token de autenticación
 api.interceptors.request.use(
   (config) => {
+    const tokenStr = localStorage.getItem('syntix_token');
     const userStr = localStorage.getItem('syntix_user');
+    let token = null;
+
+    if (tokenStr) {
+      try {
+        token = JSON.parse(tokenStr);
+      } catch {
+        token = tokenStr;
+      }
+    }
+
     if (userStr) {
       try {
         const parsed = JSON.parse(userStr);
         // Si el usuario tiene un token de sesión seguro, lo enviamos en los headers
-        if (parsed && parsed.token) {
-          config.headers.Authorization = `Bearer ${parsed.token}`;
-        }
+        token = token || parsed?.token;
       } catch (error) {
         console.error('Error al leer el token:', error);
       }
     }
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
@@ -67,7 +86,7 @@ const normalizeApiErrorMessage = (error, fallbackMessage) => {
   }
 
   if (status === 404 && requestPath.startsWith('/auth/')) {
-    return 'Ruta de autenticacion no encontrada. Revisa VITE_API_URL y asegúrate de incluir /api.';
+    return 'Ruta de autenticacion no encontrada. Revisa que el backend este ejecutandose en la URL configurada.';
   }
 
   if (status === 503) {

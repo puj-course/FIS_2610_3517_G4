@@ -1,12 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '@/services/api.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useConductors } from './useConductors.js';
 import { useDocuments } from './useDocuments.js';
+import { useRtm } from '@/contexts/RtmContext.jsx';
 import { getWorstState } from '@/utils/dateUtils.js';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const API_URL = `${API_BASE_URL}/api/vehiculos`;
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
 const normalizeVehicle = (vehiculo) => ({
@@ -25,6 +24,7 @@ export function useVehicles() {
   const { user } = useAuth();
   const { conductores } = useConductors();
   const { soats } = useDocuments();
+  const { rtms } = useRtm();
 
   const fetchVehicles = useCallback(async () => {
     if (!user?.email) {
@@ -33,7 +33,7 @@ export function useVehicles() {
     }
 
     try {
-      const res = await axios.get(API_URL, {
+      const res = await api.get('/vehiculos', {
         params: { email: user.email },
       });
 
@@ -63,7 +63,7 @@ export function useVehicles() {
       throw new Error('No hay usuario autenticado');
     }
 
-    const response = await axios.post(API_URL, {
+    const response = await api.post('/vehiculos', {
       ...data,
       placa: String(data.placa ?? '').trim().toUpperCase(),
       anio: Number(data.anio),
@@ -79,7 +79,7 @@ export function useVehicles() {
   };
 
   const updateVehicle = async (id, data) => {
-    const response = await axios.put(`${API_URL}/${id}`, {
+    const response = await api.put(`/vehiculos/${id}`, {
       ...data,
       placa: String(data.placa ?? '').trim().toUpperCase(),
       anio: Number(data.anio),
@@ -92,13 +92,13 @@ export function useVehicles() {
   };
 
   const deleteVehicle = async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
+    await api.delete(`/vehiculos/${id}`);
     await fetchVehicles();
     notifyVehiclesUpdated();
   };
 
   const assignConductor = async (vehicleId, conductorId) => {
-    const response = await axios.put(`${API_URL}/${vehicleId}/conductor`, {
+    const response = await api.put(`/vehiculos/${vehicleId}/conductor`, {
       conductorId: conductorId || null,
     });
 
@@ -113,15 +113,18 @@ export function useVehicles() {
       (item) => String(item.id) === String(vehiculo.conductorId)
     );
     const soat = soats.find((item) => String(item.vehiculoId) === String(vehiculo.id));
+    const rtm = rtms.find((item) => String(item.vehiculoId) === String(vehiculo.id));
     const estadoConductor = vehiculo.conductorId ? conductor?.estado || 'rojo' : 'rojo';
     const estadoSoat = soat?.estado || 'rojo';
+    const estadoRtm = rtm?.estado || 'rojo';
 
     return {
       ...vehiculo,
       conductor,
       soat,
+      rtm,
       ownerLabel: vehiculo.ownerEmpresa || user?.empresa || vehiculo.ownerEmail || 'Sin dato',
-      estadoGeneral: getWorstState(estadoConductor, estadoSoat),
+      estadoGeneral: getWorstState(getWorstState(estadoConductor, estadoSoat), estadoRtm),
     };
   });
 

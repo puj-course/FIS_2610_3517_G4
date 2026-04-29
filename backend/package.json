@@ -26,7 +26,8 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.11.0",
-    "mongoose": "^9.5.0"
+    "mongoose": "^9.5.0",
+    "nodemailer": "^7.0.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

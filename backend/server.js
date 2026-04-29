@@ -96,9 +96,17 @@ app.get('/api/health/email', async (_req, res) => {
   return res.json({ ok: true, smtp });
 });
 
-const MONGO_URI =
-  process.env.MONGO_URI ||
+const DEFAULT_MONGO_URI =
   'mongodb+srv://juansebastianvd_db_user:UcgkGfBgvUkgEVcF@cluster0.45cqzzh.mongodb.net/logistica_db?retryWrites=true&w=majority';
+const hasPlaceholderValue = (value = '') => String(value).includes('<') || String(value).includes('>');
+const configuredMongoUri = String(process.env.MONGO_URI || '').trim();
+const MONGO_URI = configuredMongoUri && !hasPlaceholderValue(configuredMongoUri)
+  ? configuredMongoUri
+  : DEFAULT_MONGO_URI;
+
+if (configuredMongoUri && hasPlaceholderValue(configuredMongoUri)) {
+  console.warn('[ENV] MONGO_URI contiene placeholders. Se usara la URI Mongo por defecto del proyecto.');
+}
 
 mongoose.set('bufferCommands', false);
 
@@ -231,6 +239,15 @@ const normalizeNullableText = (value) => {
   return normalized || null;
 };
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
+const isValidDateRange = (fechaInicio, fechaVencimiento) =>
+  Boolean(fechaInicio && fechaVencimiento && new Date(fechaVencimiento) > new Date(fechaInicio));
+const findOwnedVehicle = (vehiculoId, ownerEmail) => {
+  if (!mongoose.Types.ObjectId.isValid(vehiculoId)) {
+    return null;
+  }
+
+  return Vehiculo.findOne({ _id: vehiculoId, ownerEmail });
+};
 
 // Registro: crea usuario no verificado y dispara envio de OTP al correo.
 app.post('/api/auth/register', async (req, res) => {
@@ -443,7 +460,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/conductores', async (req, res) => {
   try {
-    const email = normalizeText(req.query.email);
+    const email = normalizeEmail(req.query.email);
 
     if (!email) {
       return res.status(400).json({ error: 'El email es obligatorio.' });
@@ -464,7 +481,7 @@ app.post('/api/conductores', async (req, res) => {
     const telefonoNormalizado = normalizeText(telefono);
     const categoriaNormalizada = normalizeText(categoria);
     const fechaVencimientoNormalizada = normalizeText(fechaVencimiento);
-    const ownerEmailNormalizado = normalizeText(ownerEmail);
+    const ownerEmailNormalizado = normalizeEmail(ownerEmail);
 
     if (
       !nombreNormalizado ||
@@ -568,7 +585,7 @@ app.delete('/api/conductores/:id', async (req, res) => {
 
 app.get('/api/vehiculos', async (req, res) => {
   try {
-    const email = normalizeText(req.query.email);
+    const email = normalizeEmail(req.query.email);
 
     if (!email) {
       return res.status(400).json({ error: 'El email es obligatorio.' });
@@ -589,7 +606,7 @@ app.post('/api/vehiculos', async (req, res) => {
     const modeloNormalizado = normalizeText(modelo);
     const anioNormalizado = normalizeText(anio);
     const tipoNormalizado = normalizeText(tipo);
-    const ownerEmailNormalizado = normalizeText(ownerEmail);
+    const ownerEmailNormalizado = normalizeEmail(ownerEmail);
     const ownerEmpresaNormalizada = normalizeText(ownerEmpresa);
     const anioNumero = Number(anio);
 
@@ -606,8 +623,21 @@ app.post('/api/vehiculos', async (req, res) => {
         .json({ error: 'Todos los campos obligatorios deben estar completos.' });
     }
 
-    if (!Number.isInteger(anioNumero)) {
+    if (!Number.isInteger(anioNumero) || anioNumero < 1990 || anioNumero > new Date().getFullYear() + 1) {
       return res.status(400).json({ error: 'El anio del vehiculo no es valido.' });
+    }
+
+    const conductorIdNormalizado = normalizeNullableText(conductorId);
+
+    if (conductorIdNormalizado) {
+      if (!mongoose.Types.ObjectId.isValid(conductorIdNormalizado)) {
+        return res.status(400).json({ error: 'El conductor seleccionado no es valido.' });
+      }
+
+      const conductor = await Conductor.findById(conductorIdNormalizado);
+      if (!conductor || conductor.ownerEmail !== ownerEmailNormalizado) {
+        return res.status(400).json({ error: 'El conductor no pertenece al usuario autenticado.' });
+      }
     }
 
     const existente = await Vehiculo.findOne({
@@ -625,7 +655,7 @@ app.post('/api/vehiculos', async (req, res) => {
       modelo: modeloNormalizado,
       anio: anioNumero,
       tipo: tipoNormalizado,
-      conductorId: normalizeNullableText(conductorId),
+      conductorId: conductorIdNormalizado,
       ownerEmail: ownerEmailNormalizado,
       ownerEmpresa: ownerEmpresaNormalizada,
     });
@@ -664,7 +694,7 @@ app.put('/api/vehiculos/:id', async (req, res) => {
         .json({ error: 'Todos los campos obligatorios deben estar completos.' });
     }
 
-    if (!Number.isInteger(anioNumero)) {
+    if (!Number.isInteger(anioNumero) || anioNumero < 1990 || anioNumero > new Date().getFullYear() + 1) {
       return res.status(400).json({ error: 'El anio del vehiculo no es valido.' });
     }
 
@@ -699,6 +729,15 @@ app.delete('/api/vehiculos/:id', async (req, res) => {
       return res.status(404).json({ error: 'Vehiculo no encontrado' });
     }
 
+    await Soat.deleteMany({
+      vehiculoId: String(vehiculoEliminado._id),
+      ownerEmail: vehiculoEliminado.ownerEmail,
+    });
+    await Rtm.deleteMany({
+      vehiculoId: String(vehiculoEliminado._id),
+      ownerEmail: vehiculoEliminado.ownerEmail,
+    });
+
     res.json({ ok: true });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -719,6 +758,10 @@ app.put('/api/vehiculos/:id/conductor', async (req, res) => {
     }
 
     if (conductorId) {
+      if (!mongoose.Types.ObjectId.isValid(conductorId)) {
+        return res.status(400).json({ error: 'El conductor seleccionado no es valido.' });
+      }
+
       const conductor = await Conductor.findById(conductorId);
 
       if (!conductor) {
@@ -754,7 +797,7 @@ app.put('/api/vehiculos/:id/conductor', async (req, res) => {
 
 app.get('/api/soats', async (req, res) => {
   try {
-    const email = normalizeText(req.query.email);
+    const email = normalizeEmail(req.query.email);
     if (!email) return res.status(400).json({ error: 'El email es obligatorio.' });
     const data = await Soat.find({ ownerEmail: email });
     res.json(data);
@@ -770,10 +813,19 @@ app.post('/api/soats', async (req, res) => {
     const numeroPolizaNorm = normalizeText(numeroPoliza);
     const fechaInicioNorm = normalizeText(fechaInicio);
     const fechaVencimientoNorm = normalizeText(fechaVencimiento);
-    const ownerEmailNorm = normalizeText(ownerEmail);
+    const ownerEmailNorm = normalizeEmail(ownerEmail);
 
     if (!vehiculoIdNorm || !numeroPolizaNorm || !fechaInicioNorm || !fechaVencimientoNorm || !ownerEmailNorm) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    if (!isValidDateRange(fechaInicioNorm, fechaVencimientoNorm)) {
+      return res.status(400).json({ error: 'La fecha de vencimiento debe ser posterior a la fecha de inicio.' });
+    }
+
+    const vehiculo = await findOwnedVehicle(vehiculoIdNorm, ownerEmailNorm);
+    if (!vehiculo) {
+      return res.status(400).json({ error: 'El vehiculo seleccionado no existe o no pertenece al usuario.' });
     }
 
     await Soat.deleteMany({ vehiculoId: vehiculoIdNorm, ownerEmail: ownerEmailNorm });
@@ -807,7 +859,7 @@ app.delete('/api/soats/:id', async (req, res) => {
 
 app.get('/api/rtms', async (req, res) => {
   try {
-    const email = normalizeText(req.query.email);
+    const email = normalizeEmail(req.query.email);
     if (!email) return res.status(400).json({ error: 'El email es obligatorio.' });
     const data = await Rtm.find({ ownerEmail: email });
     res.json(data);
@@ -823,10 +875,19 @@ app.post('/api/rtms', async (req, res) => {
     const numeroRtmNorm = normalizeText(numeroRtm);
     const fechaInicioNorm = normalizeText(fechaInicio);
     const fechaVencimientoNorm = normalizeText(fechaVencimiento);
-    const ownerEmailNorm = normalizeText(ownerEmail);
+    const ownerEmailNorm = normalizeEmail(ownerEmail);
 
     if (!vehiculoIdNorm || !numeroRtmNorm || !fechaInicioNorm || !fechaVencimientoNorm || !ownerEmailNorm) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    if (!isValidDateRange(fechaInicioNorm, fechaVencimientoNorm)) {
+      return res.status(400).json({ error: 'La fecha de vencimiento debe ser posterior a la fecha de inicio.' });
+    }
+
+    const vehiculo = await findOwnedVehicle(vehiculoIdNorm, ownerEmailNorm);
+    if (!vehiculo) {
+      return res.status(400).json({ error: 'El vehiculo seleccionado no existe o no pertenece al usuario.' });
     }
 
     await Rtm.deleteMany({ vehiculoId: vehiculoIdNorm, ownerEmail: ownerEmailNorm });
