@@ -22,10 +22,11 @@ export default function AddDocumentModal({ isOpen, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    const numeroPoliza = formData.numeroPoliza.trim();
 
     if (
       !formData.vehiculoId ||
-      !formData.numeroPoliza ||
+      !numeroPoliza ||
       !formData.fechaInicio ||
       !formData.fechaVencimiento
     ) {
@@ -42,7 +43,7 @@ export default function AddDocumentModal({ isOpen, onClose }) {
       setSaving(true);
       await addSoat({
         vehiculoId: formData.vehiculoId,
-        numeroPoliza: formData.numeroPoliza,
+        numeroPoliza,
         fechaInicio: formData.fechaInicio,
         fechaVencimiento: formData.fechaVencimiento,
       });
@@ -56,7 +57,7 @@ export default function AddDocumentModal({ isOpen, onClose }) {
 
       onClose();
     } catch (err) {
-      setError('Error al guardar el documento. Intenta de nuevo.');
+      setError(err.response?.data?.error || 'Error al guardar el documento. Intenta de nuevo.');
     } finally {
       setSaving(false);
     }
@@ -80,7 +81,7 @@ export default function AddDocumentModal({ isOpen, onClose }) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="p-6 space-y-4">
           {error && (
             <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
               {error}

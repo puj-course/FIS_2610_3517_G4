@@ -22,8 +22,9 @@ export default function AddRtmModal({ isOpen, onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    const numeroRtm = formData.numeroRtm.trim();
 
-    if (!formData.vehiculoId || !formData.numeroRtm || !formData.fechaInicio || !formData.fechaVencimiento) {
+    if (!formData.vehiculoId || !numeroRtm || !formData.fechaInicio || !formData.fechaVencimiento) {
       setError('Todos los campos son obligatorios.');
       return;
     }
@@ -37,14 +38,14 @@ export default function AddRtmModal({ isOpen, onClose }) {
       setSaving(true);
       await addRtm({
         vehiculoId: formData.vehiculoId,
-        numeroRtm: formData.numeroRtm,
+        numeroRtm,
         fechaInicio: formData.fechaInicio,
         fechaVencimiento: formData.fechaVencimiento,
       });
       setFormData({ vehiculoId: '', numeroRtm: '', fechaInicio: '', fechaVencimiento: '' });
       onClose();
     } catch (err) {
-      setError('Error al guardar la RTM. Intenta de nuevo.');
+      setError(err.response?.data?.error || 'Error al guardar la RTM. Intenta de nuevo.');
     } finally {
       setSaving(false);
     }
@@ -63,7 +64,7 @@ export default function AddRtmModal({ isOpen, onClose }) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="p-6 space-y-4">
           {error && (
             <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
               {error}
