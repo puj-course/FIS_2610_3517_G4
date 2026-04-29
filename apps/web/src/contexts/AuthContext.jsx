@@ -124,7 +124,7 @@ export function AuthProvider({ children }) {
           success: true,
           needsVerification: true,
           email: apiResult.data?.email || normalizedEmail,
-          message: apiResult.message,
+          message: apiResult.data?.message || apiResult.message || 'Registro exitoso. Revisa tu correo para verificar tu cuenta.',
         };
       }
 
@@ -173,6 +173,7 @@ export function AuthProvider({ children }) {
     if (!verifiedUser) return { success: false };
     setUser(verifiedUser);
     setToken(verifiedToken);
+    setError(null);
     return { success: true };
   }, [setUser, setToken]);
 

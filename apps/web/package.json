@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"node ../../backend/server.js\" \"vite --host :: --port 3000\"",
+    "predev": "node scripts/prepare-dev.mjs",
+    "dev": "concurrently \"npm --prefix ../../backend start\" \"vite --host :: --port 3000\"",
     "dev:frontend": "vite --host :: --port 3000",
-    "backend": "node ../../backend/server.js",
+    "backend": "npm --prefix ../../backend start",
     "build": "node tools/generate-llms.js || true && vite build --outDir ../../dist/apps/web",
     "start": "vite preview --outDir ../../dist/apps/web --host :: --port 3000",
     "lint": "eslint . --quiet",
