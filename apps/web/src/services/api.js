@@ -75,10 +75,9 @@ const normalizeApiErrorMessage = (error, fallbackMessage) => {
 export const authService = {
   async register(userData) {
     try {
-      // Nota: Asumiendo que tu backend usa las rutas /auth/register y /auth/login
       const response = await api.post('/auth/register', userData);
-      // Extraemos la propiedad 'data' que viene de la respuesta de Express
-      return { success: true, data: response.data.data }; 
+      // El endpoint de registro retorna message/email; no retorna token hasta verificar OTP.
+      return { success: true, data: response.data };
     } catch (error) {
       if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED') {
         return { success: false, useLocalStorage: true };

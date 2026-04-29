@@ -45,27 +45,27 @@ export function AuthProvider({ children }) {
       const apiResult = await authService.register({ email, password, empresa, telefono });
       
       if (apiResult.useLocalStorage) {
-        const localResult = registerLocal(email, password, empresa, telefono);
         setLoading(false);
         return { success: false, message: 'El servidor no está disponible. Intenta nuevamente en unos momentos.' };
       }
       
       if (apiResult.success) {
-        setUser(apiResult.data.user);
-        setToken(apiResult.data.token); // Guardamos el JWT
         setLoading(false);
-        return { success: true, needsVerification: true };
+        return {
+          success: true,
+          needsVerification: true,
+          message: apiResult?.data?.message || 'Registro exitoso. Revisa tu correo para verificar tu cuenta.',
+        };
       }
       
       setLoading(false);
       return { success: false, message: apiResult.message };
     } catch (err) {
-      console.warn('Error en API, usando localStorage:', err);
-      const localResult = registerLocal(email, password, empresa, telefono);
+      console.warn('Error inesperado en registro:', err);
       setLoading(false);
       return { success: false, message: 'No se pudo conectar al servidor. Verifica tu conexión.' };
     }
-  }, [registerLocal, setUser, setToken]);
+  }, []);
 
   const login = useCallback(async (email, password) => {
     setLoading(true);
@@ -96,6 +96,13 @@ export function AuthProvider({ children }) {
     }
   }, [loginLocal, setUser, setToken]);
 
+  // Activa sesión inmediatamente después de validar OTP.
+  const loginAfterVerification = useCallback((userData) => {
+    setUser(userData);
+    setToken(null);
+    setError(null);
+  }, [setUser, setToken]);
+
   const logout = useCallback(() => {
     setUser(null);
     setToken(null);
@@ -106,7 +113,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{ 
-      user, token, login, register, logout, 
+      user, token, login, register, logout, loginAfterVerification,
       isAuthenticated: !!user, loading, error, clearError
     }}>
       {children}
