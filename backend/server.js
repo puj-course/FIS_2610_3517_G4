@@ -223,62 +223,79 @@ VerificacionOTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 const VerificacionOTP = mongoose.model('VerificacionOTP', VerificacionOTPSchema);
 
 const normalizeText = (value) => String(value ?? '').trim();
+const normalizeEmail = (value) => normalizeText(value).toLowerCase();
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DUPLICATE_EMAIL_MESSAGE = 'Ya existe una cuenta con este correo electrónico.';
 const normalizeNullableText = (value) => {
   const normalized = normalizeText(value);
   return normalized || null;
 };
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
-// Registro: crea/actualiza usuario no verificado y dispara envio de OTP al correo.
+// Registro: crea usuario no verificado y dispara envio de OTP al correo.
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { email, password, nombre, empresa, telefono } = req.body;
+    const emailNormalizado = normalizeEmail(email);
+    const nombreNormalizado = normalizeText(nombre);
+    const empresaNormalizada = normalizeText(empresa);
+    const telefonoNormalizado = normalizeText(telefono);
 
-    if (!email || !password) {
-      return res.status(400).json({ message: 'Email y contrasena son requeridos' });
+    if (!empresaNormalizada) {
+      return res.status(400).json({ message: 'Ingresa el nombre de la empresa.' });
     }
 
-    const existe = await Usuario.findOne({ email });
-    if (existe && existe.isVerified) {
-      return res.status(400).json({ message: 'El correo ya esta registrado' });
+    if (!telefonoNormalizado) {
+      return res.status(400).json({ message: 'Ingresa el teléfono.' });
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    if (existe && !existe.isVerified) {
-      existe.password = passwordHash;
-      existe.nombre = nombre || '';
-      existe.empresa = empresa;
-      existe.telefono = telefono;
-      await existe.save();
-    } else {
-      const nuevoUsuario = new Usuario({
-        nombre: nombre || '',
-        email,
-        password: passwordHash,
-        empresa,
-        telefono,
-        isVerified: false,
-      });
-      await nuevoUsuario.save();
+    if (!EMAIL_REGEX.test(emailNormalizado)) {
+      return res.status(400).json({ message: 'Ingresa un correo electrónico válido.' });
     }
+
+    if (!password) {
+      return res.status(400).json({ message: 'Ingresa una contraseña.' });
+    }
+
+    if (String(password).length < 6) {
+      return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
+    }
+
+    const existe = await Usuario.findOne({ email: emailNormalizado });
+    if (existe) {
+      return res.status(400).json({ message: DUPLICATE_EMAIL_MESSAGE });
+    }
+
+    const nuevoUsuario = new Usuario({
+      nombre: nombreNormalizado,
+      email: emailNormalizado,
+      password,
+      empresa: empresaNormalizada,
+      telefono: telefonoNormalizado,
+      isVerified: false,
+    });
+    await nuevoUsuario.save();
 
     // Generar OTP de 6 digitos
     const codigo = String(secureRandomInt(100000, 999999));
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
 
-    await VerificacionOTP.findOneAndDelete({ email });
-    await new VerificacionOTP({ email, codigoHash, expiresAt }).save();
+    await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
+    await new VerificacionOTP({ email: emailNormalizado, codigoHash, expiresAt }).save();
 
     try {
-      await enviarCodigoVerificacion(email, nombre, codigo);
+      await enviarCodigoVerificacion(emailNormalizado, nombreNormalizado || empresaNormalizada, codigo);
     } catch (emailErr) {
       console.error('Error al enviar correo:', emailErr.message);
       return res.status(500).json({ message: `No se pudo enviar el correo de verificacion: ${emailErr.message}` });
     }
 
-    res.status(201).json({ message: 'Registro exitoso. Revisa tu correo para verificar tu cuenta.', email });
+    res.status(201).json({
+      success: true,
+      message: 'Registro exitoso. Revisa tu correo para verificar tu cuenta.',
+      data: { email: emailNormalizado, needsVerification: true },
+    });
   } catch (err) {
     if (err?.name === 'MongooseServerSelectionError' || err?.name === 'MongoServerSelectionError') {
       return res.status(503).json({ message: DB_UNAVAILABLE_MESSAGE, code: 'DB_UNAVAILABLE' });
@@ -290,24 +307,25 @@ app.post('/api/auth/register', async (req, res) => {
 app.post('/api/auth/verificar-codigo', async (req, res) => {
   try {
     const { email, codigo } = req.body;
+    const emailNormalizado = normalizeEmail(email);
 
-    if (!email || !codigo) {
+    if (!emailNormalizado || !codigo) {
       return res.status(400).json({ message: 'Email y codigo son requeridos' });
     }
 
-    const verificacion = await VerificacionOTP.findOne({ email });
+    const verificacion = await VerificacionOTP.findOne({ email: emailNormalizado });
 
     if (!verificacion) {
       return res.status(400).json({ message: 'No hay un codigo pendiente para este correo. Vuelve a registrarte.' });
     }
 
     if (new Date() > verificacion.expiresAt) {
-      await VerificacionOTP.findOneAndDelete({ email });
+      await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
       return res.status(400).json({ message: 'El codigo ha expirado. Solicita uno nuevo.' });
     }
 
     if (verificacion.intentos >= OTP_MAX_INTENTOS) {
-      await VerificacionOTP.findOneAndDelete({ email });
+      await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
       return res.status(400).json({ message: 'Demasiados intentos fallidos. Solicita un nuevo codigo.' });
     }
 
@@ -320,13 +338,23 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
       return res.status(400).json({ message: `Codigo incorrecto. Intentos restantes: ${restantes}` });
     }
 
-    await Usuario.findOneAndUpdate({ email }, { isVerified: true });
-    await VerificacionOTP.findOneAndDelete({ email });
+    await Usuario.findOneAndUpdate({ email: emailNormalizado }, { isVerified: true });
+    await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
 
-    const usuario = await Usuario.findOne({ email });
+    const usuario = await Usuario.findOne({ email: emailNormalizado });
     res.json({
+      success: true,
       message: 'Cuenta verificada exitosamente.',
-      user: { _id: usuario._id, email: usuario.email, empresa: usuario.empresa, role: usuario.role },
+      data: {
+        user: {
+          _id: usuario._id,
+          email: usuario.email,
+          empresa: usuario.empresa,
+          telefono: usuario.telefono,
+          role: usuario.role,
+        },
+        token: generateToken(usuario._id),
+      },
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -336,12 +364,13 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
 app.post('/api/auth/reenviar-codigo', async (req, res) => {
   try {
     const { email } = req.body;
+    const emailNormalizado = normalizeEmail(email);
 
-    if (!email) {
+    if (!emailNormalizado) {
       return res.status(400).json({ message: 'Email es requerido' });
     }
 
-    const usuario = await Usuario.findOne({ email });
+    const usuario = await Usuario.findOne({ email: emailNormalizado });
     if (!usuario) {
       return res.status(404).json({ message: 'Usuario no encontrado' });
     }
@@ -349,7 +378,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
       return res.status(400).json({ message: 'Esta cuenta ya esta verificada' });
     }
 
-    const verificacionExistente = await VerificacionOTP.findOne({ email });
+    const verificacionExistente = await VerificacionOTP.findOne({ email: emailNormalizado });
     if (verificacionExistente) {
       const segundosDesdeUltimoEnvio = (Date.now() - new Date(verificacionExistente.ultimoEnvio).getTime()) / 1000;
       if (segundosDesdeUltimoEnvio < OTP_COOLDOWN_SEGUNDOS) {
@@ -362,11 +391,11 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
 
-    await VerificacionOTP.findOneAndDelete({ email });
-    await new VerificacionOTP({ email, codigoHash, expiresAt, ultimoEnvio: new Date() }).save();
+    await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
+    await new VerificacionOTP({ email: emailNormalizado, codigoHash, expiresAt, ultimoEnvio: new Date() }).save();
 
     try {
-      await enviarCodigoVerificacion(email, usuario.nombre, codigo);
+      await enviarCodigoVerificacion(emailNormalizado, usuario.nombre || usuario.empresa, codigo);
     } catch (emailErr) {
       console.error('Error al enviar correo:', emailErr.message);
       return res.status(500).json({ message: `Error al enviar el correo: ${emailErr.message}` });
@@ -382,18 +411,25 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    const emailNormalizado = normalizeEmail(email);
 
-    if (!email || !password) {
+    if (!emailNormalizado || !password) {
       return res.status(400).json({ message: 'Email y contrasena son requeridos' });
     }
 
-    const usuario = await Usuario.findOne({ email });
+    const usuario = await Usuario.findOne({ email: emailNormalizado });
 
     if (usuario && (await usuario.comparePassword(password))) {
       res.json({
         success: true,
         data: {
-          user: { _id: usuario._id, email: usuario.email, empresa: usuario.empresa, role: usuario.role },
+          user: {
+            _id: usuario._id,
+            email: usuario.email,
+            empresa: usuario.empresa,
+            telefono: usuario.telefono,
+            role: usuario.role,
+          },
           token: generateToken(usuario._id),
         },
       });

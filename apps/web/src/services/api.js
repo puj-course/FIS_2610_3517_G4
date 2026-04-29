@@ -48,6 +48,12 @@ const normalizeApiErrorMessage = (error, fallbackMessage) => {
   const backendMessage = error?.response?.data?.message;
   const requestPath = error?.config?.url || '';
 
+  const normalizedBackendMessage = backendMessage?.toLowerCase() || '';
+
+  if (status === 400 && normalizedBackendMessage.includes('ya') && normalizedBackendMessage.includes('registr')) {
+    return 'Ya existe una cuenta con este correo electrónico.';
+  }
+
   if (backendMessage) {
     return backendMessage;
   }
@@ -71,16 +77,28 @@ const normalizeApiErrorMessage = (error, fallbackMessage) => {
   return fallbackMessage;
 };
 
+const shouldUseLocalStorage = (error) => {
+  const status = error?.response?.status;
+  const code = error?.response?.data?.code;
+  return (
+    error.code === 'ERR_NETWORK' ||
+    error.code === 'ECONNREFUSED' ||
+    (status === 503 && code === 'DB_UNAVAILABLE')
+  );
+};
+
 // Servicios de autenticación
 export const authService = {
   async register(userData) {
     try {
-      // Nota: Asumiendo que tu backend usa las rutas /auth/register y /auth/login
       const response = await api.post('/auth/register', userData);
-      // Extraemos la propiedad 'data' que viene de la respuesta de Express
-      return { success: true, data: response.data.data }; 
+      return {
+        success: true,
+        data: response.data.data || response.data,
+        message: response.data.message,
+      };
     } catch (error) {
-      if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED') {
+      if (shouldUseLocalStorage(error)) {
         return { success: false, useLocalStorage: true };
       }
       return {
@@ -95,7 +113,7 @@ export const authService = {
       const response = await api.post('/auth/login', { email, password });
       return { success: true, data: response.data.data };
     } catch (error) {
-      if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED') {
+      if (shouldUseLocalStorage(error)) {
         return { success: false, useLocalStorage: true };
       }
       return {
@@ -111,9 +129,9 @@ export const authService = {
   async verificarCodigo(email, codigo) {
     try {
       const response = await api.post('/auth/verificar-codigo', { email, codigo });
-      return { success: true, data: response.data };
+      return { success: true, data: response.data.data || response.data };
     } catch (error) {
-      if (error.code === 'ERR_NETWORK') {
+      if (shouldUseLocalStorage(error)) {
         return { success: false, useLocalStorage: true };
       }
       return {
@@ -131,7 +149,7 @@ export const authService = {
       const response = await api.post('/auth/reenviar-codigo', { email });
       return { success: true, data: response.data };
     } catch (error) {
-      if (error.code === 'ERR_NETWORK') {
+      if (shouldUseLocalStorage(error)) {
         return { success: false, useLocalStorage: true };
       }
       return {
@@ -146,7 +164,7 @@ export const authService = {
       const response = await api.put('/auth/user', userData);
       return { success: true, data: response.data.data };
     } catch (error) {
-      if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED') {
+      if (shouldUseLocalStorage(error)) {
         return { success: false, useLocalStorage: true };
       }
       return {
