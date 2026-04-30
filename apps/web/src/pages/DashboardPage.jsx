@@ -51,7 +51,14 @@ export default function DashboardPage() {
               onClick={() => openModal('addDocument')}
               style={btnSecondary}
             >
-              + Documento
+              + SOAT
+            </button>
+          <button
+              type="button"
+              onClick={() => openModal('addRtm')}
+              style={btnSecondary}
+            >
+              + RTM
             </button>
         </div>
       </div>

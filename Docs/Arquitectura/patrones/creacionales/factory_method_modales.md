@@ -20,14 +20,26 @@ classDiagram
     }
 
     class ModalFactory {
-        +ModalFactory(modalType, props)
+        +renderModal(modalType, props)
     }
+
+    class LoginModal
+    class RegisterModal
+    class AddVehicleModal
+    class AddDocumentModal
+    class AddConductorModal
 
     BaseModalFactory <|-- AuthModalFactory
     BaseModalFactory <|-- FleetModalFactory
 
-    ModalFactory --> AuthModalFactory : selecciona y delega
-    ModalFactory --> FleetModalFactory : selecciona y delega
+    ModalFactory --> BaseModalFactory : usa
+
+    AuthModalFactory ..> LoginModal : crea
+    AuthModalFactory ..> RegisterModal : crea
+
+    FleetModalFactory ..> AddVehicleModal : crea
+    FleetModalFactory ..> AddDocumentModal : crea
+    FleetModalFactory ..> AddConductorModal : crea
 ```
 
 ## Tipo
