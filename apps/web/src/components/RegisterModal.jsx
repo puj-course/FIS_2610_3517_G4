@@ -3,6 +3,8 @@ import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw } from 
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { authService } from '@/services/api.js';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const [formData, setFormData] = useState({ email: '', password: '', empresa: '', telefono: '' });
   const [error, setError] = useState('');
@@ -20,17 +22,39 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    const empresa = formData.empresa.trim();
+    const telefono = formData.telefono.trim();
+    const email = formData.email.trim().toLowerCase();
+
+    if (!empresa) {
+      setError('Ingresa el nombre de la empresa.');
+      return;
+    }
+    if (!telefono) {
+      setError('Ingresa el teléfono.');
+      return;
+    }
+    if (!EMAIL_REGEX.test(email)) {
+      setError('Ingresa un correo electrónico válido.');
+      return;
+    }
+    if (!formData.password) {
+      setError('Ingresa una contraseña.');
+      return;
+    }
     if (formData.password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres');
       return;
     }
     setIsSubmitting(true);
     try {
-      const res = await register(formData.email, formData.password, formData.empresa, formData.telefono);
-      if (res.success || res.needsVerification) {
-        setPendingEmail(formData.email);
+      const res = await register(email, formData.password, empresa, telefono);
+      if (res.needsVerification) {
+        setPendingEmail(res.email || email);
         setStep('verify');
         startCooldown();
+      } else if (res.success) {
+        onClose();
       } else {
         setError(res.message || 'Error al registrar usuario');
       }
@@ -78,7 +102,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     try {
       const res = await authService.verificarCodigo(pendingEmail, codigo);
       if (res.success) {
-        if (loginAfterVerification) loginAfterVerification(res.data.user);
+        if (loginAfterVerification) loginAfterVerification(res.data.user, res.data.token);
         onClose();
       } else {
         setError(res.message || 'Código incorrecto');
@@ -118,7 +142,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
               <h2 className="text-2xl font-bold text-syntix-navy">Crear Cuenta</h2>
               <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors"><X className="w-6 h-6" /></button>
             </div>
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <form onSubmit={handleSubmit} noValidate className="p-6 space-y-4">
               {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de Empresa</label>

@@ -58,6 +58,20 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
     setError('');
 
     const placaUpper = formData.placa.trim().toUpperCase();
+    const marca = formData.marca.trim();
+    const modelo = formData.modelo.trim();
+    const anio = Number(formData.anio);
+
+    if (!placaUpper || !marca || !modelo || !formData.tipo) {
+      setError('Todos los campos obligatorios deben estar completos.');
+      return;
+    }
+
+    if (!Number.isInteger(anio) || anio < 1990 || anio > currentYear + 1) {
+      setError('El anio del vehiculo no es valido.');
+      return;
+    }
+
     const isDuplicatePlate = vehiculos.some((vehiculo) => {
       const samePlate = vehiculo.placa?.toUpperCase() === placaUpper;
       const isSameVehicle = isEditing && String(vehiculo.id) === String(vehicleToEdit.id);
@@ -73,6 +87,9 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
       const payload = {
         ...formData,
         placa: placaUpper,
+        marca,
+        modelo,
+        anio,
       };
 
       if (isEditing) {
@@ -90,6 +107,16 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
 
       if (err.response?.data?.error) {
         setError(err.response.data.error);
+        return;
+      }
+
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+        return;
+      }
+
+      if (err.code === 'ERR_NETWORK' || err.code === 'ECONNABORTED') {
+        setError('El backend no esta disponible. Revisa la terminal donde ejecutaste npm run dev.');
         return;
       }
 
@@ -113,7 +140,7 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} noValidate className="p-6 space-y-4">
           {error && (
             <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">
               {error}

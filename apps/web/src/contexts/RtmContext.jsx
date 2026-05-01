@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
-import axios from 'axios';
+import api from '@/services/api.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
@@ -8,10 +8,8 @@ import { clearSourceAlerts } from '@/hooks/useAlertHub.js';
 import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
 import RtmAlertAdapter from '@/patterns/adapters/RtmAlertAdapter.js';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const API_URL = `${API_BASE_URL}/api/rtms`;
-
 const RtmContext = createContext(null);
+const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
 export function RtmProvider({ children }) {
   const [storedRtms, setStoredRtms] = useState([]);
@@ -27,7 +25,7 @@ export function RtmProvider({ children }) {
     }
     setLoading(true);
     try {
-      const res = await axios.get(API_URL, { params: { email: user.email } });
+      const res = await api.get('/rtms', { params: { email: user.email } });
       setStoredRtms(res.data.map((r) => ({ ...r, id: r._id || r.id })));
     } catch (err) {
       console.error('Error cargando RTMs:', err);
@@ -38,6 +36,17 @@ export function RtmProvider({ children }) {
 
   useEffect(() => {
     fetchRtms();
+  }, [fetchRtms]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const handleVehiclesUpdated = () => {
+      fetchRtms();
+    };
+
+    window.addEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
+    return () => window.removeEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
   }, [fetchRtms]);
 
   const rtms = useMemo(() => {
@@ -56,12 +65,12 @@ export function RtmProvider({ children }) {
 
   const addRtm = async (nuevaRtm) => {
     if (!user?.email) throw new Error('No hay usuario autenticado');
-    await axios.post(API_URL, { ...nuevaRtm, ownerEmail: user.email });
+    await api.post('/rtms', { ...nuevaRtm, ownerEmail: user.email });
     await fetchRtms();
   };
 
   const removeRtm = async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
+    await api.delete(`/rtms/${id}`);
     await fetchRtms();
   };
 

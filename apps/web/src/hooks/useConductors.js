@@ -1,11 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '@/services/api.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const API_URL = `${API_BASE_URL}/api/conductores`;
 const CONDUCTORS_UPDATED_EVENT = 'syntix:conductors-updated';
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
@@ -39,7 +37,7 @@ export function useConductors() {
     }
 
     try {
-      const res = await axios.get(API_URL, {
+      const res = await api.get('/conductores', {
         params: { email: user.email },
       });
 
@@ -69,7 +67,7 @@ export function useConductors() {
       throw new Error('No hay usuario autenticado');
     }
 
-    const response = await axios.post(API_URL, {
+    const response = await api.post('/conductores', {
       ...data,
       documento: String(data.documento ?? '').trim(),
       telefono: String(data.telefono ?? '').trim(),
@@ -83,7 +81,7 @@ export function useConductors() {
   };
 
   const updateConductor = async (id, data) => {
-    const response = await axios.put(`${API_URL}/${id}`, {
+    const response = await api.put(`/conductores/${id}`, {
       ...data,
       documento: String(data.documento ?? '').trim(),
       telefono: String(data.telefono ?? '').trim(),
@@ -96,7 +94,7 @@ export function useConductors() {
   };
 
   const deleteConductor = async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
+    await api.delete(`/conductores/${id}`);
     await fetchConductors();
     notifyConductorsUpdated();
     notifyVehiclesUpdated();
