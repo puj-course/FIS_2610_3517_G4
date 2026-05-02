@@ -13,8 +13,18 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
     },
   },
+<<<<<<< HEAD
   test: {
     globals: true,
     environment: 'node',
+=======
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+      },
+    },
+>>>>>>> 292a25849a0f9a4f415c3a8c327dd2ad6d35376e
   },
 })
