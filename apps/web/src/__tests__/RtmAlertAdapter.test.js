@@ -1,5 +1,4 @@
 /**
- * RtmAlertAdapter.test.js
  * Pruebas unitarias para el adaptador de alertas de Tecnomecánica.
  *
  * Autor: Sebastian Rodríguez Ramirez (@juserora)
