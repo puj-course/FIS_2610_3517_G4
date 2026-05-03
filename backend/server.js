@@ -1,159 +1,21 @@
-const fs = require('fs');
-const path = require('path');
-const dotenv = require('dotenv');
-
-const envPath = path.resolve(__dirname, '.env');
-const envExamplePath = path.resolve(__dirname, '.env.example');
-let envLoadedFrom = null;
-
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath });
-  envLoadedFrom = '.env';
-} else if (fs.existsSync(envExamplePath)) {
-  dotenv.config({ path: envExamplePath });
-  envLoadedFrom = '.env.example';
-  console.warn('[ENV] No se encontro backend/.env. Se cargo backend/.env.example como respaldo.');
-} else {
-  console.error('[ENV] No se encontro backend/.env ni backend/.env.example');
-}
-
-if (envLoadedFrom) {
-  console.log(`[ENV] Variables cargadas desde backend/${envLoadedFrom}`);
-}
-
-const missingEmailVars = ['EMAIL_USER', 'EMAIL_PASS'].filter((key) => !process.env[key]);
-if (missingEmailVars.length > 0) {
-  console.error(`[ENV] Faltan variables SMTP: ${missingEmailVars.join(', ')}`);
-}
-
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const helmet = require('helmet');
-const crypto = require('crypto');
-const { enviarCodigoVerificacion, verificarServicioCorreo } = require('./services/emailService');
-
-const DB_UNAVAILABLE_MESSAGE =
-  'Base de datos no disponible. Verifica la IP permitida en MongoDB Atlas y la variable MONGO_URI.';
-
-const OTP_EXPIRACION_MINUTOS = parseInt(process.env.OTP_EXPIRACION_MINUTOS || '10');
-const OTP_MAX_INTENTOS = parseInt(process.env.OTP_MAX_INTENTOS || '5');
-const OTP_COOLDOWN_SEGUNDOS = parseInt(process.env.OTP_COOLDOWN_SEGUNDOS || '60');
-
-// Genera un entero criptograficamente seguro en [min, max).
-// Usa crypto.randomInt (Node >= 14.10) con fallback a crypto.randomBytes
-// para compatibilidad con versiones anteriores de Node.
-const secureRandomInt = (min, max) => {
-  if (typeof crypto.randomInt === 'function') {
-    return crypto.randomInt(min, max);
-  }
-  const range = max - min;
-  const bytesNeeded = Math.ceil(Math.log2(range) / 8) + 1;
-  const maxValid = Math.floor(256 ** bytesNeeded / range) * range;
-  let value;
-  do {
-    value = parseInt(crypto.randomBytes(bytesNeeded).toString('hex'), 16);
-  } while (value >= maxValid);
-  return min + (value % range);
-};
 
 const app = express();
-
-// BLINDAJE DE SEGURIDAD
-app.use(helmet());
-
-// Sanitización manual contra inyección MongoDB
-// (express-mongo-sanitize es incompatible con Express moderno donde req.query es read-only)
-app.use((req, _res, next) => {
-  const sanitize = (obj) => {
-    if (obj && typeof obj === 'object') {
-      for (const key of Object.keys(obj)) {
-        if (key.startsWith('$') || key.includes('.')) {
-          delete obj[key];
-        } else {
-          sanitize(obj[key]);
-        }
-      }
-    }
-  };
-  sanitize(req.body);
-  sanitize(req.params);
-  next();
-});
 
 app.use(cors());
 app.use(express.json());
 
-app.get('/api/health/email', async (_req, res) => {
-  const smtp = await verificarServicioCorreo();
-  if (!smtp.ok) {
-    return res.status(500).json({ ok: false, smtp });
-  }
-
-  return res.json({ ok: true, smtp });
-});
-
-const DEFAULT_MONGO_URI =
+const MONGO_URI =
+  process.env.MONGO_URI ||
   'mongodb+srv://juansebastianvd_db_user:UcgkGfBgvUkgEVcF@cluster0.45cqzzh.mongodb.net/logistica_db?retryWrites=true&w=majority';
-const JUAN_MONGO_URI = String(process.env.JUAN_MONGO_URI || '').trim() || DEFAULT_MONGO_URI;
-const hasPlaceholderValue = (value = '') => String(value).includes('<') || String(value).includes('>');
-const configuredMongoUri = String(process.env.MONGO_URI || '').trim();
-const MONGO_URI = configuredMongoUri && !hasPlaceholderValue(configuredMongoUri)
-  ? configuredMongoUri
-  : DEFAULT_MONGO_URI;
-
-if (configuredMongoUri && hasPlaceholderValue(configuredMongoUri)) {
-  console.warn('[ENV] MONGO_URI contiene placeholders. Se usara la URI Mongo por defecto del proyecto.');
-}
-
-mongoose.set('bufferCommands', false);
 
 mongoose
-  .connect(MONGO_URI, { serverSelectionTimeoutMS: 10000 })
+  .connect(MONGO_URI)
   .then(() => console.log('Conexion exitosa a MongoDB Atlas'))
   .catch((err) => console.error('Error de conexion:', err));
-
-const juanConnection = mongoose.createConnection(JUAN_MONGO_URI, { serverSelectionTimeoutMS: 10000 });
-juanConnection.set('bufferCommands', false);
-
-const juanConnectionReady = juanConnection
-  .asPromise()
-  .then(() => {
-    console.log('Conexion exitosa a MongoDB Atlas de Juan');
-  })
-  .catch((err) => {
-    console.error('Error de conexion a la base de Juan:', err.message);
-    return null;
-  });
-
-const isDbConnected = () => mongoose.connection.readyState === 1;
-
-app.get('/api/health/db', (_req, res) => {
-  if (isDbConnected()) {
-    return res.json({ ok: true, state: mongoose.connection.readyState });
-  }
-
-  return res.status(503).json({
-    ok: false,
-    state: mongoose.connection.readyState,
-    message: DB_UNAVAILABLE_MESSAGE,
-  });
-});
-
-app.use('/api', (req, res, next) => {
-  if (req.path === '/health/email' || req.path === '/health/db') {
-    return next();
-  }
-
-  if (!isDbConnected()) {
-    return res.status(503).json({ message: DB_UNAVAILABLE_MESSAGE, code: 'DB_UNAVAILABLE' });
-  }
-
-  return next();
-});
 
 const ConductorSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
@@ -178,42 +40,13 @@ const VehiculoSchema = new mongoose.Schema({
 const Vehiculo = mongoose.model('Vehiculo', VehiculoSchema);
 
 const UsuarioSchema = new mongoose.Schema({
-  nombre: { type: String, default: '' },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   empresa: String,
   telefono: String,
   role: { type: String, default: 'admin' },
-  isVerified: { type: Boolean, default: false },
-  createdAt: { type: Date, default: Date.now },
 });
-
-// Hook: encripta la contraseña antes de guardar
-// Hook: encripta la contraseña antes de guardar
-UsuarioSchema.pre('save', async function () {
-  // Si la contraseña no ha sido modificada, simplemente salimos de la función
-  if (!this.isModified('password')) return;
-  
-  // Como es una función 'async', los errores de bcrypt se propagan automáticamente,
-  // por lo que podemos eliminar el bloque try/catch y las llamadas a next()
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
-
-// Método: compara contraseña candidata con el hash
-UsuarioSchema.methods.comparePassword = async function (candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
-
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
-const UsuarioJuan = juanConnection.model('Usuario', UsuarioSchema);
-
-// Generador de Token JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'syntix_super_secret_key', {
-    expiresIn: '30d',
-  });
-};
 
 const SoatSchema = new mongoose.Schema({
   vehiculoId: { type: String, required: true },
@@ -233,323 +66,51 @@ const RtmSchema = new mongoose.Schema({
 });
 const Rtm = mongoose.model('Rtm', RtmSchema);
 
-const VerificacionOTPSchema = new mongoose.Schema({
-  email: { type: String, required: true },
-  codigoHash: { type: String, required: true },
-  expiresAt: { type: Date, required: true },
-  intentos: { type: Number, default: 0 },
-  ultimoEnvio: { type: Date, default: Date.now },
-  createdAt: { type: Date, default: Date.now },
-});
-VerificacionOTPSchema.index({ email: 1 });
-VerificacionOTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-const VerificacionOTP = mongoose.model('VerificacionOTP', VerificacionOTPSchema);
-const VerificacionOTPJuan = juanConnection.model('VerificacionOTP', VerificacionOTPSchema);
-
-const ensureJuanConnection = async () => {
-  await juanConnectionReady;
-
-  if (juanConnection.readyState !== 1) {
-    throw new Error('La base de datos secundaria de Juan no esta disponible.');
-  }
-};
-
-const syncUsuarioToJuan = async (usuario) => {
-  await ensureJuanConnection();
-
-  await UsuarioJuan.findOneAndUpdate(
-    { email: usuario.email },
-    {
-      $set: {
-        nombre: usuario.nombre || '',
-        email: usuario.email,
-        password: usuario.password,
-        empresa: usuario.empresa,
-        telefono: usuario.telefono,
-        role: usuario.role || 'admin',
-        isVerified: usuario.isVerified,
-        createdAt: usuario.createdAt || new Date(),
-      },
-    },
-    {
-      upsert: true,
-      new: true,
-      runValidators: true,
-      setDefaultsOnInsert: true,
-    }
-  );
-};
-
-const syncOtpToJuan = async (verificacion) => {
-  await ensureJuanConnection();
-
-  await VerificacionOTPJuan.findOneAndUpdate(
-    { email: verificacion.email },
-    {
-      $set: {
-        email: verificacion.email,
-        codigoHash: verificacion.codigoHash,
-        expiresAt: verificacion.expiresAt,
-        intentos: verificacion.intentos,
-        ultimoEnvio: verificacion.ultimoEnvio,
-        createdAt: verificacion.createdAt || new Date(),
-      },
-    },
-    {
-      upsert: true,
-      new: true,
-      runValidators: true,
-      setDefaultsOnInsert: true,
-    }
-  );
-};
-
-const deleteOtpFromJuan = async (email) => {
-  await ensureJuanConnection();
-  await VerificacionOTPJuan.findOneAndDelete({ email });
-};
-
 const normalizeText = (value) => String(value ?? '').trim();
-const normalizeEmail = (value) => normalizeText(value).toLowerCase();
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const DUPLICATE_EMAIL_MESSAGE = 'Ya existe una cuenta con este correo electrónico.';
 const normalizeNullableText = (value) => {
   const normalized = normalizeText(value);
   return normalized || null;
 };
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
-const isValidDateRange = (fechaInicio, fechaVencimiento) =>
-  Boolean(fechaInicio && fechaVencimiento && new Date(fechaVencimiento) > new Date(fechaInicio));
-const findOwnedVehicle = (vehiculoId, ownerEmail) => {
-  if (!mongoose.Types.ObjectId.isValid(vehiculoId)) {
-    return null;
-  }
 
-  return Vehiculo.findOne({ _id: vehiculoId, ownerEmail });
-};
-
-// Registro: crea usuario no verificado y dispara envio de OTP al correo.
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, nombre, empresa, telefono } = req.body;
-    const emailNormalizado = normalizeEmail(email);
-    const nombreNormalizado = normalizeText(nombre);
-    const empresaNormalizada = normalizeText(empresa);
-    const telefonoNormalizado = normalizeText(telefono);
+    const { email, password, empresa, telefono } = req.body;
 
-    if (!empresaNormalizada) {
-      return res.status(400).json({ message: 'Ingresa el nombre de la empresa.' });
-    }
-
-    if (!telefonoNormalizado) {
-      return res.status(400).json({ message: 'Ingresa el teléfono.' });
-    }
-
-    if (!EMAIL_REGEX.test(emailNormalizado)) {
-      return res.status(400).json({ message: 'Ingresa un correo electrónico válido.' });
-    }
-
-    if (!password) {
-      return res.status(400).json({ message: 'Ingresa una contraseña.' });
-    }
-
-    if (String(password).length < 6) {
-      return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
-    }
-
-    const existe = await Usuario.findOne({ email: emailNormalizado });
-    if (existe) {
-      return res.status(400).json({ message: DUPLICATE_EMAIL_MESSAGE });
-    }
-
-    const nuevoUsuario = new Usuario({
-      nombre: nombreNormalizado,
-      email: emailNormalizado,
-      password,
-      empresa: empresaNormalizada,
-      telefono: telefonoNormalizado,
-      isVerified: false,
-    });
-    await nuevoUsuario.save();
-    await syncUsuarioToJuan(nuevoUsuario);
-
-    const codigo = String(secureRandomInt(100000, 999999));
-    const codigoHash = await bcrypt.hash(codigo, 10);
-    const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
-
-    await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
-    await deleteOtpFromJuan(emailNormalizado);
-    const verificacion = await new VerificacionOTP({ email: emailNormalizado, codigoHash, expiresAt }).save();
-    await syncOtpToJuan(verificacion);
-
-    try {
-      await enviarCodigoVerificacion(emailNormalizado, nombreNormalizado || empresaNormalizada, codigo);
-    } catch (emailErr) {
-      console.error('Error al enviar correo:', emailErr.message);
-      return res.status(500).json({ message: `No se pudo enviar el correo de verificacion: ${emailErr.message}` });
-    }
-
-    res.status(201).json({
-      success: true,
-      message: 'Registro exitoso. Revisa tu correo para verificar tu cuenta.',
-      data: { email: emailNormalizado, needsVerification: true },
-    });
-  } catch (err) {
-    if (err?.name === 'MongooseServerSelectionError' || err?.name === 'MongoServerSelectionError') {
-      return res.status(503).json({ message: DB_UNAVAILABLE_MESSAGE, code: 'DB_UNAVAILABLE' });
-    }
-    res.status(500).json({ message: err.message });
-  }
-});
-
-app.post('/api/auth/verificar-codigo', async (req, res) => {
-  try {
-    const { email, codigo } = req.body;
-    const emailNormalizado = normalizeEmail(email);
-
-    if (!emailNormalizado || !codigo) {
-      return res.status(400).json({ message: 'Email y codigo son requeridos' });
-    }
-
-    const verificacion = await VerificacionOTP.findOne({ email: emailNormalizado });
-
-    if (!verificacion) {
-      return res.status(400).json({ message: 'No hay un codigo pendiente para este correo. Vuelve a registrarte.' });
-    }
-
-    if (new Date() > verificacion.expiresAt) {
-      await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
-      await deleteOtpFromJuan(emailNormalizado);
-      return res.status(400).json({ message: 'El codigo ha expirado. Solicita uno nuevo.' });
-    }
-
-    if (verificacion.intentos >= OTP_MAX_INTENTOS) {
-      await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
-      await deleteOtpFromJuan(emailNormalizado);
-      return res.status(400).json({ message: 'Demasiados intentos fallidos. Solicita un nuevo codigo.' });
-    }
-
-    const codigoCorrecto = await bcrypt.compare(String(codigo), verificacion.codigoHash);
-
-    if (!codigoCorrecto) {
-      verificacion.intentos += 1;
-      await verificacion.save();
-      await syncOtpToJuan(verificacion);
-      const restantes = OTP_MAX_INTENTOS - verificacion.intentos;
-      return res.status(400).json({ message: `Codigo incorrecto. Intentos restantes: ${restantes}` });
-    }
-
-    const usuarioActualizado = await Usuario.findOneAndUpdate(
-      { email: emailNormalizado },
-      { isVerified: true },
-      { new: true }
-    );
-    await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
-    await syncUsuarioToJuan(usuarioActualizado);
-    await deleteOtpFromJuan(emailNormalizado);
-
-    const usuario = await Usuario.findOne({ email: emailNormalizado });
-    res.json({
-      success: true,
-      message: 'Cuenta verificada exitosamente.',
-      data: {
-        user: {
-          _id: usuario._id,
-          email: usuario.email,
-          empresa: usuario.empresa,
-          telefono: usuario.telefono,
-          role: usuario.role,
-        },
-        token: generateToken(usuario._id),
-      },
-    });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-app.post('/api/auth/reenviar-codigo', async (req, res) => {
-  try {
-    const { email } = req.body;
-    const emailNormalizado = normalizeEmail(email);
-
-    if (!emailNormalizado) {
-      return res.status(400).json({ message: 'Email es requerido' });
-    }
-
-    const usuario = await Usuario.findOne({ email: emailNormalizado });
-    if (!usuario) {
-      return res.status(404).json({ message: 'Usuario no encontrado' });
-    }
-    if (usuario.isVerified) {
-      return res.status(400).json({ message: 'Esta cuenta ya esta verificada' });
-    }
-
-    const verificacionExistente = await VerificacionOTP.findOne({ email: emailNormalizado });
-    if (verificacionExistente) {
-      const segundosDesdeUltimoEnvio = (Date.now() - new Date(verificacionExistente.ultimoEnvio).getTime()) / 1000;
-      if (segundosDesdeUltimoEnvio < OTP_COOLDOWN_SEGUNDOS) {
-        const espera = Math.ceil(OTP_COOLDOWN_SEGUNDOS - segundosDesdeUltimoEnvio);
-        return res.status(429).json({ message: `Espera ${espera} segundos antes de solicitar otro codigo.` });
-      }
-    }
-
-    const codigo = String(secureRandomInt(100000, 999999));
-    const codigoHash = await bcrypt.hash(codigo, 10);
-    const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
-
-    await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
-    await deleteOtpFromJuan(emailNormalizado);
-    const verificacion = await new VerificacionOTP({
-      email: emailNormalizado,
-      codigoHash,
-      expiresAt,
-      ultimoEnvio: new Date(),
-    }).save();
-    await syncOtpToJuan(verificacion);
-
-    try {
-      await enviarCodigoVerificacion(emailNormalizado, usuario.nombre || usuario.empresa, codigo);
-    } catch (emailErr) {
-      console.error('Error al enviar correo:', emailErr.message);
-      return res.status(500).json({ message: `Error al enviar el correo: ${emailErr.message}` });
-    }
-
-    res.json({ message: 'Codigo reenviado exitosamente. Revisa tu correo.' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// Login restringido: solo permite acceso cuando isVerified es true.
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const emailNormalizado = normalizeEmail(email);
-
-    if (!emailNormalizado || !password) {
+    if (!email || !password) {
       return res.status(400).json({ message: 'Email y contrasena son requeridos' });
     }
 
-    const usuario = await Usuario.findOne({ email: emailNormalizado });
-
-    if (usuario && (await usuario.comparePassword(password))) {
-      res.json({
-        success: true,
-        data: {
-          user: {
-            _id: usuario._id,
-            email: usuario.email,
-            empresa: usuario.empresa,
-            telefono: usuario.telefono,
-            role: usuario.role,
-          },
-          token: generateToken(usuario._id),
-        },
-      });
-    } else {
-      res.status(401).json({ success: false, message: 'Credenciales invalidas' });
+    const existe = await Usuario.findOne({ email });
+    if (existe) {
+      return res.status(400).json({ message: 'El correo ya esta registrado' });
     }
+
+    const nuevoUsuario = new Usuario({ email, password, empresa, telefono });
+    await nuevoUsuario.save();
+
+    const { password: _, ...userSinPassword } = nuevoUsuario.toObject();
+    res.status(201).json({ user: userSinPassword });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email y contrasena son requeridos' });
+    }
+
+    const usuario = await Usuario.findOne({ email, password });
+    if (!usuario) {
+      return res.status(401).json({ message: 'Credenciales invalidas' });
+    }
+
+    const { password: _, ...userSinPassword } = usuario.toObject();
+    res.json({ user: userSinPassword });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -557,7 +118,7 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.get('/api/conductores', async (req, res) => {
   try {
-    const email = normalizeEmail(req.query.email);
+    const email = normalizeText(req.query.email);
 
     if (!email) {
       return res.status(400).json({ error: 'El email es obligatorio.' });
@@ -578,7 +139,7 @@ app.post('/api/conductores', async (req, res) => {
     const telefonoNormalizado = normalizeText(telefono);
     const categoriaNormalizada = normalizeText(categoria);
     const fechaVencimientoNormalizada = normalizeText(fechaVencimiento);
-    const ownerEmailNormalizado = normalizeEmail(ownerEmail);
+    const ownerEmailNormalizado = normalizeText(ownerEmail);
 
     if (
       !nombreNormalizado ||
@@ -682,7 +243,7 @@ app.delete('/api/conductores/:id', async (req, res) => {
 
 app.get('/api/vehiculos', async (req, res) => {
   try {
-    const email = normalizeEmail(req.query.email);
+    const email = normalizeText(req.query.email);
 
     if (!email) {
       return res.status(400).json({ error: 'El email es obligatorio.' });
@@ -703,7 +264,7 @@ app.post('/api/vehiculos', async (req, res) => {
     const modeloNormalizado = normalizeText(modelo);
     const anioNormalizado = normalizeText(anio);
     const tipoNormalizado = normalizeText(tipo);
-    const ownerEmailNormalizado = normalizeEmail(ownerEmail);
+    const ownerEmailNormalizado = normalizeText(ownerEmail);
     const ownerEmpresaNormalizada = normalizeText(ownerEmpresa);
     const anioNumero = Number(anio);
 
@@ -720,21 +281,8 @@ app.post('/api/vehiculos', async (req, res) => {
         .json({ error: 'Todos los campos obligatorios deben estar completos.' });
     }
 
-    if (!Number.isInteger(anioNumero) || anioNumero < 1990 || anioNumero > new Date().getFullYear() + 1) {
+    if (!Number.isInteger(anioNumero)) {
       return res.status(400).json({ error: 'El anio del vehiculo no es valido.' });
-    }
-
-    const conductorIdNormalizado = normalizeNullableText(conductorId);
-
-    if (conductorIdNormalizado) {
-      if (!mongoose.Types.ObjectId.isValid(conductorIdNormalizado)) {
-        return res.status(400).json({ error: 'El conductor seleccionado no es valido.' });
-      }
-
-      const conductor = await Conductor.findById(conductorIdNormalizado);
-      if (!conductor || conductor.ownerEmail !== ownerEmailNormalizado) {
-        return res.status(400).json({ error: 'El conductor no pertenece al usuario autenticado.' });
-      }
     }
 
     const existente = await Vehiculo.findOne({
@@ -752,7 +300,7 @@ app.post('/api/vehiculos', async (req, res) => {
       modelo: modeloNormalizado,
       anio: anioNumero,
       tipo: tipoNormalizado,
-      conductorId: conductorIdNormalizado,
+      conductorId: normalizeNullableText(conductorId),
       ownerEmail: ownerEmailNormalizado,
       ownerEmpresa: ownerEmpresaNormalizada,
     });
@@ -791,7 +339,7 @@ app.put('/api/vehiculos/:id', async (req, res) => {
         .json({ error: 'Todos los campos obligatorios deben estar completos.' });
     }
 
-    if (!Number.isInteger(anioNumero) || anioNumero < 1990 || anioNumero > new Date().getFullYear() + 1) {
+    if (!Number.isInteger(anioNumero)) {
       return res.status(400).json({ error: 'El anio del vehiculo no es valido.' });
     }
 
@@ -826,15 +374,6 @@ app.delete('/api/vehiculos/:id', async (req, res) => {
       return res.status(404).json({ error: 'Vehiculo no encontrado' });
     }
 
-    await Soat.deleteMany({
-      vehiculoId: String(vehiculoEliminado._id),
-      ownerEmail: vehiculoEliminado.ownerEmail,
-    });
-    await Rtm.deleteMany({
-      vehiculoId: String(vehiculoEliminado._id),
-      ownerEmail: vehiculoEliminado.ownerEmail,
-    });
-
     res.json({ ok: true });
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -855,10 +394,6 @@ app.put('/api/vehiculos/:id/conductor', async (req, res) => {
     }
 
     if (conductorId) {
-      if (!mongoose.Types.ObjectId.isValid(conductorId)) {
-        return res.status(400).json({ error: 'El conductor seleccionado no es valido.' });
-      }
-
       const conductor = await Conductor.findById(conductorId);
 
       if (!conductor) {
@@ -894,7 +429,7 @@ app.put('/api/vehiculos/:id/conductor', async (req, res) => {
 
 app.get('/api/soats', async (req, res) => {
   try {
-    const email = normalizeEmail(req.query.email);
+    const email = normalizeText(req.query.email);
     if (!email) return res.status(400).json({ error: 'El email es obligatorio.' });
     const data = await Soat.find({ ownerEmail: email });
     res.json(data);
@@ -910,21 +445,13 @@ app.post('/api/soats', async (req, res) => {
     const numeroPolizaNorm = normalizeText(numeroPoliza);
     const fechaInicioNorm = normalizeText(fechaInicio);
     const fechaVencimientoNorm = normalizeText(fechaVencimiento);
-    const ownerEmailNorm = normalizeEmail(ownerEmail);
+    const ownerEmailNorm = normalizeText(ownerEmail);
 
     if (!vehiculoIdNorm || !numeroPolizaNorm || !fechaInicioNorm || !fechaVencimientoNorm || !ownerEmailNorm) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
 
-    if (!isValidDateRange(fechaInicioNorm, fechaVencimientoNorm)) {
-      return res.status(400).json({ error: 'La fecha de vencimiento debe ser posterior a la fecha de inicio.' });
-    }
-
-    const vehiculo = await findOwnedVehicle(vehiculoIdNorm, ownerEmailNorm);
-    if (!vehiculo) {
-      return res.status(400).json({ error: 'El vehiculo seleccionado no existe o no pertenece al usuario.' });
-    }
-
+    // Un vehículo solo puede tener un SOAT activo — reemplazar si ya existe
     await Soat.deleteMany({ vehiculoId: vehiculoIdNorm, ownerEmail: ownerEmailNorm });
 
     const nuevo = new Soat({
@@ -937,6 +464,30 @@ app.post('/api/soats', async (req, res) => {
 
     await nuevo.save();
     res.status(201).json(nuevo);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/soats/:id', async (req, res) => {
+  try {
+    const soatExistente = await Soat.findById(req.params.id);
+    if (!soatExistente) return res.status(404).json({ error: 'SOAT no encontrado.' });
+
+    const numeroPolizaNorm = normalizeText(req.body.numeroPoliza);
+    const fechaInicioNorm = normalizeText(req.body.fechaInicio);
+    const fechaVencimientoNorm = normalizeText(req.body.fechaVencimiento);
+
+    if (!numeroPolizaNorm || !fechaInicioNorm || !fechaVencimientoNorm) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    soatExistente.numeroPoliza = numeroPolizaNorm;
+    soatExistente.fechaInicio = fechaInicioNorm;
+    soatExistente.fechaVencimiento = fechaVencimientoNorm;
+
+    await soatExistente.save();
+    res.json(soatExistente);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -956,7 +507,7 @@ app.delete('/api/soats/:id', async (req, res) => {
 
 app.get('/api/rtms', async (req, res) => {
   try {
-    const email = normalizeEmail(req.query.email);
+    const email = normalizeText(req.query.email);
     if (!email) return res.status(400).json({ error: 'El email es obligatorio.' });
     const data = await Rtm.find({ ownerEmail: email });
     res.json(data);
@@ -972,21 +523,13 @@ app.post('/api/rtms', async (req, res) => {
     const numeroRtmNorm = normalizeText(numeroRtm);
     const fechaInicioNorm = normalizeText(fechaInicio);
     const fechaVencimientoNorm = normalizeText(fechaVencimiento);
-    const ownerEmailNorm = normalizeEmail(ownerEmail);
+    const ownerEmailNorm = normalizeText(ownerEmail);
 
     if (!vehiculoIdNorm || !numeroRtmNorm || !fechaInicioNorm || !fechaVencimientoNorm || !ownerEmailNorm) {
       return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
 
-    if (!isValidDateRange(fechaInicioNorm, fechaVencimientoNorm)) {
-      return res.status(400).json({ error: 'La fecha de vencimiento debe ser posterior a la fecha de inicio.' });
-    }
-
-    const vehiculo = await findOwnedVehicle(vehiculoIdNorm, ownerEmailNorm);
-    if (!vehiculo) {
-      return res.status(400).json({ error: 'El vehiculo seleccionado no existe o no pertenece al usuario.' });
-    }
-
+    // Un vehículo solo puede tener una RTM activa — reemplazar si ya existe
     await Rtm.deleteMany({ vehiculoId: vehiculoIdNorm, ownerEmail: ownerEmailNorm });
 
     const nuevo = new Rtm({
@@ -999,6 +542,30 @@ app.post('/api/rtms', async (req, res) => {
 
     await nuevo.save();
     res.status(201).json(nuevo);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/rtms/:id', async (req, res) => {
+  try {
+    const rtmExistente = await Rtm.findById(req.params.id);
+    if (!rtmExistente) return res.status(404).json({ error: 'RTM no encontrada.' });
+
+    const numeroRtmNorm = normalizeText(req.body.numeroRtm);
+    const fechaInicioNorm = normalizeText(req.body.fechaInicio);
+    const fechaVencimientoNorm = normalizeText(req.body.fechaVencimiento);
+
+    if (!numeroRtmNorm || !fechaInicioNorm || !fechaVencimientoNorm) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    rtmExistente.numeroRtm = numeroRtmNorm;
+    rtmExistente.fechaInicio = fechaInicioNorm;
+    rtmExistente.fechaVencimiento = fechaVencimientoNorm;
+
+    await rtmExistente.save();
+    res.json(rtmExistente);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
