@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
-import api from '@/services/api.js';
+import axios from 'axios';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
@@ -8,8 +8,10 @@ import { clearSourceAlerts } from '@/hooks/useAlertHub.js';
 import SoatAlertAdapter from '@/patterns/adapters/SoatAlertAdapter.js';
 import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = `${API_BASE_URL}/api/soats`;
+
 const DocumentsContext = createContext(null);
-const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
 export function DocumentsProvider({ children }) {
   const [storedSoats, setStoredSoats] = useState([]);
@@ -25,7 +27,7 @@ export function DocumentsProvider({ children }) {
     }
     setLoading(true);
     try {
-      const res = await api.get('/soats', { params: { email: user.email } });
+      const res = await axios.get(API_URL, { params: { email: user.email } });
       setStoredSoats(res.data.map((s) => ({ ...s, id: s._id || s.id })));
     } catch (err) {
       console.error('Error cargando SOATs:', err);
@@ -36,17 +38,6 @@ export function DocumentsProvider({ children }) {
 
   useEffect(() => {
     fetchSoats();
-  }, [fetchSoats]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
-
-    const handleVehiclesUpdated = () => {
-      fetchSoats();
-    };
-
-    window.addEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
-    return () => window.removeEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
   }, [fetchSoats]);
 
   const soats = useMemo(() => {
@@ -65,17 +56,22 @@ export function DocumentsProvider({ children }) {
 
   const addSoat = async (nuevoSoat) => {
     if (!user?.email) throw new Error('No hay usuario autenticado');
-    await api.post('/soats', { ...nuevoSoat, ownerEmail: user.email });
+    await axios.post(API_URL, { ...nuevoSoat, ownerEmail: user.email });
+    await fetchSoats();
+  };
+
+  const editSoat = async (id, datos) => {
+    await axios.put(`${API_URL}/${id}`, datos);
     await fetchSoats();
   };
 
   const removeSoat = async (id) => {
-    await api.delete(`/soats/${id}`);
+    await axios.delete(`${API_URL}/${id}`);
     await fetchSoats();
   };
 
   return (
-    <DocumentsContext.Provider value={{ soats, addSoat, removeSoat, loading }}>
+    <DocumentsContext.Provider value={{ soats, addSoat, editSoat, removeSoat, loading }}>
       {children}
     </DocumentsContext.Provider>
   );
