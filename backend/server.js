@@ -98,6 +98,7 @@ app.get('/api/health/email', async (_req, res) => {
 
 const DEFAULT_MONGO_URI =
   'mongodb+srv://juansebastianvd_db_user:UcgkGfBgvUkgEVcF@cluster0.45cqzzh.mongodb.net/logistica_db?retryWrites=true&w=majority';
+const JUAN_MONGO_URI = String(process.env.JUAN_MONGO_URI || '').trim() || DEFAULT_MONGO_URI;
 const hasPlaceholderValue = (value = '') => String(value).includes('<') || String(value).includes('>');
 const configuredMongoUri = String(process.env.MONGO_URI || '').trim();
 const MONGO_URI = configuredMongoUri && !hasPlaceholderValue(configuredMongoUri)
@@ -114,6 +115,19 @@ mongoose
   .connect(MONGO_URI, { serverSelectionTimeoutMS: 10000 })
   .then(() => console.log('Conexion exitosa a MongoDB Atlas'))
   .catch((err) => console.error('Error de conexion:', err));
+
+const juanConnection = mongoose.createConnection(JUAN_MONGO_URI, { serverSelectionTimeoutMS: 10000 });
+juanConnection.set('bufferCommands', false);
+
+const juanConnectionReady = juanConnection
+  .asPromise()
+  .then(() => {
+    console.log('Conexion exitosa a MongoDB Atlas de Juan');
+  })
+  .catch((err) => {
+    console.error('Error de conexion a la base de Juan:', err.message);
+    return null;
+  });
 
 const isDbConnected = () => mongoose.connection.readyState === 1;
 
@@ -192,6 +206,7 @@ UsuarioSchema.methods.comparePassword = async function (candidatePassword) {
 };
 
 const Usuario = mongoose.model('Usuario', UsuarioSchema);
+const UsuarioJuan = juanConnection.model('Usuario', UsuarioSchema);
 
 // Generador de Token JWT
 const generateToken = (id) => {
@@ -229,6 +244,70 @@ const VerificacionOTPSchema = new mongoose.Schema({
 VerificacionOTPSchema.index({ email: 1 });
 VerificacionOTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 const VerificacionOTP = mongoose.model('VerificacionOTP', VerificacionOTPSchema);
+const VerificacionOTPJuan = juanConnection.model('VerificacionOTP', VerificacionOTPSchema);
+
+const ensureJuanConnection = async () => {
+  await juanConnectionReady;
+
+  if (juanConnection.readyState !== 1) {
+    throw new Error('La base de datos secundaria de Juan no esta disponible.');
+  }
+};
+
+const syncUsuarioToJuan = async (usuario) => {
+  await ensureJuanConnection();
+
+  await UsuarioJuan.findOneAndUpdate(
+    { email: usuario.email },
+    {
+      $set: {
+        nombre: usuario.nombre || '',
+        email: usuario.email,
+        password: usuario.password,
+        empresa: usuario.empresa,
+        telefono: usuario.telefono,
+        role: usuario.role || 'admin',
+        isVerified: usuario.isVerified,
+        createdAt: usuario.createdAt || new Date(),
+      },
+    },
+    {
+      upsert: true,
+      new: true,
+      runValidators: true,
+      setDefaultsOnInsert: true,
+    }
+  );
+};
+
+const syncOtpToJuan = async (verificacion) => {
+  await ensureJuanConnection();
+
+  await VerificacionOTPJuan.findOneAndUpdate(
+    { email: verificacion.email },
+    {
+      $set: {
+        email: verificacion.email,
+        codigoHash: verificacion.codigoHash,
+        expiresAt: verificacion.expiresAt,
+        intentos: verificacion.intentos,
+        ultimoEnvio: verificacion.ultimoEnvio,
+        createdAt: verificacion.createdAt || new Date(),
+      },
+    },
+    {
+      upsert: true,
+      new: true,
+      runValidators: true,
+      setDefaultsOnInsert: true,
+    }
+  );
+};
+
+const deleteOtpFromJuan = async (email) => {
+  await ensureJuanConnection();
+  await VerificacionOTPJuan.findOneAndDelete({ email });
+};
 
 const normalizeText = (value) => String(value ?? '').trim();
 const normalizeEmail = (value) => normalizeText(value).toLowerCase();
@@ -292,14 +371,16 @@ app.post('/api/auth/register', async (req, res) => {
       isVerified: false,
     });
     await nuevoUsuario.save();
+    await syncUsuarioToJuan(nuevoUsuario);
 
-    // Generar OTP de 6 digitos
     const codigo = String(secureRandomInt(100000, 999999));
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
 
     await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
-    await new VerificacionOTP({ email: emailNormalizado, codigoHash, expiresAt }).save();
+    await deleteOtpFromJuan(emailNormalizado);
+    const verificacion = await new VerificacionOTP({ email: emailNormalizado, codigoHash, expiresAt }).save();
+    await syncOtpToJuan(verificacion);
 
     try {
       await enviarCodigoVerificacion(emailNormalizado, nombreNormalizado || empresaNormalizada, codigo);
@@ -338,11 +419,13 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
 
     if (new Date() > verificacion.expiresAt) {
       await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
+      await deleteOtpFromJuan(emailNormalizado);
       return res.status(400).json({ message: 'El codigo ha expirado. Solicita uno nuevo.' });
     }
 
     if (verificacion.intentos >= OTP_MAX_INTENTOS) {
       await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
+      await deleteOtpFromJuan(emailNormalizado);
       return res.status(400).json({ message: 'Demasiados intentos fallidos. Solicita un nuevo codigo.' });
     }
 
@@ -351,12 +434,19 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
     if (!codigoCorrecto) {
       verificacion.intentos += 1;
       await verificacion.save();
+      await syncOtpToJuan(verificacion);
       const restantes = OTP_MAX_INTENTOS - verificacion.intentos;
       return res.status(400).json({ message: `Codigo incorrecto. Intentos restantes: ${restantes}` });
     }
 
-    await Usuario.findOneAndUpdate({ email: emailNormalizado }, { isVerified: true });
+    const usuarioActualizado = await Usuario.findOneAndUpdate(
+      { email: emailNormalizado },
+      { isVerified: true },
+      { new: true }
+    );
     await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
+    await syncUsuarioToJuan(usuarioActualizado);
+    await deleteOtpFromJuan(emailNormalizado);
 
     const usuario = await Usuario.findOne({ email: emailNormalizado });
     res.json({
@@ -409,7 +499,14 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
 
     await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
-    await new VerificacionOTP({ email: emailNormalizado, codigoHash, expiresAt, ultimoEnvio: new Date() }).save();
+    await deleteOtpFromJuan(emailNormalizado);
+    const verificacion = await new VerificacionOTP({
+      email: emailNormalizado,
+      codigoHash,
+      expiresAt,
+      ultimoEnvio: new Date(),
+    }).save();
+    await syncOtpToJuan(verificacion);
 
     try {
       await enviarCodigoVerificacion(emailNormalizado, usuario.nombre || usuario.empresa, codigo);
