@@ -178,6 +178,36 @@ export const authService = {
     }
   },
 
+  async solicitarRecuperacion(email) {
+    try {
+      const response = await api.post('/auth/recuperar-cuenta', { email });
+      return { success: true, data: response.data.data || response.data, message: response.data.message };
+    } catch (error) {
+      if (shouldUseLocalStorage(error)) {
+        return { success: false, useLocalStorage: true };
+      }
+      return {
+        success: false,
+        message: normalizeApiErrorMessage(error, 'Error al solicitar recuperacion'),
+      };
+    }
+  },
+
+  async restablecerPassword(email, codigo, nuevaPassword) {
+    try {
+      const response = await api.post('/auth/restablecer-password', { email, codigo, nuevaPassword });
+      return { success: true, data: response.data, message: response.data.message };
+    } catch (error) {
+      if (shouldUseLocalStorage(error)) {
+        return { success: false, useLocalStorage: true };
+      }
+      return {
+        success: false,
+        message: normalizeApiErrorMessage(error, 'Error al restablecer la contrasena'),
+      };
+    }
+  },
+
   async updateUser(userData) {
     try {
       const response = await api.put('/auth/user', userData);
