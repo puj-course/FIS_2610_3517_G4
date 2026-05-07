@@ -585,3 +585,113 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Servidor backend listo en http://localhost:${PORT}`);
 });
+
+// Mapa temporal en memoria para guardar OTPs pendientes
+const pendingUsers = new Map();
+
+// Modificar el registro para que envíe OTP en lugar de crear usuario directo
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { email, password, empresa, telefono } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email y contraseña son requeridos' });
+    }
+
+    const existe = await Usuario.findOne({ email });
+    if (existe) {
+      return res.status(400).json({ message: 'El correo ya esta registrado' });
+    }
+
+    // Generar OTP de 6 dígitos
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiracion = Date.now() + (parseInt(process.env.OTP_EXPIRACION_MINUTOS || '10') * 60 * 1000);
+
+    // Guardar usuario pendiente en memoria (sin guardarlo aún en BD)
+    pendingUsers.set(email, { email, password, empresa, telefono, codigo, expiracion, intentos: 0 });
+
+    // Enviar código por email
+    const { enviarCodigoVerificacion } = require('./services/emailService');
+    await enviarCodigoVerificacion(email, empresa, codigo);
+
+    res.status(200).json({
+      message: 'Código enviado. Revisa tu correo.',
+      needsVerification: true,
+      email
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Verificar código OTP
+app.post('/api/auth/verificar-codigo', async (req, res) => {
+  try {
+    const { email, codigo } = req.body;
+    const pending = pendingUsers.get(email);
+
+    if (!pending) {
+      return res.status(400).json({ message: 'No hay registro pendiente para este correo.' });
+    }
+    if (Date.now() > pending.expiracion) {
+      pendingUsers.delete(email);
+      return res.status(400).json({ message: 'El código ha expirado. Regístrate de nuevo.' });
+    }
+    if (pending.codigo !== codigo) {
+      pending.intentos = (pending.intentos || 0) + 1;
+      if (pending.intentos >= parseInt(process.env.OTP_MAX_INTENTOS || '5')) {
+        pendingUsers.delete(email);
+        return res.status(400).json({ message: 'Demasiados intentos. Regístrate de nuevo.' });
+      }
+      return res.status(400).json({ message: 'Código incorrecto.' });
+    }
+
+    // Código correcto: crear usuario en BD
+    const nuevoUsuario = new Usuario({
+      email: pending.email,
+      password: pending.password,
+      empresa: pending.empresa,
+      telefono: pending.telefono
+    });
+    await nuevoUsuario.save();
+    pendingUsers.delete(email);
+
+    const { password: _, ...userSinPassword } = nuevoUsuario.toObject();
+    res.status(201).json({
+      message: 'Cuenta verificada y creada exitosamente.',
+      data: { user: userSinPassword, token: nuevoUsuario._id }
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Reenviar código OTP
+app.post('/api/auth/reenviar-codigo', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const pending = pendingUsers.get(email);
+
+    if (!pending) {
+      return res.status(400).json({ message: 'No hay registro pendiente para este correo.' });
+    }
+
+    const nuevoCodigo = Math.floor(100000 + Math.random() * 900000).toString();
+    pending.codigo = nuevoCodigo;
+    pending.expiracion = Date.now() + (parseInt(process.env.OTP_EXPIRACION_MINUTOS || '10') * 60 * 1000);
+    pending.intentos = 0;
+
+    const { enviarCodigoVerificacion } = require('./services/emailService');
+    await enviarCodigoVerificacion(email, pending.empresa, nuevoCodigo);
+
+    res.json({ success: true, message: 'Código reenviado.' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+app.get('/api/usuarios', async (req, res) => {
+  const usuarios = await Usuario.find({}, { password: 0 }); // oculta contraseñas
+  res.json(usuarios);
+});
+
+
