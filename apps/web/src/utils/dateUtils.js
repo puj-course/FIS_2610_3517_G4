@@ -1,19 +1,27 @@
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+const isInvalidDate = (date) => Number.isNaN(date.getTime());
+
 // Calcula diferencia en días normalizando ambas fechas a medianoche para evitar desfases por hora.
 export const calculateDaysRemaining = (targetDateStr, simulatedDateStr) => {
   if (!targetDateStr) return -999;
   const target = new Date(targetDateStr);
   const current = simulatedDateStr ? new Date(simulatedDateStr) : new Date();
-  
+
+  if (isInvalidDate(target) || isInvalidDate(current)) return -999;
+
   target.setHours(0, 0, 0, 0);
   current.setHours(0, 0, 0, 0);
-  
+
   const diffTime = target.getTime() - current.getTime();
-  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return Math.ceil(diffTime / MS_PER_DAY);
 };
 
 // Convierte días restantes en el semáforo documental que usan páginas, hooks y alertas.
 export const calculateDocumentState = (daysRemaining, threshold = 15) => {
-  if (daysRemaining < 0 || daysRemaining === -999) return 'rojo';
+  if (!Number.isFinite(daysRemaining) || daysRemaining < 0 || daysRemaining === -999) {
+    return 'rojo';
+  }
   if (daysRemaining <= threshold) return 'amarillo';
   return 'verde';
 };
