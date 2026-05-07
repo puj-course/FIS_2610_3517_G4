@@ -159,7 +159,7 @@ const hasPlaceholderValue = (value = '') => String(value).includes('<') || Strin
 const MONGO_URI = String(process.env.MONGO_URI || '').trim();
 
 if (!MONGO_URI || hasPlaceholderValue(MONGO_URI)) {
-  console.error('[ENV] MONGO_URI no esta configurada. Crea backend/.env con la URI de MongoDB Atlas de Juan.');
+  console.error('[ENV] MONGO_URI no esta configurada. Crea backend/.env con la URI de MongoDB Atlas compartida por el equipo.');
   process.exit(1);
 }
 

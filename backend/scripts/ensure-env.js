@@ -34,7 +34,7 @@ if (!mongoUri) {
 }
 
 if (hasPlaceholderValue(mongoUri)) {
-  console.error('[ENV] MONGO_URI contiene placeholders. Reemplazala por el connection string real de Juan.');
+  console.error('[ENV] MONGO_URI contiene placeholders. Reemplazala por el connection string real compartido por el equipo.');
   process.exit(1);
 }
 
