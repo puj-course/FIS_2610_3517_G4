@@ -1,6 +1,7 @@
 name: "Kanban 1 - Flujo y Asignación Dinámica"
 on:
   issues:
+    # Apenas nace una issue, se automatiza la logística mínima del tablero.
     types: [opened]
 
 jobs:
@@ -16,6 +17,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
+            // La autoasignación deja claro quién abrió la tarea y evita issues huérfanas.
             github.rest.issues.addAssignees({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -28,6 +30,7 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
+            <!-- Mensaje ligero para confirmar que la automatización de flujo sí corrió -->
             ###  Organización Hecha
             Hola @${{ github.actor }}, se ha generado una asignación automática para esta tarea.
             

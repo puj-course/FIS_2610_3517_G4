@@ -1,7 +1,7 @@
 name: HU-454 - Pipeline CI/CD Autenticacion
 
 on:
-  # CI para revisar cambios en PR antes de merge
+  # CI para revisar cambios en PR antes de merge.
   pull_request:
     branches: [develop, main]
     paths:
@@ -9,7 +9,7 @@ on:
       - 'backend/**'
       - '.github/workflows/pipeline_hu454_auth_ci_cd.yml'
 
-  # CD al hacer push directo/merge en ramas objetivo
+  # CD al hacer push directo/merge en ramas objetivo.
   push:
     branches: [develop, main]
     paths:
@@ -17,7 +17,7 @@ on:
       - 'backend/**'
       - '.github/workflows/pipeline_hu454_auth_ci_cd.yml'
 
-  # Permite ejecutar pruebas manuales desde Actions
+  # Permite ejecutar pruebas manuales desde Actions.
   workflow_dispatch:
 
 permissions:
@@ -29,6 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
+        # Todos los comandos de esta job se resuelven desde el frontend.
         working-directory: apps/web
 
     steps:
@@ -56,6 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
+        # Esta job asume un backend Node separado, por eso cambia de carpeta antes de validar.
         working-directory: backend
 
     steps:
@@ -72,7 +74,7 @@ jobs:
       - name: Instalar dependencias backend
         run: npm ci
 
-      # Validacion rapida de sintaxis para evitar romper despliegue.
+      # Validación rápida de sintaxis para evitar romper despliegue.
       - name: Verificar sintaxis backend
         run: node --check server.js
 
