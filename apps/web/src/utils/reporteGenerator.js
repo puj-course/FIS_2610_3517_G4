@@ -17,6 +17,7 @@ export const reporteGenerator = {
     const data = validation.resultadoRUNT.data;
     const timestamp = new Date(validation.timestamp).toLocaleString('es-CO');
 
+    // El HTML se deja autocontenido para poder descargarlo como respaldo aunque no exista motor PDF real.
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -285,6 +286,7 @@ export const reporteGenerator = {
   generateHistoryCSV(validations) {
     if (!validations || validations.length === 0) return '';
 
+    // El CSV prioriza campos comparables para revisión operativa y auditoría rápida fuera del sistema.
     const headers = ['Placa', 'Fecha', 'Hora', 'Usuario', 'SOAT Vigente', 'RTM Vigente', 'Días SOAT', 'Días RTM', 'Notas'];
     
     const rows = validations.map(v => [
@@ -314,6 +316,7 @@ export const reporteGenerator = {
    * @param {string} mimeType - Tipo MIME
    */
   downloadFile(content, filename, mimeType = 'text/plain') {
+    // La descarga se implementa con un enlace temporal para no depender de librerías adicionales.
     const element = document.createElement('a');
     element.setAttribute('href', `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`);
     element.setAttribute('download', filename);
@@ -329,9 +332,9 @@ export const reporteGenerator = {
    */
   downloadValidationAsPDF(validation) {
     const htmlContent = this.generateValidationPDFContent(validation);
-    // En producción, usar jspdf + html2canvas o similar
+    // En producción, usar jspdf + html2canvas o similar.
     console.log('PDF download requirería jspdf/html2canvas');
-    // Por ahora, descargar como HTML
+    // Mientras tanto, se descarga HTML para conservar el contenido y el formato de auditoría.
     this.downloadFile(htmlContent, `validacion-${validation.placa}-${validation.id}.html`, 'text/html');
   },
 

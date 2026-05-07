@@ -1,6 +1,7 @@
 name: "Kanban 2 - Estándares de Calidad"
 on:
   issues:
+    # Comenta automáticamente las nuevas tareas para recordar criterios de calidad del curso.
     types: [opened]
 
 jobs:
@@ -14,6 +15,7 @@ jobs:
         with:
           issue-number: ${{ github.event.issue.number }}
           body: |
+            <!-- Checklist guía para que cada issue nazca con criterios visibles de aceptación -->
             Control de Calidad SYNTIX TECH
             Para que esta tarea sea aceptada, debe cumplir con:
 

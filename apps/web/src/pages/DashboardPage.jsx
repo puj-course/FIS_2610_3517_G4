@@ -6,12 +6,14 @@ import { useVehicles } from '@/hooks/useVehicles.js';
 import { useConductors } from '@/hooks/useConductors.js';
 import { useAlerts } from '@/hooks/useAlerts.js';
 
+// DashboardPage prioriza lectura rápida: KPIs, accesos directos y señales recientes de la operación.
 export default function DashboardPage() {
   const { vehiculos } = useVehicles();
   const { conductores } = useConductors();
   const { alerts } = useAlerts();
   const { activeModal, openModal, closeModal } = useModalManager();
 
+  // Las tarjetas superiores sintetizan el estado del sistema sin obligar a entrar a cada módulo.
   const stats = useMemo(
     () => [
       { label: 'Vehículos', value: vehiculos.length, hint: 'Registrados' },

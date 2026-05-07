@@ -3,6 +3,8 @@ import { Outlet } from 'react-router-dom';
 import Header from '@/components/Header.jsx';
 import Sidebar from '@/components/Sidebar.jsx';
 
+// DashboardLayout mantiene la estructura compartida del backoffice:
+// navegación lateral, cabecera fija y espacio central para cada módulo.
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 

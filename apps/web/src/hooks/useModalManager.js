@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+// Gestor simple para que las páginas hablen en términos de "modal activo" y no de múltiples booleans.
 export default function useModalManager(initialModal = null) {
   const [activeModal, setActiveModal] = useState(initialModal);
 

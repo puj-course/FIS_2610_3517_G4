@@ -8,6 +8,7 @@ import { getWorstState } from '@/utils/dateUtils.js';
 
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
+// Normaliza el shape de salida del backend para que el resto del frontend trate todos los vehículos igual.
 const normalizeVehicle = (vehiculo) => ({
   ...vehiculo,
   id: vehiculo._id || vehiculo.id,
@@ -44,12 +45,14 @@ export function useVehicles() {
   }, [user?.email]);
 
   useEffect(() => {
+    // La lista depende del usuario porque el backend filtra por ownerEmail.
     fetchVehicles();
   }, [fetchVehicles]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
+    // Este listener permite refrescar la flota desde cualquier mutación disparada en otro módulo.
     const handleVehiclesUpdated = () => {
       fetchVehicles();
     };
@@ -109,6 +112,8 @@ export function useVehicles() {
   };
 
   const vehiculosCompletos = vehiculos.map((vehiculo) => {
+    // Aquí se arma la visión "enriquecida" que consumen las pantallas:
+    // vehículo + conductor + documentos + severidad consolidada.
     const conductor = conductores.find(
       (item) => String(item.id) === String(vehiculo.conductorId)
     );

@@ -260,6 +260,8 @@ const runtDatabase = [
   }
 ];
 
+// Este hook encapsula la base simulada del RUNT para que las vistas consuman una interfaz estable
+// aunque detrás siga siendo un dataset mock orientado a demos y validaciones académicas.
 export function useRUNTSimulator() {
   const searchByPlaca = (placa) => {
     if (!placa || placa.trim().length === 0) {
@@ -274,6 +276,7 @@ export function useRUNTSimulator() {
         encontrado: true,
         data: {
           ...vehiculo,
+          // Los días restantes se recalculan en cada búsqueda para no depender del valor sembrado en el mock.
           soat: {
             ...vehiculo.soat,
             diasRestantes: calculateDaysRemaining(vehiculo.soat.fechaVencimiento)
@@ -322,6 +325,7 @@ export function useRUNTSimulator() {
   };
 
   const getAllVehiculos = () => {
+    // Esta proyección resumida es útil para dashboards o tablas que no necesitan el detalle completo.
     return runtDatabase.map(v => ({
       placa: v.placa,
       marca: v.marca,

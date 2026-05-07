@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	darkMode: ['class'],
+	// Se escanean tanto carpetas heredadas como src para no perder clases en la compilación.
 	content: [
 		'./pages/**/*.{js,jsx}',
 		'./components/**/*.{js,jsx}',
@@ -16,6 +17,7 @@ module.exports = {
 			},
 		},
 		extend: {
+			// Aquí conviven los colores de marca y los tokens genéricos usados por los componentes UI.
 			colors: {
 				syntix: {
 					navy: '#1B263B',
@@ -63,5 +65,6 @@ module.exports = {
 			},
 		},
 	},
+	// tailwindcss-animate habilita utilidades ya usadas por modales y toasts del proyecto.
 	plugins: [require('tailwindcss-animate')],
 };

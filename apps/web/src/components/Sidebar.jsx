@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Car, Users, FileText, BellRing, Search, BarChart3, Settings, X } from 'lucide-react';
 import { useAlerts } from '@/hooks/useAlerts.js';
 
+// Sidebar concentra los módulos del backoffice y refleja cuántas alertas siguen activas.
 export default function Sidebar({ isOpen, toggleSidebar }) {
   const { totalAlerts } = useAlerts();
 

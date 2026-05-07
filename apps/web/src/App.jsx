@@ -21,6 +21,8 @@ import HistorialValidacionesPage from '@/pages/HistorialValidacionesPage.jsx';
 import ReportesPage from '@/pages/ReportesPage.jsx';
 import ConfiguracionPage from '@/pages/ConfiguracionPage.jsx';
 
+// App arma el árbol principal de providers y define qué vistas son públicas
+// y cuáles deben pasar por la protección de autenticación.
 function App() {
   return (
     <AuthProvider>
@@ -28,13 +30,13 @@ function App() {
         <RtmProvider>
         <Router>
           <Routes>
-            {/* Públicas */}
+            {/* Las rutas públicas alimentan la landing y el acceso inicial al sistema. */}
             <Route path="/" element={<HomePage />} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/planes" element={<PlanesPage />} /> {/* Ruta agregada */}
 
-            {/* Protegidas */}
+            {/* Las rutas protegidas comparten el layout del dashboard y dependen de sesión activa. */}
             <Route element={<ProtectedRoute />}>
               <Route element={<DashboardLayout />}>
                 <Route path="/dashboard" element={<DashboardPage />} />

@@ -7,6 +7,7 @@ import { useSimulatedDate } from './useSimulatedDate.js';
 const CONDUCTORS_UPDATED_EVENT = 'syntix:conductors-updated';
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
+// Normaliza IDs del backend para que el resto de hooks no dependa de _id vs id.
 const normalizeConductor = (conductor) => ({
   ...conductor,
   id: conductor._id || conductor.id,
@@ -48,12 +49,14 @@ export function useConductors() {
   }, [user?.email]);
 
   useEffect(() => {
+    // Cada sesión ve solo sus conductores, por eso la consulta depende del usuario autenticado.
     fetchConductors();
   }, [fetchConductors]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
+    // El evento permite refrescar la lista desde cualquier pantalla que muta conductores.
     const handleConductorsUpdated = () => {
       fetchConductors();
     };
@@ -101,6 +104,7 @@ export function useConductors() {
   };
 
   const conductorsWithState = conductores.map((conductor) => {
+    // El estado de la licencia se deriva en cliente para responder a la fecha simulada del dashboard.
     const days = calculateDaysRemaining(conductor.fechaVencimiento, simulatedDate);
 
     return {

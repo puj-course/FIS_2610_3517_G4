@@ -1,3 +1,4 @@
+// Hook mínimo para calcular semáforos documentales sin acoplar la vista al detalle del cálculo.
 export function useDocumentStatus() {
   const getStatus = (expirationDate, simulatedToday = new Date()) => {
     if (!expirationDate) return 'rojo';

@@ -9,6 +9,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const normalizeText = (value) => String(value ?? '').trim();
 const normalizeEmail = (value) => normalizeText(value).toLowerCase();
 
+// La validación previa evita golpear la API con datos que ya sabemos que son inconsistentes.
 const validateRegistrationData = ({ email, password, empresa, telefono }) => {
   if (!normalizeText(empresa)) return 'Ingresa el nombre de la empresa.';
   if (!normalizeText(telefono)) return 'Ingresa el teléfono.';
@@ -20,13 +21,13 @@ const validateRegistrationData = ({ email, password, empresa, telefono }) => {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useLocalStorage('syntix_user', null);
-  // Nuevo: Guardamos el token de sesión industrial para rutas protegidas
+  // El token se guarda aparte para desacoplar la sesión del perfil mínimo mostrado en UI.
   const [token, setToken] = useLocalStorage('syntix_token', null);
   const [usersDb, setUsersDb] = useLocalStorage('syntix_users_db', []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // --- FALLBACKS LOCALES (Se mantienen igual) ---
+  // Fallback local: permite que el frontend siga operando cuando el backend aún no está disponible.
   const registerLocal = useCallback((email, password, empresa, telefono) => {
     const normalizedEmail = normalizeEmail(email);
     const normalizedEmpresa = normalizeText(empresa);
@@ -88,7 +89,7 @@ export function AuthProvider({ children }) {
     return { success: false, message: 'Credenciales inválidas' };
   }, [usersDb, setUser, setToken]);
 
-  // --- MÉTODOS PRINCIPALES CON API ---
+  // Flujo principal: intenta backend y solo vuelve al almacenamiento local si la integración falla.
   const register = useCallback(async (email, password, empresa, telefono) => {
     const normalizedEmail = normalizeEmail(email);
     const normalizedEmpresa = normalizeText(empresa);
@@ -116,7 +117,12 @@ export function AuthProvider({ children }) {
       });
 
       if (apiResult.useLocalStorage) {
-        return registerLocal(normalizedEmail, password, normalizedEmpresa, normalizedTelefono);
+        return {
+          success: false,
+          message:
+            apiResult.message ||
+            'El backend no esta disponible para completar el registro con verificacion por correo.',
+        };
       }
 
       if (apiResult.success) {
@@ -130,12 +136,15 @@ export function AuthProvider({ children }) {
 
       return { success: false, message: apiResult.message || 'Error al registrar usuario' };
     } catch (err) {
-      console.warn('Error en API, usando localStorage:', err);
-      return registerLocal(normalizedEmail, password, normalizedEmpresa, normalizedTelefono);
+      console.warn('Error en API durante registro:', err);
+      return {
+        success: false,
+        message: 'No se pudo completar el registro. Verifica que el backend y la base de datos esten disponibles.',
+      };
     } finally {
       setLoading(false);
     }
-  }, [registerLocal]);
+  }, []);
 
   const login = useCallback(async (email, password) => {
     const normalizedEmail = normalizeEmail(email);
@@ -155,6 +164,7 @@ export function AuthProvider({ children }) {
         return { success: true };
       }
 
+      // Si la API responde error funcional, aún se revisa el fallback local para no romper demos.
       const localResult = loginLocal(normalizedEmail, password);
       if (localResult.success) {
         return localResult;
@@ -168,6 +178,42 @@ export function AuthProvider({ children }) {
       setLoading(false);
     }
   }, [loginLocal, setUser, setToken]);
+
+  const loginWithGoogle = useCallback(async ({ idToken, empresa = '', telefono = '' }) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const apiResult = await authService.googleAuth({
+        idToken,
+        empresa: normalizeText(empresa),
+        telefono: normalizeText(telefono),
+      });
+
+      if (apiResult.success) {
+        setUser(apiResult.data.user);
+        setToken(apiResult.data.token);
+        return {
+          success: true,
+          created: Boolean(apiResult.data.created),
+          message: apiResult.message,
+        };
+      }
+
+      if (apiResult.useLocalStorage) {
+        return {
+          success: false,
+          message: 'La autenticacion con Google requiere que el backend este disponible.',
+        };
+      }
+
+      return { success: false, message: apiResult.message || 'No se pudo autenticar con Google' };
+    } catch (err) {
+      return { success: false, message: 'Error inesperado al autenticar con Google.' };
+    } finally {
+      setLoading(false);
+    }
+  }, [setUser, setToken]);
 
   const loginAfterVerification = useCallback((verifiedUser, verifiedToken = null) => {
     if (!verifiedUser) return { success: false };
@@ -187,7 +233,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{
-      user, token, login, register, loginAfterVerification, logout,
+      user, token, login, loginWithGoogle, register, loginAfterVerification, logout,
       isAuthenticated: !!user, loading, error, clearError
     }}>
       {children}

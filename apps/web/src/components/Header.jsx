@@ -4,6 +4,8 @@ import { LogOut, Menu, Bell, User } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAlerts } from '@/hooks/useAlerts.js';
 
+// Header muestra el contexto actual del dashboard y concentra acciones globales:
+// navegación móvil, alertas activas y cierre de sesión.
 export default function Header({ toggleSidebar }) {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -18,6 +20,7 @@ export default function Header({ toggleSidebar }) {
     navigate('/');
   };
 
+  // El breadcrumb simple se deriva de la ruta activa para evitar títulos hardcodeados por vista.
   const pathNames = location.pathname.split('/').filter(x => x);
   const currentPage = pathNames.length > 0 ? pathNames[pathNames.length - 1] : 'Dashboard';
 

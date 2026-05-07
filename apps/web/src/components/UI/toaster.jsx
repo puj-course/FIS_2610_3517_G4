@@ -9,6 +9,7 @@ import {
 import { useToast } from '@/components/UI/use-toast';
 import React from 'react';
 
+// Toaster conecta el store de notificaciones con el árbol visual de Radix.
 export function Toaster() {
 	const { toasts } = useToast();
 

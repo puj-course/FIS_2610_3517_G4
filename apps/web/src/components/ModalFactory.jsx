@@ -2,6 +2,7 @@ import React from 'react';
 import AuthModalFactory from '@/patterns/factory/AuthModalFactory.jsx';
 import FleetModalFactory from '@/patterns/factory/FleetModalFactory.jsx';
 
+// Esta fachada evita que cada página conozca el detalle de creación de cada modal.
 export default function ModalFactory({ modalType, ...props }) {
   if (!modalType) return null;
 

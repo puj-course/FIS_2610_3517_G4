@@ -1,5 +1,6 @@
 import BaseAlertAdapter from './BaseAlertAdapter.js';
 
+// Genera alertas a partir de vencimientos o proximidad de la tecnomecánica.
 export default class RtmAlertAdapter extends BaseAlertAdapter {
   adapt(rtm) {
     if (rtm.estado !== 'rojo' && rtm.estado !== 'amarillo') {

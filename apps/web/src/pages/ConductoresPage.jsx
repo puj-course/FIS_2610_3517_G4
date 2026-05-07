@@ -5,6 +5,7 @@ import StatusBadge from '@/components/StatusBadge.jsx';
 import AddConductorModal from '@/components/AddConductorModal.jsx';
 import { useConductors } from '@/hooks/useConductors.js';
 
+// Vista operativa para buscar, registrar y corregir conductores sin salir del dashboard.
 export default function ConductoresPage() {
   const { conductores, deleteConductor } = useConductors();
   const [searchTerm, setSearchTerm] = useState('');
