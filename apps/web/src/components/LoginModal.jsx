@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Mail, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 
+// Modal ligero para autenticación desde la landing sin abandonar el flujo público.
 export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

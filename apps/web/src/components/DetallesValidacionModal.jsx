@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { X, Download, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import StatusBadge from './StatusBadge.jsx';
 
+// Este modal profundiza una validación puntual y agrega auditoría, historial por placa
+// y acciones de seguimiento en un mismo panel.
 export default function DetallesValidacionModal({
   isOpen,
   onClose,

@@ -10,6 +10,8 @@ const createInitialFormData = (currentYear) => ({
   tipo: 'Automovil',
 });
 
+// Este modal reutiliza la misma UI para crear y editar vehículos.
+// Además centraliza las validaciones que impactan el inventario base de la flota.
 export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null }) {
   const { vehiculos, addVehicle, updateVehicle } = useVehicles();
   const currentYear = new Date().getFullYear();
@@ -26,6 +28,8 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
   };
 
   useEffect(() => {
+    // Cuando el modal cambia de modo, el formulario se sincroniza con el vehículo activo
+    // o vuelve a un estado limpio para una creación nueva.
     if (!isOpen) {
       return;
     }
@@ -72,6 +76,7 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
       return;
     }
 
+    // La placa es el identificador visible más crítico, por eso se protege contra duplicados.
     const isDuplicatePlate = vehiculos.some((vehiculo) => {
       const samePlate = vehiculo.placa?.toUpperCase() === placaUpper;
       const isSameVehicle = isEditing && String(vehiculo.id) === String(vehicleToEdit.id);

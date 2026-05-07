@@ -3,6 +3,8 @@ import { X, FileText, Save } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
 
+// Modal dedicado al alta de SOAT.
+// Su objetivo es garantizar que cada póliza tenga fechas coherentes antes de enviarse al contexto.
 export default function AddDocumentModal({ isOpen, onClose }) {
   const { vehiculos } = useVehicles();
   const { addSoat } = useDocuments();
@@ -24,6 +26,7 @@ export default function AddDocumentModal({ isOpen, onClose }) {
     setError('');
     const numeroPoliza = formData.numeroPoliza.trim();
 
+    // Primero se valida la integridad mínima del formulario para evitar registros incompletos.
     if (
       !formData.vehiculoId ||
       !numeroPoliza ||
@@ -40,6 +43,7 @@ export default function AddDocumentModal({ isOpen, onClose }) {
     }
 
     try {
+      // El guardado se serializa con un estado local para proteger la UX del doble envío.
       setSaving(true);
       await addSoat({
         vehiculoId: formData.vehiculoId,

@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Settings, LogOut, User } from 'lucide-react';
 
+// Dropdown del perfil pensado para no saturar la cabecera con acciones secundarias del usuario.
 export default function UserProfileDropdown() {
   const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -10,6 +11,7 @@ export default function UserProfileDropdown() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Se cierra al hacer clic fuera para que el menú no quede abierto por accidente.
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);

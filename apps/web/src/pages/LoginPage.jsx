@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Car, Lock, Mail, Loader2 } from 'lucide-react';
 import { Helmet } from 'react-helmet';
 
+// Página de login tradicional para accesos directos y redirecciones desde rutas protegidas.
 export default function LoginPage() {
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
@@ -15,7 +16,7 @@ export default function LoginPage() {
   const location     = useLocation();
   const from         = location.state?.from?.pathname || '/';
 
-  // ── KEY FIX: handleSubmit debe ser async ────────────────────────────────────
+  // Si el login viene desde una ruta protegida, al autenticarse vuelve exactamente al destino pedido.
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
