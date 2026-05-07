@@ -33,6 +33,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
 const crypto = require('crypto');
+const { OAuth2Client } = require('google-auth-library');
 const {
   enviarCodigoVerificacion,
   enviarCodigoRecuperacion,
@@ -248,6 +249,7 @@ const UsuarioSchema = new mongoose.Schema({
   password: { type: String, required: true },
   empresa: String,
   telefono: String,
+  googleId: { type: String, default: null },
   role: { type: String, default: 'admin' },
   isVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
@@ -324,6 +326,9 @@ const normalizeText = (value) => String(value ?? '').trim();
 
 const normalizeEmail = (value) => normalizeText(value).toLowerCase();
 
+const GOOGLE_CLIENT_ID = normalizeText(process.env.GOOGLE_CLIENT_ID);
+const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const DUPLICATE_EMAIL_MESSAGE = 'Ya existe una cuenta con este correo electrónico.';
@@ -350,6 +355,31 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'syntix_super_secret_key', {
     expiresIn: '30d',
   });
+};
+
+const generateRandomPassword = () => crypto.randomBytes(24).toString('hex');
+
+const verifyGoogleIdentity = async (idToken) => {
+  if (!GOOGLE_CLIENT_ID || !googleClient) {
+    const error = new Error('Google Auth no esta configurado en el backend.');
+    error.statusCode = 503;
+    throw error;
+  }
+
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+
+  if (!payload?.email || !payload?.email_verified) {
+    const error = new Error('Google no devolvio un correo verificado para esta cuenta.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return payload;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -618,6 +648,121 @@ app.post('/api/auth/login', async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
+  }
+});
+
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { idToken, empresa, telefono } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({ message: 'El token de Google es requerido.' });
+    }
+
+    const googleProfile = await verifyGoogleIdentity(idToken);
+    const emailNormalizado = normalizeEmail(googleProfile.email);
+    const empresaNormalizada = normalizeText(empresa);
+    const telefonoNormalizado = normalizeText(telefono);
+    const nombreNormalizado = normalizeText(googleProfile.name);
+
+    let usuario = await Usuario.findOne({ email: emailNormalizado });
+    let created = false;
+
+    if (!usuario) {
+      if (!empresaNormalizada) {
+        return res.status(400).json({
+          message: 'Ingresa el nombre de la empresa para completar el registro con Google.',
+        });
+      }
+
+      if (!telefonoNormalizado) {
+        return res.status(400).json({
+          message: 'Ingresa el teléfono para completar el registro con Google.',
+        });
+      }
+
+      usuario = new Usuario({
+        nombre: nombreNormalizado,
+        email: emailNormalizado,
+        password: generateRandomPassword(),
+        empresa: empresaNormalizada,
+        telefono: telefonoNormalizado,
+        isVerified: true,
+        googleId: String(googleProfile.sub || ''),
+      });
+
+      await usuario.save();
+      created = true;
+    } else {
+      let shouldSave = false;
+
+      if (!usuario.googleId && googleProfile.sub) {
+        usuario.googleId = String(googleProfile.sub);
+        shouldSave = true;
+      }
+
+      if (!usuario.nombre && nombreNormalizado) {
+        usuario.nombre = nombreNormalizado;
+        shouldSave = true;
+      }
+
+      if (!usuario.empresa && empresaNormalizada) {
+        usuario.empresa = empresaNormalizada;
+        shouldSave = true;
+      }
+
+      if (!usuario.telefono && telefonoNormalizado) {
+        usuario.telefono = telefonoNormalizado;
+        shouldSave = true;
+      }
+
+      if (!usuario.isVerified) {
+        usuario.isVerified = true;
+        shouldSave = true;
+      }
+
+      if (shouldSave) {
+        await usuario.save();
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: created
+        ? 'Cuenta creada con Google correctamente.'
+        : 'Sesion iniciada con Google correctamente.',
+      data: {
+        user: {
+          _id: usuario._id,
+          email: usuario.email,
+          empresa: usuario.empresa,
+          telefono: usuario.telefono,
+          role: usuario.role,
+        },
+        token: generateToken(usuario._id),
+        created,
+      },
+    });
+  } catch (err) {
+    if (err?.name === 'MongooseServerSelectionError' || err?.name === 'MongoServerSelectionError') {
+      return res.status(503).json({
+        message: getDbUnavailableMessage(),
+        code: 'DB_UNAVAILABLE',
+      });
+    }
+
+    const googleErrorMessage = String(err?.message || '').toLowerCase();
+    if (
+      googleErrorMessage.includes('token used too late') ||
+      googleErrorMessage.includes('jwt') ||
+      googleErrorMessage.includes('wrong recipient') ||
+      googleErrorMessage.includes('invalid token') ||
+      googleErrorMessage.includes('wrong number of segments')
+    ) {
+      return res.status(401).json({ message: 'El token de Google no es valido o ya expiro.' });
+    }
+
+    return res.status(err.statusCode || 500).json({ message: err.message });
   }
 });
 
