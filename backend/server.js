@@ -35,6 +35,12 @@ const helmet = require('helmet');
 const crypto = require('crypto');
 const { OAuth2Client } = require('google-auth-library');
 const {
+  DEFAULT_MONGO_DB_NAME,
+  DEFAULT_MONGO_HOST,
+  buildMongoUri,
+  getMongoConfigErrors,
+} = require('./config/mongo');
+const {
   enviarCodigoVerificacion,
   enviarCodigoRecuperacion,
   verificarServicioCorreo,
@@ -153,14 +159,19 @@ app.get('/api/health/email', async (_req, res) => {
  * - soats
  * - rtms
  *
- * La URI real debe ir en backend/.env:
- * MONGO_URI=mongodb+srv://usuario:password@cluster/logistica_db?retryWrites=true&w=majority
+ * El backend prioriza MONGO_URI si existe.
+ * Si no existe, compone la conexion con valores por defecto para este proyecto:
+ * - MONGO_HOST=cluster0.45cqzzh.mongodb.net
+ * - MONGO_DB_NAME=logistica_db
+ * y toma las credenciales desde MONGO_USER / MONGO_PASSWORD.
  */
-const hasPlaceholderValue = (value = '') => String(value).includes('<') || String(value).includes('>');
-const MONGO_URI = String(process.env.MONGO_URI || '').trim();
+const MONGO_URI = buildMongoUri(process.env);
+const mongoConfigErrors = getMongoConfigErrors(process.env);
 
-if (!MONGO_URI || hasPlaceholderValue(MONGO_URI)) {
-  console.error('[ENV] MONGO_URI no esta configurada. Crea backend/.env con la URI de MongoDB Atlas compartida por el equipo.');
+if (mongoConfigErrors.length > 0) {
+  console.error(
+    `[ENV] Configuracion Mongo incompleta. Usa MONGO_URI o configura MONGO_USER/MONGO_PASSWORD para ${DEFAULT_MONGO_HOST}/${DEFAULT_MONGO_DB_NAME}.`
+  );
   process.exit(1);
 }
 

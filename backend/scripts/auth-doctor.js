@@ -4,6 +4,13 @@ const dns = require('dns').promises;
 const https = require('https');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const {
+  DEFAULT_MONGO_DB_NAME,
+  DEFAULT_MONGO_HOST,
+  buildMongoUri,
+  getMongoConfigErrors,
+  hasPlaceholderValue,
+} = require('../config/mongo');
 
 const args = process.argv.slice(2);
 const noConnect = args.includes('--no-connect');
@@ -35,7 +42,7 @@ if (!fs.existsSync(envPath)) {
 dotenv.config({ path: envPath });
 console.log(`[AUTH-DOCTOR] Variables cargadas desde ${path.basename(envPath)}`);
 
-const requiredKeys = ['MONGO_URI', 'PORT', 'EMAIL_HOST', 'EMAIL_PORT', 'OTP_EXPIRACION_MINUTOS', 'OTP_MAX_INTENTOS', 'OTP_COOLDOWN_SEGUNDOS'];
+const requiredKeys = ['PORT', 'EMAIL_HOST', 'EMAIL_PORT', 'OTP_EXPIRACION_MINUTOS', 'OTP_MAX_INTENTOS', 'OTP_COOLDOWN_SEGUNDOS'];
 const missing = requiredKeys.filter((key) => !String(process.env[key] || '').trim());
 
 if (missing.length > 0) {
@@ -43,11 +50,22 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-const mongoUri = String(process.env.MONGO_URI || '').trim();
+const mongoErrors = getMongoConfigErrors(process.env);
+const isCiOrNoConnect = ciMode || noConnect;
+const nonPlaceholderMongoErrors = mongoErrors.filter((error) => !error.includes('placeholders'));
+
+if (nonPlaceholderMongoErrors.length > 0) {
+  console.error(
+    `[AUTH-DOCTOR] Configuracion Mongo incompleta. Usa MONGO_URI o define MONGO_USER/MONGO_PASSWORD para ${DEFAULT_MONGO_HOST}/${DEFAULT_MONGO_DB_NAME}.`
+  );
+  process.exit(1);
+}
+
+const mongoUri = buildMongoUri(process.env);
 const validMongoPrefix = mongoUri.startsWith('mongodb://') || mongoUri.startsWith('mongodb+srv://');
 
 if (!validMongoPrefix) {
-  console.error('[AUTH-DOCTOR] MONGO_URI debe iniciar con mongodb:// o mongodb+srv://');
+  console.error('[AUTH-DOCTOR] La configuracion Mongo resultante debe iniciar con mongodb:// o mongodb+srv://');
   process.exit(1);
 }
 
@@ -74,7 +92,11 @@ if (hosts.length === 0) {
   process.exit(1);
 }
 
-const hasPlaceholderHosts = hosts.some((host) => host.includes('<') || host.includes('>'));
+const hasPlaceholderHosts = hosts.some((host) => hasPlaceholderValue(host));
+const hasPlaceholderCredentials =
+  hasPlaceholderValue(process.env.MONGO_URI) ||
+  hasPlaceholderValue(process.env.MONGO_USER) ||
+  hasPlaceholderValue(process.env.MONGO_PASSWORD);
 
 const lookupHosts = async () => {
   console.log(`[AUTH-DOCTOR] Verificando DNS de ${hosts.length} host(s)...`);
@@ -124,11 +146,11 @@ const testMongoConnection = async () => {
 };
 
 (async () => {
-  if (hasPlaceholderHosts) {
-    if (ciMode || noConnect) {
-      console.log('[AUTH-DOCTOR] Se detectaron hosts placeholder en MONGO_URI. Se omite DNS en modo CI/no-connect.');
+  if (hasPlaceholderHosts || hasPlaceholderCredentials) {
+    if (isCiOrNoConnect) {
+      console.log('[AUTH-DOCTOR] Se detectaron placeholders en la configuracion Mongo. Se omite DNS en modo CI/no-connect.');
     } else {
-      console.error('[AUTH-DOCTOR] MONGO_URI contiene placeholders. Reemplaza <usuario>, <password> y <cluster-host>.');
+      console.error('[AUTH-DOCTOR] La configuracion Mongo contiene placeholders. Reemplaza las credenciales reales antes de conectar.');
       process.exit(1);
     }
   } else {
@@ -140,7 +162,7 @@ const testMongoConnection = async () => {
     process.exit(0);
   }
 
-  if (ciMode && !process.env.MONGO_URI) {
+  if (ciMode && mongoErrors.length > 0) {
     console.log('[AUTH-DOCTOR] CI sin MONGO_URI operativo. Se omite prueba de conexion Mongo.');
     process.exit(0);
   }
