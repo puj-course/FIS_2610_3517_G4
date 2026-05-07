@@ -40,5 +40,5 @@ jobs:
         with:
           name: DriveControl-Build-Produccion
           # El artefacto resultante se publica para revisión o descarga manual posterior.
-          path: apps/web/dist 
+          path: dist/apps/web
           retention-days: 7
