@@ -1,5 +1,6 @@
 import BaseAlertAdapter from './BaseAlertAdapter.js';
 
+// Genera alertas de SOAT usando el mismo contrato que el resto de fuentes documentales.
 export default class SoatAlertAdapter extends BaseAlertAdapter {
   adapt(soat) {
     if (soat.estado !== 'rojo' && soat.estado !== 'amarillo') {

@@ -1,3 +1,4 @@
+// Contrato base para convertir fuentes heterogéneas en alertas con un formato común.
 export default class BaseAlertAdapter {
   adapt() {
     throw new Error('El adapter debe implementar adapt().');
