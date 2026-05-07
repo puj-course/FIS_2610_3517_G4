@@ -5,7 +5,7 @@ import DashboardPage from "../pages/DashboardPage";
 import VehiculosPage from "../pages/VehiculosPage";
 import ConductoresPage from "../pages/ConductoresPage";
 
-// Interface Contract
+// Contrato liviano de rutas para pantallas que solo necesitan saber el destino y su protección.
 export const routesConfig = [
   { path: "/", element: <HomePage />, protected: false },
   { path: "/team", element: <TeamPage />, protected: false },
