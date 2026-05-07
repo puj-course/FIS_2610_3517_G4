@@ -33,6 +33,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const helmet = require('helmet');
 const crypto = require('crypto');
+const { OAuth2Client } = require('google-auth-library');
+const {
+  DEFAULT_MONGO_DB_NAME,
+  DEFAULT_MONGO_HOST,
+  buildMongoUri,
+  getMongoConfigErrors,
+} = require('./config/mongo');
 const {
   enviarCodigoVerificacion,
   enviarCodigoRecuperacion,
@@ -44,6 +51,8 @@ const DB_UNAVAILABLE_MESSAGE =
 const MONGO_AUTH_ERROR_MESSAGE =
   'Error de autenticacion MongoDB: revisa usuario, contrasena, permisos del usuario en Atlas y que la URI pertenezca al cluster correcto.';
 const MONGO_DNS_ERROR_MESSAGE = 'Host del cluster incorrecto o inaccesible.';
+const MONGO_SRV_DNS_ERROR_MESSAGE =
+  'La red local rechazo la resolucion SRV de MongoDB Atlas. Si usas mongodb+srv y ves querySrv/ECONNREFUSED, cambia temporalmente a una URI directa mongodb:// con los hosts del replica set.';
 const MONGO_WHITELIST_ERROR_MESSAGE =
   'MongoDB Atlas rechazo la conexion. Revisa Network Access en MongoDB Atlas y agrega tu IP actual a la whitelist.';
 
@@ -56,6 +65,14 @@ const getMongoConnectionMessage = (error) => {
 
   if (message.includes('bad auth') || message.includes('authentication failed')) {
     return MONGO_AUTH_ERROR_MESSAGE;
+  }
+
+  if (
+    (code === 'ECONNREFUSED' && message.includes('_mongodb._tcp')) ||
+    message.includes('querysrv econnrefused') ||
+    message.includes('query srv econnrefused')
+  ) {
+    return MONGO_SRV_DNS_ERROR_MESSAGE;
   }
 
   if (
@@ -152,14 +169,19 @@ app.get('/api/health/email', async (_req, res) => {
  * - soats
  * - rtms
  *
- * La URI real debe ir en backend/.env:
- * MONGO_URI=mongodb+srv://usuario:password@cluster/logistica_db?retryWrites=true&w=majority
+ * El backend prioriza MONGO_URI si existe.
+ * Si no existe, compone la conexion con valores por defecto para este proyecto:
+ * - MONGO_HOST=cluster0.45cqzzh.mongodb.net
+ * - MONGO_DB_NAME=logistica_db
+ * y toma las credenciales desde MONGO_USER / MONGO_PASSWORD.
  */
-const hasPlaceholderValue = (value = '') => String(value).includes('<') || String(value).includes('>');
-const MONGO_URI = String(process.env.MONGO_URI || '').trim();
+const MONGO_URI = buildMongoUri(process.env);
+const mongoConfigErrors = getMongoConfigErrors(process.env);
 
-if (!MONGO_URI || hasPlaceholderValue(MONGO_URI)) {
-  console.error('[ENV] MONGO_URI no esta configurada. Crea backend/.env con la URI de MongoDB Atlas compartida por el equipo.');
+if (mongoConfigErrors.length > 0) {
+  console.error(
+    `[ENV] Configuracion Mongo incompleta. Usa MONGO_URI o configura MONGO_USER/MONGO_PASSWORD para ${DEFAULT_MONGO_HOST}/${DEFAULT_MONGO_DB_NAME}.`
+  );
   process.exit(1);
 }
 
@@ -248,6 +270,7 @@ const UsuarioSchema = new mongoose.Schema({
   password: { type: String, required: true },
   empresa: String,
   telefono: String,
+  googleId: { type: String, default: null },
   role: { type: String, default: 'admin' },
   isVerified: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now },
@@ -324,6 +347,9 @@ const normalizeText = (value) => String(value ?? '').trim();
 
 const normalizeEmail = (value) => normalizeText(value).toLowerCase();
 
+const GOOGLE_CLIENT_ID = normalizeText(process.env.GOOGLE_CLIENT_ID);
+const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const DUPLICATE_EMAIL_MESSAGE = 'Ya existe una cuenta con este correo electrónico.';
@@ -350,6 +376,31 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'syntix_super_secret_key', {
     expiresIn: '30d',
   });
+};
+
+const generateRandomPassword = () => crypto.randomBytes(24).toString('hex');
+
+const verifyGoogleIdentity = async (idToken) => {
+  if (!GOOGLE_CLIENT_ID || !googleClient) {
+    const error = new Error('Google Auth no esta configurado en el backend.');
+    error.statusCode = 503;
+    throw error;
+  }
+
+  const ticket = await googleClient.verifyIdToken({
+    idToken,
+    audience: GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+
+  if (!payload?.email || !payload?.email_verified) {
+    const error = new Error('Google no devolvio un correo verificado para esta cuenta.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return payload;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -618,6 +669,121 @@ app.post('/api/auth/login', async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
+  }
+});
+
+app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { idToken, empresa, telefono } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({ message: 'El token de Google es requerido.' });
+    }
+
+    const googleProfile = await verifyGoogleIdentity(idToken);
+    const emailNormalizado = normalizeEmail(googleProfile.email);
+    const empresaNormalizada = normalizeText(empresa);
+    const telefonoNormalizado = normalizeText(telefono);
+    const nombreNormalizado = normalizeText(googleProfile.name);
+
+    let usuario = await Usuario.findOne({ email: emailNormalizado });
+    let created = false;
+
+    if (!usuario) {
+      if (!empresaNormalizada) {
+        return res.status(400).json({
+          message: 'Ingresa el nombre de la empresa para completar el registro con Google.',
+        });
+      }
+
+      if (!telefonoNormalizado) {
+        return res.status(400).json({
+          message: 'Ingresa el teléfono para completar el registro con Google.',
+        });
+      }
+
+      usuario = new Usuario({
+        nombre: nombreNormalizado,
+        email: emailNormalizado,
+        password: generateRandomPassword(),
+        empresa: empresaNormalizada,
+        telefono: telefonoNormalizado,
+        isVerified: true,
+        googleId: String(googleProfile.sub || ''),
+      });
+
+      await usuario.save();
+      created = true;
+    } else {
+      let shouldSave = false;
+
+      if (!usuario.googleId && googleProfile.sub) {
+        usuario.googleId = String(googleProfile.sub);
+        shouldSave = true;
+      }
+
+      if (!usuario.nombre && nombreNormalizado) {
+        usuario.nombre = nombreNormalizado;
+        shouldSave = true;
+      }
+
+      if (!usuario.empresa && empresaNormalizada) {
+        usuario.empresa = empresaNormalizada;
+        shouldSave = true;
+      }
+
+      if (!usuario.telefono && telefonoNormalizado) {
+        usuario.telefono = telefonoNormalizado;
+        shouldSave = true;
+      }
+
+      if (!usuario.isVerified) {
+        usuario.isVerified = true;
+        shouldSave = true;
+      }
+
+      if (shouldSave) {
+        await usuario.save();
+      }
+    }
+
+    return res.json({
+      success: true,
+      message: created
+        ? 'Cuenta creada con Google correctamente.'
+        : 'Sesion iniciada con Google correctamente.',
+      data: {
+        user: {
+          _id: usuario._id,
+          email: usuario.email,
+          empresa: usuario.empresa,
+          telefono: usuario.telefono,
+          role: usuario.role,
+        },
+        token: generateToken(usuario._id),
+        created,
+      },
+    });
+  } catch (err) {
+    if (err?.name === 'MongooseServerSelectionError' || err?.name === 'MongoServerSelectionError') {
+      return res.status(503).json({
+        message: getDbUnavailableMessage(),
+        code: 'DB_UNAVAILABLE',
+      });
+    }
+
+    const googleErrorMessage = String(err?.message || '').toLowerCase();
+    if (
+      googleErrorMessage.includes('token used too late') ||
+      googleErrorMessage.includes('jwt') ||
+      googleErrorMessage.includes('wrong recipient') ||
+      googleErrorMessage.includes('invalid token') ||
+      googleErrorMessage.includes('wrong number of segments')
+    ) {
+      return res.status(401).json({ message: 'El token de Google no es valido o ya expiro.' });
+    }
+
+    return res.status(err.statusCode || 500).json({ message: err.message });
   }
 });
 

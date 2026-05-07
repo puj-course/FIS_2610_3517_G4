@@ -117,7 +117,12 @@ export function AuthProvider({ children }) {
       });
 
       if (apiResult.useLocalStorage) {
-        return registerLocal(normalizedEmail, password, normalizedEmpresa, normalizedTelefono);
+        return {
+          success: false,
+          message:
+            apiResult.message ||
+            'El backend no esta disponible para completar el registro con verificacion por correo.',
+        };
       }
 
       if (apiResult.success) {
@@ -131,12 +136,15 @@ export function AuthProvider({ children }) {
 
       return { success: false, message: apiResult.message || 'Error al registrar usuario' };
     } catch (err) {
-      console.warn('Error en API, usando localStorage:', err);
-      return registerLocal(normalizedEmail, password, normalizedEmpresa, normalizedTelefono);
+      console.warn('Error en API durante registro:', err);
+      return {
+        success: false,
+        message: 'No se pudo completar el registro. Verifica que el backend y la base de datos esten disponibles.',
+      };
     } finally {
       setLoading(false);
     }
-  }, [registerLocal]);
+  }, []);
 
   const login = useCallback(async (email, password) => {
     const normalizedEmail = normalizeEmail(email);
@@ -171,6 +179,42 @@ export function AuthProvider({ children }) {
     }
   }, [loginLocal, setUser, setToken]);
 
+  const loginWithGoogle = useCallback(async ({ idToken, empresa = '', telefono = '' }) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const apiResult = await authService.googleAuth({
+        idToken,
+        empresa: normalizeText(empresa),
+        telefono: normalizeText(telefono),
+      });
+
+      if (apiResult.success) {
+        setUser(apiResult.data.user);
+        setToken(apiResult.data.token);
+        return {
+          success: true,
+          created: Boolean(apiResult.data.created),
+          message: apiResult.message,
+        };
+      }
+
+      if (apiResult.useLocalStorage) {
+        return {
+          success: false,
+          message: 'La autenticacion con Google requiere que el backend este disponible.',
+        };
+      }
+
+      return { success: false, message: apiResult.message || 'No se pudo autenticar con Google' };
+    } catch (err) {
+      return { success: false, message: 'Error inesperado al autenticar con Google.' };
+    } finally {
+      setLoading(false);
+    }
+  }, [setUser, setToken]);
+
   const loginAfterVerification = useCallback((verifiedUser, verifiedToken = null) => {
     if (!verifiedUser) return { success: false };
     setUser(verifiedUser);
@@ -189,7 +233,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{
-      user, token, login, register, loginAfterVerification, logout,
+      user, token, login, loginWithGoogle, register, loginAfterVerification, logout,
       isAuthenticated: !!user, loading, error, clearError
     }}>
       {children}

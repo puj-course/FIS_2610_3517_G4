@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { authService } from '@/services/api.js';
+import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -16,7 +17,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [resendCooldown, setResendCooldown] = useState(0);
   const inputRefs = useRef([]);
-  const { register, loginAfterVerification } = useAuth();
+  const { register, loginAfterVerification, loginWithGoogle } = useAuth();
 
   if (!isOpen) return null;
 
@@ -62,6 +63,40 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       }
     } catch (err) {
       setError('Error inesperado al registrar. Intente nuevamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleRegister = async (credential) => {
+    const empresa = formData.empresa.trim();
+    const telefono = formData.telefono.trim();
+
+    if (!empresa) {
+      setError('Ingresa el nombre de la empresa antes de continuar con Google.');
+      return;
+    }
+
+    if (!telefono) {
+      setError('Ingresa el teléfono antes de continuar con Google.');
+      return;
+    }
+
+    if (!credential) {
+      setError('Google no devolvio un token valido.');
+      return;
+    }
+
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      const res = await loginWithGoogle({ idToken: credential, empresa, telefono });
+      if (res.success) {
+        onClose();
+      } else {
+        setError(res.message || 'No se pudo completar el registro con Google.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -186,6 +221,28 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
               <button type="submit" disabled={isSubmitting} className="w-full bg-syntix-green text-white py-2.5 rounded-lg font-medium hover:bg-syntix-green/90 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 {isSubmitting ? (<><Loader2 className="w-5 h-5 animate-spin" />Registrando...</>) : 'Registrarse'}
               </button>
+
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-400">o registrarte con</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-2">
+                <GoogleAuthButton
+                  onSuccess={handleGoogleRegister}
+                  onError={() => setError('No se pudo completar el registro con Google.')}
+                  disabled={isSubmitting}
+                  text="signup_with"
+                />
+                <p className="text-center text-xs text-gray-500">
+                  Google aporta el correo verificado; empresa y teléfono siguen siendo obligatorios para crear la cuenta.
+                </p>
+              </div>
+
               <p className="text-center text-sm text-gray-600 mt-4">
                 ¿Ya tienes cuenta? <button type="button" onClick={onSwitchToLogin} className="text-syntix-navy font-semibold hover:underline">Inicia Sesión</button>
               </p>

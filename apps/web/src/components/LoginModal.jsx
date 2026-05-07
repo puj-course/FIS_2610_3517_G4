@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { authService } from '@/services/api.js';
+import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -19,7 +20,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
 
   if (!isOpen) return null;
 
@@ -57,6 +58,27 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     } catch (err) {
       setError('Error inesperado al iniciar sesion. Intenta nuevamente.');
       console.error('Error en login:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleLogin = async (credential) => {
+    if (!credential) {
+      setError('Google no devolvio un token valido.');
+      return;
+    }
+
+    clearMessages();
+    setIsSubmitting(true);
+
+    try {
+      const res = await loginWithGoogle({ idToken: credential });
+      if (res.success) {
+        onClose();
+      } else {
+        setError(res.message || 'No se pudo iniciar sesion con Google.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -214,6 +236,24 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
                 'Acceder'
               )}
             </button>
+
+            <div className="relative py-2">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-400">o continuar con</span>
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <GoogleAuthButton
+                onSuccess={handleGoogleLogin}
+                onError={() => setError('No se pudo completar la autenticacion con Google.')}
+                disabled={isSubmitting}
+                text="signin_with"
+              />
+            </div>
 
             <p className="text-center text-sm text-gray-600 mt-4">
               ¿No tienes cuenta? <button type="button" onClick={onSwitchToRegister} className="text-syntix-green font-semibold hover:underline">Registrate</button>
