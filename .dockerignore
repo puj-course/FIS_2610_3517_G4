@@ -1,0 +1,8 @@
+.git
+.github
+**/node_modules
+**/.env
+dist
+coverage
+apps/web/coverage
+npm-debug.log*
