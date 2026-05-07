@@ -1,5 +1,6 @@
 import BaseAlertAdapter from './BaseAlertAdapter.js';
 
+// Traduce el estado documental de la licencia del conductor al lenguaje común de alertas.
 export default class ConductorAlertAdapter extends BaseAlertAdapter {
   adapt(conductor) {
     if (conductor.estado !== 'rojo' && conductor.estado !== 'amarillo') {

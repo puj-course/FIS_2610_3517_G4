@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Base URL para el backend API
+// Normaliza la URL base para que el frontend acepte variables con o sin sufijo /api.
 const normalizeApiBaseUrl = (value) => {
   const baseUrl = String(value || 'http://localhost:5000/api').replace(/\/+$/, '');
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
@@ -8,7 +8,7 @@ const normalizeApiBaseUrl = (value) => {
 
 export const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_URL);
 
-// Crear instancia de axios con configuración base
+// Esta instancia centraliza timeout, headers e interceptores compartidos por todos los servicios.
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -17,7 +17,7 @@ const api = axios.create({
   },
 });
 
-// Interceptor para agregar token de autenticación
+// Cada request intenta recuperar el token desde las dos fuentes que usa hoy el frontend.
 api.interceptors.request.use(
   (config) => {
     const tokenStr = localStorage.getItem('syntix_token');
@@ -35,7 +35,7 @@ api.interceptors.request.use(
     if (userStr) {
       try {
         const parsed = JSON.parse(userStr);
-        // Si el usuario tiene un token de sesión seguro, lo enviamos en los headers
+        // Si el perfil ya trae token embebido, se usa como respaldo del storage plano.
         token = token || parsed?.token;
       } catch (error) {
         console.error('Error al leer el token:', error);
@@ -51,7 +51,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor para manejar errores de respuesta
+// Aquí solo se detecta caída de red; la traducción funcional del error vive más abajo.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -106,7 +106,7 @@ const shouldUseLocalStorage = (error) => {
   );
 };
 
-// Servicios de autenticación
+// authService concentra la capa request -> respuesta amigable para que el contexto no conozca axios.
 export const authService = {
   async register(userData) {
     try {
@@ -117,8 +117,14 @@ export const authService = {
         message: response.data.message,
       };
     } catch (error) {
+      // El registro con OTP depende del backend: sin API no debemos crear cuentas locales
+      // porque eso salta el correo de verificación y deja el flujo inconsistente.
       if (shouldUseLocalStorage(error)) {
-        return { success: false, useLocalStorage: true };
+        return {
+          success: false,
+          useLocalStorage: true,
+          message: 'El backend no esta disponible para completar el registro con verificacion por correo.',
+        };
       }
       return {
         success: false,
@@ -132,6 +138,7 @@ export const authService = {
       const response = await api.post('/auth/login', { email, password });
       return { success: true, data: response.data.data };
     } catch (error) {
+      // El login comparte el mismo criterio de fallback para sostener demos sin backend.
       if (shouldUseLocalStorage(error)) {
         return { success: false, useLocalStorage: true };
       }
@@ -142,9 +149,26 @@ export const authService = {
     }
   },
 
-  /**
-   * Verificar codigo OTP
-   */
+  async googleAuth(payload) {
+    try {
+      const response = await api.post('/auth/google', payload);
+      return {
+        success: true,
+        data: response.data.data || response.data,
+        message: response.data.message,
+      };
+    } catch (error) {
+      if (shouldUseLocalStorage(error)) {
+        return { success: false, useLocalStorage: true };
+      }
+      return {
+        success: false,
+        message: normalizeApiErrorMessage(error, 'No se pudo autenticar con Google'),
+      };
+    }
+  },
+
+  // Verifica el OTP emitido por backend antes de materializar la sesión en el cliente.
   async verificarCodigo(email, codigo) {
     try {
       const response = await api.post('/auth/verificar-codigo', { email, codigo });
@@ -160,9 +184,7 @@ export const authService = {
     }
   },
 
-  /**
-   * Reenviar codigo OTP
-   */
+  // Reenvía OTP sin obligar a recrear el registro desde cero.
   async reenviarCodigo(email) {
     try {
       const response = await api.post('/auth/reenviar-codigo', { email });
@@ -174,6 +196,36 @@ export const authService = {
       return {
         success: false,
         message: normalizeApiErrorMessage(error, 'Error al reenviar codigo'),
+      };
+    }
+  },
+
+  async solicitarRecuperacion(email) {
+    try {
+      const response = await api.post('/auth/recuperar-cuenta', { email });
+      return { success: true, data: response.data.data || response.data, message: response.data.message };
+    } catch (error) {
+      if (shouldUseLocalStorage(error)) {
+        return { success: false, useLocalStorage: true };
+      }
+      return {
+        success: false,
+        message: normalizeApiErrorMessage(error, 'Error al solicitar recuperacion'),
+      };
+    }
+  },
+
+  async restablecerPassword(email, codigo, nuevaPassword) {
+    try {
+      const response = await api.post('/auth/restablecer-password', { email, codigo, nuevaPassword });
+      return { success: true, data: response.data, message: response.data.message };
+    } catch (error) {
+      if (shouldUseLocalStorage(error)) {
+        return { success: false, useLocalStorage: true };
+      }
+      return {
+        success: false,
+        message: normalizeApiErrorMessage(error, 'Error al restablecer la contrasena'),
       };
     }
   },

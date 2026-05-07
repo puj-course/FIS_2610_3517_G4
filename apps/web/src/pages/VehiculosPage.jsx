@@ -5,6 +5,7 @@ import StatusBadge from '@/components/StatusBadge.jsx';
 import AddVehicleModal from '@/components/AddVehicleModal.jsx';
 import { useVehicles } from '@/hooks/useVehicles.js';
 
+// Vista principal de flota: combina búsqueda, filtros y edición sobre los vehículos del usuario.
 export default function VehiculosPage() {
   const { vehiculos, deleteVehicle } = useVehicles();
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,6 +28,7 @@ export default function VehiculosPage() {
     setVehicleToEdit(null);
   };
 
+  // El filtrado une texto libre y severidad para apoyar tanto búsqueda rápida como revisión operativa.
   const filteredVehiculos = useMemo(() => {
     return vehiculos.filter((v) => {
       const matchesSearch = [v.placa, v.marca, v.modelo, v.ownerLabel]

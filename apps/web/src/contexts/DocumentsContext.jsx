@@ -40,11 +40,7 @@ export function DocumentsProvider({ children }) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
-
-    const handleVehiclesUpdated = () => {
-      fetchSoats();
-    };
-
+    const handleVehiclesUpdated = () => { fetchSoats(); };
     window.addEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
     return () => window.removeEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
   }, [fetchSoats]);
@@ -69,13 +65,18 @@ export function DocumentsProvider({ children }) {
     await fetchSoats();
   };
 
+  const editSoat = async (id, datos) => {
+    await api.put(`/soats/${id}`, datos);
+    await fetchSoats();
+  };
+
   const removeSoat = async (id) => {
     await api.delete(`/soats/${id}`);
     await fetchSoats();
   };
 
   return (
-    <DocumentsContext.Provider value={{ soats, addSoat, removeSoat, loading }}>
+    <DocumentsContext.Provider value={{ soats, addSoat, editSoat, removeSoat, loading }}>
       {children}
     </DocumentsContext.Provider>
   );

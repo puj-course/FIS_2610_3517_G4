@@ -4,6 +4,13 @@ const dns = require('dns').promises;
 const https = require('https');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const {
+  DEFAULT_MONGO_DB_NAME,
+  DEFAULT_MONGO_HOST,
+  buildMongoUri,
+  getMongoConfigErrors,
+  hasPlaceholderValue,
+} = require('../config/mongo');
 
 const args = process.argv.slice(2);
 const noConnect = args.includes('--no-connect');
@@ -35,7 +42,7 @@ if (!fs.existsSync(envPath)) {
 dotenv.config({ path: envPath });
 console.log(`[AUTH-DOCTOR] Variables cargadas desde ${path.basename(envPath)}`);
 
-const requiredKeys = ['MONGO_URI', 'PORT', 'EMAIL_HOST', 'EMAIL_PORT', 'OTP_EXPIRACION_MINUTOS', 'OTP_MAX_INTENTOS', 'OTP_COOLDOWN_SEGUNDOS'];
+const requiredKeys = ['PORT', 'EMAIL_HOST', 'EMAIL_PORT', 'OTP_EXPIRACION_MINUTOS', 'OTP_MAX_INTENTOS', 'OTP_COOLDOWN_SEGUNDOS'];
 const missing = requiredKeys.filter((key) => !String(process.env[key] || '').trim());
 
 if (missing.length > 0) {
@@ -43,11 +50,23 @@ if (missing.length > 0) {
   process.exit(1);
 }
 
-const mongoUri = String(process.env.MONGO_URI || '').trim();
+const mongoErrors = getMongoConfigErrors(process.env);
+const isCiOrNoConnect = ciMode || noConnect;
+const nonPlaceholderMongoErrors = mongoErrors.filter((error) => !error.includes('placeholders'));
+
+if (nonPlaceholderMongoErrors.length > 0) {
+  console.error(
+    `[AUTH-DOCTOR] Configuracion Mongo incompleta. Usa MONGO_URI o define MONGO_USER/MONGO_PASSWORD para ${DEFAULT_MONGO_HOST}/${DEFAULT_MONGO_DB_NAME}.`
+  );
+  process.exit(1);
+}
+
+const mongoUri = buildMongoUri(process.env);
 const validMongoPrefix = mongoUri.startsWith('mongodb://') || mongoUri.startsWith('mongodb+srv://');
+const isSrvUri = mongoUri.startsWith('mongodb+srv://');
 
 if (!validMongoPrefix) {
-  console.error('[AUTH-DOCTOR] MONGO_URI debe iniciar con mongodb:// o mongodb+srv://');
+  console.error('[AUTH-DOCTOR] La configuracion Mongo resultante debe iniciar con mongodb:// o mongodb+srv://');
   process.exit(1);
 }
 
@@ -74,9 +93,38 @@ if (hosts.length === 0) {
   process.exit(1);
 }
 
-const hasPlaceholderHosts = hosts.some((host) => host.includes('<') || host.includes('>'));
+const hasPlaceholderHosts = hosts.some((host) => hasPlaceholderValue(host));
+const hasPlaceholderCredentials =
+  hasPlaceholderValue(process.env.MONGO_URI) ||
+  hasPlaceholderValue(process.env.MONGO_USER) ||
+  hasPlaceholderValue(process.env.MONGO_PASSWORD);
 
 const lookupHosts = async () => {
+  if (isSrvUri) {
+    console.log(`[AUTH-DOCTOR] Verificando SRV de ${hosts.length} host(s)...`);
+    for (const host of hosts) {
+      try {
+        const srvRecords = await dns.resolveSrv(`_mongodb._tcp.${host}`);
+        if (!srvRecords.length) {
+          console.error(`[AUTH-DOCTOR] SRV ERROR ${host}: sin registros SRV`);
+          process.exit(1);
+        }
+
+        for (const record of srvRecords) {
+          const result = await dns.lookup(record.name);
+          console.log(`[AUTH-DOCTOR] SRV OK ${host} -> ${record.name}:${record.port} (${result.address})`);
+        }
+      } catch (error) {
+        console.error(`[AUTH-DOCTOR] SRV ERROR ${host}: ${error.code || error.message}`);
+        if (String(error.code || '').toUpperCase() === 'ECONNREFUSED') {
+          console.error('[AUTH-DOCTOR] La red local rechazo la consulta SRV de MongoDB Atlas. Usa una URI directa mongodb:// o ajusta el DNS del equipo.');
+        }
+        process.exit(1);
+      }
+    }
+    return;
+  }
+
   console.log(`[AUTH-DOCTOR] Verificando DNS de ${hosts.length} host(s)...`);
   for (const host of hosts) {
     try {
@@ -116,19 +164,28 @@ const testMongoConnection = async () => {
     await mongoose.disconnect();
   } catch (error) {
     const publicIp = await getPublicIp();
+    const message = String(error?.message || '').toLowerCase();
     console.error(`[AUTH-DOCTOR] Error de conexion MongoDB: ${error.name}: ${error.message}`);
     console.error(`[AUTH-DOCTOR] IP publica detectada: ${publicIp}`);
-    console.error('[AUTH-DOCTOR] Accion recomendada: agrega esa IP en Atlas > Security > Network Access.');
+    if (
+      (String(error?.code || '').toUpperCase() === 'ECONNREFUSED' && message.includes('_mongodb._tcp')) ||
+      message.includes('querysrv econnrefused') ||
+      message.includes('query srv econnrefused')
+    ) {
+      console.error('[AUTH-DOCTOR] Accion recomendada: tu red local esta bloqueando consultas SRV. Usa una URI directa mongodb:// con los hosts del replica set o cambia el DNS de la maquina.');
+    } else {
+      console.error('[AUTH-DOCTOR] Accion recomendada: agrega esa IP en Atlas > Security > Network Access.');
+    }
     process.exit(1);
   }
 };
 
 (async () => {
-  if (hasPlaceholderHosts) {
-    if (ciMode || noConnect) {
-      console.log('[AUTH-DOCTOR] Se detectaron hosts placeholder en MONGO_URI. Se omite DNS en modo CI/no-connect.');
+  if (hasPlaceholderHosts || hasPlaceholderCredentials) {
+    if (isCiOrNoConnect) {
+      console.log('[AUTH-DOCTOR] Se detectaron placeholders en la configuracion Mongo. Se omite DNS en modo CI/no-connect.');
     } else {
-      console.error('[AUTH-DOCTOR] MONGO_URI contiene placeholders. Reemplaza <usuario>, <password> y <cluster-host>.');
+      console.error('[AUTH-DOCTOR] La configuracion Mongo contiene placeholders. Reemplaza las credenciales reales antes de conectar.');
       process.exit(1);
     }
   } else {
@@ -140,7 +197,7 @@ const testMongoConnection = async () => {
     process.exit(0);
   }
 
-  if (ciMode && !process.env.MONGO_URI) {
+  if (ciMode && mongoErrors.length > 0) {
     console.log('[AUTH-DOCTOR] CI sin MONGO_URI operativo. Se omite prueba de conexion Mongo.');
     process.exit(0);
   }

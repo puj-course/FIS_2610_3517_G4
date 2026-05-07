@@ -3,6 +3,8 @@ import { X, FileText, Save } from 'lucide-react';
 import { useRtm } from '@/contexts/RtmContext.jsx';
 import { useVehicles } from '@/hooks/useVehicles.js';
 
+// Este modal replica la lógica de alta documental, pero especializada en RTM
+// para mantener separado el flujo de tecnomecánica del de pólizas SOAT.
 export default function AddRtmModal({ isOpen, onClose }) {
   const { vehiculos } = useVehicles();
   const { addRtm } = useRtm();
@@ -24,6 +26,7 @@ export default function AddRtmModal({ isOpen, onClose }) {
     setError('');
     const numeroRtm = formData.numeroRtm.trim();
 
+    // La RTM comparte validaciones de rango temporal para evitar documentos incoherentes.
     if (!formData.vehiculoId || !numeroRtm || !formData.fechaInicio || !formData.fechaVencimiento) {
       setError('Todos los campos son obligatorios.');
       return;

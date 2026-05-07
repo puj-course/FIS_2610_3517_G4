@@ -40,11 +40,7 @@ export function RtmProvider({ children }) {
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
-
-    const handleVehiclesUpdated = () => {
-      fetchRtms();
-    };
-
+    const handleVehiclesUpdated = () => { fetchRtms(); };
     window.addEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
     return () => window.removeEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
   }, [fetchRtms]);
@@ -69,13 +65,18 @@ export function RtmProvider({ children }) {
     await fetchRtms();
   };
 
+  const editRtm = async (id, datos) => {
+    await api.put(`/rtms/${id}`, datos);
+    await fetchRtms();
+  };
+
   const removeRtm = async (id) => {
     await api.delete(`/rtms/${id}`);
     await fetchRtms();
   };
 
   return (
-    <RtmContext.Provider value={{ rtms, addRtm, removeRtm, loading }}>
+    <RtmContext.Provider value={{ rtms, addRtm, editRtm, removeRtm, loading }}>
       {children}
     </RtmContext.Provider>
   );

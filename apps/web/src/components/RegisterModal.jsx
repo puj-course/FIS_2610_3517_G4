@@ -1,20 +1,23 @@
 import React, { useState, useRef } from 'react';
-import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw } from 'lucide-react';
+import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { authService } from '@/services/api.js';
+import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Registro en dos pasos: alta inicial y luego verificación OTP para cerrar el onboarding.
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const [formData, setFormData] = useState({ email: '', password: '', empresa: '', telefono: '' });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState('register'); // 'register' | 'verify'
   const [pendingEmail, setPendingEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [resendCooldown, setResendCooldown] = useState(0);
   const inputRefs = useRef([]);
-  const { register, loginAfterVerification } = useAuth();
+  const { register, loginAfterVerification, loginWithGoogle } = useAuth();
 
   if (!isOpen) return null;
 
@@ -60,6 +63,40 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       }
     } catch (err) {
       setError('Error inesperado al registrar. Intente nuevamente.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleRegister = async (credential) => {
+    const empresa = formData.empresa.trim();
+    const telefono = formData.telefono.trim();
+
+    if (!empresa) {
+      setError('Ingresa el nombre de la empresa antes de continuar con Google.');
+      return;
+    }
+
+    if (!telefono) {
+      setError('Ingresa el teléfono antes de continuar con Google.');
+      return;
+    }
+
+    if (!credential) {
+      setError('Google no devolvio un token valido.');
+      return;
+    }
+
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      const res = await loginWithGoogle({ idToken: credential, empresa, telefono });
+      if (res.success) {
+        onClose();
+      } else {
+        setError(res.message || 'No se pudo completar el registro con Google.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -169,12 +206,43 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input type="password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
+                  <input type={showPassword ? 'text' : 'password'} required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(prev => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-syntix-green transition-colors"
+                    aria-label={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                    title={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
               </div>
               <button type="submit" disabled={isSubmitting} className="w-full bg-syntix-green text-white py-2.5 rounded-lg font-medium hover:bg-syntix-green/90 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 {isSubmitting ? (<><Loader2 className="w-5 h-5 animate-spin" />Registrando...</>) : 'Registrarse'}
               </button>
+
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-400">o registrarte con</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-2">
+                <GoogleAuthButton
+                  onSuccess={handleGoogleRegister}
+                  onError={() => setError('No se pudo completar el registro con Google.')}
+                  disabled={isSubmitting}
+                  text="signup_with"
+                />
+                <p className="text-center text-xs text-gray-500">
+                  Google aporta el correo verificado; empresa y teléfono siguen siendo obligatorios para crear la cuenta.
+                </p>
+              </div>
+
               <p className="text-center text-sm text-gray-600 mt-4">
                 ¿Ya tienes cuenta? <button type="button" onClick={onSwitchToLogin} className="text-syntix-navy font-semibold hover:underline">Inicia Sesión</button>
               </p>

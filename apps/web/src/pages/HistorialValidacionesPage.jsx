@@ -5,6 +5,7 @@ import StatusBadge from '@/components/StatusBadge.jsx';
 import DetallesValidacionModal from '@/components/DetallesValidacionModal.jsx';
 import { useValidationHistory } from '@/hooks/useValidationHistory.js';
 
+// HistorialValidacionesPage funciona como bitácora de auditoría para consultas RUNT ya realizadas.
 export default function HistorialValidacionesPage() {
   const { validations, deleteValidation, getValidationHistory, exportToCSV, getStatistics } = useValidationHistory();
   
@@ -17,7 +18,7 @@ export default function HistorialValidacionesPage() {
 
   const itemsPerPage = 20;
 
-  // Filtrar validaciones
+  // Los filtros se aplican antes de paginar para que la navegación siempre refleje el subconjunto activo.
   const filteredValidations = useMemo(() => {
     let filtered = [...validations];
 
@@ -54,7 +55,7 @@ export default function HistorialValidacionesPage() {
     return filtered;
   }, [validations, searchTerm, filterState, dateRange]);
 
-  // Paginación
+  // La paginación mantiene liviana la tabla aunque el historial siga creciendo.
   const totalPages = Math.ceil(filteredValidations.length / itemsPerPage);
   const paginatedValidations = filteredValidations.slice(
     (currentPage - 1) * itemsPerPage,

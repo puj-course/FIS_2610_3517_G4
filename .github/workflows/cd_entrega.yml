@@ -1,6 +1,7 @@
 name: CD - Generación de Artefacto y Entrega Continua
 on:
   push:
+    # Solo se empaqueta al integrar en ramas de consolidación del proyecto.
     branches: [ "main", "develop" ] 
 
 jobs:
@@ -9,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
+        # El build real del frontend vive en apps/web, así que todos los pasos se ejecutan allí.
         working-directory: apps/web
 
     steps:
@@ -37,5 +39,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: DriveControl-Build-Produccion
-          path: apps/web/dist 
+          # El artefacto resultante se publica para revisión o descarga manual posterior.
+          path: dist/apps/web
           retention-days: 7

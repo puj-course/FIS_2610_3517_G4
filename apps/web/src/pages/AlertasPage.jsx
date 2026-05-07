@@ -4,6 +4,7 @@ import { BellRing, Calendar } from 'lucide-react';
 import { useAlerts } from '@/hooks/useAlerts.js';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
 
+// Centro de alertas: deja ver el estado consolidado del sistema para una fecha dada.
 export default function AlertasPage() {
   const { alerts } = useAlerts();
   const { simulatedDate, setSimulatedDate, resetDate } = useSimulatedDate();

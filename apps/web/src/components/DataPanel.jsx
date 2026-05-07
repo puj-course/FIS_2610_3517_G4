@@ -4,6 +4,8 @@ import { useVehicles } from '@/hooks/useVehicles.js';
 import { useAlerts } from '@/hooks/useAlerts.js';
 import { AlertTriangle, ChevronDown, ChevronUp, Activity } from 'lucide-react';
 
+// DataPanel resume métricas ejecutivas del dashboard y convierte la flota
+// en indicadores rápidos para lectura gerencial.
 export default function DataPanel() {
   const { vehiculos } = useVehicles();
   const { alerts } = useAlerts();
@@ -21,7 +23,7 @@ export default function DataPanel() {
   // Metric 2: Documentos Próximos a Vencer (Amarillo)
   const yellowAlerts = alerts.filter(a => a.prioridad === 'amarillo');
 
-  // Metric 3: Vehicle Distribution Chart
+  // El gráfico agrupa por tipo de vehículo para visualizar rápidamente la composición de la flota.
   const typeCounts = vehiculos.reduce((acc, v) => {
     acc[v.tipo] = (acc[v.tipo] || 0) + 1;
     return acc;

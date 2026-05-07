@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { BarChart3, Download } from 'lucide-react';
 import { useVehicles } from '@/hooks/useVehicles.js';
 
+// ReportesPage traduce el estado de la flota a métricas y exportables simples para seguimiento.
 export default function ReportesPage() {
   const { vehiculos } = useVehicles();
 
@@ -16,6 +17,7 @@ export default function ReportesPage() {
   const cumplimiento = stats.total > 0 ? Math.round((stats.verde / stats.total) * 100) : 0;
 
   const handleExportCSV = () => {
+    // Se exporta una foto del estado actual para compartirla fuera del sistema sin depender del backend.
     const headers = ['Placa', 'Marca/Modelo', 'Tipo', 'Conductor', 'Estado SOAT', 'Estado Licencia', 'Estado General', 'Días Restantes SOAT', 'Días Restantes Licencia'];
     
     const rows = vehiculos.map(v => {

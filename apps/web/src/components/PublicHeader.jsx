@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import UserProfileDropdown from './UserProfileDropdown.jsx';
 
+// Cabecera de la zona pública: mezcla navegación de marketing con accesos de autenticación.
 export default function PublicHeader({ onLoginClick, onRegisterClick }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();

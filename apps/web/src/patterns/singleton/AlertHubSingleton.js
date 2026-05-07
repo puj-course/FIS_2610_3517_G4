@@ -1,5 +1,6 @@
 import PriorityAlertSortStrategy from '@/patterns/strategy/PriorityAlertSortStrategy.js';
 
+// Hub único de alertas: fusiona múltiples fuentes y entrega una lista ya ordenada a la UI.
 export default class AlertHubSingleton {
   static instance = null;
 
@@ -33,6 +34,7 @@ export default class AlertHubSingleton {
     const merged = [];
     const seen = new Set();
 
+    // Se deduplican alertas por id para que una misma fuente no contamine el tablero con repetidos.
     Array.from(this.sourceAlerts.values())
       .flat()
       .forEach((alert) => {
