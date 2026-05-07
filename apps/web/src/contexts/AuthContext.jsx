@@ -9,6 +9,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const normalizeText = (value) => String(value ?? '').trim();
 const normalizeEmail = (value) => normalizeText(value).toLowerCase();
 
+// La validación previa evita golpear la API con datos que ya sabemos que son inconsistentes.
 const validateRegistrationData = ({ email, password, empresa, telefono }) => {
   if (!normalizeText(empresa)) return 'Ingresa el nombre de la empresa.';
   if (!normalizeText(telefono)) return 'Ingresa el teléfono.';
@@ -20,13 +21,13 @@ const validateRegistrationData = ({ email, password, empresa, telefono }) => {
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useLocalStorage('syntix_user', null);
-  // Nuevo: Guardamos el token de sesión industrial para rutas protegidas
+  // El token se guarda aparte para desacoplar la sesión del perfil mínimo mostrado en UI.
   const [token, setToken] = useLocalStorage('syntix_token', null);
   const [usersDb, setUsersDb] = useLocalStorage('syntix_users_db', []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // --- FALLBACKS LOCALES (Se mantienen igual) ---
+  // Fallback local: permite que el frontend siga operando cuando el backend aún no está disponible.
   const registerLocal = useCallback((email, password, empresa, telefono) => {
     const normalizedEmail = normalizeEmail(email);
     const normalizedEmpresa = normalizeText(empresa);
@@ -88,7 +89,7 @@ export function AuthProvider({ children }) {
     return { success: false, message: 'Credenciales inválidas' };
   }, [usersDb, setUser, setToken]);
 
-  // --- MÉTODOS PRINCIPALES CON API ---
+  // Flujo principal: intenta backend y solo vuelve al almacenamiento local si la integración falla.
   const register = useCallback(async (email, password, empresa, telefono) => {
     const normalizedEmail = normalizeEmail(email);
     const normalizedEmpresa = normalizeText(empresa);
@@ -155,6 +156,7 @@ export function AuthProvider({ children }) {
         return { success: true };
       }
 
+      // Si la API responde error funcional, aún se revisa el fallback local para no romper demos.
       const localResult = loginLocal(normalizedEmail, password);
       if (localResult.success) {
         return localResult;
