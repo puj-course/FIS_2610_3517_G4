@@ -117,9 +117,14 @@ export const authService = {
         message: response.data.message,
       };
     } catch (error) {
-      // Si falla la infraestructura, el contexto sabrá que debe caer al modo local.
+      // El registro con OTP depende del backend: sin API no debemos crear cuentas locales
+      // porque eso salta el correo de verificación y deja el flujo inconsistente.
       if (shouldUseLocalStorage(error)) {
-        return { success: false, useLocalStorage: true };
+        return {
+          success: false,
+          useLocalStorage: true,
+          message: 'El backend no esta disponible para completar el registro con verificacion por correo.',
+        };
       }
       return {
         success: false,

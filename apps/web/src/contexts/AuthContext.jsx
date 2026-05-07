@@ -117,7 +117,12 @@ export function AuthProvider({ children }) {
       });
 
       if (apiResult.useLocalStorage) {
-        return registerLocal(normalizedEmail, password, normalizedEmpresa, normalizedTelefono);
+        return {
+          success: false,
+          message:
+            apiResult.message ||
+            'El backend no esta disponible para completar el registro con verificacion por correo.',
+        };
       }
 
       if (apiResult.success) {
@@ -131,12 +136,15 @@ export function AuthProvider({ children }) {
 
       return { success: false, message: apiResult.message || 'Error al registrar usuario' };
     } catch (err) {
-      console.warn('Error en API, usando localStorage:', err);
-      return registerLocal(normalizedEmail, password, normalizedEmpresa, normalizedTelefono);
+      console.warn('Error en API durante registro:', err);
+      return {
+        success: false,
+        message: 'No se pudo completar el registro. Verifica que el backend y la base de datos esten disponibles.',
+      };
     } finally {
       setLoading(false);
     }
-  }, [registerLocal]);
+  }, []);
 
   const login = useCallback(async (email, password) => {
     const normalizedEmail = normalizeEmail(email);
