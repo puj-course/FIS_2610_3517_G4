@@ -144,6 +144,25 @@ export const authService = {
     }
   },
 
+  async googleAuth(payload) {
+    try {
+      const response = await api.post('/auth/google', payload);
+      return {
+        success: true,
+        data: response.data.data || response.data,
+        message: response.data.message,
+      };
+    } catch (error) {
+      if (shouldUseLocalStorage(error)) {
+        return { success: false, useLocalStorage: true };
+      }
+      return {
+        success: false,
+        message: normalizeApiErrorMessage(error, 'No se pudo autenticar con Google'),
+      };
+    }
+  },
+
   // Verifica el OTP emitido por backend antes de materializar la sesión en el cliente.
   async verificarCodigo(email, codigo) {
     try {
