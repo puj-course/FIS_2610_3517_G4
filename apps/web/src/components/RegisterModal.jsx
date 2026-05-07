@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw } from 'lucide-react';
+import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { authService } from '@/services/api.js';
 
@@ -10,6 +10,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const [formData, setFormData] = useState({ email: '', password: '', empresa: '', telefono: '' });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [step, setStep] = useState('register'); // 'register' | 'verify'
   const [pendingEmail, setPendingEmail] = useState('');
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -170,7 +171,16 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input type="password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
+                  <input type={showPassword ? 'text' : 'password'} required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(prev => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-syntix-green transition-colors"
+                    aria-label={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                    title={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
               </div>
               <button type="submit" disabled={isSubmitting} className="w-full bg-syntix-green text-white py-2.5 rounded-lg font-medium hover:bg-syntix-green/90 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">

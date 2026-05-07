@@ -5,7 +5,6 @@ import { spawnSync } from 'node:child_process';
 const webDir = process.cwd();
 const backendDir = path.resolve(webDir, '../../backend');
 const envPath = path.join(backendDir, '.env');
-const envExamplePath = path.join(backendDir, '.env.example');
 const backendNodeModulesPath = path.join(backendDir, 'node_modules');
 const backendPackageJsonPath = path.join(backendDir, 'package.json');
 
@@ -33,12 +32,10 @@ const shouldInstallBackendDeps = () => {
 };
 
 if (!fs.existsSync(envPath)) {
-  if (!fs.existsSync(envExamplePath)) {
-    console.error('[prepare-dev] Falta backend/.env.example y no se puede crear backend/.env');
-    process.exit(1);
-  }
-  fs.copyFileSync(envExamplePath, envPath);
-  console.log('[prepare-dev] backend/.env creado automaticamente desde backend/.env.example');
+  console.error('[prepare-dev] Falta backend/.env.');
+  console.error('[prepare-dev] Crea backend/.env con las variables reales compartidas por el equipo.');
+  console.error('[prepare-dev] No copies backend/.env.example sin reemplazar MONGO_URI, EMAIL_USER y EMAIL_PASS.');
+  process.exit(1);
 }
 
 if (shouldInstallBackendDeps()) {

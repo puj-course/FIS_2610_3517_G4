@@ -89,4 +89,39 @@ async function enviarCodigoVerificacion(email, nombre, codigo) {
   console.log(`[EMAIL] OTP enviado a ${email}. messageId=${info.messageId}`);
 }
 
-module.exports = { enviarCodigoVerificacion, verificarServicioCorreo };
+async function enviarCodigoRecuperacion(email, nombre, codigo) {
+  if (!EMAIL_ENABLED) {
+    throw new Error('Servicio de correo no configurado: faltan EMAIL_USER y/o EMAIL_PASS en backend/.env');
+  }
+
+  const mailOptions = {
+    from: `"Drive Control" <${EMAIL_USER}>`,
+    to: email,
+    subject: 'Codigo para recuperar tu cuenta - Drive Control',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto; padding: 32px; border: 1px solid #e5e7eb; border-radius: 8px;">
+        <h2 style="color: #1e3a5f;">Recuperacion de cuenta</h2>
+        <p style="color: #374151;">Hola ${nombre || email}, usa este codigo para restablecer tu contrasena:</p>
+        <div style="text-align: center; margin: 32px 0;">
+          <span style="font-size: 36px; font-weight: bold; letter-spacing: 10px; color: #1e3a5f; background: #f3f4f6; padding: 16px 24px; border-radius: 8px;">${codigo}</span>
+        </div>
+        <p style="color: #6b7280; font-size: 14px;">Este codigo expira en <strong>${process.env.OTP_EXPIRACION_MINUTOS || 10} minutos</strong>.</p>
+        <p style="color: #6b7280; font-size: 14px;">Si no solicitaste este cambio, puedes ignorar este correo.</p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+        <p style="color: #9ca3af; font-size: 12px; text-align: center;">Drive Control &mdash; Sistema de gestion logistica</p>
+      </div>
+    `,
+  };
+
+  const info = await transporter.sendMail(mailOptions);
+  const accepted = Array.isArray(info.accepted) ? info.accepted : [];
+  const rejected = Array.isArray(info.rejected) ? info.rejected : [];
+
+  if (accepted.length === 0 || rejected.length > 0) {
+    throw new Error(`SMTP no confirmo entrega. accepted=${accepted.length} rejected=${rejected.length}`);
+  }
+
+  console.log(`[EMAIL] OTP de recuperacion enviado a ${email}. messageId=${info.messageId}`);
+}
+
+module.exports = { enviarCodigoVerificacion, enviarCodigoRecuperacion, verificarServicioCorreo };
