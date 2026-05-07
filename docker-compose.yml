@@ -1,0 +1,72 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: drivectrl-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - drivectrl-net
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: drivectrl-backend
+    restart: unless-stopped
+    environment:
+      PORT: 5000
+      JWT_SECRET: syntix_super_secret_key_dev
+      MONGO_URI: mongodb://mongodb:27017/logistica_db
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      EMAIL_HOST: ${EMAIL_HOST:-smtp.gmail.com}
+      EMAIL_PORT: ${EMAIL_PORT:-587}
+      EMAIL_USER: ${EMAIL_USER:-}
+      EMAIL_PASS: ${EMAIL_PASS:-}
+      OTP_EXPIRACION_MINUTOS: ${OTP_EXPIRACION_MINUTOS:-10}
+      OTP_MAX_INTENTOS: ${OTP_MAX_INTENTOS:-5}
+      OTP_COOLDOWN_SEGUNDOS: ${OTP_COOLDOWN_SEGUNDOS:-60}
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:5000/api/health/db').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+    networks:
+      - drivectrl-net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:5000/api}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+    container_name: drivectrl-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost/"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - drivectrl-net
+
+volumes:
+  mongo_data:
+
+networks:
+  drivectrl-net:
+    driver: bridge
