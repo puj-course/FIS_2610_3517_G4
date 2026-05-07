@@ -63,6 +63,7 @@ if (nonPlaceholderMongoErrors.length > 0) {
 
 const mongoUri = buildMongoUri(process.env);
 const validMongoPrefix = mongoUri.startsWith('mongodb://') || mongoUri.startsWith('mongodb+srv://');
+const isSrvUri = mongoUri.startsWith('mongodb+srv://');
 
 if (!validMongoPrefix) {
   console.error('[AUTH-DOCTOR] La configuracion Mongo resultante debe iniciar con mongodb:// o mongodb+srv://');
@@ -99,6 +100,31 @@ const hasPlaceholderCredentials =
   hasPlaceholderValue(process.env.MONGO_PASSWORD);
 
 const lookupHosts = async () => {
+  if (isSrvUri) {
+    console.log(`[AUTH-DOCTOR] Verificando SRV de ${hosts.length} host(s)...`);
+    for (const host of hosts) {
+      try {
+        const srvRecords = await dns.resolveSrv(`_mongodb._tcp.${host}`);
+        if (!srvRecords.length) {
+          console.error(`[AUTH-DOCTOR] SRV ERROR ${host}: sin registros SRV`);
+          process.exit(1);
+        }
+
+        for (const record of srvRecords) {
+          const result = await dns.lookup(record.name);
+          console.log(`[AUTH-DOCTOR] SRV OK ${host} -> ${record.name}:${record.port} (${result.address})`);
+        }
+      } catch (error) {
+        console.error(`[AUTH-DOCTOR] SRV ERROR ${host}: ${error.code || error.message}`);
+        if (String(error.code || '').toUpperCase() === 'ECONNREFUSED') {
+          console.error('[AUTH-DOCTOR] La red local rechazo la consulta SRV de MongoDB Atlas. Usa una URI directa mongodb:// o ajusta el DNS del equipo.');
+        }
+        process.exit(1);
+      }
+    }
+    return;
+  }
+
   console.log(`[AUTH-DOCTOR] Verificando DNS de ${hosts.length} host(s)...`);
   for (const host of hosts) {
     try {
@@ -138,9 +164,18 @@ const testMongoConnection = async () => {
     await mongoose.disconnect();
   } catch (error) {
     const publicIp = await getPublicIp();
+    const message = String(error?.message || '').toLowerCase();
     console.error(`[AUTH-DOCTOR] Error de conexion MongoDB: ${error.name}: ${error.message}`);
     console.error(`[AUTH-DOCTOR] IP publica detectada: ${publicIp}`);
-    console.error('[AUTH-DOCTOR] Accion recomendada: agrega esa IP en Atlas > Security > Network Access.');
+    if (
+      (String(error?.code || '').toUpperCase() === 'ECONNREFUSED' && message.includes('_mongodb._tcp')) ||
+      message.includes('querysrv econnrefused') ||
+      message.includes('query srv econnrefused')
+    ) {
+      console.error('[AUTH-DOCTOR] Accion recomendada: tu red local esta bloqueando consultas SRV. Usa una URI directa mongodb:// con los hosts del replica set o cambia el DNS de la maquina.');
+    } else {
+      console.error('[AUTH-DOCTOR] Accion recomendada: agrega esa IP en Atlas > Security > Network Access.');
+    }
     process.exit(1);
   }
 };

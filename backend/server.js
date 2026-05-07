@@ -51,6 +51,8 @@ const DB_UNAVAILABLE_MESSAGE =
 const MONGO_AUTH_ERROR_MESSAGE =
   'Error de autenticacion MongoDB: revisa usuario, contrasena, permisos del usuario en Atlas y que la URI pertenezca al cluster correcto.';
 const MONGO_DNS_ERROR_MESSAGE = 'Host del cluster incorrecto o inaccesible.';
+const MONGO_SRV_DNS_ERROR_MESSAGE =
+  'La red local rechazo la resolucion SRV de MongoDB Atlas. Si usas mongodb+srv y ves querySrv/ECONNREFUSED, cambia temporalmente a una URI directa mongodb:// con los hosts del replica set.';
 const MONGO_WHITELIST_ERROR_MESSAGE =
   'MongoDB Atlas rechazo la conexion. Revisa Network Access en MongoDB Atlas y agrega tu IP actual a la whitelist.';
 
@@ -63,6 +65,14 @@ const getMongoConnectionMessage = (error) => {
 
   if (message.includes('bad auth') || message.includes('authentication failed')) {
     return MONGO_AUTH_ERROR_MESSAGE;
+  }
+
+  if (
+    (code === 'ECONNREFUSED' && message.includes('_mongodb._tcp')) ||
+    message.includes('querysrv econnrefused') ||
+    message.includes('query srv econnrefused')
+  ) {
+    return MONGO_SRV_DNS_ERROR_MESSAGE;
   }
 
   if (
