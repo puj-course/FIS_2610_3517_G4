@@ -7,6 +7,7 @@ import useModalManager from '@/hooks/useModalManager.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 
+// Landing principal: presenta la propuesta de valor y deriva al usuario hacia registro o dashboard.
 export default function HomePage() {
   const { activeModal, openModal, closeModal } = useModalManager();
   const { isAuthenticated } = useAuth();

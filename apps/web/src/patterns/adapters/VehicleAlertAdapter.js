@@ -1,5 +1,6 @@
 import BaseAlertAdapter from './BaseAlertAdapter.js';
 
+// Detecta huecos estructurales del vehículo, como ausencia de conductor o de SOAT registrado.
 export default class VehicleAlertAdapter extends BaseAlertAdapter {
   adapt(vehiculo) {
     const alerts = [];

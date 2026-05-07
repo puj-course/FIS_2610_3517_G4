@@ -2,6 +2,7 @@ const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 const isInvalidDate = (date) => Number.isNaN(date.getTime());
 
+// Calcula diferencia en días normalizando ambas fechas a medianoche para evitar desfases por hora.
 export const calculateDaysRemaining = (targetDateStr, simulatedDateStr) => {
   if (!targetDateStr) return -999;
 
@@ -17,16 +18,17 @@ export const calculateDaysRemaining = (targetDateStr, simulatedDateStr) => {
   return Math.ceil(diffTime / MS_PER_DAY);
 };
 
+// Convierte días restantes en el semáforo documental que usan páginas, hooks y alertas.
 export const calculateDocumentState = (daysRemaining, threshold = 15) => {
   if (!Number.isFinite(daysRemaining) || daysRemaining < 0 || daysRemaining === -999) {
     return 'rojo';
   }
-
   if (daysRemaining <= threshold) return 'amarillo';
 
   return 'verde';
 };
 
+// Cuando un vehículo combina varios documentos, siempre manda el estado más crítico.
 export const getWorstState = (state1, state2) => {
   const priority = { rojo: 3, amarillo: 2, verde: 1 };
   const p1 = priority[state1] || 3;

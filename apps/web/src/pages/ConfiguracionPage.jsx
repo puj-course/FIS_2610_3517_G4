@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Settings, Save, Database, AlertTriangle, Upload, Download, CheckCircle } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 
+// Configuración concentra ajustes de simulación y operaciones de respaldo local del MVP.
 export default function ConfiguracionPage() {
   const [threshold, setThreshold] = useLocalStorage('syntix_threshold', 15);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -16,6 +17,7 @@ export default function ConfiguracionPage() {
 
   const handleExportBackup = () => {
     try {
+      // Solo se exportan claves del espacio syntix_ para no contaminar el respaldo con datos ajenos.
       const data = {};
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -50,7 +52,7 @@ export default function ConfiguracionPage() {
       try {
         const data = JSON.parse(event.target.result);
         
-        // Validate basic structure
+        // La validación mínima evita cargar archivos que no pertenezcan al formato del proyecto.
         if (typeof data !== 'object' || data === null) throw new Error('Formato inválido');
         
         if (window.confirm('¿Está seguro de importar este respaldo? Se sobrescribirán los datos actuales.')) {

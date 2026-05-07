@@ -5,6 +5,7 @@ import { authService } from '@/services/api.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Modal ligero para autenticación desde la landing sin abandonar el flujo público.
 export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');

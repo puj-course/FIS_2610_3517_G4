@@ -11,6 +11,7 @@ import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.j
 const DocumentsContext = createContext(null);
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
+// DocumentsProvider mantiene el catálogo de SOAT sincronizado con usuario, fecha simulada y alertas.
 export function DocumentsProvider({ children }) {
   const [storedSoats, setStoredSoats] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,12 +36,14 @@ export function DocumentsProvider({ children }) {
   }, [user?.email]);
 
   useEffect(() => {
+    // Cuando cambia la autenticación, se refresca la fuente documental visible para ese usuario.
     fetchSoats();
   }, [fetchSoats]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
+    // La relación documento-vehículo obliga a refrescar si la flota cambia desde otro módulo.
     const handleVehiclesUpdated = () => {
       fetchSoats();
     };
@@ -51,6 +54,7 @@ export function DocumentsProvider({ children }) {
 
   const soats = useMemo(() => {
     return storedSoats.map((soat) => {
+      // El estado no se persiste fijo: se recalcula con la fecha simulada y el umbral configurado.
       const diasRestantes = calculateDaysRemaining(soat.fechaVencimiento, simulatedDate);
       const estado = calculateDocumentState(diasRestantes, threshold);
       return { ...soat, diasRestantes, estado };
@@ -59,6 +63,7 @@ export function DocumentsProvider({ children }) {
 
   const soatAlertAdapter = new SoatAlertAdapter();
   useEffect(() => {
+    // Cada recalculo de SOAT vuelve a publicar su bloque de alertas dentro del hub compartido.
     publishAdaptedAlerts(soatAlertAdapter, 'soats', soats);
     return () => clearSourceAlerts('soats');
   }, [soats]);

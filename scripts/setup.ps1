@@ -1,6 +1,7 @@
 # Script de configuracion inicial del proyecto (Windows)
 # Corre este script una sola vez despues de clonar el repo
 
+# Equivalente PowerShell del setup para quienes desarrollan en Windows.
 Write-Host "=== Setup del proyecto ===" -ForegroundColor Cyan
 
 # Copiar .env si no existe
@@ -12,10 +13,12 @@ if (-Not (Test-Path "backend\.env")) {
 }
 
 # Instalar dependencias del backend
+# Se ejecuta primero para dejar lista la capa de datos e integración.
 Write-Host "Instalando dependencias del backend..."
 Set-Location backend; npm install; Set-Location ..
 
 # Instalar dependencias del frontend
+# Así el siguiente paso natural del desarrollador es levantar la UI local.
 Write-Host "Instalando dependencias del frontend..."
 Set-Location apps\web; npm install; Set-Location ..\..
 

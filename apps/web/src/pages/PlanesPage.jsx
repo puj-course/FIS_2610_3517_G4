@@ -4,6 +4,7 @@ import PublicHeader from "@/components/PublicHeader.jsx";
 import LoginModal from "@/components/LoginModal.jsx";
 import RegisterModal from "@/components/RegisterModal.jsx";
 
+// Página comercial de planes para explicar el empaquetado del producto en el MVP.
 export default function PlanesPage() {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);

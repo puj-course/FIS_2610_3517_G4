@@ -7,6 +7,7 @@ import { useVehicles } from '@/hooks/useVehicles.js';
 import ModalFactory from '@/components/ModalFactory.jsx';
 import useModalManager from '@/hooks/useModalManager.js';
 
+// Esta página cruza vehículos con sus documentos para visualizar SOAT y RTM en paralelo.
 function getBadgeClasses(estado) {
   if (estado === 'rojo') return 'bg-red-50 text-red-500 border border-red-200';
   if (estado === 'amarillo') return 'bg-yellow-50 text-yellow-600 border border-yellow-200';

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Base URL para el backend API
+// Normaliza la URL base para que el frontend acepte variables con o sin sufijo /api.
 const normalizeApiBaseUrl = (value) => {
   const baseUrl = String(value || 'http://localhost:5000/api').replace(/\/+$/, '');
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
@@ -8,7 +8,7 @@ const normalizeApiBaseUrl = (value) => {
 
 export const API_BASE_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_URL);
 
-// Crear instancia de axios con configuración base
+// Esta instancia centraliza timeout, headers e interceptores compartidos por todos los servicios.
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -17,7 +17,7 @@ const api = axios.create({
   },
 });
 
-// Interceptor para agregar token de autenticación
+// Cada request intenta recuperar el token desde las dos fuentes que usa hoy el frontend.
 api.interceptors.request.use(
   (config) => {
     const tokenStr = localStorage.getItem('syntix_token');
@@ -35,7 +35,7 @@ api.interceptors.request.use(
     if (userStr) {
       try {
         const parsed = JSON.parse(userStr);
-        // Si el usuario tiene un token de sesión seguro, lo enviamos en los headers
+        // Si el perfil ya trae token embebido, se usa como respaldo del storage plano.
         token = token || parsed?.token;
       } catch (error) {
         console.error('Error al leer el token:', error);
@@ -51,7 +51,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Interceptor para manejar errores de respuesta
+// Aquí solo se detecta caída de red; la traducción funcional del error vive más abajo.
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -106,7 +106,7 @@ const shouldUseLocalStorage = (error) => {
   );
 };
 
-// Servicios de autenticación
+// authService concentra la capa request -> respuesta amigable para que el contexto no conozca axios.
 export const authService = {
   async register(userData) {
     try {
@@ -117,6 +117,7 @@ export const authService = {
         message: response.data.message,
       };
     } catch (error) {
+      // Si falla la infraestructura, el contexto sabrá que debe caer al modo local.
       if (shouldUseLocalStorage(error)) {
         return { success: false, useLocalStorage: true };
       }
@@ -132,6 +133,7 @@ export const authService = {
       const response = await api.post('/auth/login', { email, password });
       return { success: true, data: response.data.data };
     } catch (error) {
+      // El login comparte el mismo criterio de fallback para sostener demos sin backend.
       if (shouldUseLocalStorage(error)) {
         return { success: false, useLocalStorage: true };
       }
@@ -142,9 +144,7 @@ export const authService = {
     }
   },
 
-  /**
-   * Verificar codigo OTP
-   */
+  // Verifica el OTP emitido por backend antes de materializar la sesión en el cliente.
   async verificarCodigo(email, codigo) {
     try {
       const response = await api.post('/auth/verificar-codigo', { email, codigo });
@@ -160,9 +160,7 @@ export const authService = {
     }
   },
 
-  /**
-   * Reenviar codigo OTP
-   */
+  // Reenvía OTP sin obligar a recrear el registro desde cero.
   async reenviarCodigo(email) {
     try {
       const response = await api.post('/auth/reenviar-codigo', { email });

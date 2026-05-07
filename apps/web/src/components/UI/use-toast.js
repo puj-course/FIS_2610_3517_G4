@@ -16,6 +16,7 @@ const toastStore = {
     },
     listeners: [],
 
+	// El store vive fuera de React para que distintos componentes compartan la misma cola de toasts.
 	getState: () => toastStore.state,
 	setState: (nextState) => {
     if (typeof nextState === 'function') {
@@ -77,6 +78,7 @@ export function useToast() {
     }, [])
 
 	useEffect(() => {
+    // Cada toast administra su propio timeout para soportar duraciones distintas o infinitas.
     const timeouts = []
 
     state.toasts.forEach((toast) => {

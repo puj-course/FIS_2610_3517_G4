@@ -5,6 +5,7 @@ import { authService } from '@/services/api.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// Registro en dos pasos: alta inicial y luego verificación OTP para cerrar el onboarding.
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const [formData, setFormData] = useState({ email: '', password: '', empresa: '', telefono: '' });
   const [error, setError] = useState('');

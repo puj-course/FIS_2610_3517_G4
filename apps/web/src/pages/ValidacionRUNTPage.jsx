@@ -7,6 +7,7 @@ import { useValidationHistory } from '@/hooks/useValidationHistory.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
 import { useConductors } from '@/hooks/useConductors.js';
 
+// ValidacionRUNTPage orquesta la búsqueda externa simulada y la guarda como evidencia interna.
 export default function ValidacionRUNTPage() {
   const [searchInput, setSearchInput] = useState('');
   const [searchType, setSearchType] = useState('placa'); // 'placa' o 'vin'
@@ -26,7 +27,7 @@ export default function ValidacionRUNTPage() {
     setLoading(true);
     setResult(null);
 
-    // Simular delay de consulta
+    // El delay mantiene la sensación de consulta externa y hace visible el estado de carga.
     setTimeout(() => {
       let searchResult;
       if (searchType === 'placa') {
@@ -37,7 +38,7 @@ export default function ValidacionRUNTPage() {
 
       setResult(searchResult);
 
-      // Agregar a búsquedas recientes
+      // El historial corto de búsquedas acelera la reconsulta de placas usadas con frecuencia.
       if (searchResult.encontrado) {
         setRecentSearches(prev => {
           const filtered = prev.filter(s => s !== searchResult.data.placa);
@@ -61,7 +62,7 @@ export default function ValidacionRUNTPage() {
       'usuario_actual'
     );
 
-    // Mostrar confirmación
+    // La confirmación explícita refuerza que la consulta quedó auditada en el historial.
     alert('✅ Validación guardada correctamente en el historial');
     setSearchInput('');
     setResult(null);

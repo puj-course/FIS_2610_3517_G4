@@ -12,6 +12,8 @@ const createInitialFormData = () => ({
   vehiculoId: '',
 });
 
+// El modal de conductores también coordina la asignación opcional a un vehículo
+// para mantener alineadas las dos entidades más consultadas del sistema.
 export default function AddConductorModal({
   isOpen,
   onClose,
@@ -46,6 +48,8 @@ export default function AddConductorModal({
   };
 
   useEffect(() => {
+    // Al editar, el formulario respeta la relación ya existente entre conductor y vehículo
+    // para no perder el contexto operativo del registro.
     if (!isOpen) {
       return;
     }
@@ -88,6 +92,7 @@ export default function AddConductorModal({
       return;
     }
 
+    // El documento se valida como identificador único antes de persistir cambios.
     const isDuplicateDocument = conductores.some((conductor) => {
       const sameDocument = String(conductor.documento ?? '').trim() === documento;
       const isSameConductor =

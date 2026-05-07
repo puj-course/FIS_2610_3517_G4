@@ -11,6 +11,7 @@ import RtmAlertAdapter from '@/patterns/adapters/RtmAlertAdapter.js';
 const RtmContext = createContext(null);
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
+// RtmProvider replica la misma estrategia documental, pero para tecnomecánica.
 export function RtmProvider({ children }) {
   const [storedRtms, setStoredRtms] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,12 +36,14 @@ export function RtmProvider({ children }) {
   }, [user?.email]);
 
   useEffect(() => {
+    // La fuente RTM se vuelve a consultar cuando cambia el usuario activo.
     fetchRtms();
   }, [fetchRtms]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return undefined;
 
+    // Si cambia la flota, también cambia el universo de RTM que debe mostrarse en pantalla.
     const handleVehiclesUpdated = () => {
       fetchRtms();
     };
@@ -51,6 +54,7 @@ export function RtmProvider({ children }) {
 
   const rtms = useMemo(() => {
     return storedRtms.map((rtm) => {
+      // Igual que SOAT, el estado visible depende de la fecha simulada y del umbral del usuario.
       const diasRestantes = calculateDaysRemaining(rtm.fechaVencimiento, simulatedDate);
       const estado = calculateDocumentState(diasRestantes, threshold);
       return { ...rtm, diasRestantes, estado };
@@ -59,6 +63,7 @@ export function RtmProvider({ children }) {
 
   const rtmAlertAdapter = new RtmAlertAdapter();
   useEffect(() => {
+    // El hub de alertas recibe una versión ya adaptada al formato unificado de la aplicación.
     publishAdaptedAlerts(rtmAlertAdapter, 'rtms', rtms);
     return () => clearSourceAlerts('rtms');
   }, [rtms]);

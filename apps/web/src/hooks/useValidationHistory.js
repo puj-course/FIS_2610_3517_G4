@@ -8,6 +8,7 @@ import { useLocalStorage } from './useLocalStorage.js';
 
 const initialHistory = [];
 
+// El historial actúa como bitácora local de auditoría para consultas RUNT y sus notas posteriores.
 export function useValidationHistory() {
   const [validations, setValidations] = useLocalStorage('syntix_validation_history', initialHistory);
 
@@ -70,6 +71,7 @@ export function useValidationHistory() {
   const exportToCSV = () => {
     if (validations.length === 0) return '';
 
+    // El CSV prioriza campos que ayudan a revisar cumplimiento sin abrir el detalle completo.
     const headers = ['ID', 'Placa', 'Fecha', 'Usuario', 'SOAT Vigente', 'RTM Vigente', 'Notas'];
     const rows = validations.map(v => [
       v.id,

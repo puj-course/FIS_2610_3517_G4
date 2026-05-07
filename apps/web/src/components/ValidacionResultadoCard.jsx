@@ -2,6 +2,7 @@ import React from 'react';
 import { CheckCircle, XCircle, AlertCircle, Download } from 'lucide-react';
 import StatusBadge from './StatusBadge.jsx';
 
+// Tarjeta de resultado que cruza lo consultado en RUNT con lo registrado en el sistema.
 export default function ValidacionResultadoCard({
   datosRUNT,
   vehiculoSistema,
@@ -35,7 +36,7 @@ export default function ValidacionResultadoCard({
   const licenciaState = conductorAsignado ? 
     getStateColor(conductorAsignado.estado === 'verde', conductorAsignado.diasRestantes) : 'rojo';
 
-  // Validar coincidencias con sistema
+  // Estas coincidencias ayudan a explicar si el activo consultado sí corresponde con el activo interno.
   const coincidencias = {
     placaCoincidia: vehiculoSistema?.placa === data.placa,
     marcaCoincidia: vehiculoSistema?.marca?.toLowerCase() === data.marca.toLowerCase(),

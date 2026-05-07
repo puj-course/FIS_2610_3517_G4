@@ -4,6 +4,7 @@ on:
   pull_request:
     branches: [ "develop","main" ]
   push:
+    # Este patrón intenta cubrir ramas feature antes de integración.
     branches: [ "feature/**" ]
 
 jobs:
@@ -12,6 +13,7 @@ jobs:
 
     defaults:
       run:
+        # Igual que en CD, el frontend es el objetivo principal de esta verificación.
         working-directory: apps/web
 
     steps:
@@ -36,6 +38,7 @@ jobs:
 
       - name: Resumen de verificación
         run: |
+          # Se deja una traza corta para identificar rápidamente qué rama pasó por el workflow.
           echo "Rama: ${{ github.ref_name }}"
           echo "Autor: ${{ github.actor }}"
           echo "Verificación exitosa"

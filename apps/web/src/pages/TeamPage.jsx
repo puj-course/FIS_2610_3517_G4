@@ -4,6 +4,7 @@ import PublicHeader from '@/components/PublicHeader.jsx';
 import ModalFactory from '@/components/ModalFactory.jsx';
 import useModalManager from '@/hooks/useModalManager.js';
 
+// Página institucional para presentar al equipo sin perder acceso a los modales de autenticación.
 export default function TeamPage() {
   const { activeModal, openModal, closeModal } = useModalManager();
 
