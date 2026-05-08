@@ -204,6 +204,8 @@ Servicios expuestos:
 - Healthcheck base de datos: http://localhost:5000/api/health/db
 - Healthcheck por proxy del frontend: http://localhost:3000/api/health/db
 
+La configuracion de Compose toma `MONGO_URI` desde el archivo `.env` de la raiz para conectar el backend a la base compartida del equipo. Si esa variable no existe, usa el servicio local `mongodb` definido en `docker-compose.yml` como respaldo.
+
 Comandos utiles de verificacion:
 
 ```bash
