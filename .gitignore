@@ -15,6 +15,7 @@ apps/**/.vite-temp/
 # env / logs
 **/.env
 **/.env.*
+!.env
 !backend/.env
 !**/.env.example
 *.log
