@@ -41,23 +41,35 @@ jobs:
         run: docker compose -f docker-compose.yml config
 
       - name: Construir imagen backend
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile
-          push: false
-          tags: local/drivectrl-backend:ci
+        run: docker build -t local/drivectrl-backend:ci -f Dockerfile .
 
       - name: Construir imagen frontend
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: apps/web/Dockerfile
-          push: false
-          tags: local/drivectrl-frontend:ci
-          build-args: |
-            VITE_API_URL=http://localhost:5000/api
-            VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+        run: >
+          docker build
+          --build-arg VITE_API_URL=/api
+          --build-arg VITE_GOOGLE_CLIENT_ID="${{ secrets.VITE_GOOGLE_CLIENT_ID }}"
+          -t local/drivectrl-frontend:ci
+          -f apps/web/Dockerfile
+          .
+
+      - name: Levantar stack Docker Compose
+        run: docker compose up -d --build
+
+      - name: Validar health backend
+        run: curl --fail --retry 12 --retry-delay 5 --retry-all-errors http://localhost:5000/api/health/db
+
+      - name: Validar frontend
+        run: curl --fail --retry 12 --retry-delay 5 --retry-all-errors http://localhost:3000/
+
+      - name: Validar proxy API del frontend
+        run: curl --fail --retry 12 --retry-delay 5 --retry-all-errors http://localhost:3000/api/health/db
+
+      - name: Mostrar servicios activos
+        run: docker compose ps
+
+      - name: Limpiar stack Docker Compose
+        if: always()
+        run: docker compose down -v
 
   docker-publish:
     name: Publicacion en DockerHub
@@ -107,7 +119,7 @@ jobs:
           file: apps/web/Dockerfile
           push: true
           build-args: |
-            VITE_API_URL=http://localhost:5000/api
+            VITE_API_URL=/api
             VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/drivectrl-frontend:${{ github.sha }}

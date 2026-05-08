@@ -19,7 +19,7 @@ services:
     environment:
       PORT: 5000
       JWT_SECRET: syntix_super_secret_key_dev
-      MONGO_URI: mongodb://mongodb:27017/logistica_db
+      MONGO_URI: ${MONGO_URI:-mongodb://mongodb:27017/logistica_db}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       EMAIL_HOST: ${EMAIL_HOST:-smtp.gmail.com}
       EMAIL_PORT: ${EMAIL_PORT:-587}
@@ -46,17 +46,17 @@ services:
       context: .
       dockerfile: apps/web/Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:5000/api}
+        VITE_API_URL: ${VITE_API_URL:-/api}
         VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
     container_name: drivectrl-frontend
     restart: unless-stopped
     ports:
-      - "3000:80"
+      - "3000:3000"
     depends_on:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost/"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/"]
       interval: 20s
       timeout: 5s
       retries: 5

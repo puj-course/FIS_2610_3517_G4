@@ -5,10 +5,13 @@ const dotenv = require('dotenv');
 const envPath = path.resolve(__dirname, '.env');
 const envExamplePath = path.resolve(__dirname, '.env.example');
 let envLoadedFrom = null;
+const hasRuntimeMongoEnv = Boolean(process.env.MONGO_URI || process.env.MONGO_USER);
 
 if (fs.existsSync(envPath)) {
   dotenv.config({ path: envPath });
   envLoadedFrom = '.env';
+} else if (hasRuntimeMongoEnv) {
+  envLoadedFrom = 'variables de entorno del contenedor';
 } else if (fs.existsSync(envExamplePath)) {
   dotenv.config({ path: envExamplePath });
   envLoadedFrom = '.env.example';
@@ -18,7 +21,10 @@ if (fs.existsSync(envPath)) {
 }
 
 if (envLoadedFrom) {
-  console.log(`[ENV] Variables cargadas desde backend/${envLoadedFrom}`);
+  const envPrefix = envLoadedFrom.startsWith('.')
+    ? `backend/${envLoadedFrom}`
+    : envLoadedFrom;
+  console.log(`[ENV] Variables cargadas desde ${envPrefix}`);
 }
 
 const missingEmailVars = ['EMAIL_USER', 'EMAIL_PASS'].filter((key) => !process.env[key]);
@@ -178,6 +184,28 @@ app.get('/api/health/email', async (_req, res) => {
 const MONGO_URI = buildMongoUri(process.env);
 const mongoConfigErrors = getMongoConfigErrors(process.env);
 
+const describeMongoTarget = (mongoUri = '') => {
+  const value = String(mongoUri);
+  const protocol = value.startsWith('mongodb+srv://') ? 'mongodb+srv' : 'mongodb';
+  const withoutProtocol = value.replace(/^mongodb(\+srv)?:\/\//, '');
+  const withoutCredentials = withoutProtocol.includes('@')
+    ? withoutProtocol.slice(withoutProtocol.indexOf('@') + 1)
+    : withoutProtocol;
+  const [hostSegment = '', pathSegment = ''] = withoutCredentials.split('/');
+  const dbName = (pathSegment.split('?')[0] || DEFAULT_MONGO_DB_NAME).trim();
+
+  return {
+    protocol,
+    hosts: hostSegment,
+    database: dbName || DEFAULT_MONGO_DB_NAME,
+    source: hostSegment.includes('mongodb') && !hostSegment.startsWith('mongodb:')
+      ? 'atlas'
+      : 'local-compose',
+  };
+};
+
+const mongoTarget = describeMongoTarget(MONGO_URI);
+
 if (mongoConfigErrors.length > 0) {
   console.error(
     `[ENV] Configuracion Mongo incompleta. Usa MONGO_URI o configura MONGO_USER/MONGO_PASSWORD para ${DEFAULT_MONGO_HOST}/${DEFAULT_MONGO_DB_NAME}.`
@@ -190,7 +218,7 @@ mongoose.set('bufferCommands', false);
 mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 10000 })
   .then(() => {
     lastMongoConnectionMessage = null;
-    console.log('Conexion exitosa a MongoDB Atlas usando MONGO_URI');
+    console.log(`Conexion exitosa a MongoDB (${mongoTarget.source}) usando ${mongoTarget.database}`);
   })
   .catch((err) => {
     lastMongoConnectionMessage = getMongoConnectionMessage(err);
@@ -211,12 +239,18 @@ const getDbUnavailableMessage = () => lastMongoConnectionMessage || DB_UNAVAILAB
 
 app.get('/api/health/db', (_req, res) => {
   if (isDbConnected()) {
-    return res.json({ ok: true, state: mongoose.connection.readyState });
+    return res.json({
+      ok: true,
+      state: mongoose.connection.readyState,
+      database: mongoose.connection.name || mongoTarget.database,
+      target: mongoTarget,
+    });
   }
 
   return res.status(503).json({
     ok: false,
     state: mongoose.connection.readyState,
+    target: mongoTarget,
     message: getDbUnavailableMessage(),
   });
 });
