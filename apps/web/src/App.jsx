@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, BrowserRouter as Router, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext.jsx';
+import { OnboardingProvider } from '@/contexts/OnboardingContext.jsx';
 import ProtectedRoute from '@/components/ProtectedRoute.jsx';
 import DashboardLayout from '@/layouts/DashboardLayout.jsx';
 import { DocumentsProvider } from '@/contexts/DocumentsContext.jsx';
@@ -34,11 +35,11 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/team" element={<TeamPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/planes" element={<PlanesPage />} /> {/* Ruta agregada */}
+             <Route path="/planes" element={<PlanesPage />} /> {/* Ruta agregada */}
 
-            {/* Las rutas protegidas comparten el layout del dashboard y dependen de sesión activa. */}
-            <Route element={<ProtectedRoute />}>
-              <Route element={<DashboardLayout />}>
+             {/* Las rutas protegidas comparten el layout del dashboard y dependen de sesión activa. */}
+             <Route element={<ProtectedRoute />}>
+              <Route element={<OnboardingProvider><DashboardLayout /></OnboardingProvider>}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/vehiculos" element={<VehiculosPage />} />
                 <Route path="/conductores" element={<ConductoresPage />} />

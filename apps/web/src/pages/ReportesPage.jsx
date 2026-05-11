@@ -126,12 +126,16 @@ export default function ReportesPage() {
         <title>Reportes | SYNTIX Drive Control</title>
       </Helmet>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div data-onboarding="reports-header" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-syntix-navy">Reportes y Analitica</h1>
           <p className="text-gray-500 text-sm mt-1">Metricas reales de cumplimiento de la flota</p>
         </div>
-        <button onClick={handleExportCSV} className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm">
+        <button
+          data-onboarding="reports-export"
+          onClick={handleExportCSV}
+          className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm"
+        >
           <Download className="w-4 h-4" /> Descargar CSV
         </button>
       </div>
@@ -145,7 +149,7 @@ export default function ReportesPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-syntix-navy rounded-2xl p-8 text-white relative overflow-hidden shadow-lg">
+        <div data-onboarding="reports-compliance-card" className="bg-syntix-navy rounded-2xl p-8 text-white relative overflow-hidden shadow-lg">
           <div className="absolute top-0 right-0 w-64 h-64 bg-syntix-green rounded-full opacity-20 blur-3xl -mr-20 -mt-20" />
           <div className="relative z-10">
             <h3 className="text-lg font-medium text-gray-300 mb-2">Cumplimiento Total</h3>
@@ -156,7 +160,7 @@ export default function ReportesPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex flex-col justify-center">
+        <div data-onboarding="reports-distribution-card" className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex flex-col justify-center">
           <h3 className="text-lg font-bold text-gray-900 mb-6">Distribucion de Estados</h3>
           <div className="space-y-4">
             <StatusBar label="Al Dia (Verde)" value={stateStats.verde} total={stateStats.total} colorClass="bg-syntix-green" textClass="text-syntix-green" />

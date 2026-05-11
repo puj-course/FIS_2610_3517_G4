@@ -1,13 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Search, Plus, Trash2, Car } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge.jsx';
 import AddVehicleModal from '@/components/AddVehicleModal.jsx';
+import { useOnboarding } from '@/contexts/OnboardingContext.jsx';
 import { useVehicles } from '@/hooks/useVehicles.js';
 
 // Vista principal de flota: combina búsqueda, filtros y edición sobre los vehículos del usuario.
 export default function VehiculosPage() {
   const { vehiculos, deleteVehicle } = useVehicles();
+  const { currentStep, isTourActive } = useOnboarding();
+  const tutorialOpenedModalRef = useRef(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterState, setFilterState] = useState('todos');
   const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
@@ -40,13 +43,43 @@ export default function VehiculosPage() {
     });
   }, [vehiculos, searchTerm, filterState]);
 
+  useEffect(() => {
+    const vehicleTutorialSteps = new Set([
+      'vehicle-form',
+      'vehicle-plate-field',
+      'vehicle-brand-model-fields',
+      'vehicle-year-type-fields',
+      'vehicle-submit-actions',
+    ]);
+
+    const shouldShowTutorialModal = Boolean(
+      isTourActive && vehicleTutorialSteps.has(currentStep?.id)
+    );
+
+    if (shouldShowTutorialModal) {
+      setVehicleToEdit(null);
+      setIsVehicleModalOpen(true);
+      tutorialOpenedModalRef.current = true;
+      return;
+    }
+
+    if (tutorialOpenedModalRef.current) {
+      setIsVehicleModalOpen(false);
+      setVehicleToEdit(null);
+      tutorialOpenedModalRef.current = false;
+    }
+  }, [currentStep?.id, isTourActive]);
+
   return (
     <div className="space-y-6">
       <Helmet>
         <title>Vehiculos | SYNTIX Drive Control</title>
       </Helmet>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div
+        data-onboarding="vehicles-header"
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+      >
         <div>
           <h1 className="text-2xl font-bold text-syntix-navy">Gestion de Vehiculos</h1>
           <p className="text-sm text-gray-500 mt-1">
@@ -57,6 +90,7 @@ export default function VehiculosPage() {
         <button
           type="button"
           onClick={openCreateModal}
+          data-onboarding="vehicles-add-button"
           className="bg-syntix-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2 shadow-sm"
         >
           <Plus className="w-4 h-4" /> Nuevo Vehiculo
@@ -65,7 +99,7 @@ export default function VehiculosPage() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-4 justify-between bg-gray-50/50">
-          <div className="relative w-full sm:w-96">
+          <div data-onboarding="vehicles-search" className="relative w-full sm:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
@@ -77,6 +111,7 @@ export default function VehiculosPage() {
           </div>
 
           <select
+            data-onboarding="vehicles-filter"
             value={filterState}
             onChange={(e) => setFilterState(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white focus:ring-2 focus:ring-syntix-green outline-none"
@@ -88,7 +123,7 @@ export default function VehiculosPage() {
           </select>
         </div>
 
-        <div className="overflow-x-auto">
+        <div data-onboarding="vehicles-table" className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-600">
             <thead className="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200">
               <tr>
