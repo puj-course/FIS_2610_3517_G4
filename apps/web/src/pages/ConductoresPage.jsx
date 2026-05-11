@@ -4,10 +4,45 @@ import { Search, Plus, User, Trash2 } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge.jsx';
 import AddConductorModal from '@/components/AddConductorModal.jsx';
 import { useConductors } from '@/hooks/useConductors.js';
+import { useVehicles } from '@/hooks/useVehicles.js';
+import { getVehicleOptionLabel } from '@/utils/colombiaFormats.js';
+
+const getConductorId = (conductor) => conductor?._id || conductor?.id;
+
+const resolveAssignedVehicle = (conductor, vehiculos) => {
+  const conductorVehicleId = conductor?.vehiculoId || conductor?.vehicleId;
+
+  if (conductorVehicleId) {
+    return vehiculos.find(
+      (vehiculo) => String(conductorVehicleId) === String(vehiculo._id || vehiculo.id)
+    ) || null;
+  }
+
+  const conductorId = getConductorId(conductor);
+  if (!conductorId) return null;
+
+  return vehiculos.find(
+    (vehiculo) => String(vehiculo.conductorId) === String(conductorId)
+  ) || null;
+};
+
+const hasVehicleReference = (conductor) =>
+  Boolean(conductor?.vehiculoId || conductor?.vehicleId);
+
+const getAssignedVehicleLabel = (conductor, vehiculos) => {
+  const vehicle = resolveAssignedVehicle(conductor, vehiculos);
+
+  if (vehicle) {
+    return getVehicleOptionLabel(vehicle);
+  }
+
+  return hasVehicleReference(conductor) ? 'Vehículo no encontrado' : 'Sin vehículo asignado';
+};
 
 // Vista operativa para buscar, registrar y corregir conductores sin salir del dashboard.
 export default function ConductoresPage() {
   const { conductores, deleteConductor } = useConductors();
+  const { vehiculos } = useVehicles();
   const [searchTerm, setSearchTerm] = useState('');
   const [isConductorModalOpen, setIsConductorModalOpen] = useState(false);
   const [conductorToEdit, setConductorToEdit] = useState(null);
@@ -28,9 +63,16 @@ export default function ConductoresPage() {
   };
 
   const filtered = conductores.filter(
-    (c) =>
-      c.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.documento.includes(searchTerm)
+    (c) => {
+      const query = searchTerm.toLowerCase();
+      const assignedVehicleLabel = getAssignedVehicleLabel(c, vehiculos).toLowerCase();
+
+      return (
+        c.nombre.toLowerCase().includes(query) ||
+        c.documento.includes(searchTerm) ||
+        assignedVehicleLabel.includes(query)
+      );
+    }
   );
 
   return (
@@ -73,49 +115,62 @@ export default function ConductoresPage() {
                 <th className="px-6 py-4">Documento</th>
                 <th className="px-6 py-4">Contacto</th>
                 <th className="px-6 py-4">Licencia</th>
+                <th className="px-6 py-4">Vehículo asignado</th>
                 <th className="px-6 py-4 text-center">Editar</th>
                 <th className="px-6 py-4 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.map((c) => (
-                <tr key={c.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-syntix-navy/5 rounded-full flex items-center justify-center text-syntix-navy">
-                      <User className="w-5 h-5" />
-                    </div>
-                    <span className="font-bold text-gray-900">{c.nombre}</span>
-                  </td>
-                  <td className="px-6 py-4 font-medium">{c.documento}</td>
-                  <td className="px-6 py-4">{c.telefono}</td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-col gap-1 items-start">
-                      <span className="text-xs font-bold text-gray-500">Cat: {c.categoria}</span>
-                      <StatusBadge status={c.estado} />
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <button
-                      type="button"
-                      onClick={() => openEditModal(c)}
-                      className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-syntix-navy bg-syntix-navy/5 hover:bg-syntix-navy/10 rounded-lg transition-colors"
-                      aria-label={`Editar conductor ${c.nombre}`}
-                    >
-                      Editar
-                    </button>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      type="button"
-                      onClick={() => deleteConductor(c.id)}
-                      className="p-2 text-gray-400 hover:text-syntix-red hover:bg-red-50 rounded-lg transition-colors"
-                      aria-label={`Eliminar conductor ${c.nombre}`}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((c) => {
+                const assignedVehicleLabel = getAssignedVehicleLabel(c, vehiculos);
+
+                return (
+                  <tr key={c.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 flex items-center gap-3">
+                      <div className="w-10 h-10 bg-syntix-navy/5 rounded-full flex items-center justify-center text-syntix-navy">
+                        <User className="w-5 h-5" />
+                      </div>
+                      <span className="font-bold text-gray-900">{c.nombre}</span>
+                    </td>
+                    <td className="px-6 py-4 font-medium">{c.documento}</td>
+                    <td className="px-6 py-4">{c.telefono}</td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1 items-start">
+                        <span className="text-xs font-bold text-gray-500">Cat: {c.categoria}</span>
+                        <StatusBadge status={c.estado} />
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className="block max-w-[240px] truncate text-sm font-medium text-gray-700"
+                        title={assignedVehicleLabel}
+                      >
+                        {assignedVehicleLabel}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(c)}
+                        className="inline-flex items-center justify-center px-3 py-1.5 text-xs font-semibold text-syntix-navy bg-syntix-navy/5 hover:bg-syntix-navy/10 rounded-lg transition-colors"
+                        aria-label={`Editar conductor ${c.nombre}`}
+                      >
+                        Editar
+                      </button>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        type="button"
+                        onClick={() => deleteConductor(c.id)}
+                        className="p-2 text-gray-400 hover:text-syntix-red hover:bg-red-50 rounded-lg transition-colors"
+                        aria-label={`Eliminar conductor ${c.nombre}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

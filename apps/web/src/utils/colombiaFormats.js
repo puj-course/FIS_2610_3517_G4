@@ -89,7 +89,7 @@ export const sanitizePhone = (value) => {
  * Uso: <option>{getVehicleOptionLabel(vehicle)}</option>
  */
 export const getVehicleOptionLabel = (vehicle) => {
-  const placa = vehicle?.placa || 'Vehículo sin placa';
+  const placa = vehicle?.placa || vehicle?.placaVehiculo || 'Vehículo sin placa';
   const marca = vehicle?.marca || '';
   const modelo = vehicle?.modelo || '';
   const tipo = vehicle?.tipo || '';
