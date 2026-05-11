@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { X, User, Save } from 'lucide-react';
 import { useConductors } from '@/hooks/useConductors.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
+import { isValidCedula, isValidColombianMobile } from '@/utils/colombiaFormats.js';
 
 const createInitialFormData = () => ({
   nombre: '',
@@ -105,13 +106,13 @@ export default function AddConductorModal({
       return;
     }
 
-    if (!/^\d{7,15}$/.test(documento)) {
-      setError('El documento debe contener solo numeros y tener entre 7 y 15 digitos.');
+    if (!isValidCedula(documento)) {
+      setError('La cedula debe tener exactamente 10 digitos numericos.');
       return;
     }
 
-    if (!/^[0-9+\s-]{7,20}$/.test(telefono)) {
-      setError('Ingresa un telefono valido.');
+    if (!isValidColombianMobile(telefono)) {
+      setError('El celular debe tener 10 digitos e iniciar por 3.');
       return;
     }
 
@@ -231,7 +232,7 @@ export default function AddConductorModal({
               <option value="">Sin asignar</option>
               {vehiculosDisponibles.map((vehiculo) => (
                 <option key={vehiculo.id} value={vehiculo.id}>
-                  {vehiculo.placa} - {vehiculo.marca} {vehiculo.modelo}
+                  {vehiculo.placa} - {vehiculo.tipo || 'Otro'}
                 </option>
               ))}
             </select>

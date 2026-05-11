@@ -1,9 +1,9 @@
 import BaseAlertAdapter from './BaseAlertAdapter.js';
+import { isValidPlate, normalizePlate } from '@/utils/colombiaFormats.js';
 
 const buildVehicleEntity = (soat) => {
-  const placa = String(soat.placaVehiculo || soat.vehiculoPlaca || soat.placa || '').trim();
-  if (!placa || placa === 'Vehiculo no encontrado') return 'Vehiculo no encontrado';
-  return placa ? `Vehiculo ${placa}` : 'Vehiculo no encontrado';
+  const placa = normalizePlate(soat.placaVehiculo || soat.vehiculoPlaca || soat.placa || '');
+  return isValidPlate(placa) ? `Vehiculo ${placa}` : 'Vehiculo no encontrado';
 };
 
 // Genera alertas de SOAT usando el mismo contrato que el resto de fuentes documentales.
@@ -13,6 +13,8 @@ export default class SoatAlertAdapter extends BaseAlertAdapter {
       return null;
     }
 
+    const fechaFinVigencia = soat.fechaFinVigencia || soat.fechaVencimiento || null;
+
     return {
       id: `soat-${soat.id}`,
       tipo: 'SOAT',
@@ -21,10 +23,11 @@ export default class SoatAlertAdapter extends BaseAlertAdapter {
       entidad: buildVehicleEntity(soat),
       mensaje:
         soat.estado === 'rojo'
-          ? 'SOAT Vencido'
-          : 'SOAT Proximo a Vencer',
+          ? 'SOAT vencido'
+          : 'SOAT proximo a vencer',
       diasRestantes: soat.diasRestantes,
-      fechaVencimiento: soat.fechaVencimiento || null,
+      fechaVencimiento: fechaFinVigencia,
+      fechaFinVigencia,
       prioridad: soat.estado,
       fecha: new Date().toISOString(),
     };

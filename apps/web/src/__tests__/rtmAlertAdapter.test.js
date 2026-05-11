@@ -31,7 +31,7 @@ describe('RtmAlertAdapter - validacion de vigencia RTM', () => {
       categoria: 'vehiculos',
       grupo: 'RTM',
       entidad: 'Vehiculo SYN106',
-      mensaje: 'Tecnomecanica Vencida',
+      mensaje: 'RTM vencida',
       diasRestantes: -3,
       fechaVencimiento: '2025-11-10',
       prioridad: 'rojo',
@@ -51,7 +51,7 @@ describe('RtmAlertAdapter - validacion de vigencia RTM', () => {
     expect(result).toMatchObject({
       id: 'rtm-3',
       entidad: 'Vehiculo no encontrado',
-      mensaje: 'Tecnomecanica Proxima a Vencer',
+      mensaje: 'RTM proxima a vencer',
       prioridad: 'amarillo',
       diasRestantes: 5,
     });

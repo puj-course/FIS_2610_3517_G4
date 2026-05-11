@@ -9,6 +9,7 @@ import RtmAlertAdapter from '@/patterns/adapters/RtmAlertAdapter.js';
 import ConductorAlertAdapter from '@/patterns/adapters/ConductorAlertAdapter.js';
 import PriorityAlertSortStrategy from '@/patterns/strategy/PriorityAlertSortStrategy.js';
 import UrgencyAlertSortStrategy from '@/patterns/strategy/UrgencyAlertSortStrategy.js';
+import { isValidPlate, normalizePlate } from '@/utils/colombiaFormats.js';
 
 const soatAlertAdapter = new SoatAlertAdapter();
 const rtmAlertAdapter = new RtmAlertAdapter();
@@ -42,7 +43,9 @@ const resolveVehiclePlate = (documento, vehiculos = []) => {
     (item) => String(documento.vehiculoId) === String(item._id || item.id)
   );
 
-  return String(vehiculo?.placa || '').trim() || UNKNOWN_VEHICLE_LABEL;
+  const placa = normalizePlate(vehiculo?.placa || documento.placaVehiculo || documento.vehiculoPlaca || documento.placa || '');
+
+  return isValidPlate(placa) ? placa : UNKNOWN_VEHICLE_LABEL;
 };
 
 const enrichDocumentWithVehicle = (documento, vehiculos) => {

@@ -22,7 +22,7 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
       placaVehiculo: 'SYN106',
       estado: 'rojo',
       diasRestantes: -1,
-      fechaVencimiento: '2025-12-15',
+      fechaFinVigencia: '2025-12-15',
     });
 
     expect(result).toMatchObject({
@@ -31,9 +31,10 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
       categoria: 'vehiculos',
       grupo: 'SOAT',
       entidad: 'Vehiculo SYN106',
-      mensaje: 'SOAT Vencido',
+      mensaje: 'SOAT vencido',
       diasRestantes: -1,
       fechaVencimiento: '2025-12-15',
+      fechaFinVigencia: '2025-12-15',
       prioridad: 'rojo',
     });
     expect(Number.isNaN(Date.parse(result.fecha))).toBe(false);
@@ -51,7 +52,7 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
     expect(result).toMatchObject({
       id: 'soat-3',
       entidad: 'Vehiculo no encontrado',
-      mensaje: 'SOAT Vencido',
+      mensaje: 'SOAT vencido',
       prioridad: 'rojo',
       diasRestantes: -999,
     });
@@ -68,7 +69,7 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
     expect(result).toMatchObject({
       id: 'soat-4',
       entidad: 'Vehiculo MNO321',
-      mensaje: 'SOAT Proximo a Vencer',
+      mensaje: 'SOAT proximo a vencer',
       prioridad: 'amarillo',
       diasRestantes: 0,
     });
@@ -85,7 +86,7 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
     expect(result).toMatchObject({
       id: 'soat-5',
       entidad: 'Vehiculo QRS654',
-      mensaje: 'SOAT Proximo a Vencer',
+      mensaje: 'SOAT proximo a vencer',
       prioridad: 'amarillo',
       diasRestantes: 5,
     });

@@ -49,6 +49,23 @@ export default function ReportesPage() {
     licencias: conductorAlerts.filter((alert) => alert.grupo === 'Licencias').length,
   }), [vehicleAlerts, conductorAlerts]);
 
+  const documentStats = useMemo(() => ({
+    soat: {
+      total: soats.length,
+      vigente: soats.filter((soat) => soat.estado === 'verde').length,
+      proximo: soats.filter((soat) => soat.estado === 'amarillo').length,
+      vencido: soats.filter((soat) => soat.estado === 'rojo').length,
+      faltantes: vehiculos.filter((vehiculo) => !vehiculo.soat).length,
+    },
+    rtm: {
+      total: rtms.length,
+      vigente: rtms.filter((rtm) => rtm.estado === 'verde').length,
+      proximo: rtms.filter((rtm) => rtm.estado === 'amarillo').length,
+      vencido: rtms.filter((rtm) => rtm.estado === 'rojo').length,
+      faltantes: vehiculos.filter((vehiculo) => !vehiculo.rtm).length,
+    },
+  }), [rtms, soats, vehiculos]);
+
   const cumplimiento = stateStats.total > 0
     ? Math.round((stateStats.verde / stateStats.total) * 100)
     : 0;
@@ -80,7 +97,7 @@ export default function ReportesPage() {
         vehiculo.tipo,
         conductorName,
         soatStatus.toUpperCase(),
-        formatColombianDate(vehiculo.soat?.fechaVencimiento),
+        formatColombianDate(vehiculo.soat?.fechaFinVigencia || vehiculo.soat?.fechaVencimiento),
         rtmStatus.toUpperCase(),
         formatColombianDate(vehiculo.rtm?.fechaVencimiento),
         licenseStatus.toUpperCase(),
@@ -165,8 +182,8 @@ export default function ReportesPage() {
       <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Resumen Documental</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <DocumentSummary title="SOAT" total={soats.length} alerts={alertStats.soat} />
-          <DocumentSummary title="RTM" total={rtms.length} alerts={alertStats.rtm} />
+          <DocumentSummary title="SOAT" stats={documentStats.soat} alerts={alertStats.soat} />
+          <DocumentSummary title="RTM" stats={documentStats.rtm} alerts={alertStats.rtm} />
           <DocumentSummary title="Licencias" total={conductores.length} alerts={alertStats.licencias} />
         </div>
       </div>
@@ -242,11 +259,21 @@ function ReportSection({ title, alerts, emptyMessage }) {
   );
 }
 
-function DocumentSummary({ title, total, alerts }) {
+function DocumentSummary({ title, total, alerts, stats = null }) {
+  const totalValue = stats?.total ?? total;
+
   return (
     <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
       <p className="text-sm text-gray-500">{title}</p>
-      <p className="text-2xl font-black text-syntix-navy mt-1">{total}</p>
+      <p className="text-2xl font-black text-syntix-navy mt-1">{totalValue}</p>
+      {stats && (
+        <div className="grid grid-cols-2 gap-2 mt-3 text-xs text-gray-600">
+          <span>Vigentes: <strong>{stats.vigente}</strong></span>
+          <span>Proximos: <strong>{stats.proximo}</strong></span>
+          <span>Vencidos: <strong>{stats.vencido}</strong></span>
+          <span>Sin registro: <strong>{stats.faltantes}</strong></span>
+        </div>
+      )}
       <p className="text-xs text-gray-500 mt-1">
         {alerts} alertas activas
       </p>

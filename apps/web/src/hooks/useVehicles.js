@@ -5,6 +5,7 @@ import { useConductors } from './useConductors.js';
 import { useDocuments } from './useDocuments.js';
 import { useRtm } from '@/contexts/RtmContext.jsx';
 import { getWorstState } from '@/utils/dateUtils.js';
+import { normalizePlate } from '@/utils/colombiaFormats.js';
 
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
@@ -12,6 +13,8 @@ const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 const normalizeVehicle = (vehiculo) => ({
   ...vehiculo,
   id: vehiculo._id || vehiculo.id,
+  placa: normalizePlate(vehiculo.placa),
+  tipo: vehiculo.tipo || 'Otro',
 });
 
 const notifyVehiclesUpdated = () => {
@@ -68,8 +71,9 @@ export function useVehicles() {
 
     const response = await api.post('/vehiculos', {
       ...data,
-      placa: String(data.placa ?? '').trim().toUpperCase(),
+      placa: normalizePlate(data.placa),
       anio: Number(data.anio),
+      tipo: data.tipo || 'Otro',
       conductorId: data.conductorId ?? null,
       ownerEmail: user.email,
       ownerEmpresa: user.empresa || '',
@@ -84,8 +88,9 @@ export function useVehicles() {
   const updateVehicle = async (id, data) => {
     const response = await api.put(`/vehiculos/${id}`, {
       ...data,
-      placa: String(data.placa ?? '').trim().toUpperCase(),
+      placa: normalizePlate(data.placa),
       anio: Number(data.anio),
+      tipo: data.tipo || 'Otro',
     });
 
     await fetchVehicles();

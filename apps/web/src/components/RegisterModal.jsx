@@ -3,6 +3,7 @@ import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw, Eye, E
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { authService } from '@/services/api.js';
 import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
+import { isValidColombianMobile } from '@/utils/colombiaFormats.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -35,6 +36,10 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     }
     if (!telefono) {
       setError('Ingresa el teléfono.');
+      return;
+    }
+    if (!isValidColombianMobile(telefono)) {
+      setError('El celular debe tener 10 digitos e iniciar por 3.');
       return;
     }
     if (!EMAIL_REGEX.test(email)) {
@@ -79,6 +84,11 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
     if (!telefono) {
       setError('Ingresa el teléfono antes de continuar con Google.');
+      return;
+    }
+
+    if (!isValidColombianMobile(telefono)) {
+      setError('El celular debe tener 10 digitos e iniciar por 3.');
       return;
     }
 
@@ -192,7 +202,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input type="tel" required value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="300 123 4567" />
+                  <input type="tel" required value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="3001234567" />
                 </div>
               </div>
               <div>

@@ -1,9 +1,9 @@
 import BaseAlertAdapter from './BaseAlertAdapter.js';
+import { isValidPlate, normalizePlate } from '@/utils/colombiaFormats.js';
 
 const buildVehicleEntity = (rtm) => {
-  const placa = String(rtm.placaVehiculo || rtm.vehiculoPlaca || rtm.placa || '').trim();
-  if (!placa || placa === 'Vehiculo no encontrado') return 'Vehiculo no encontrado';
-  return placa ? `Vehiculo ${placa}` : 'Vehiculo no encontrado';
+  const placa = normalizePlate(rtm.placaVehiculo || rtm.vehiculoPlaca || rtm.placa || '');
+  return isValidPlate(placa) ? `Vehiculo ${placa}` : 'Vehiculo no encontrado';
 };
 
 // Genera alertas a partir de vencimientos o proximidad de la tecnomecanica.
@@ -21,8 +21,8 @@ export default class RtmAlertAdapter extends BaseAlertAdapter {
       entidad: buildVehicleEntity(rtm),
       mensaje:
         rtm.estado === 'rojo'
-          ? 'Tecnomecanica Vencida'
-          : 'Tecnomecanica Proxima a Vencer',
+          ? 'RTM vencida'
+          : 'RTM proxima a vencer',
       diasRestantes: rtm.diasRestantes,
       fechaVencimiento: rtm.fechaVencimiento || null,
       prioridad: rtm.estado,
