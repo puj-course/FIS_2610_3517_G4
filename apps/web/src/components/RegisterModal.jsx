@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
+import { queueOnboardingForUser } from '@/contexts/OnboardingContext.jsx';
 import { authService } from '@/services/api.js';
 import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
 
@@ -57,6 +58,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
         setStep('verify');
         startCooldown();
       } else if (res.success) {
+        queueOnboardingForUser(res.user?.email || email);
         onClose();
       } else {
         setError(res.message || 'Error al registrar usuario');
@@ -93,6 +95,9 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     try {
       const res = await loginWithGoogle({ idToken: credential, empresa, telefono });
       if (res.success) {
+        if (res.created && res.user?.email) {
+          queueOnboardingForUser(res.user.email);
+        }
         onClose();
       } else {
         setError(res.message || 'No se pudo completar el registro con Google.');
@@ -139,6 +144,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     try {
       const res = await authService.verificarCodigo(pendingEmail, codigo);
       if (res.success) {
+        queueOnboardingForUser(res.data.user?.email || pendingEmail);
         if (loginAfterVerification) loginAfterVerification(res.data.user, res.data.token);
         onClose();
       } else {

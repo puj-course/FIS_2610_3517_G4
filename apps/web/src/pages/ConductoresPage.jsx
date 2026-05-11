@@ -39,11 +39,12 @@ export default function ConductoresPage() {
         <title>Conductores | SYNTIX Drive Control</title>
       </Helmet>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div data-onboarding="conductors-header" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-syntix-navy">Gestion de Conductores</h1>
         <button
           type="button"
           onClick={openCreateModal}
+          data-onboarding="conductors-add-button"
           className="bg-syntix-navy text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2 shadow-sm"
         >
           <Plus className="w-4 h-4" /> Nuevo Conductor
@@ -52,7 +53,7 @@ export default function ConductoresPage() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 border-b border-gray-100 bg-gray-50/50">
-          <div className="relative w-full sm:w-96">
+          <div data-onboarding="conductors-search" className="relative w-full sm:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
@@ -64,7 +65,7 @@ export default function ConductoresPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div data-onboarding="conductors-table" className="overflow-x-auto">
           <table className="w-full text-left text-sm text-gray-600">
             <thead className="bg-gray-50 text-gray-700 font-semibold border-b border-gray-200">
               <tr>

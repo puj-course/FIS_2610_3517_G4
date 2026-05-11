@@ -74,7 +74,7 @@ export default function ValidacionRUNTPage() {
         <title>Validación RUNT | SYNTIX Drive Control</title>
       </Helmet>
 
-      <div className="text-center mb-8">
+      <div data-onboarding="runt-header" className="text-center mb-8">
         <div className="w-16 h-16 bg-syntix-navy/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Database className="w-8 h-8 text-syntix-navy" />
         </div>
@@ -83,10 +83,10 @@ export default function ValidacionRUNTPage() {
       </div>
 
       {/* Formulario de Búsqueda */}
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-4">
+      <div data-onboarding="runt-search" className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 space-y-4">
         <form onSubmit={handleSearch} className="space-y-4">
           {/* Selector de Tipo de Búsqueda */}
-          <div className="flex gap-4">
+          <div data-onboarding="runt-search-type" className="flex gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input 
                 type="radio" 
@@ -111,7 +111,7 @@ export default function ValidacionRUNTPage() {
 
           {/* Input de Búsqueda */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1 relative">
+            <div data-onboarding="runt-search-input" className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input 
                 type="text" 
@@ -123,6 +123,7 @@ export default function ValidacionRUNTPage() {
               />
             </div>
             <button 
+              data-onboarding="runt-search-button"
               type="submit" 
               disabled={loading || !searchInput.trim()}
               className="bg-syntix-navy text-white px-8 py-4 rounded-xl font-bold hover:bg-syntix-navy/90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed shadow-md"
@@ -133,7 +134,7 @@ export default function ValidacionRUNTPage() {
 
           {/* Búsquedas Recientes */}
           {recentSearches.length > 0 && (
-            <div className="p-3 bg-gray-50 rounded-lg">
+            <div data-onboarding="runt-recent-searches" className="p-3 bg-gray-50 rounded-lg">
               <p className="text-xs font-bold text-gray-600 mb-2">Búsquedas recientes:</p>
               <div className="flex flex-wrap gap-2">
                 {recentSearches.map(placa => (
@@ -181,7 +182,7 @@ export default function ValidacionRUNTPage() {
       )}
 
       {/* Link a Historial */}
-      <div className="text-center p-6 bg-syntix-navy/5 rounded-xl">
+      <div data-onboarding="runt-history-link" className="text-center p-6 bg-syntix-navy/5 rounded-xl">
         <p className="text-gray-600 mb-2">¿Quieres ver todas tus validaciones?</p>
         <a 
           href="/historial-validaciones"

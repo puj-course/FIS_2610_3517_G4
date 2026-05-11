@@ -17,13 +17,19 @@ export default function AlertasPage() {
         <title>Alertas | SYNTIX Drive Control</title>
       </Helmet>
 
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div
+        data-onboarding="alerts-header"
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
+      >
         <div>
           <h1 className="text-2xl font-bold text-syntix-navy">Centro de Alertas</h1>
           <p className="text-gray-500 text-sm mt-1">Notificaciones automáticas basadas en la Regla de Oro</p>
         </div>
 
-        <div className="bg-white p-2 rounded-lg border border-gray-200 shadow-sm flex items-center gap-3">
+        <div
+          data-onboarding="alerts-date-filter"
+          className="bg-white p-2 rounded-lg border border-gray-200 shadow-sm flex items-center gap-3"
+        >
           <Calendar className="w-5 h-5 text-gray-400 ml-2" />
           <div className="flex flex-col">
             <label className="text-xs font-bold text-gray-500 uppercase">Simular Fecha</label>
@@ -34,13 +40,13 @@ export default function AlertasPage() {
               className="text-sm font-medium text-syntix-navy outline-none bg-transparent"
             />
           </div>
-          <button onClick={resetDate} className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded font-medium transition-colors">
+          <button data-onboarding="alerts-reset-date" onClick={resetDate} className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded font-medium transition-colors">
             Hoy
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <div data-onboarding="alerts-list" className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <BellRing className="w-5 h-5 text-syntix-navy" /> Alertas Activas ({alertCount})

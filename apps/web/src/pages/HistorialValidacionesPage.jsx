@@ -93,9 +93,10 @@ export default function HistorialValidacionesPage() {
       </Helmet>
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div data-onboarding="runt-history-header" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-syntix-navy">Historial de Validaciones RUNT</h1>
         <button 
+          data-onboarding="runt-history-export"
           onClick={handleDownloadCSV}
           disabled={filteredValidations.length === 0}
           className="bg-syntix-green text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-syntix-green/90 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -105,7 +106,7 @@ export default function HistorialValidacionesPage() {
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div data-onboarding="runt-history-stats" className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
           <p className="text-xs font-bold text-gray-500 uppercase mb-1">Total</p>
           <p className="text-3xl font-black text-syntix-navy">{stats.total}</p>
@@ -129,7 +130,7 @@ export default function HistorialValidacionesPage() {
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-4">
+      <div data-onboarding="runt-history-filters" className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Búsqueda */}
           <div className="relative">
@@ -192,7 +193,7 @@ export default function HistorialValidacionesPage() {
       </div>
 
       {/* Tabla */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div data-onboarding="runt-history-table" className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {filteredValidations.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-gray-500 font-medium">No hay validaciones registradas</p>

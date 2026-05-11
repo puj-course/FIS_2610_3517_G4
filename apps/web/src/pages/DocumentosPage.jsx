@@ -49,7 +49,7 @@ export default function DocumentosPage() {
       </Helmet>
 
       {/* Header */}
-      <div className="mb-8 flex items-start justify-between gap-3 flex-wrap">
+      <div data-onboarding="documents-header" className="mb-8 flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-4xl font-extrabold text-syntix-navy mb-2">
             Gestión de Documentos
@@ -60,6 +60,7 @@ export default function DocumentosPage() {
           <button
             type="button"
             onClick={() => openModal('addDocument')}
+            data-onboarding="documents-add-soat"
             style={{ background: '#111', color: '#fff', padding: '10px 16px', borderRadius: 10, fontWeight: 600, fontSize: 13, border: 'none', cursor: 'pointer' }}
           >
             + SOAT
@@ -67,6 +68,7 @@ export default function DocumentosPage() {
           <button
             type="button"
             onClick={() => openModal('addRtm')}
+            data-onboarding="documents-add-rtm"
             style={{ background: '#f3f4f6', color: '#111', padding: '10px 16px', borderRadius: 10, fontWeight: 600, fontSize: 13, border: 'none', cursor: 'pointer' }}
           >
             + RTM
@@ -75,7 +77,7 @@ export default function DocumentosPage() {
       </div>
 
       {/* Tabla SOAT */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+      <div data-onboarding="documents-soat-table" className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
         <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
           <Shield className="w-6 h-6 text-syntix-navy" />
           <h2 className="text-2xl font-bold text-syntix-navy">Pólizas SOAT</h2>
@@ -145,7 +147,7 @@ export default function DocumentosPage() {
       </div>
 
       {/* Tabla RTM */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      <div data-onboarding="documents-rtm-table" className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
           <Wrench className="w-6 h-6 text-syntix-navy" />
           <h2 className="text-2xl font-bold text-syntix-navy">Revisiones Técnico-Mecánicas</h2>
