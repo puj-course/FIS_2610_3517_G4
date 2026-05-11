@@ -34,6 +34,7 @@ const {
   enviarCodigoRecuperacion,
   verificarServicioCorreo,
 } = require('./services/emailService');
+const { enviarCodigoRecuperacionSms } = require('./services/smsService');
 
 const DB_UNAVAILABLE_MESSAGE =
   'Base de datos no disponible. Verifica la IP permitida en MongoDB Atlas y la variable MONGO_URI.';
@@ -344,14 +345,18 @@ const VerificacionOTP = mongoose.model('VerificacionOTP', VerificacionOTPSchema)
 
 const PasswordResetOTPSchema = new mongoose.Schema({
   email: { type: String, required: true },
+  recoveryTokenHash: { type: String, required: true },
   codigoHash: { type: String, required: true },
   expiresAt: { type: Date, required: true },
   intentos: { type: Number, default: 0 },
   ultimoEnvio: { type: Date, default: Date.now },
+  canalEntrega: { type: String, enum: ['email', 'sms'], required: true },
+  destinoEnmascarado: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
 PasswordResetOTPSchema.index({ email: 1 });
+PasswordResetOTPSchema.index({ recoveryTokenHash: 1 }, { unique: true });
 PasswordResetOTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const PasswordResetOTP = mongoose.model('PasswordResetOTP', PasswordResetOTPSchema);
@@ -364,6 +369,10 @@ const normalizeText = (value) => String(value ?? '').trim();
 
 const normalizeEmail = (value) => normalizeText(value).toLowerCase();
 
+const normalizePhone = (value) => normalizeText(value).replace(/[^\d+]/g, '');
+
+const getPhoneLookupKey = (value) => normalizePhone(value).replace(/\D/g, '');
+
 const GOOGLE_CLIENT_ID = normalizeText(process.env.GOOGLE_CLIENT_ID);
 const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
 
@@ -374,6 +383,76 @@ const DUPLICATE_EMAIL_MESSAGE = 'Ya existe una cuenta con este correo electróni
 const normalizeNullableText = (value) => {
   const normalized = normalizeText(value);
   return normalized || null;
+};
+
+const buildSmsDestination = (value) => {
+  const digits = getPhoneLookupKey(value);
+  if (!digits) {
+    return null;
+  }
+
+  if (digits.startsWith('57')) {
+    return `+${digits}`;
+  }
+
+  if (digits.length === 10) {
+    return `+57${digits}`;
+  }
+
+  return `+${digits}`;
+};
+
+const maskEmail = (email) => {
+  const normalizedEmail = normalizeEmail(email);
+  const [localPart = '', domain = ''] = normalizedEmail.split('@');
+  if (!domain) {
+    return normalizedEmail;
+  }
+
+  const visibleLocal = localPart.slice(0, 2);
+  return `${visibleLocal}${'*'.repeat(Math.max(localPart.length - visibleLocal.length, 2))}@${domain}`;
+};
+
+const maskPhone = (phone) => {
+  const digits = getPhoneLookupKey(phone);
+  if (digits.length <= 4) {
+    return digits;
+  }
+
+  return `${'*'.repeat(Math.max(digits.length - 4, 4))}${digits.slice(-4)}`;
+};
+
+const buildRecoveryToken = () => crypto.randomBytes(24).toString('hex');
+
+const hashRecoveryToken = (token) =>
+  crypto.createHash('sha256').update(String(token || '')).digest('hex');
+
+const isPhoneIdentifier = (value) => getPhoneLookupKey(value).length >= 7;
+
+const findUserByPhone = async (phoneLookupKey) => {
+  const usuariosConTelefono = await Usuario.find({
+    telefono: { $exists: true, $ne: null },
+  });
+
+  return usuariosConTelefono.find((usuario) => getPhoneLookupKey(usuario.telefono) === phoneLookupKey) || null;
+};
+
+const findUserByRecoveryIdentifier = async (identifier) => {
+  const normalizedIdentifier = normalizeText(identifier);
+
+  if (EMAIL_REGEX.test(normalizedIdentifier)) {
+    const emailNormalizado = normalizeEmail(normalizedIdentifier);
+    const usuario = await Usuario.findOne({ email: emailNormalizado });
+    return { usuario, tipo: 'email', valor: emailNormalizado };
+  }
+
+  if (isPhoneIdentifier(normalizedIdentifier)) {
+    const phoneLookupKey = getPhoneLookupKey(normalizedIdentifier);
+    const usuario = await findUserByPhone(phoneLookupKey);
+    return { usuario, tipo: 'phone', valor: phoneLookupKey };
+  }
+
+  return { usuario: null, tipo: null, valor: '' };
 };
 
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
@@ -432,7 +511,7 @@ app.post('/api/auth/register', async (req, res) => {
     const emailNormalizado = normalizeEmail(email);
     const nombreNormalizado = normalizeText(nombre);
     const empresaNormalizada = normalizeText(empresa);
-    const telefonoNormalizado = normalizeText(telefono);
+    const telefonoNormalizado = normalizePhone(telefono);
 
     if (!empresaNormalizada) {
       return res.status(400).json({ message: 'Ingresa el nombre de la empresa.' });
@@ -700,7 +779,7 @@ app.post('/api/auth/google', async (req, res) => {
     const googleProfile = await verifyGoogleIdentity(idToken);
     const emailNormalizado = normalizeEmail(googleProfile.email);
     const empresaNormalizada = normalizeText(empresa);
-    const telefonoNormalizado = normalizeText(telefono);
+    const telefonoNormalizado = normalizePhone(telefono);
     const nombreNormalizado = normalizeText(googleProfile.name);
 
     let usuario = await Usuario.findOne({ email: emailNormalizado });
@@ -806,20 +885,28 @@ app.post('/api/auth/google', async (req, res) => {
 
 app.post('/api/auth/recuperar-cuenta', async (req, res) => {
   try {
-    const { email } = req.body;
-    const emailNormalizado = normalizeEmail(email);
+    const identifier = normalizeText(req.body?.identifier || req.body?.email || req.body?.telefono);
 
-    if (!EMAIL_REGEX.test(emailNormalizado)) {
-      return res.status(400).json({ message: 'Ingresa un correo electronico valido.' });
+    if (!identifier) {
+      return res.status(400).json({ message: 'Ingresa el correo o telefono registrado.' });
     }
 
-    const usuario = await Usuario.findOne({ email: emailNormalizado });
+    const { usuario, tipo } = await findUserByRecoveryIdentifier(identifier);
+    const genericMessage = 'Si existe una cuenta asociada, enviaremos un codigo de recuperacion al contacto registrado.';
+
+    if (!tipo) {
+      return res.status(400).json({ message: 'Ingresa un correo o telefono valido.' });
+    }
 
     if (!usuario) {
-      return res.status(404).json({ message: 'No existe una cuenta con este correo.' });
+      return res.json({
+        success: true,
+        message: genericMessage,
+      });
     }
 
-    const recuperacionExistente = await PasswordResetOTP.findOne({ email: emailNormalizado });
+    const emailRegistrado = normalizeEmail(usuario.email);
+    const recuperacionExistente = await PasswordResetOTP.findOne({ email: emailRegistrado });
 
     if (recuperacionExistente) {
       const segundosDesdeUltimoEnvio =
@@ -837,30 +924,58 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
     const codigo = String(secureRandomInt(100000, 999999));
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
+    const recoveryToken = buildRecoveryToken();
+    const recoveryTokenHash = hashRecoveryToken(recoveryToken);
+    let canalEntrega = 'email';
+    let destinoEnmascarado = maskEmail(emailRegistrado);
 
-    await PasswordResetOTP.findOneAndDelete({ email: emailNormalizado });
-
-    await new PasswordResetOTP({
-      email: emailNormalizado,
-      codigoHash,
-      expiresAt,
-      ultimoEnvio: new Date(),
-    }).save();
+    await PasswordResetOTP.findOneAndDelete({ email: emailRegistrado });
 
     try {
-      await enviarCodigoRecuperacion(emailNormalizado, usuario.nombre || usuario.empresa, codigo);
+      await enviarCodigoRecuperacion(emailRegistrado, usuario.nombre || usuario.empresa, codigo);
     } catch (emailErr) {
       console.error('Error al enviar correo de recuperacion:', emailErr.message);
 
-      return res.status(500).json({
-        message: `Error al enviar el correo de recuperacion: ${emailErr.message}`,
-      });
+      const smsDestination = buildSmsDestination(usuario.telefono);
+      if (!smsDestination) {
+        return res.status(500).json({
+          message: 'No fue posible enviar el codigo por correo y no hay un telefono valido registrado para SMS.',
+        });
+      }
+
+      try {
+        await enviarCodigoRecuperacionSms(smsDestination, usuario.nombre || usuario.empresa, codigo);
+        canalEntrega = 'sms';
+        destinoEnmascarado = maskPhone(smsDestination);
+      } catch (smsErr) {
+        console.error('Error al enviar SMS de recuperacion:', smsErr.message);
+        return res.status(500).json({
+          message: 'No fue posible enviar el codigo de recuperacion por correo ni por SMS.',
+        });
+      }
     }
+
+    await new PasswordResetOTP({
+      email: emailRegistrado,
+      recoveryTokenHash,
+      codigoHash,
+      expiresAt,
+      ultimoEnvio: new Date(),
+      canalEntrega,
+      destinoEnmascarado,
+    }).save();
 
     return res.json({
       success: true,
-      message: 'Codigo de recuperacion enviado. Revisa tu correo.',
-      data: { email: emailNormalizado },
+      message:
+        canalEntrega === 'sms'
+          ? 'No pudimos usar el correo registrado. Enviamos el codigo por SMS al telefono asociado.'
+          : 'Codigo de recuperacion enviado al correo registrado.',
+      data: {
+        recoveryToken,
+        channel: canalEntrega,
+        destinationHint: destinoEnmascarado,
+      },
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -869,32 +984,39 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
 
 app.post('/api/auth/restablecer-password', async (req, res) => {
   try {
-    const { email, codigo, password, nuevaPassword } = req.body;
-    const emailNormalizado = normalizeEmail(email);
+    const { email, codigo, password, nuevaPassword, recoveryToken } = req.body;
     const passwordNueva = String(nuevaPassword || password || '');
 
-    if (!emailNormalizado || !codigo || !passwordNueva) {
-      return res.status(400).json({ message: 'Email, codigo y nueva contrasena son requeridos.' });
+    if (!codigo || !passwordNueva || (!recoveryToken && !email)) {
+      return res.status(400).json({ message: 'Codigo, nueva contrasena y token de recuperacion son requeridos.' });
     }
 
     if (passwordNueva.length < 6) {
       return res.status(400).json({ message: 'La contrasena debe tener al menos 6 caracteres.' });
     }
 
-    const recuperacion = await PasswordResetOTP.findOne({ email: emailNormalizado });
+    let recuperacion = null;
+
+    if (recoveryToken) {
+      recuperacion = await PasswordResetOTP.findOne({
+        recoveryTokenHash: hashRecoveryToken(recoveryToken),
+      });
+    } else {
+      recuperacion = await PasswordResetOTP.findOne({ email: normalizeEmail(email) });
+    }
 
     if (!recuperacion) {
-      return res.status(400).json({ message: 'No hay un codigo de recuperacion pendiente para este correo.' });
+      return res.status(400).json({ message: 'No hay una recuperacion pendiente o el token ya no es valido.' });
     }
 
     if (new Date() > recuperacion.expiresAt) {
-      await PasswordResetOTP.findOneAndDelete({ email: emailNormalizado });
+      await PasswordResetOTP.findOneAndDelete({ email: recuperacion.email });
 
       return res.status(400).json({ message: 'El codigo ha expirado. Solicita uno nuevo.' });
     }
 
     if (recuperacion.intentos >= OTP_MAX_INTENTOS) {
-      await PasswordResetOTP.findOneAndDelete({ email: emailNormalizado });
+      await PasswordResetOTP.findOneAndDelete({ email: recuperacion.email });
 
       return res.status(400).json({ message: 'Demasiados intentos fallidos. Solicita un nuevo codigo.' });
     }
@@ -912,6 +1034,7 @@ app.post('/api/auth/restablecer-password', async (req, res) => {
       });
     }
 
+    const emailNormalizado = normalizeEmail(recuperacion.email);
     const usuario = await Usuario.findOne({ email: emailNormalizado });
 
     if (!usuario) {
@@ -928,6 +1051,9 @@ app.post('/api/auth/restablecer-password', async (req, res) => {
     return res.json({
       success: true,
       message: 'Contrasena actualizada. Ya puedes iniciar sesion.',
+      data: {
+        email: usuario.email,
+      },
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });

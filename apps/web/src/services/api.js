@@ -200,9 +200,9 @@ export const authService = {
     }
   },
 
-  async solicitarRecuperacion(email) {
+  async solicitarRecuperacion(identifier) {
     try {
-      const response = await api.post('/auth/recuperar-cuenta', { email });
+      const response = await api.post('/auth/recuperar-cuenta', { identifier });
       return { success: true, data: response.data.data || response.data, message: response.data.message };
     } catch (error) {
       if (shouldUseLocalStorage(error)) {
@@ -215,10 +215,10 @@ export const authService = {
     }
   },
 
-  async restablecerPassword(email, codigo, nuevaPassword) {
+  async restablecerPassword(recoveryToken, codigo, nuevaPassword) {
     try {
-      const response = await api.post('/auth/restablecer-password', { email, codigo, nuevaPassword });
-      return { success: true, data: response.data, message: response.data.message };
+      const response = await api.post('/auth/restablecer-password', { recoveryToken, codigo, nuevaPassword });
+      return { success: true, data: response.data.data || response.data, message: response.data.message };
     } catch (error) {
       if (shouldUseLocalStorage(error)) {
         return { success: false, useLocalStorage: true };
