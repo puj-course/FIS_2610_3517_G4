@@ -1174,9 +1174,23 @@ app.post('/api/conductores', async (req, res) => {
       });
     }
 
+    // Validación adicional: rechazar documentos con caracteres no numéricos
+    if (!/^\d+$/.test(documentoNormalizado)) {
+      return res.status(400).json({
+        error: 'La cedula solo debe contener numeros.',
+      });
+    }
+
     if (!COLOMBIAN_MOBILE_REGEX.test(telefonoNormalizado)) {
       return res.status(400).json({
         error: 'El celular debe tener 10 digitos e iniciar por 3.',
+      });
+    }
+
+    // Validación adicional: rechazar teléfono con caracteres no numéricos
+    if (!/^\d+$/.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        error: 'El celular solo debe contener numeros.',
       });
     }
 
@@ -1239,9 +1253,23 @@ app.put('/api/conductores/:id', async (req, res) => {
       });
     }
 
+    // Validación adicional: rechazar documentos con caracteres no numéricos
+    if (!/^\d+$/.test(documentoNormalizado)) {
+      return res.status(400).json({
+        error: 'La cedula solo debe contener numeros.',
+      });
+    }
+
     if (!COLOMBIAN_MOBILE_REGEX.test(telefonoNormalizado)) {
       return res.status(400).json({
         error: 'El celular debe tener 10 digitos e iniciar por 3.',
+      });
+    }
+
+    // Validación adicional: rechazar teléfono con caracteres no numéricos
+    if (!/^\d+$/.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        error: 'El celular solo debe contener numeros.',
       });
     }
 
@@ -1345,6 +1373,13 @@ app.post('/api/vehiculos', async (req, res) => {
       });
     }
 
+    // Validación adicional: rechazar placas con más de 6 caracteres
+    if (placaNormalizada.length !== 6) {
+      return res.status(400).json({
+        error: 'La placa debe tener exactamente 6 caracteres.',
+      });
+    }
+
     const conductorIdNormalizado = normalizeNullableText(conductorId);
 
     if (conductorIdNormalizado) {
@@ -1429,6 +1464,13 @@ app.put('/api/vehiculos/:id', async (req, res) => {
     if (!isValidPlate(placaNormalizada)) {
       return res.status(400).json({
         error: 'La placa debe tener formato ABC123: tres letras y tres numeros, sin guiones ni espacios.',
+      });
+    }
+
+    // Validación adicional: rechazar placas con más de 6 caracteres
+    if (placaNormalizada.length !== 6) {
+      return res.status(400).json({
+        error: 'La placa debe tener exactamente 6 caracteres.',
       });
     }
 

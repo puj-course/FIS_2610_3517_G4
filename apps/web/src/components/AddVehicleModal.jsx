@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X, Car, Save } from 'lucide-react';
 import { useVehicles } from '@/hooks/useVehicles.js';
-import { isValidPlate, normalizePlate } from '@/utils/colombiaFormats.js';
+import { isValidPlate, normalizePlate, sanitizePlate } from '@/utils/colombiaFormats.js';
 
 const VEHICLE_TYPE_OPTIONS = [
   'Automovil',
@@ -180,10 +180,10 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
             <input
               type="text"
               required
-              maxLength={12}
+              maxLength={6}
               value={formData.placa}
               onChange={(e) =>
-                setFormData({ ...formData, placa: e.target.value.toUpperCase() })
+                setFormData({ ...formData, placa: sanitizePlate(e.target.value) })
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 uppercase font-bold tracking-wider"
               placeholder="ABC123"

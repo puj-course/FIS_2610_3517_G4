@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { X, User, Save } from 'lucide-react';
 import { useConductors } from '@/hooks/useConductors.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
-import { isValidCedula, isValidColombianMobile } from '@/utils/colombiaFormats.js';
+import { isValidCedula, isValidColombianMobile, sanitizeDocument, sanitizePhone, getVehicleOptionLabel } from '@/utils/colombiaFormats.js';
 
 const createInitialFormData = () => ({
   nombre: '',
@@ -201,9 +201,11 @@ export default function AddConductorModal({
               <label className="block text-sm font-bold text-gray-700 mb-1">Documento</label>
               <input
                 type="text"
+                inputMode="numeric"
                 required
+                maxLength={10}
                 value={formData.documento}
-                onChange={(e) => setFormData({ ...formData, documento: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, documento: sanitizeDocument(e.target.value) })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
                 placeholder="1234567890"
               />
@@ -212,10 +214,12 @@ export default function AddConductorModal({
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">Telefono</label>
               <input
-                type="tel"
+                type="text"
+                inputMode="numeric"
                 required
+                maxLength={10}
                 value={formData.telefono}
-                onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, telefono: sanitizePhone(e.target.value) })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
                 placeholder="3001234567"
               />
@@ -232,7 +236,7 @@ export default function AddConductorModal({
               <option value="">Sin asignar</option>
               {vehiculosDisponibles.map((vehiculo) => (
                 <option key={vehiculo.id} value={vehiculo.id}>
-                  {vehiculo.placa} - {vehiculo.tipo || 'Otro'}
+                  {getVehicleOptionLabel(vehiculo)}
                 </option>
               ))}
             </select>
