@@ -52,6 +52,12 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    networks:
+      - drivectrl-net
+    container_name: drivectrl-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
     depends_on:
       backend:
         condition: service_healthy
