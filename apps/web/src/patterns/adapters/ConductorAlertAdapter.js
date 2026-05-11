@@ -22,6 +22,7 @@ export default class ConductorAlertAdapter extends BaseAlertAdapter {
           ? 'Licencia Vencida'
           : 'Licencia Proxima a Vencer',
       diasRestantes: conductor.diasRestantes,
+      fechaVencimiento: conductor.fechaVencimiento || null,
       prioridad: conductor.estado,
       fecha: new Date().toISOString(),
     };

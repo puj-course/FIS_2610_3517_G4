@@ -22,6 +22,7 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
       placaVehiculo: 'SYN106',
       estado: 'rojo',
       diasRestantes: -1,
+      fechaVencimiento: '2025-12-15',
     });
 
     expect(result).toMatchObject({
@@ -32,6 +33,7 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
       entidad: 'Vehiculo SYN106',
       mensaje: 'SOAT Vencido',
       diasRestantes: -1,
+      fechaVencimiento: '2025-12-15',
       prioridad: 'rojo',
     });
     expect(Number.isNaN(Date.parse(result.fecha))).toBe(false);

@@ -21,6 +21,7 @@ describe('ConductorAlertAdapter - validacion de vigencia de licencia', () => {
       nombre: 'Juan Perez',
       estado: 'rojo',
       diasRestantes: -10,
+      fechaVencimiento: '2025-12-15',
     });
 
     expect(result).toMatchObject({
@@ -31,6 +32,7 @@ describe('ConductorAlertAdapter - validacion de vigencia de licencia', () => {
       entidad: 'Juan Perez',
       mensaje: 'Licencia Vencida',
       diasRestantes: -10,
+      fechaVencimiento: '2025-12-15',
       prioridad: 'rojo',
     });
     expect(Number.isNaN(Date.parse(result.fecha))).toBe(false);

@@ -24,6 +24,7 @@ export default class RtmAlertAdapter extends BaseAlertAdapter {
           ? 'Tecnomecanica Vencida'
           : 'Tecnomecanica Proxima a Vencer',
       diasRestantes: rtm.diasRestantes,
+      fechaVencimiento: rtm.fechaVencimiento || null,
       prioridad: rtm.estado,
       fecha: new Date().toISOString(),
     };

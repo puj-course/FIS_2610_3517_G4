@@ -22,6 +22,7 @@ describe('RtmAlertAdapter - validacion de vigencia RTM', () => {
       placaVehiculo: 'SYN106',
       estado: 'rojo',
       diasRestantes: -3,
+      fechaVencimiento: '2025-11-10',
     });
 
     expect(result).toMatchObject({
@@ -32,6 +33,7 @@ describe('RtmAlertAdapter - validacion de vigencia RTM', () => {
       entidad: 'Vehiculo SYN106',
       mensaje: 'Tecnomecanica Vencida',
       diasRestantes: -3,
+      fechaVencimiento: '2025-11-10',
       prioridad: 'rojo',
     });
     expect(Number.isNaN(Date.parse(result.fecha))).toBe(false);

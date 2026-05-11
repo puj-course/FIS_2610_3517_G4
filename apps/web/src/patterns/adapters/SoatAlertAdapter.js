@@ -24,6 +24,7 @@ export default class SoatAlertAdapter extends BaseAlertAdapter {
           ? 'SOAT Vencido'
           : 'SOAT Proximo a Vencer',
       diasRestantes: soat.diasRestantes,
+      fechaVencimiento: soat.fechaVencimiento || null,
       prioridad: soat.estado,
       fecha: new Date().toISOString(),
     };
