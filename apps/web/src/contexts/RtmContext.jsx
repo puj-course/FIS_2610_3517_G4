@@ -4,9 +4,6 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 import { calculateDaysRemaining, calculateDocumentState } from '@/utils/dateUtils.js';
-import { clearSourceAlerts } from '@/hooks/useAlertHub.js';
-import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
-import RtmAlertAdapter from '@/patterns/adapters/RtmAlertAdapter.js';
 
 const RtmContext = createContext(null);
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
@@ -52,12 +49,6 @@ export function RtmProvider({ children }) {
       return { ...rtm, diasRestantes, estado };
     });
   }, [storedRtms, simulatedDate, threshold]);
-
-  const rtmAlertAdapter = new RtmAlertAdapter();
-  useEffect(() => {
-    publishAdaptedAlerts(rtmAlertAdapter, 'rtms', rtms);
-    return () => clearSourceAlerts('rtms');
-  }, [rtms]);
 
   const addRtm = async (nuevaRtm) => {
     if (!user?.email) throw new Error('No hay usuario autenticado');

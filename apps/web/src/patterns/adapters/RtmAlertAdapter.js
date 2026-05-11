@@ -1,6 +1,12 @@
 import BaseAlertAdapter from './BaseAlertAdapter.js';
 
-// Genera alertas a partir de vencimientos o proximidad de la tecnomecánica.
+const buildVehicleEntity = (rtm) => {
+  const placa = String(rtm.placaVehiculo || rtm.vehiculoPlaca || rtm.placa || '').trim();
+  if (!placa || placa === 'Vehiculo no encontrado') return 'Vehiculo no encontrado';
+  return placa ? `Vehiculo ${placa}` : 'Vehiculo no encontrado';
+};
+
+// Genera alertas a partir de vencimientos o proximidad de la tecnomecanica.
 export default class RtmAlertAdapter extends BaseAlertAdapter {
   adapt(rtm) {
     if (rtm.estado !== 'rojo' && rtm.estado !== 'amarillo') {
@@ -10,11 +16,13 @@ export default class RtmAlertAdapter extends BaseAlertAdapter {
     return {
       id: `rtm-${rtm.id}`,
       tipo: 'RTM',
-      entidad: `Vehículo ${rtm.vehiculoId}`,
+      categoria: 'vehiculos',
+      grupo: 'RTM',
+      entidad: buildVehicleEntity(rtm),
       mensaje:
         rtm.estado === 'rojo'
-          ? 'Tecnomecánica Vencida'
-          : 'Tecnomecánica Próxima a Vencer',
+          ? 'Tecnomecanica Vencida'
+          : 'Tecnomecanica Proxima a Vencer',
       diasRestantes: rtm.diasRestantes,
       prioridad: rtm.estado,
       fecha: new Date().toISOString(),

@@ -1,5 +1,11 @@
 import BaseAlertAdapter from './BaseAlertAdapter.js';
 
+const buildVehicleEntity = (soat) => {
+  const placa = String(soat.placaVehiculo || soat.vehiculoPlaca || soat.placa || '').trim();
+  if (!placa || placa === 'Vehiculo no encontrado') return 'Vehiculo no encontrado';
+  return placa ? `Vehiculo ${placa}` : 'Vehiculo no encontrado';
+};
+
 // Genera alertas de SOAT usando el mismo contrato que el resto de fuentes documentales.
 export default class SoatAlertAdapter extends BaseAlertAdapter {
   adapt(soat) {
@@ -10,14 +16,16 @@ export default class SoatAlertAdapter extends BaseAlertAdapter {
     return {
       id: `soat-${soat.id}`,
       tipo: 'SOAT',
-      entidad: `Vehículo ${soat.vehiculoId}`,
+      categoria: 'vehiculos',
+      grupo: 'SOAT',
+      entidad: buildVehicleEntity(soat),
       mensaje:
         soat.estado === 'rojo'
           ? 'SOAT Vencido'
-          : 'SOAT Próximo a Vencer',
+          : 'SOAT Proximo a Vencer',
       diasRestantes: soat.diasRestantes,
       prioridad: soat.estado,
-      fecha: new Date().toISOString()
+      fecha: new Date().toISOString(),
     };
   }
 }

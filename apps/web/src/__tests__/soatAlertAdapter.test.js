@@ -15,10 +15,11 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
     expect(result).toBeNull();
   });
 
-  it('CP-SF-02 SOAT vencido genera alerta roja', () => {
+  it('CP-SF-02 SOAT vencido genera alerta roja con placa del vehiculo', () => {
     const result = adapter.adapt({
       id: 2,
-      vehiculoId: 'XYZ987',
+      vehiculoId: '665200000000000000000006',
+      placaVehiculo: 'SYN106',
       estado: 'rojo',
       diasRestantes: -1,
     });
@@ -26,7 +27,9 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
     expect(result).toMatchObject({
       id: 'soat-2',
       tipo: 'SOAT',
-      entidad: 'Vehículo XYZ987',
+      categoria: 'vehiculos',
+      grupo: 'SOAT',
+      entidad: 'Vehiculo SYN106',
       mensaje: 'SOAT Vencido',
       diasRestantes: -1,
       prioridad: 'rojo',
@@ -34,16 +37,18 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
     expect(Number.isNaN(Date.parse(result.fecha))).toBe(false);
   });
 
-  it('CP-SF-03 SOAT sin fecha genera estado invalido o alerta de vencido', () => {
+  it('CP-SF-03 SOAT sin placa visible mantiene alerta con fallback', () => {
     const result = adapter.adapt({
       id: 3,
-      vehiculoId: 'JKL456',
+      vehiculoId: '665200000000000000000099',
+      placaVehiculo: 'Vehiculo no encontrado',
       estado: 'rojo',
       diasRestantes: -999,
     });
 
     expect(result).toMatchObject({
       id: 'soat-3',
+      entidad: 'Vehiculo no encontrado',
       mensaje: 'SOAT Vencido',
       prioridad: 'rojo',
       diasRestantes: -999,
@@ -53,14 +58,15 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
   it('CP-SF-04 SOAT vence hoy', () => {
     const result = adapter.adapt({
       id: 4,
-      vehiculoId: 'MNO321',
+      placaVehiculo: 'MNO321',
       estado: 'amarillo',
       diasRestantes: 0,
     });
 
     expect(result).toMatchObject({
       id: 'soat-4',
-      mensaje: 'SOAT Próximo a Vencer',
+      entidad: 'Vehiculo MNO321',
+      mensaje: 'SOAT Proximo a Vencer',
       prioridad: 'amarillo',
       diasRestantes: 0,
     });
@@ -69,14 +75,15 @@ describe('SoatAlertAdapter - validacion de vigencia SOAT', () => {
   it('CP-SF-05 SOAT vence dentro del rango de advertencia', () => {
     const result = adapter.adapt({
       id: 5,
-      vehiculoId: 'QRS654',
+      placaVehiculo: 'QRS654',
       estado: 'amarillo',
       diasRestantes: 5,
     });
 
     expect(result).toMatchObject({
       id: 'soat-5',
-      mensaje: 'SOAT Próximo a Vencer',
+      entidad: 'Vehiculo QRS654',
+      mensaje: 'SOAT Proximo a Vencer',
       prioridad: 'amarillo',
       diasRestantes: 5,
     });

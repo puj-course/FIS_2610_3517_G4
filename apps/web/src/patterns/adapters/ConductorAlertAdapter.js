@@ -1,6 +1,10 @@
 import BaseAlertAdapter from './BaseAlertAdapter.js';
 
-// Traduce el estado documental de la licencia del conductor al lenguaje común de alertas.
+const resolveConductorLabel = (conductor) =>
+  String(conductor.nombre || conductor.name || '').trim() ||
+  'Conductor no identificado';
+
+// Traduce el estado documental de la licencia del conductor al lenguaje comun de alertas.
 export default class ConductorAlertAdapter extends BaseAlertAdapter {
   adapt(conductor) {
     if (conductor.estado !== 'rojo' && conductor.estado !== 'amarillo') {
@@ -10,14 +14,16 @@ export default class ConductorAlertAdapter extends BaseAlertAdapter {
     return {
       id: `lic-${conductor.id}`,
       tipo: 'Licencia',
-      entidad: `Conductor ${conductor.nombre}`,
+      categoria: 'conductores',
+      grupo: 'Licencias',
+      entidad: resolveConductorLabel(conductor),
       mensaje:
         conductor.estado === 'rojo'
           ? 'Licencia Vencida'
-          : 'Licencia Próxima a Vencer',
+          : 'Licencia Proxima a Vencer',
       diasRestantes: conductor.diasRestantes,
       prioridad: conductor.estado,
-      fecha: new Date().toISOString()
+      fecha: new Date().toISOString(),
     };
   }
 }

@@ -4,9 +4,6 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 import { calculateDaysRemaining, calculateDocumentState } from '@/utils/dateUtils.js';
-import { clearSourceAlerts } from '@/hooks/useAlertHub.js';
-import SoatAlertAdapter from '@/patterns/adapters/SoatAlertAdapter.js';
-import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
 
 const DocumentsContext = createContext(null);
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
@@ -52,12 +49,6 @@ export function DocumentsProvider({ children }) {
       return { ...soat, diasRestantes, estado };
     });
   }, [storedSoats, simulatedDate, threshold]);
-
-  const soatAlertAdapter = new SoatAlertAdapter();
-  useEffect(() => {
-    publishAdaptedAlerts(soatAlertAdapter, 'soats', soats);
-    return () => clearSourceAlerts('soats');
-  }, [soats]);
 
   const addSoat = async (nuevoSoat) => {
     if (!user?.email) throw new Error('No hay usuario autenticado');
