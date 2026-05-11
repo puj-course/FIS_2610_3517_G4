@@ -190,15 +190,16 @@ export function AuthProvider({ children }) {
         telefono: normalizeText(telefono),
       });
 
-      if (apiResult.success) {
-        setUser(apiResult.data.user);
-        setToken(apiResult.data.token);
-        return {
-          success: true,
-          created: Boolean(apiResult.data.created),
-          message: apiResult.message,
-        };
-      }
+        if (apiResult.success) {
+          setUser(apiResult.data.user);
+          setToken(apiResult.data.token);
+          return {
+            success: true,
+            created: Boolean(apiResult.data.created),
+            user: apiResult.data.user,
+            message: apiResult.message,
+          };
+        }
 
       if (apiResult.useLocalStorage) {
         return {

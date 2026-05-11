@@ -33,7 +33,10 @@ export default function DashboardPage() {
 
   return (
     <div style={{ padding: 20, fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Arial' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+      <div
+        data-onboarding="dashboard-summary"
+        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
+      >
         <div>
           <h1 style={{ margin: 0, fontSize: 26 }}>Dashboard</h1>
           <p style={{ marginTop: 6, color: '#555' }}>
@@ -41,16 +44,17 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <Link to="/vehiculos" style={btnSecondary}>
+        <div data-onboarding="dashboard-header-actions" style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <Link to="/vehiculos" data-onboarding="dashboard-action-vehicles" style={btnSecondary}>
             Ir a Vehículos
           </Link>
-          <button type="button" onClick={openVehicleModal} style={btnPrimary}>
+          <button type="button" onClick={openVehicleModal} data-onboarding="dashboard-action-add-vehicle" style={btnPrimary}>
             + Vehículo
           </button> 
           <button
               type="button"
               onClick={() => openModal('addDocument')}
+              data-onboarding="dashboard-action-add-soat"
               style={btnSecondary}
             >
               + SOAT
@@ -58,6 +62,7 @@ export default function DashboardPage() {
           <button
               type="button"
               onClick={() => openModal('addRtm')}
+              data-onboarding="dashboard-action-add-rtm"
               style={btnSecondary}
             >
               + RTM
@@ -67,7 +72,11 @@ export default function DashboardPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12, marginTop: 18 }}>
         {stats.map((s) => (
-          <div key={s.label} style={card}>
+          <div
+            key={s.label}
+            data-onboarding={`dashboard-stat-${s.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+            style={card}
+          >
             <div style={{ color: '#666', fontSize: 13 }}>{s.label}</div>
             <div style={{ fontSize: 28, fontWeight: 700, marginTop: 6 }}>{s.value}</div>
             <div style={{ color: '#888', fontSize: 12, marginTop: 4 }}>{s.hint}</div>
@@ -76,19 +85,19 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 12, marginTop: 14 }}>
-        <div style={card}>
+        <div data-onboarding="dashboard-quick-actions" style={card}>
           <h2 style={h2}>Accesos rápidos</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
-            <Link to="/vehiculos" style={quickLink}>Vehículos</Link>
-            <Link to="/conductores" style={quickLink}>Conductores</Link>
-            <Link to="/documentos" style={quickLink}>Documentos</Link>
-            <Link to="/alertas" style={quickLink}>Alertas</Link>
-            <Link to="/validacion-runt" style={quickLink}>Validación RUNT</Link>
-            <Link to="/reportes" style={quickLink}>Reportes</Link>
+            <Link to="/vehiculos" data-onboarding="dashboard-quick-vehicles" style={quickLink}>Vehículos</Link>
+            <Link to="/conductores" data-onboarding="dashboard-quick-conductores" style={quickLink}>Conductores</Link>
+            <Link to="/documentos" data-onboarding="dashboard-quick-documentos" style={quickLink}>Documentos</Link>
+            <Link to="/alertas" data-onboarding="dashboard-quick-alertas" style={quickLink}>Alertas</Link>
+            <Link to="/validacion-runt" data-onboarding="dashboard-quick-runt" style={quickLink}>Validación RUNT</Link>
+            <Link to="/reportes" data-onboarding="dashboard-quick-reportes" style={quickLink}>Reportes</Link>
           </div>
         </div>
 
-        <div style={card}>
+        <div data-onboarding="dashboard-recent-vehicles" style={card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
             <h2 style={h2}>Vehículos recientes</h2>
             <Link to="/vehiculos" style={smallLink}>Ver todos →</Link>
@@ -117,7 +126,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div style={card}>
+        <div data-onboarding="dashboard-recent-alerts" style={card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
             <h2 style={h2}>Alertas recientes</h2>
             <Link to="/alertas" style={smallLink}>Ver todas →</Link>
@@ -138,7 +147,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div style={card}>
+        <div data-onboarding="dashboard-doc-status" style={card}>
           <h2 style={h2}>Estado documental</h2>
           <p style={{ marginTop: 6, color: '#666', fontSize: 13 }}>
             Aquí puedes revisar el semáforo documental de los vehículos y entrar rápidamente al módulo correspondiente.
@@ -150,7 +159,7 @@ export default function DashboardPage() {
             <span style={pill('#ffebee', '#b71c1c')}>Vencido</span>
           </div>
 
-          <div style={{ marginTop: 12, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <div data-onboarding="dashboard-doc-links" style={{ marginTop: 12, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <Link to="/documentos" style={btnSecondary}>Ir a Documentos</Link>
             <Link to="/vehiculos" style={btnSecondary}>Ir a Vehículos</Link>
           </div>

@@ -84,7 +84,7 @@ export default function ConfiguracionPage() {
         <title>Configuración | SYNTIX Drive Control</title>
       </Helmet>
 
-      <div>
+      <div data-onboarding="settings-header">
         <h1 className="text-2xl font-bold text-syntix-navy">Configuración del Sistema</h1>
         <p className="text-gray-500 text-sm mt-1">Ajustes generales y gestión de datos</p>
       </div>
@@ -101,7 +101,7 @@ export default function ConfiguracionPage() {
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
             <Settings className="w-5 h-5 text-syntix-navy" /> Parámetros de Alertas
           </h2>
-          <div className="max-w-md">
+          <div data-onboarding="settings-threshold" className="max-w-md">
             <label className="block text-sm font-bold text-gray-700 mb-2">
               Umbral de Alerta Amarilla (Días)
             </label>
@@ -114,7 +114,7 @@ export default function ConfiguracionPage() {
                 min="1"
                 max="60"
               />
-              <button onClick={() => showMessage('success', 'Umbral guardado correctamente.')} className="bg-syntix-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2">
+              <button data-onboarding="settings-save-button" onClick={() => showMessage('success', 'Umbral guardado correctamente.')} className="bg-syntix-navy text-white px-4 py-2 rounded-lg font-medium hover:bg-syntix-navy/90 transition-colors flex items-center gap-2">
                 <Save className="w-4 h-4" /> Guardar
               </button>
             </div>
@@ -124,12 +124,12 @@ export default function ConfiguracionPage() {
           </div>
         </div>
 
-        <div className="p-6 bg-gray-50">
+        <div data-onboarding="settings-data-management" className="p-6 bg-gray-50">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
             <Database className="w-5 h-5 text-syntix-navy" /> Gestión de Datos
           </h2>
           <div className="flex flex-wrap gap-4">
-            <button onClick={handleExportBackup} className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors shadow-sm flex items-center gap-2">
+            <button data-onboarding="settings-export" onClick={handleExportBackup} className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors shadow-sm flex items-center gap-2">
               <Download className="w-4 h-4" /> Exportar Respaldo
             </button>
             
@@ -140,11 +140,11 @@ export default function ConfiguracionPage() {
               ref={fileInputRef}
               onChange={handleImportBackup}
             />
-            <button onClick={() => fileInputRef.current?.click()} className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors shadow-sm flex items-center gap-2">
+            <button data-onboarding="settings-import" onClick={() => fileInputRef.current?.click()} className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors shadow-sm flex items-center gap-2">
               <Upload className="w-4 h-4" /> Importar Respaldo
             </button>
             
-            <button onClick={() => setShowResetConfirm(true)} className="bg-red-50 border border-red-200 text-syntix-red px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors shadow-sm flex items-center gap-2 ml-auto">
+            <button data-onboarding="settings-reset" onClick={() => setShowResetConfirm(true)} className="bg-red-50 border border-red-200 text-syntix-red px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors shadow-sm flex items-center gap-2 ml-auto">
               <AlertTriangle className="w-4 h-4" /> Restablecer Datos
             </button>
           </div>

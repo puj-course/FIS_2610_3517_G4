@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
-import { LogOut, Menu, Bell, User } from 'lucide-react';
+import { useOnboarding } from '@/contexts/OnboardingContext.jsx';
+import { LogOut, Menu, Bell, User, Sparkles } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAlerts } from '@/hooks/useAlerts.js';
 
@@ -8,6 +9,7 @@ import { useAlerts } from '@/hooks/useAlerts.js';
 // navegación móvil, alertas activas y cierre de sesión.
 export default function Header({ toggleSidebar }) {
   const { user, logout } = useAuth();
+  const { startTour } = useOnboarding();
   const location = useLocation();
   const navigate = useNavigate();
   const { alerts } = useAlerts();
@@ -38,6 +40,15 @@ export default function Header({ toggleSidebar }) {
       </div>
 
       <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={startTour}
+          className="hidden md:inline-flex items-center gap-2 rounded-full border border-white/15 px-3 py-2 text-xs font-semibold text-gray-200 transition-colors hover:bg-white/10"
+          title="Abrir tutorial"
+        >
+          <Sparkles className="w-4 h-4" />
+          Tutorial
+        </button>
         <button
           onClick={handleAlertsClick}
           className="p-2 text-gray-300 hover:bg-white/10 rounded-full relative"

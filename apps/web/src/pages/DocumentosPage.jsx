@@ -135,7 +135,7 @@ export default function DocumentosPage() {
         <title>Documentos | SYNTIX Drive Control</title>
       </Helmet>
 
-      <div className="mb-8 flex items-start justify-between gap-3 flex-wrap">
+      <div data-onboarding="documents-header" className="mb-8 flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-4xl font-extrabold text-syntix-navy mb-2">
             Gestion de Documentos
@@ -146,6 +146,7 @@ export default function DocumentosPage() {
           <button
             type="button"
             onClick={() => openModal('addDocument')}
+            data-onboarding="documents-add-soat"
             className="bg-syntix-navy text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-syntix-navy/90"
           >
             + SOAT
@@ -153,6 +154,7 @@ export default function DocumentosPage() {
           <button
             type="button"
             onClick={() => openModal('addRtm')}
+            data-onboarding="documents-add-rtm"
             className="bg-white text-gray-900 border border-gray-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50"
           >
             + RTM
@@ -161,6 +163,7 @@ export default function DocumentosPage() {
       </div>
 
       <DocumentTableShell
+        onboardingId="documents-soat-table"
         icon={Shield}
         title="Polizas SOAT"
         count={filteredSoats.length}
@@ -223,6 +226,7 @@ export default function DocumentosPage() {
       </DocumentTableShell>
 
       <DocumentTableShell
+        onboardingId="documents-rtm-table"
         icon={Wrench}
         title="Revisiones Tecnico-Mecanicas"
         count={filteredRtms.length}
@@ -316,6 +320,7 @@ export default function DocumentosPage() {
 }
 
 function DocumentTableShell({
+  onboardingId,
   icon: Icon,
   title,
   count,
@@ -326,7 +331,7 @@ function DocumentTableShell({
   children,
 }) {
   return (
-    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+    <div data-onboarding={onboardingId} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 px-6 py-5 border-b border-gray-100">
         <div className="flex items-center gap-3">
           <Icon className="w-6 h-6 text-syntix-navy" />

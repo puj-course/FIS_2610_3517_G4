@@ -154,7 +154,10 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
+      <div
+        data-onboarding="vehicle-form"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200"
+      >
         <div className="flex justify-between items-center p-6 border-b border-gray-100 bg-gray-50">
           <h2 className="text-xl font-bold text-syntix-navy flex items-center gap-2">
             <Car className="w-5 h-5" /> {modalTitle}
@@ -175,7 +178,7 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
             </div>
           )}
 
-          <div>
+          <div data-onboarding="vehicle-plate-field">
             <label className="block text-sm font-bold text-gray-700 mb-1">Placa</label>
             <input
               type="text"
@@ -190,7 +193,7 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div data-onboarding="vehicle-brand-model-fields" className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">Marca</label>
               <input
@@ -215,7 +218,7 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div data-onboarding="vehicle-year-type-fields" className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1">Anio</label>
               <input
@@ -247,7 +250,7 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
             </div>
           </div>
 
-          <div className="pt-4 flex justify-end gap-3">
+          <div data-onboarding="vehicle-submit-actions" className="pt-4 flex justify-end gap-3">
             <button
               type="button"
               onClick={handleClose}

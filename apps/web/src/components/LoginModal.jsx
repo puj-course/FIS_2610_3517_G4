@@ -5,16 +5,23 @@ import { authService } from '@/services/api.js';
 import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isValidRecoveryIdentifier = (value) => {
+  const normalizedValue = String(value || '').trim();
+  return EMAIL_REGEX.test(normalizedValue) || normalizedValue.replace(/\D/g, '').length >= 7;
+};
 
 // Modal ligero para autenticación desde la landing sin abandonar el flujo público.
 export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const [mode, setMode] = useState('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [resetEmail, setResetEmail] = useState('');
+  const [resetIdentifier, setResetIdentifier] = useState('');
   const [resetCode, setResetCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [recoveryToken, setRecoveryToken] = useState('');
+  const [resetChannel, setResetChannel] = useState('');
+  const [resetDestinationHint, setResetDestinationHint] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [error, setError] = useState('');
@@ -31,15 +38,21 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
   const goToLogin = () => {
     clearMessages();
+    setRecoveryToken('');
+    setResetChannel('');
+    setResetDestinationHint('');
     setMode('login');
   };
 
   const goToRecover = () => {
     clearMessages();
-    setResetEmail(email.trim().toLowerCase());
+    setResetIdentifier(email.trim().toLowerCase());
     setResetCode('');
     setNewPassword('');
     setConfirmPassword('');
+    setRecoveryToken('');
+    setResetChannel('');
+    setResetDestinationHint('');
     setMode('recover');
   };
 
@@ -87,25 +100,31 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const handleRecoverSubmit = async (e) => {
     e.preventDefault();
     clearMessages();
-    const normalizedEmail = resetEmail.trim().toLowerCase();
+    const normalizedIdentifier = resetIdentifier.trim();
 
-    if (!EMAIL_REGEX.test(normalizedEmail)) {
-      setError('Ingresa un correo electronico valido.');
+    if (!isValidRecoveryIdentifier(normalizedIdentifier)) {
+      setError('Ingresa un correo o telefono valido.');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const res = await authService.solicitarRecuperacion(normalizedEmail);
+      const res = await authService.solicitarRecuperacion(normalizedIdentifier);
 
       if (res.success) {
-        setResetEmail(res.data?.email || normalizedEmail);
-        setResetCode('');
-        setNewPassword('');
-        setConfirmPassword('');
-        setNotice(res.message || 'Codigo enviado. Revisa tu correo.');
-        setMode('reset');
+        if (res.data?.recoveryToken) {
+          setRecoveryToken(res.data.recoveryToken);
+          setResetChannel(res.data.channel || '');
+          setResetDestinationHint(res.data.destinationHint || '');
+          setResetCode('');
+          setNewPassword('');
+          setConfirmPassword('');
+          setNotice(res.message || 'Codigo enviado al contacto registrado.');
+          setMode('reset');
+        } else {
+          setNotice(res.message || 'Si existe una cuenta asociada, enviaremos un codigo al contacto registrado.');
+        }
       } else {
         setError(res.message || 'No se pudo enviar el codigo.');
       }
@@ -119,8 +138,12 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const handleResetSubmit = async (e) => {
     e.preventDefault();
     clearMessages();
-    const normalizedEmail = resetEmail.trim().toLowerCase();
     const normalizedCode = resetCode.trim();
+
+    if (!recoveryToken) {
+      setError('Solicita un nuevo codigo de recuperacion antes de continuar.');
+      return;
+    }
 
     if (normalizedCode.length !== 6) {
       setError('Ingresa el codigo de 6 digitos.');
@@ -140,14 +163,18 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     setIsSubmitting(true);
 
     try {
-      const res = await authService.restablecerPassword(normalizedEmail, normalizedCode, newPassword);
+      const res = await authService.restablecerPassword(recoveryToken, normalizedCode, newPassword);
 
       if (res.success) {
-        setEmail(normalizedEmail);
+        setEmail(res.data?.email || '');
         setPassword('');
         setResetCode('');
         setNewPassword('');
         setConfirmPassword('');
+        setResetIdentifier('');
+        setRecoveryToken('');
+        setResetChannel('');
+        setResetDestinationHint('');
         setNotice(res.message || 'Contrasena actualizada. Ya puedes iniciar sesion.');
         setMode('login');
       } else {
@@ -264,12 +291,16 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
         {mode === 'recover' && (
           <form onSubmit={handleRecoverSubmit} className="p-6 space-y-4">
             {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}
+            {notice && <div className="p-3 bg-green-50 text-syntix-green text-sm rounded-lg border border-green-100">{notice}</div>}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electronico</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Correo o Telefono</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input type="email" required value={resetEmail} onChange={e => setResetEmail(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="admin@empresa.com" />
+                <input type="text" required value={resetIdentifier} onChange={e => setResetIdentifier(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="admin@empresa.com o 3001234567" />
               </div>
+              <p className="mt-2 text-xs text-gray-500">
+                Puedes iniciar la recuperacion con el correo registrado o con el telefono asociado a tu cuenta.
+              </p>
             </div>
             <button type="submit" disabled={isSubmitting} className="w-full bg-syntix-green text-white py-2.5 rounded-lg font-medium hover:bg-syntix-green/90 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
               {isSubmitting ? (<><Loader2 className="w-5 h-5 animate-spin" />Enviando...</>) : 'Enviar codigo'}
@@ -284,7 +315,10 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <ShieldCheck className="w-4 h-4 text-syntix-green" />
-              <span>{resetEmail}</span>
+              <span>
+                {resetChannel === 'sms' ? 'SMS enviado a ' : 'Codigo enviado a '}
+                {resetDestinationHint || 'tu contacto registrado'}
+              </span>
             </div>
 
             <div>
