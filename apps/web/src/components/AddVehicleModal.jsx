@@ -1,6 +1,22 @@
 import { useEffect, useState } from 'react';
 import { X, Car, Save } from 'lucide-react';
 import { useVehicles } from '@/hooks/useVehicles.js';
+import { isValidPlate, normalizePlate, sanitizePlate } from '@/utils/colombiaFormats.js';
+
+const VEHICLE_TYPE_OPTIONS = [
+  'Automovil',
+  'Camioneta',
+  'Pickup',
+  'Van',
+  'Van de soporte',
+  'Camion liviano',
+  'Camion mediano',
+  'Camion de carga',
+  'Camion refrigerado',
+  'Buseta',
+  'Microbus',
+  'Otro',
+];
 
 const createInitialFormData = (currentYear) => ({
   placa: '',
@@ -61,13 +77,19 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
     e.preventDefault();
     setError('');
 
-    const placaUpper = formData.placa.trim().toUpperCase();
+    const placaNormalizada = normalizePlate(formData.placa);
     const marca = formData.marca.trim();
     const modelo = formData.modelo.trim();
+    const tipo = String(formData.tipo ?? '').trim();
     const anio = Number(formData.anio);
 
-    if (!placaUpper || !marca || !modelo || !formData.tipo) {
+    if (!placaNormalizada || !marca || !modelo || !tipo) {
       setError('Todos los campos obligatorios deben estar completos.');
+      return;
+    }
+
+    if (!isValidPlate(placaNormalizada)) {
+      setError('La placa debe tener formato ABC123: tres letras y tres numeros, sin guiones ni espacios.');
       return;
     }
 
@@ -78,7 +100,7 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
 
     // La placa es el identificador visible más crítico, por eso se protege contra duplicados.
     const isDuplicatePlate = vehiculos.some((vehiculo) => {
-      const samePlate = vehiculo.placa?.toUpperCase() === placaUpper;
+      const samePlate = normalizePlate(vehiculo.placa) === placaNormalizada;
       const isSameVehicle = isEditing && String(vehiculo.id) === String(vehicleToEdit.id);
       return samePlate && !isSameVehicle;
     });
@@ -91,9 +113,10 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
     try {
       const payload = {
         ...formData,
-        placa: placaUpper,
+        placa: placaNormalizada,
         marca,
         modelo,
+        tipo,
         anio,
       };
 
@@ -157,13 +180,13 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
             <input
               type="text"
               required
-              maxLength={7}
+              maxLength={6}
               value={formData.placa}
               onChange={(e) =>
-                setFormData({ ...formData, placa: e.target.value.toUpperCase() })
+                setFormData({ ...formData, placa: sanitizePlate(e.target.value) })
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 uppercase font-bold tracking-wider"
-              placeholder="ABC-123"
+              placeholder="ABC123"
             />
           </div>
 
@@ -214,11 +237,12 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
                 onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 bg-white"
               >
-                <option value="Automovil">Automovil</option>
-                <option value="Camioneta">Camioneta</option>
-                <option value="Camion">Camion</option>
-                <option value="Furgon">Furgon</option>
-                <option value="Motocicleta">Motocicleta</option>
+                {formData.tipo && !VEHICLE_TYPE_OPTIONS.includes(formData.tipo) && (
+                  <option value={formData.tipo}>{formData.tipo}</option>
+                )}
+                {VEHICLE_TYPE_OPTIONS.map((tipo) => (
+                  <option key={tipo} value={tipo}>{tipo}</option>
+                ))}
               </select>
             </div>
           </div>

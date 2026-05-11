@@ -4,12 +4,27 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 import { calculateDaysRemaining, calculateDocumentState } from '@/utils/dateUtils.js';
-import { clearSourceAlerts } from '@/hooks/useAlertHub.js';
-import SoatAlertAdapter from '@/patterns/adapters/SoatAlertAdapter.js';
-import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
 
 const DocumentsContext = createContext(null);
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
+
+const normalizeSoat = (soat) => {
+  const fechaInicioVigencia = soat.fechaInicioVigencia || soat.fechaInicio || '';
+  const fechaFinVigencia = soat.fechaFinVigencia || soat.fechaVencimiento || '';
+  const placaVehiculo = soat.placaVehiculo || soat.vehiculoPlaca || soat.placa || '';
+
+  return {
+    ...soat,
+    id: soat._id || soat.id,
+    placaVehiculo,
+    vehiculoPlaca: placaVehiculo,
+    placa: placaVehiculo,
+    fechaInicioVigencia,
+    fechaFinVigencia,
+    fechaInicio: fechaInicioVigencia,
+    fechaVencimiento: fechaFinVigencia,
+  };
+};
 
 export function DocumentsProvider({ children }) {
   const [storedSoats, setStoredSoats] = useState([]);
@@ -26,7 +41,7 @@ export function DocumentsProvider({ children }) {
     setLoading(true);
     try {
       const res = await api.get('/soats', { params: { email: user.email } });
-      setStoredSoats(res.data.map((s) => ({ ...s, id: s._id || s.id })));
+      setStoredSoats(res.data.map(normalizeSoat));
     } catch (err) {
       console.error('Error cargando SOATs:', err);
     } finally {
@@ -47,21 +62,20 @@ export function DocumentsProvider({ children }) {
 
   const soats = useMemo(() => {
     return storedSoats.map((soat) => {
-      const diasRestantes = calculateDaysRemaining(soat.fechaVencimiento, simulatedDate);
+      const normalized = normalizeSoat(soat);
+      const diasRestantes = calculateDaysRemaining(normalized.fechaFinVigencia, simulatedDate);
       const estado = calculateDocumentState(diasRestantes, threshold);
-      return { ...soat, diasRestantes, estado };
+      return { ...normalized, diasRestantes, estado };
     });
   }, [storedSoats, simulatedDate, threshold]);
 
-  const soatAlertAdapter = new SoatAlertAdapter();
-  useEffect(() => {
-    publishAdaptedAlerts(soatAlertAdapter, 'soats', soats);
-    return () => clearSourceAlerts('soats');
-  }, [soats]);
-
   const addSoat = async (nuevoSoat) => {
     if (!user?.email) throw new Error('No hay usuario autenticado');
-    await api.post('/soats', { ...nuevoSoat, ownerEmail: user.email });
+    await api.post('/soats', {
+      ...nuevoSoat,
+      ownerEmail: user.email,
+      ownerEmpresa: user.empresa || '',
+    });
     await fetchSoats();
   };
 

@@ -1,49 +1,62 @@
 # Datos demo para DriveControl / AutoMinder Enterprise
 
-Este paquete contiene un seed para cargar datos masivos en MongoDB Atlas y revisar el estado visual de la pagina.
+Este paquete carga datos demo colombianos para validar dashboard, vehiculos, conductores, documentos, alertas y reportes.
 
-## Que inserta
+## Conteos esperados
 
 - 12 conductores.
 - 14 vehiculos.
 - 12 SOAT.
 - 12 RTM.
-- Casos verdes, amarillos y rojos para dashboard, documentos y alertas.
+- 2 vehiculos quedan sin SOAT/RTM para validar reportes de faltantes.
 
-## Importante
+## Formatos del seed
 
-La app filtra por `ownerEmail`. Para que los datos se vean, debes iniciar sesion con el mismo correo usado al importar.
+- Placa: `ABC123`, tres letras y tres numeros, sin guiones ni espacios.
+- Cedula: 10 digitos numericos.
+- Celular: 10 digitos iniciando por `3`.
+- SOAT canonico: `vehiculoId`, `placaVehiculo`, `numeroPoliza`, `aseguradora`, `fechaExpedicion`, `fechaInicioVigencia`, `fechaFinVigencia`, `observaciones`, `ownerEmail`, `ownerEmpresa`, `seedTag`.
+- RTM canonica: `vehiculoId`, `placaVehiculo`, `numeroCertificado`, `cda`, `nitCda`, `fechaExpedicion`, `fechaVencimiento`, `resultado`, `observaciones`, `ownerEmail`, `ownerEmpresa`, `seedTag`.
 
-El seed usa por defecto:
+## Variables
+
+La app filtra por `ownerEmail`. Debes iniciar sesion con el mismo correo usado al importar.
+
+Valores por defecto del seed:
 
 ```text
-uafv718ily@lnovic.com
+OWNER_EMAIL=uafv718ily@lnovic.com
+OWNER_EMPRESA=Transportes Syntix Demo
 ```
 
-Si entras con otro correo, cambia `OWNER_EMAIL` al ejecutar el comando.
+Puedes cambiarlos con variables de entorno.
 
-## Importar usando Docker y la URI del archivo .env
+## Importar usando Docker
 
 Desde la raiz del repo:
 
 ```bash
 MONGO_URI=$(grep '^MONGO_URI=' .env | cut -d= -f2-)
+
 docker run --rm \
+  -e OWNER_EMAIL="sekasolnin@gmail.com" \
+  -e OWNER_EMPRESA="Sarm" \
   -v "$PWD/Docs/QA/datos_mongo_seed:/seed" \
   mongo:7 \
   mongosh "$MONGO_URI" /seed/seed_drivecontrol_demo.mongosh.js
 ```
 
-## Importar con otro correo de usuario
+El seed limpia primero los registros con el mismo `{ ownerEmail, seedTag }` y tambien los `_id` demo usados por este archivo. Por eso se puede ejecutar varias veces sin `MongoBulkWriteError E11000 duplicate key`.
+
+## Verificar API
+
+Con el backend en `localhost:5000`:
 
 ```bash
-MONGO_URI=$(grep '^MONGO_URI=' .env | cut -d= -f2-)
-docker run --rm \
-  -e OWNER_EMAIL="tu-correo@dominio.com" \
-  -e OWNER_EMPRESA="Nombre de Empresa Demo" \
-  -v "$PWD/Docs/QA/datos_mongo_seed:/seed" \
-  mongo:7 \
-  mongosh "$MONGO_URI" /seed/seed_drivecontrol_demo.mongosh.js
+curl -s "http://localhost:5000/api/vehiculos?email=sekasolnin%40gmail.com"
+curl -s "http://localhost:5000/api/conductores?email=sekasolnin%40gmail.com"
+curl -s "http://localhost:5000/api/soats?email=sekasolnin%40gmail.com"
+curl -s "http://localhost:5000/api/rtms?email=sekasolnin%40gmail.com"
 ```
 
 ## Verificar en la app
@@ -54,45 +67,33 @@ docker run --rm \
 docker compose up -d --build
 ```
 
-2. Verifica conexion a Atlas:
-
-```bash
-curl http://localhost:5000/api/health/db
-curl http://localhost:3000/api/health/db
-```
-
-Debe aparecer:
-
-```json
-"source":"atlas"
-```
-
-3. Abre:
+2. Abre:
 
 ```text
 http://localhost:3000
 ```
 
-4. Inicia sesion con el mismo correo usado en `OWNER_EMAIL`.
+3. Inicia sesion con el mismo correo usado en `OWNER_EMAIL`.
 
-5. Revisa:
+4. Revisa:
 
 - Dashboard.
 - Vehiculos.
+- Conductores.
 - Documentos.
 - Alertas.
+- Reportes.
 
-## Limpiar solo estos datos demo
-
-Si quieres borrar esta carga de prueba:
+## Limpiar datos demo
 
 ```bash
 MONGO_URI=$(grep '^MONGO_URI=' .env | cut -d= -f2-)
+
 docker run --rm \
   -v "$PWD/Docs/QA/datos_mongo_seed:/seed" \
   mongo:7 \
   mongosh "$MONGO_URI" --eval '
-    const OWNER_EMAIL = "uafv718ily@lnovic.com";
+    const OWNER_EMAIL = "sekasolnin@gmail.com";
     const SEED_TAG = "drivecontrol-demo-alertas-2026-05";
     db.conductors.deleteMany({ ownerEmail: OWNER_EMAIL, seedTag: SEED_TAG });
     db.vehiculos.deleteMany({ ownerEmail: OWNER_EMAIL, seedTag: SEED_TAG });

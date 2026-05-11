@@ -327,20 +327,37 @@ const Usuario = mongoose.model('Usuario', UsuarioSchema);
 
 const SoatSchema = new mongoose.Schema({
   vehiculoId: { type: String, required: true },
+  placaVehiculo: String,
   numeroPoliza: { type: String, required: true },
-  fechaInicio: { type: String, required: true },
-  fechaVencimiento: { type: String, required: true },
+  aseguradora: String,
+  fechaExpedicion: String,
+  fechaInicioVigencia: String,
+  fechaFinVigencia: String,
+  fechaInicio: String,
+  fechaVencimiento: String,
+  observaciones: String,
   ownerEmail: { type: String, required: true },
+  ownerEmpresa: String,
+  seedTag: String,
 });
 
 const Soat = mongoose.model('Soat', SoatSchema);
 
 const RtmSchema = new mongoose.Schema({
   vehiculoId: { type: String, required: true },
-  numeroRtm: { type: String, required: true },
-  fechaInicio: { type: String, required: true },
+  placaVehiculo: String,
+  numeroCertificado: String,
+  numeroRtm: String,
+  cda: String,
+  nitCda: String,
+  fechaExpedicion: String,
+  fechaInicio: String,
   fechaVencimiento: { type: String, required: true },
+  resultado: String,
+  observaciones: String,
   ownerEmail: { type: String, required: true },
+  ownerEmpresa: String,
+  seedTag: String,
 });
 
 const Rtm = mongoose.model('Rtm', RtmSchema);
@@ -395,8 +412,40 @@ const normalizeNullableText = (value) => {
 
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
+const PLATE_REGEX = /^[A-Z]{3}[0-9]{3}$/;
+const CEDULA_REGEX = /^[0-9]{10}$/;
+const COLOMBIAN_MOBILE_REGEX = /^3[0-9]{9}$/;
+const DOCUMENT_CODE_REGEX = /^[A-Z0-9-]{6,30}$/;
+
+const normalizePlate = (value) =>
+  normalizeText(value).toUpperCase().replace(/[\s.-]+/g, '');
+
+const normalizeDocumentCode = (value) => normalizeText(value).toUpperCase();
+
+const isValidPlate = (value) => PLATE_REGEX.test(normalizePlate(value));
+
+const isValidDateValue = (value) => {
+  const dateText = normalizeText(value);
+  const match = dateText.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+
+  const [, year, month, day] = match;
+  const parsed = new Date(Number(year), Number(month) - 1, Number(day));
+
+  return (
+    !Number.isNaN(parsed.getTime()) &&
+    parsed.getFullYear() === Number(year) &&
+    parsed.getMonth() === Number(month) - 1 &&
+    parsed.getDate() === Number(day)
+  );
+};
+
 const isValidDateRange = (fechaInicio, fechaVencimiento) =>
-  Boolean(fechaInicio && fechaVencimiento && new Date(fechaVencimiento) > new Date(fechaInicio));
+  Boolean(
+    isValidDateValue(fechaInicio) &&
+    isValidDateValue(fechaVencimiento) &&
+    new Date(fechaVencimiento).getTime() >= new Date(fechaInicio).getTime()
+  );
 
 const findOwnedVehicle = (vehiculoId, ownerEmail) => {
   if (!mongoose.Types.ObjectId.isValid(vehiculoId)) {
@@ -404,6 +453,121 @@ const findOwnedVehicle = (vehiculoId, ownerEmail) => {
   }
 
   return Vehiculo.findOne({ _id: vehiculoId, ownerEmail });
+};
+
+const buildSoatPayload = async (body, ownerEmailFallback = '') => {
+  const vehiculoId = normalizeText(body.vehiculoId);
+  const ownerEmail = normalizeEmail(ownerEmailFallback || body.ownerEmail);
+  const numeroPoliza = normalizeDocumentCode(body.numeroPoliza);
+  const aseguradora = normalizeText(body.aseguradora);
+  const fechaExpedicion = normalizeText(body.fechaExpedicion);
+  const fechaInicioVigencia = normalizeText(body.fechaInicioVigencia || body.fechaInicio);
+  const fechaFinVigencia = normalizeText(body.fechaFinVigencia || body.fechaVencimiento);
+  const placaRecibida = normalizePlate(body.placaVehiculo || body.placa);
+
+  if (!vehiculoId || !numeroPoliza || !aseguradora || !fechaExpedicion || !fechaInicioVigencia || !fechaFinVigencia || !ownerEmail) {
+    return { error: 'Todos los campos obligatorios del SOAT deben estar completos.' };
+  }
+
+  if (!DOCUMENT_CODE_REGEX.test(numeroPoliza)) {
+    return { error: 'El numero de poliza debe ser alfanumerico y tener entre 6 y 30 caracteres.' };
+  }
+
+  if (!isValidDateValue(fechaExpedicion)) {
+    return { error: 'La fecha de expedicion no es valida.' };
+  }
+
+  if (!isValidDateRange(fechaInicioVigencia, fechaFinVigencia)) {
+    return { error: 'La fecha fin de vigencia no puede ser anterior a la fecha de inicio.' };
+  }
+
+  const vehiculo = await findOwnedVehicle(vehiculoId, ownerEmail);
+
+  if (!vehiculo) {
+    return { error: 'El vehiculo seleccionado no existe o no pertenece al usuario.' };
+  }
+
+  const placaVehiculo = placaRecibida || normalizePlate(vehiculo.placa);
+
+  if (!isValidPlate(placaVehiculo)) {
+    return { error: 'La placa asociada debe tener formato ABC123.' };
+  }
+
+  return {
+    payload: {
+      vehiculoId,
+      placaVehiculo,
+      numeroPoliza,
+      aseguradora,
+      fechaExpedicion,
+      fechaInicioVigencia,
+      fechaFinVigencia,
+      fechaInicio: fechaInicioVigencia,
+      fechaVencimiento: fechaFinVigencia,
+      observaciones: normalizeText(body.observaciones),
+      ownerEmail,
+      ownerEmpresa: normalizeText(body.ownerEmpresa),
+      seedTag: normalizeText(body.seedTag),
+    },
+  };
+};
+
+const buildRtmPayload = async (body, ownerEmailFallback = '') => {
+  const vehiculoId = normalizeText(body.vehiculoId);
+  const ownerEmail = normalizeEmail(ownerEmailFallback || body.ownerEmail);
+  const numeroCertificado = normalizeDocumentCode(body.numeroCertificado || body.numeroRtm);
+  const cda = normalizeText(body.cda);
+  const fechaExpedicion = normalizeText(body.fechaExpedicion || body.fechaInicio);
+  const fechaVencimiento = normalizeText(body.fechaVencimiento);
+  const placaRecibida = normalizePlate(body.placaVehiculo || body.placa);
+  const resultado = normalizeText(body.resultado || 'Aprobado');
+
+  if (!vehiculoId || !numeroCertificado || !cda || !fechaExpedicion || !fechaVencimiento || !ownerEmail) {
+    return { error: 'Todos los campos obligatorios de la RTM deben estar completos.' };
+  }
+
+  if (!DOCUMENT_CODE_REGEX.test(numeroCertificado)) {
+    return { error: 'El numero de certificado debe ser alfanumerico y tener entre 6 y 30 caracteres.' };
+  }
+
+  if (!isValidDateRange(fechaExpedicion, fechaVencimiento)) {
+    return { error: 'La fecha de vencimiento no puede ser anterior a la fecha de expedicion.' };
+  }
+
+  if (!['Aprobado', 'Rechazado', 'Pendiente'].includes(resultado)) {
+    return { error: 'El resultado de la RTM no es valido.' };
+  }
+
+  const vehiculo = await findOwnedVehicle(vehiculoId, ownerEmail);
+
+  if (!vehiculo) {
+    return { error: 'El vehiculo seleccionado no existe o no pertenece al usuario.' };
+  }
+
+  const placaVehiculo = placaRecibida || normalizePlate(vehiculo.placa);
+
+  if (!isValidPlate(placaVehiculo)) {
+    return { error: 'La placa asociada debe tener formato ABC123.' };
+  }
+
+  return {
+    payload: {
+      vehiculoId,
+      placaVehiculo,
+      numeroCertificado,
+      numeroRtm: numeroCertificado,
+      cda,
+      nitCda: normalizeText(body.nitCda),
+      fechaExpedicion,
+      fechaInicio: fechaExpedicion,
+      fechaVencimiento,
+      resultado,
+      observaciones: normalizeText(body.observaciones),
+      ownerEmail,
+      ownerEmpresa: normalizeText(body.ownerEmpresa),
+      seedTag: normalizeText(body.seedTag),
+    },
+  };
 };
 
 const generateToken = (id) => {
@@ -457,6 +621,10 @@ app.post('/api/auth/register', async (req, res) => {
 
     if (!telefonoNormalizado) {
       return res.status(400).json({ message: 'Ingresa el teléfono.' });
+    }
+
+    if (!COLOMBIAN_MOBILE_REGEX.test(telefonoNormalizado)) {
+      return res.status(400).json({ message: 'El celular debe tener 10 digitos e iniciar por 3.' });
     }
 
     if (!EMAIL_REGEX.test(emailNormalizado)) {
@@ -719,6 +887,12 @@ app.post('/api/auth/google', async (req, res) => {
     const empresaNormalizada = normalizeText(empresa);
     const telefonoNormalizado = normalizeText(telefono);
     const nombreNormalizado = normalizeText(googleProfile.name);
+
+    if (telefonoNormalizado && !COLOMBIAN_MOBILE_REGEX.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        message: 'El celular debe tener 10 digitos e iniciar por 3.',
+      });
+    }
 
     let usuario = await Usuario.findOne({ email: emailNormalizado });
     let created = false;
@@ -994,6 +1168,32 @@ app.post('/api/conductores', async (req, res) => {
       });
     }
 
+    if (!CEDULA_REGEX.test(documentoNormalizado)) {
+      return res.status(400).json({
+        error: 'La cedula debe tener exactamente 10 digitos numericos.',
+      });
+    }
+
+    // Validación adicional: rechazar documentos con caracteres no numéricos
+    if (!/^\d+$/.test(documentoNormalizado)) {
+      return res.status(400).json({
+        error: 'La cedula solo debe contener numeros.',
+      });
+    }
+
+    if (!COLOMBIAN_MOBILE_REGEX.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        error: 'El celular debe tener 10 digitos e iniciar por 3.',
+      });
+    }
+
+    // Validación adicional: rechazar teléfono con caracteres no numéricos
+    if (!/^\d+$/.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        error: 'El celular solo debe contener numeros.',
+      });
+    }
+
     const existente = await Conductor.findOne({
       documento: documentoNormalizado,
       ownerEmail: ownerEmailNormalizado,
@@ -1044,6 +1244,32 @@ app.put('/api/conductores/:id', async (req, res) => {
     ) {
       return res.status(400).json({
         error: 'Todos los campos obligatorios deben estar completos.',
+      });
+    }
+
+    if (!CEDULA_REGEX.test(documentoNormalizado)) {
+      return res.status(400).json({
+        error: 'La cedula debe tener exactamente 10 digitos numericos.',
+      });
+    }
+
+    // Validación adicional: rechazar documentos con caracteres no numéricos
+    if (!/^\d+$/.test(documentoNormalizado)) {
+      return res.status(400).json({
+        error: 'La cedula solo debe contener numeros.',
+      });
+    }
+
+    if (!COLOMBIAN_MOBILE_REGEX.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        error: 'El celular debe tener 10 digitos e iniciar por 3.',
+      });
+    }
+
+    // Validación adicional: rechazar teléfono con caracteres no numéricos
+    if (!/^\d+$/.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        error: 'El celular solo debe contener numeros.',
       });
     }
 
@@ -1113,7 +1339,7 @@ app.post('/api/vehiculos', async (req, res) => {
   try {
     const { placa, marca, modelo, anio, tipo, conductorId, ownerEmail, ownerEmpresa } = req.body;
 
-    const placaNormalizada = normalizeText(placa).toUpperCase();
+    const placaNormalizada = normalizePlate(placa);
     const marcaNormalizada = normalizeText(marca);
     const modeloNormalizado = normalizeText(modelo);
     const anioNormalizado = normalizeText(anio);
@@ -1138,6 +1364,19 @@ app.post('/api/vehiculos', async (req, res) => {
     if (!Number.isInteger(anioNumero) || anioNumero < 1990 || anioNumero > new Date().getFullYear() + 1) {
       return res.status(400).json({
         error: 'El anio del vehiculo no es valido.',
+      });
+    }
+
+    if (!isValidPlate(placaNormalizada)) {
+      return res.status(400).json({
+        error: 'La placa debe tener formato ABC123: tres letras y tres numeros, sin guiones ni espacios.',
+      });
+    }
+
+    // Validación adicional: rechazar placas con más de 6 caracteres
+    if (placaNormalizada.length !== 6) {
+      return res.status(400).json({
+        error: 'La placa debe tener exactamente 6 caracteres.',
       });
     }
 
@@ -1197,7 +1436,7 @@ app.put('/api/vehiculos/:id', async (req, res) => {
       return res.status(404).json({ error: 'Vehiculo no encontrado' });
     }
 
-    const placaNormalizada = normalizeText(req.body.placa).toUpperCase();
+    const placaNormalizada = normalizePlate(req.body.placa);
     const marcaNormalizada = normalizeText(req.body.marca);
     const modeloNormalizado = normalizeText(req.body.modelo);
     const anioNormalizado = normalizeText(req.body.anio);
@@ -1219,6 +1458,19 @@ app.put('/api/vehiculos/:id', async (req, res) => {
     if (!Number.isInteger(anioNumero) || anioNumero < 1990 || anioNumero > new Date().getFullYear() + 1) {
       return res.status(400).json({
         error: 'El anio del vehiculo no es valido.',
+      });
+    }
+
+    if (!isValidPlate(placaNormalizada)) {
+      return res.status(400).json({
+        error: 'La placa debe tener formato ABC123: tres letras y tres numeros, sin guiones ni espacios.',
+      });
+    }
+
+    // Validación adicional: rechazar placas con más de 6 caracteres
+    if (placaNormalizada.length !== 6) {
+      return res.status(400).json({
+        error: 'La placa debe tener exactamente 6 caracteres.',
       });
     }
 
@@ -1347,56 +1599,50 @@ app.get('/api/soats', async (req, res) => {
 
 app.post('/api/soats', async (req, res) => {
   try {
-    const { vehiculoId, numeroPoliza, fechaInicio, fechaVencimiento, ownerEmail } = req.body;
+    const { error, payload } = await buildSoatPayload(req.body);
 
-    const vehiculoIdNorm = normalizeText(vehiculoId);
-    const numeroPolizaNorm = normalizeText(numeroPoliza);
-    const fechaInicioNorm = normalizeText(fechaInicio);
-    const fechaVencimientoNorm = normalizeText(fechaVencimiento);
-    const ownerEmailNorm = normalizeEmail(ownerEmail);
-
-    if (
-      !vehiculoIdNorm ||
-      !numeroPolizaNorm ||
-      !fechaInicioNorm ||
-      !fechaVencimientoNorm ||
-      !ownerEmailNorm
-    ) {
-      return res.status(400).json({
-        error: 'Todos los campos son obligatorios.',
-      });
-    }
-
-    if (!isValidDateRange(fechaInicioNorm, fechaVencimientoNorm)) {
-      return res.status(400).json({
-        error: 'La fecha de vencimiento debe ser posterior a la fecha de inicio.',
-      });
-    }
-
-    const vehiculo = await findOwnedVehicle(vehiculoIdNorm, ownerEmailNorm);
-
-    if (!vehiculo) {
-      return res.status(400).json({
-        error: 'El vehiculo seleccionado no existe o no pertenece al usuario.',
-      });
+    if (error) {
+      return res.status(400).json({ error });
     }
 
     await Soat.deleteMany({
-      vehiculoId: vehiculoIdNorm,
-      ownerEmail: ownerEmailNorm,
+      vehiculoId: payload.vehiculoId,
+      ownerEmail: payload.ownerEmail,
     });
 
-    const nuevo = new Soat({
-      vehiculoId: vehiculoIdNorm,
-      numeroPoliza: numeroPolizaNorm,
-      fechaInicio: fechaInicioNorm,
-      fechaVencimiento: fechaVencimientoNorm,
-      ownerEmail: ownerEmailNorm,
-    });
-
+    const nuevo = new Soat(payload);
     await nuevo.save();
 
     return res.status(201).json(nuevo);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/soats/:id', async (req, res) => {
+  try {
+    const soatExistente = await Soat.findById(req.params.id);
+
+    if (!soatExistente) {
+      return res.status(404).json({ error: 'SOAT no encontrado.' });
+    }
+
+    const { error, payload } = await buildSoatPayload(
+      {
+        ...req.body,
+        vehiculoId: req.body.vehiculoId || soatExistente.vehiculoId,
+      },
+      soatExistente.ownerEmail
+    );
+
+    if (error) {
+      return res.status(400).json({ error });
+    }
+
+    Object.assign(soatExistente, payload);
+    await soatExistente.save();
+
+    return res.json(soatExistente);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
@@ -1438,56 +1684,50 @@ app.get('/api/rtms', async (req, res) => {
 
 app.post('/api/rtms', async (req, res) => {
   try {
-    const { vehiculoId, numeroRtm, fechaInicio, fechaVencimiento, ownerEmail } = req.body;
+    const { error, payload } = await buildRtmPayload(req.body);
 
-    const vehiculoIdNorm = normalizeText(vehiculoId);
-    const numeroRtmNorm = normalizeText(numeroRtm);
-    const fechaInicioNorm = normalizeText(fechaInicio);
-    const fechaVencimientoNorm = normalizeText(fechaVencimiento);
-    const ownerEmailNorm = normalizeEmail(ownerEmail);
-
-    if (
-      !vehiculoIdNorm ||
-      !numeroRtmNorm ||
-      !fechaInicioNorm ||
-      !fechaVencimientoNorm ||
-      !ownerEmailNorm
-    ) {
-      return res.status(400).json({
-        error: 'Todos los campos son obligatorios.',
-      });
-    }
-
-    if (!isValidDateRange(fechaInicioNorm, fechaVencimientoNorm)) {
-      return res.status(400).json({
-        error: 'La fecha de vencimiento debe ser posterior a la fecha de inicio.',
-      });
-    }
-
-    const vehiculo = await findOwnedVehicle(vehiculoIdNorm, ownerEmailNorm);
-
-    if (!vehiculo) {
-      return res.status(400).json({
-        error: 'El vehiculo seleccionado no existe o no pertenece al usuario.',
-      });
+    if (error) {
+      return res.status(400).json({ error });
     }
 
     await Rtm.deleteMany({
-      vehiculoId: vehiculoIdNorm,
-      ownerEmail: ownerEmailNorm,
+      vehiculoId: payload.vehiculoId,
+      ownerEmail: payload.ownerEmail,
     });
 
-    const nuevo = new Rtm({
-      vehiculoId: vehiculoIdNorm,
-      numeroRtm: numeroRtmNorm,
-      fechaInicio: fechaInicioNorm,
-      fechaVencimiento: fechaVencimientoNorm,
-      ownerEmail: ownerEmailNorm,
-    });
-
+    const nuevo = new Rtm(payload);
     await nuevo.save();
 
     return res.status(201).json(nuevo);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/rtms/:id', async (req, res) => {
+  try {
+    const rtmExistente = await Rtm.findById(req.params.id);
+
+    if (!rtmExistente) {
+      return res.status(404).json({ error: 'RTM no encontrada.' });
+    }
+
+    const { error, payload } = await buildRtmPayload(
+      {
+        ...req.body,
+        vehiculoId: req.body.vehiculoId || rtmExistente.vehiculoId,
+      },
+      rtmExistente.ownerEmail
+    );
+
+    if (error) {
+      return res.status(400).json({ error });
+    }
+
+    Object.assign(rtmExistente, payload);
+    await rtmExistente.save();
+
+    return res.json(rtmExistente);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
