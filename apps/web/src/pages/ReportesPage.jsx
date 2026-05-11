@@ -36,12 +36,20 @@ export default function ReportesPage() {
     [alerts]
   );
 
-  const stateStats = useMemo(() => ({
-    verde: vehiculos.filter((v) => v.estadoGeneral === 'verde').length,
-    amarillo: vehiculos.filter((v) => v.estadoGeneral === 'amarillo').length,
-    rojo: vehiculos.filter((v) => v.estadoGeneral === 'rojo').length,
-    total: vehiculos.length,
-  }), [vehiculos]);
+  const stateStats = useMemo(() => {
+    const estadosDocumentales = vehiculos.flatMap((vehiculo) => [
+      vehiculo.soat?.estado || 'rojo',
+      vehiculo.rtm?.estado || 'rojo',
+      vehiculo.conductor?.estado || 'rojo',
+    ]);
+
+    return {
+      verde: estadosDocumentales.filter((estado) => estado === 'verde').length,
+      amarillo: estadosDocumentales.filter((estado) => estado === 'amarillo').length,
+      rojo: estadosDocumentales.filter((estado) => estado === 'rojo').length,
+      total: estadosDocumentales.length,
+    };
+  }, [vehiculos]);
 
   const alertStats = useMemo(() => ({
     soat: vehicleAlerts.filter((alert) => alert.grupo === 'SOAT').length,
@@ -161,7 +169,7 @@ export default function ReportesPage() {
         </div>
 
         <div data-onboarding="reports-distribution-card" className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex flex-col justify-center">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Distribucion de Estados</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-6">Distribucion Documental</h3>
           <div className="space-y-4">
             <StatusBar label="Al Dia (Verde)" value={stateStats.verde} total={stateStats.total} colorClass="bg-syntix-green" textClass="text-syntix-green" />
             <StatusBar label="Por Vencer (Amarillo)" value={stateStats.amarillo} total={stateStats.total} colorClass="bg-yellow-500" textClass="text-yellow-500" />
