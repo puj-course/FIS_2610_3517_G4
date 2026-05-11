@@ -4,12 +4,27 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 import { calculateDaysRemaining, calculateDocumentState } from '@/utils/dateUtils.js';
-import { clearSourceAlerts } from '@/hooks/useAlertHub.js';
-import { publishAdaptedAlerts } from '@/patterns/adapters/publishAdaptedAlerts.js';
-import RtmAlertAdapter from '@/patterns/adapters/RtmAlertAdapter.js';
 
 const RtmContext = createContext(null);
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
+
+const normalizeRtm = (rtm) => {
+  const numeroCertificado = rtm.numeroCertificado || rtm.numeroRtm || '';
+  const fechaExpedicion = rtm.fechaExpedicion || rtm.fechaInicio || '';
+  const placaVehiculo = rtm.placaVehiculo || rtm.vehiculoPlaca || rtm.placa || '';
+
+  return {
+    ...rtm,
+    id: rtm._id || rtm.id,
+    numeroCertificado,
+    numeroRtm: numeroCertificado,
+    fechaExpedicion,
+    fechaInicio: fechaExpedicion,
+    placaVehiculo,
+    vehiculoPlaca: placaVehiculo,
+    placa: placaVehiculo,
+  };
+};
 
 export function RtmProvider({ children }) {
   const [storedRtms, setStoredRtms] = useState([]);
@@ -26,7 +41,7 @@ export function RtmProvider({ children }) {
     setLoading(true);
     try {
       const res = await api.get('/rtms', { params: { email: user.email } });
-      setStoredRtms(res.data.map((r) => ({ ...r, id: r._id || r.id })));
+      setStoredRtms(res.data.map(normalizeRtm));
     } catch (err) {
       console.error('Error cargando RTMs:', err);
     } finally {
@@ -47,21 +62,20 @@ export function RtmProvider({ children }) {
 
   const rtms = useMemo(() => {
     return storedRtms.map((rtm) => {
-      const diasRestantes = calculateDaysRemaining(rtm.fechaVencimiento, simulatedDate);
+      const normalized = normalizeRtm(rtm);
+      const diasRestantes = calculateDaysRemaining(normalized.fechaVencimiento, simulatedDate);
       const estado = calculateDocumentState(diasRestantes, threshold);
-      return { ...rtm, diasRestantes, estado };
+      return { ...normalized, diasRestantes, estado };
     });
   }, [storedRtms, simulatedDate, threshold]);
 
-  const rtmAlertAdapter = new RtmAlertAdapter();
-  useEffect(() => {
-    publishAdaptedAlerts(rtmAlertAdapter, 'rtms', rtms);
-    return () => clearSourceAlerts('rtms');
-  }, [rtms]);
-
   const addRtm = async (nuevaRtm) => {
     if (!user?.email) throw new Error('No hay usuario autenticado');
-    await api.post('/rtms', { ...nuevaRtm, ownerEmail: user.email });
+    await api.post('/rtms', {
+      ...nuevaRtm,
+      ownerEmail: user.email,
+      ownerEmpresa: user.empresa || '',
+    });
     await fetchRtms();
   };
 

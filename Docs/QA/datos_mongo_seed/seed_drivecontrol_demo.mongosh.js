@@ -24,7 +24,7 @@ const conductores = [
   {
     _id: objectId('665100000000000000000001'),
     nombre: 'Laura Martinez Rojas',
-    documento: 'CC1002457801',
+    documento: '1002457801',
     telefono: '3004567812',
     categoria: 'C2',
     fechaVencimiento: '2027-08-15',
@@ -34,7 +34,7 @@ const conductores = [
   {
     _id: objectId('665100000000000000000002'),
     nombre: 'Andres Felipe Gomez',
-    documento: 'CC1018457790',
+    documento: '1018457790',
     telefono: '3012223344',
     categoria: 'C3',
     fechaVencimiento: '2026-05-17',
@@ -44,7 +44,7 @@ const conductores = [
   {
     _id: objectId('665100000000000000000003'),
     nombre: 'Natalia Perez Cardenas',
-    documento: 'CC1020998877',
+    documento: '1020998877',
     telefono: '3028889911',
     categoria: 'B1',
     fechaVencimiento: '2026-04-12',
@@ -54,7 +54,7 @@ const conductores = [
   {
     _id: objectId('665100000000000000000004'),
     nombre: 'Carlos Eduardo Torres',
-    documento: 'CC79884512',
+    documento: '1007984512',
     telefono: '3105557890',
     categoria: 'C2',
     fechaVencimiento: '2027-02-01',
@@ -64,7 +64,7 @@ const conductores = [
   {
     _id: objectId('665100000000000000000005'),
     nombre: 'Diana Carolina Ruiz',
-    documento: 'CC1030555012',
+    documento: '1030555012',
     telefono: '3119098877',
     categoria: 'C1',
     fechaVencimiento: '2026-05-22',
@@ -74,7 +74,7 @@ const conductores = [
   {
     _id: objectId('665100000000000000000006'),
     nombre: 'Miguel Angel Castro',
-    documento: 'CC80011223',
+    documento: '1008001123',
     telefono: '3126654410',
     categoria: 'C3',
     fechaVencimiento: '2025-12-15',
@@ -84,7 +84,7 @@ const conductores = [
   {
     _id: objectId('665100000000000000000007'),
     nombre: 'Valentina Herrera Diaz',
-    documento: 'CC1045566120',
+    documento: '1045566120',
     telefono: '3137789012',
     categoria: 'B1',
     fechaVencimiento: '2028-01-30',
@@ -94,7 +94,7 @@ const conductores = [
   {
     _id: objectId('665100000000000000000008'),
     nombre: 'Jorge Ivan Prieto',
-    documento: 'CC79991234',
+    documento: '1007991234',
     telefono: '3140012456',
     categoria: 'C2',
     fechaVencimiento: '2026-05-10',
@@ -104,7 +104,7 @@ const conductores = [
   {
     _id: objectId('665100000000000000000009'),
     nombre: 'Sofia Alejandra Mora',
-    documento: 'CC1052200112',
+    documento: '1052200112',
     telefono: '3158800123',
     categoria: 'C1',
     fechaVencimiento: '2027-11-09',
@@ -114,7 +114,7 @@ const conductores = [
   {
     _id: objectId('66510000000000000000000a'),
     nombre: 'Felipe Cardenas Nieto',
-    documento: 'CC1022334455',
+    documento: '1022334455',
     telefono: '3169087722',
     categoria: 'C2',
     fechaVencimiento: '2026-03-02',
@@ -124,7 +124,7 @@ const conductores = [
   {
     _id: objectId('66510000000000000000000b'),
     nombre: 'Camila Andrea Pardo',
-    documento: 'CC1009988776',
+    documento: '1009988776',
     telefono: '3178832211',
     categoria: 'B1',
     fechaVencimiento: '2026-05-19',
@@ -134,7 +134,7 @@ const conductores = [
   {
     _id: objectId('66510000000000000000000c'),
     nombre: 'Oscar Javier Molina',
-    documento: 'CC80123456',
+    documento: '1008012345',
     telefono: '3189090909',
     categoria: 'C3',
     fechaVencimiento: '2028-06-20',
@@ -315,48 +315,63 @@ const vehiculos = [
 ];
 
 const soats = [
-  ['665300000000000000000001', '665200000000000000000001', 'SOAT-SYN101-2026', '2026-01-01', '2027-01-01'],
-  ['665300000000000000000002', '665200000000000000000002', 'SOAT-SYN102-2026', '2025-05-17', '2026-05-17'],
-  ['665300000000000000000003', '665200000000000000000003', 'SOAT-SYN103-2025', '2025-04-12', '2026-04-12'],
-  ['665300000000000000000004', '665200000000000000000004', 'SOAT-SYN104-2026', '2026-02-01', '2027-02-01'],
-  ['665300000000000000000005', '665200000000000000000005', 'SOAT-SYN105-2026', '2025-05-22', '2026-05-22'],
-  ['665300000000000000000006', '665200000000000000000006', 'SOAT-SYN106-2025', '2024-12-15', '2025-12-15'],
-  ['665300000000000000000007', '665200000000000000000007', 'SOAT-SYN107-2026', '2026-01-30', '2027-01-30'],
-  ['665300000000000000000008', '665200000000000000000008', 'SOAT-SYN108-2026', '2025-05-10', '2026-05-10'],
-  ['665300000000000000000009', '665200000000000000000009', 'SOAT-SYN109-2026', '2026-03-01', '2027-03-01'],
-  ['66530000000000000000000a', '66520000000000000000000a', 'SOAT-SYN110-2025', '2025-03-02', '2026-03-02'],
-  ['66530000000000000000000b', '66520000000000000000000b', 'SOAT-SYN111-2026', '2025-05-19', '2026-05-19'],
-  ['66530000000000000000000c', '66520000000000000000000c', 'SOAT-SYN112-2026', '2026-06-20', '2027-06-20'],
-].map(([soatId, vehiculoId, numeroPoliza, fechaInicio, fechaVencimiento]) => ({
+  ['665300000000000000000001', '665200000000000000000001', 'SYN101', 'SOAT20260001', 'Seguros Mundial', '2026-01-01', '2026-01-01', '2027-01-01'],
+  ['665300000000000000000002', '665200000000000000000002', 'SYN102', 'SOAT20260002', 'Seguros Bolivar', '2025-05-17', '2025-05-17', '2026-05-17'],
+  ['665300000000000000000003', '665200000000000000000003', 'SYN103', 'BOL20260003', 'SURA', '2025-04-12', '2025-04-12', '2026-04-12'],
+  ['665300000000000000000004', '665200000000000000000004', 'SYN104', 'SUR20260004', 'Previsora Seguros', '2026-02-01', '2026-02-01', '2027-02-01'],
+  ['665300000000000000000005', '665200000000000000000005', 'SYN105', 'PRE20260005', 'Aseguradora Solidaria', '2025-05-22', '2025-05-22', '2026-05-22'],
+  ['665300000000000000000006', '665200000000000000000006', 'SYN106', 'MAP20260006', 'Mapfre', '2024-12-15', '2024-12-15', '2025-12-15'],
+  ['665300000000000000000007', '665200000000000000000007', 'SYN107', 'ALL20260007', 'Allianz', '2026-01-30', '2026-01-30', '2027-01-30'],
+  ['665300000000000000000008', '665200000000000000000008', 'SYN108', 'LIB20260008', 'Liberty Seguros', '2025-05-11', '2025-05-11', '2026-05-11'],
+  ['665300000000000000000009', '665200000000000000000009', 'SYN109', 'SOAT20260009', 'Seguros Mundial', '2026-03-01', '2026-03-01', '2027-03-01'],
+  ['66530000000000000000000a', '66520000000000000000000a', 'SYN110', 'BOL20260010', 'Seguros Bolivar', '2025-03-02', '2025-03-02', '2026-03-02'],
+  ['66530000000000000000000b', '66520000000000000000000b', 'SYN111', 'SUR20260011', 'SURA', '2025-05-19', '2025-05-19', '2026-05-19'],
+  ['66530000000000000000000c', '66520000000000000000000c', 'SYN112', 'PRE20260012', 'Previsora Seguros', '2026-06-20', '2026-06-20', '2027-06-20'],
+].map(([soatId, vehiculoId, placaVehiculo, numeroPoliza, aseguradora, fechaExpedicion, fechaInicioVigencia, fechaFinVigencia]) => ({
   _id: objectId(soatId),
   vehiculoId: id(vehiculoId),
+  placaVehiculo,
   numeroPoliza,
-  fechaInicio,
-  fechaVencimiento,
+  aseguradora,
+  fechaExpedicion,
+  fechaInicioVigencia,
+  fechaFinVigencia,
+  fechaInicio: fechaInicioVigencia,
+  fechaVencimiento: fechaFinVigencia,
+  observaciones: 'Dato demo canónico para validación SOAT.',
   ownerEmail: OWNER_EMAIL,
+  ownerEmpresa: OWNER_EMPRESA,
   seedTag: SEED_TAG,
 }));
 
 const rtms = [
-  ['665400000000000000000001', '665200000000000000000001', 'RTM-SYN101-2026', '2026-02-01', '2027-02-01'],
-  ['665400000000000000000002', '665200000000000000000002', 'RTM-SYN102-2026', '2025-05-14', '2026-05-14'],
-  ['665400000000000000000003', '665200000000000000000003', 'RTM-SYN103-2025', '2025-03-30', '2026-03-30'],
-  ['665400000000000000000004', '665200000000000000000004', 'RTM-SYN104-2026', '2026-04-01', '2027-04-01'],
-  ['665400000000000000000005', '665200000000000000000005', 'RTM-SYN105-2026', '2025-05-20', '2026-05-20'],
-  ['665400000000000000000006', '665200000000000000000006', 'RTM-SYN106-2025', '2024-11-10', '2025-11-10'],
-  ['665400000000000000000007', '665200000000000000000007', 'RTM-SYN107-2026', '2026-08-01', '2027-08-01'],
-  ['665400000000000000000008', '665200000000000000000008', 'RTM-SYN108-2026', '2025-05-11', '2026-05-11'],
-  ['665400000000000000000009', '665200000000000000000009', 'RTM-SYN109-2026', '2026-07-01', '2027-07-01'],
-  ['66540000000000000000000a', '66520000000000000000000a', 'RTM-SYN110-2025', '2025-02-20', '2026-02-20'],
-  ['66540000000000000000000b', '66520000000000000000000b', 'RTM-SYN111-2026', '2025-05-18', '2026-05-18'],
-  ['66540000000000000000000c', '66520000000000000000000c', 'RTM-SYN112-2026', '2026-09-01', '2027-09-01'],
-].map(([rtmId, vehiculoId, numeroRtm, fechaInicio, fechaVencimiento]) => ({
+  ['665400000000000000000001', '665200000000000000000001', 'SYN101', 'RTM20260001', 'CDA Bogota Norte', '2026-02-01', '2027-02-01', 'Aprobado'],
+  ['665400000000000000000002', '665200000000000000000002', 'SYN102', 'RTM20260002', 'CDA Movilidad Capital', '2025-05-14', '2026-05-14', 'Aprobado'],
+  ['665400000000000000000003', '665200000000000000000003', 'SYN103', 'CDA20260003', 'CDA Andino', '2025-03-30', '2026-03-30', 'Aprobado'],
+  ['665400000000000000000004', '665200000000000000000004', 'SYN104', 'REV20260004', 'CDA Autocontrol', '2026-04-01', '2027-04-01', 'Aprobado'],
+  ['665400000000000000000005', '665200000000000000000005', 'SYN105', 'TEC20260005', 'CDA Revision Segura', '2025-05-20', '2026-05-20', 'Pendiente'],
+  ['665400000000000000000006', '665200000000000000000006', 'SYN106', 'RTM20260006', 'CDA Centro Diagnostico Vial', '2024-11-10', '2025-11-10', 'Rechazado'],
+  ['665400000000000000000007', '665200000000000000000007', 'SYN107', 'RTM20260007', 'CDA Ruta Segura', '2026-08-01', '2027-08-01', 'Aprobado'],
+  ['665400000000000000000008', '665200000000000000000008', 'SYN108', 'RTM20260008', 'CDA Tecnica Motor', '2025-05-11', '2026-05-11', 'Aprobado'],
+  ['665400000000000000000009', '665200000000000000000009', 'SYN109', 'CDA20260009', 'CDA Bogota Norte', '2026-07-01', '2027-07-01', 'Aprobado'],
+  ['66540000000000000000000a', '66520000000000000000000a', 'SYN110', 'REV20260010', 'CDA Movilidad Capital', '2025-02-20', '2026-02-20', 'Rechazado'],
+  ['66540000000000000000000b', '66520000000000000000000b', 'SYN111', 'TEC20260011', 'CDA Andino', '2025-05-18', '2026-05-18', 'Pendiente'],
+  ['66540000000000000000000c', '66520000000000000000000c', 'SYN112', 'RTM20260012', 'CDA Autocontrol', '2026-09-01', '2027-09-01', 'Aprobado'],
+].map(([rtmId, vehiculoId, placaVehiculo, numeroCertificado, cda, fechaExpedicion, fechaVencimiento, resultado]) => ({
   _id: objectId(rtmId),
   vehiculoId: id(vehiculoId),
-  numeroRtm,
-  fechaInicio,
+  placaVehiculo,
+  numeroCertificado,
+  numeroRtm: numeroCertificado,
+  cda,
+  nitCda: '',
+  fechaExpedicion,
+  fechaInicio: fechaExpedicion,
   fechaVencimiento,
+  resultado,
+  observaciones: 'Dato demo canónico para validación RTM.',
   ownerEmail: OWNER_EMAIL,
+  ownerEmpresa: OWNER_EMPRESA,
   seedTag: SEED_TAG,
 }));
 
@@ -377,10 +392,30 @@ if (user) {
   print(`Aviso: no existe usuario con email ${OWNER_EMAIL}. Inicia sesion con ese correo o cambia OWNER_EMAIL antes de importar.`);
 }
 
-db.conductors.deleteMany({ ownerEmail: OWNER_EMAIL, seedTag: SEED_TAG });
-db.vehiculos.deleteMany({ ownerEmail: OWNER_EMAIL, seedTag: SEED_TAG });
-db.soats.deleteMany({ ownerEmail: OWNER_EMAIL, seedTag: SEED_TAG });
-db.rtms.deleteMany({ ownerEmail: OWNER_EMAIL, seedTag: SEED_TAG });
+db.conductors.deleteMany({
+  $or: [
+    { ownerEmail: OWNER_EMAIL, seedTag: SEED_TAG },
+    { _id: { $in: conductores.map((item) => item._id) } },
+  ],
+});
+db.vehiculos.deleteMany({
+  $or: [
+    { ownerEmail: OWNER_EMAIL, seedTag: SEED_TAG },
+    { _id: { $in: vehiculos.map((item) => item._id) } },
+  ],
+});
+db.soats.deleteMany({
+  $or: [
+    { ownerEmail: OWNER_EMAIL, seedTag: SEED_TAG },
+    { _id: { $in: soats.map((item) => item._id) } },
+  ],
+});
+db.rtms.deleteMany({
+  $or: [
+    { ownerEmail: OWNER_EMAIL, seedTag: SEED_TAG },
+    { _id: { $in: rtms.map((item) => item._id) } },
+  ],
+});
 
 db.conductors.insertMany(conductores);
 db.vehiculos.insertMany(vehiculos);

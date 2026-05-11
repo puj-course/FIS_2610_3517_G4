@@ -34,7 +34,7 @@ export default function VehiculosPage() {
   // El filtrado une texto libre y severidad para apoyar tanto búsqueda rápida como revisión operativa.
   const filteredVehiculos = useMemo(() => {
     return vehiculos.filter((v) => {
-      const matchesSearch = [v.placa, v.marca, v.modelo, v.ownerLabel]
+      const matchesSearch = [v.placa, v.marca, v.modelo, v.tipo, v.ownerLabel]
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(searchTerm.toLowerCase()));
 

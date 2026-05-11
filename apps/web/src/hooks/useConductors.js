@@ -1,8 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import api from '@/services/api.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
+import { useLocalStorage } from './useLocalStorage.js';
 
 const CONDUCTORS_UPDATED_EVENT = 'syntix:conductors-updated';
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
@@ -29,7 +30,7 @@ export function useConductors() {
   const [conductores, setConductores] = useState([]);
   const { user } = useAuth();
   const { simulatedDate } = useSimulatedDate();
-  const threshold = 15;
+  const [threshold] = useLocalStorage('syntix_threshold', 15);
 
   const fetchConductors = useCallback(async () => {
     if (!user?.email) {
@@ -103,7 +104,7 @@ export function useConductors() {
     notifyVehiclesUpdated();
   };
 
-  const conductorsWithState = conductores.map((conductor) => {
+  const conductorsWithState = useMemo(() => conductores.map((conductor) => {
     // El estado de la licencia se deriva en cliente para responder a la fecha simulada del dashboard.
     const days = calculateDaysRemaining(conductor.fechaVencimiento, simulatedDate);
 
@@ -112,7 +113,7 @@ export function useConductors() {
       diasRestantes: days,
       estado: calculateDocumentState(days, threshold),
     };
-  });
+  }), [conductores, simulatedDate, threshold]);
 
   return {
     conductores: conductorsWithState,

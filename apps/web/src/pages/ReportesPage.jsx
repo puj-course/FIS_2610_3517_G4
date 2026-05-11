@@ -1,47 +1,115 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Helmet } from 'react-helmet';
-import { BarChart3, Download } from 'lucide-react';
+import { AlertTriangle, Car, Download, FileText, ShieldCheck, Users } from 'lucide-react';
 import { useVehicles } from '@/hooks/useVehicles.js';
+import { useConductors } from '@/hooks/useConductors.js';
+import { useDocuments } from '@/hooks/useDocuments.js';
+import { useRtm } from '@/contexts/RtmContext.jsx';
+import { useAlerts } from '@/hooks/useAlerts.js';
+import { formatColombianDate, getExpirationAlertText } from '@/utils/dateUtils.js';
 
-// ReportesPage traduce el estado de la flota a métricas y exportables simples para seguimiento.
+const statusLabels = {
+  verde: 'Al dia',
+  amarillo: 'Por vencer',
+  rojo: 'Critico',
+};
+
+const progressWidth = (value, total) => (total > 0 ? `${Math.round((value / total) * 100)}%` : '0%');
+
+const quoteCsv = (field) => `"${String(field ?? '').replaceAll('"', '""')}"`;
+
+// ReportesPage traduce el estado real de la flota a metricas y exportables simples.
 export default function ReportesPage() {
   const { vehiculos } = useVehicles();
+  const { conductores } = useConductors();
+  const { soats } = useDocuments();
+  const { rtms } = useRtm();
+  const { alerts } = useAlerts();
 
-  const stats = {
-    verde: vehiculos.filter(v => v.estadoGeneral === 'verde').length,
-    amarillo: vehiculos.filter(v => v.estadoGeneral === 'amarillo').length,
-    rojo: vehiculos.filter(v => v.estadoGeneral === 'rojo').length,
-    total: vehiculos.length
-  };
+  const vehicleAlerts = useMemo(
+    () => alerts.filter((alert) => alert.categoria === 'vehiculos'),
+    [alerts]
+  );
 
-  const cumplimiento = stats.total > 0 ? Math.round((stats.verde / stats.total) * 100) : 0;
+  const conductorAlerts = useMemo(
+    () => alerts.filter((alert) => alert.categoria === 'conductores'),
+    [alerts]
+  );
+
+  const stateStats = useMemo(() => ({
+    verde: vehiculos.filter((v) => v.estadoGeneral === 'verde').length,
+    amarillo: vehiculos.filter((v) => v.estadoGeneral === 'amarillo').length,
+    rojo: vehiculos.filter((v) => v.estadoGeneral === 'rojo').length,
+    total: vehiculos.length,
+  }), [vehiculos]);
+
+  const alertStats = useMemo(() => ({
+    soat: vehicleAlerts.filter((alert) => alert.grupo === 'SOAT').length,
+    rtm: vehicleAlerts.filter((alert) => alert.grupo === 'RTM').length,
+    licencias: conductorAlerts.filter((alert) => alert.grupo === 'Licencias').length,
+  }), [vehicleAlerts, conductorAlerts]);
+
+  const documentStats = useMemo(() => ({
+    soat: {
+      total: soats.length,
+      vigente: soats.filter((soat) => soat.estado === 'verde').length,
+      proximo: soats.filter((soat) => soat.estado === 'amarillo').length,
+      vencido: soats.filter((soat) => soat.estado === 'rojo').length,
+      faltantes: vehiculos.filter((vehiculo) => !vehiculo.soat).length,
+    },
+    rtm: {
+      total: rtms.length,
+      vigente: rtms.filter((rtm) => rtm.estado === 'verde').length,
+      proximo: rtms.filter((rtm) => rtm.estado === 'amarillo').length,
+      vencido: rtms.filter((rtm) => rtm.estado === 'rojo').length,
+      faltantes: vehiculos.filter((vehiculo) => !vehiculo.rtm).length,
+    },
+  }), [rtms, soats, vehiculos]);
+
+  const cumplimiento = stateStats.total > 0
+    ? Math.round((stateStats.verde / stateStats.total) * 100)
+    : 0;
 
   const handleExportCSV = () => {
-    // Se exporta una foto del estado actual para compartirla fuera del sistema sin depender del backend.
-    const headers = ['Placa', 'Marca/Modelo', 'Tipo', 'Conductor', 'Estado SOAT', 'Estado Licencia', 'Estado General', 'Días Restantes SOAT', 'Días Restantes Licencia'];
-    
-    const rows = vehiculos.map(v => {
-      const conductorName = v.conductor ? v.conductor.nombre : 'Sin asignar';
-      const soatDays = v.soat ? v.soat.diasRestantes : 'N/A';
-      const licDays = v.conductor ? v.conductor.diasRestantes : 'N/A';
-      
+    const headers = [
+      'Placa',
+      'Marca/Modelo',
+      'Tipo',
+      'Conductor',
+      'Estado SOAT',
+      'Vencimiento SOAT',
+      'Estado RTM',
+      'Vencimiento RTM',
+      'Estado Licencia',
+      'Vencimiento Licencia',
+      'Estado General',
+    ];
+
+    const rows = vehiculos.map((vehiculo) => {
+      const conductorName = vehiculo.conductor?.nombre || 'Sin asignar';
+      const soatStatus = vehiculo.soat?.estado || 'sin soat';
+      const rtmStatus = vehiculo.rtm?.estado || 'sin rtm';
+      const licenseStatus = vehiculo.conductor?.estado || 'sin conductor';
+
       return [
-        v.placa,
-        `${v.marca} ${v.modelo}`,
-        v.tipo,
+        vehiculo.placa,
+        `${vehiculo.marca || ''} ${vehiculo.modelo || ''}`.trim(),
+        vehiculo.tipo,
         conductorName,
-        v.estadoSoat.toUpperCase(),
-        v.estadoLicencia.toUpperCase(),
-        v.estadoGeneral.toUpperCase(),
-        soatDays,
-        licDays
-      ].map(field => `"${field}"`).join(',');
+        soatStatus.toUpperCase(),
+        formatColombianDate(vehiculo.soat?.fechaFinVigencia || vehiculo.soat?.fechaVencimiento),
+        rtmStatus.toUpperCase(),
+        formatColombianDate(vehiculo.rtm?.fechaVencimiento),
+        licenseStatus.toUpperCase(),
+        formatColombianDate(vehiculo.conductor?.fechaVencimiento),
+        (vehiculo.estadoGeneral || 'sin dato').toUpperCase(),
+      ].map(quoteCsv).join(',');
     });
 
     const csvContent = [headers.join(','), ...rows].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    
+
     const dateStr = new Date().toISOString().split('T')[0];
     const link = document.createElement('a');
     link.setAttribute('href', url);
@@ -49,6 +117,7 @@ export default function ReportesPage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -57,13 +126,10 @@ export default function ReportesPage() {
         <title>Reportes | SYNTIX Drive Control</title>
       </Helmet>
 
-      <div
-        data-onboarding="reports-header"
-        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
-      >
+      <div data-onboarding="reports-header" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-syntix-navy">Reportes y Analítica</h1>
-          <p className="text-gray-500 text-sm mt-1">Métricas de cumplimiento de la flota</p>
+          <h1 className="text-2xl font-bold text-syntix-navy">Reportes y Analitica</h1>
+          <p className="text-gray-500 text-sm mt-1">Metricas reales de cumplimiento de la flota</p>
         </div>
         <button
           data-onboarding="reports-export"
@@ -74,51 +140,147 @@ export default function ReportesPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
+        <MetricCard icon={Car} label="Vehiculos" value={vehiculos.length} hint="Registrados" />
+        <MetricCard icon={Users} label="Conductores" value={conductores.length} hint="Registrados" />
+        <MetricCard icon={ShieldCheck} label="SOAT" value={soats.length} hint="Documentos" />
+        <MetricCard icon={FileText} label="RTM" value={rtms.length} hint="Revisiones" />
+        <MetricCard icon={AlertTriangle} label="Alertas" value={alerts.length} hint="Activas" />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div data-onboarding="reports-compliance-card" className="bg-syntix-navy rounded-2xl p-8 text-white relative overflow-hidden shadow-lg">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-syntix-green rounded-full opacity-20 blur-3xl -mr-20 -mt-20"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-syntix-green rounded-full opacity-20 blur-3xl -mr-20 -mt-20" />
           <div className="relative z-10">
             <h3 className="text-lg font-medium text-gray-300 mb-2">Cumplimiento Total</h3>
             <div className="flex items-end gap-2">
               <span className="text-6xl font-black text-syntix-green">{cumplimiento}%</span>
             </div>
-            <p className="mt-4 text-gray-400">Vehículos al día según la Regla de Oro</p>
+            <p className="mt-4 text-gray-400">Vehiculos al dia segun la Regla de Oro</p>
           </div>
         </div>
 
         <div data-onboarding="reports-distribution-card" className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex flex-col justify-center">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Distribución de Estados</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-6">Distribucion de Estados</h3>
           <div className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm font-bold mb-1">
-                <span className="text-syntix-green">Al Día (Verde)</span>
-                <span>{stats.verde}</span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-2.5">
-                <div className="bg-syntix-green h-2.5 rounded-full" style={{ width: `${(stats.verde/stats.total)*100}%` }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm font-bold mb-1">
-                <span className="text-yellow-500">Por Vencer (Amarillo)</span>
-                <span>{stats.amarillo}</span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-2.5">
-                <div className="bg-yellow-500 h-2.5 rounded-full" style={{ width: `${(stats.amarillo/stats.total)*100}%` }}></div>
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between text-sm font-bold mb-1">
-                <span className="text-syntix-red">Crítico (Rojo)</span>
-                <span>{stats.rojo}</span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-2.5">
-                <div className="bg-syntix-red h-2.5 rounded-full" style={{ width: `${(stats.rojo/stats.total)*100}%` }}></div>
-              </div>
-            </div>
+            <StatusBar label="Al Dia (Verde)" value={stateStats.verde} total={stateStats.total} colorClass="bg-syntix-green" textClass="text-syntix-green" />
+            <StatusBar label="Por Vencer (Amarillo)" value={stateStats.amarillo} total={stateStats.total} colorClass="bg-yellow-500" textClass="text-yellow-500" />
+            <StatusBar label="Critico (Rojo)" value={stateStats.rojo} total={stateStats.total} colorClass="bg-syntix-red" textClass="text-syntix-red" />
           </div>
         </div>
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ReportSection
+          title={`Alertas de vehiculos (${vehicleAlerts.length})`}
+          emptyMessage="No hay alertas de vehiculos para reportar."
+          alerts={vehicleAlerts}
+        />
+        <ReportSection
+          title={`Alertas de conductores (${conductorAlerts.length})`}
+          emptyMessage="No hay alertas de conductores para reportar."
+          alerts={conductorAlerts}
+        />
+      </div>
+
+      <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Resumen Documental</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <DocumentSummary title="SOAT" stats={documentStats.soat} alerts={alertStats.soat} />
+          <DocumentSummary title="RTM" stats={documentStats.rtm} alerts={alertStats.rtm} />
+          <DocumentSummary title="Licencias" total={conductores.length} alerts={alertStats.licencias} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MetricCard({ icon: Icon, label, value, hint }) {
+  return (
+    <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm text-gray-500">{label}</p>
+          <p className="text-3xl font-black text-syntix-navy mt-1">{value}</p>
+          <p className="text-xs text-gray-400 mt-1">{hint}</p>
+        </div>
+        <div className="p-3 rounded-lg bg-gray-50 text-syntix-navy">
+          <Icon className="w-5 h-5" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatusBar({ label, value, total, colorClass, textClass }) {
+  return (
+    <div>
+      <div className="flex justify-between text-sm font-bold mb-1">
+        <span className={textClass}>{label}</span>
+        <span>{value}</span>
+      </div>
+      <div className="w-full bg-gray-100 rounded-full h-2.5">
+        <div className={`${colorClass} h-2.5 rounded-full`} style={{ width: progressWidth(value, total) }} />
+      </div>
+    </div>
+  );
+}
+
+function ReportSection({ title, alerts, emptyMessage }) {
+  return (
+    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+      <h3 className="text-lg font-bold text-gray-900 mb-4">{title}</h3>
+
+      {alerts.length === 0 ? (
+        <div className="text-sm text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-200 p-4">
+          {emptyMessage}
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {alerts.slice(0, 6).map((alert) => {
+            const expiration = getExpirationAlertText(alert.diasRestantes, alert.fechaVencimiento);
+
+            return (
+              <div key={alert.id} className="border border-gray-100 rounded-xl p-4 bg-gray-50">
+                <div className="flex justify-between gap-3">
+                  <div>
+                    <p className="font-bold text-gray-900">{alert.mensaje}</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {alert.tipo}: {alert.entidad}
+                    </p>
+                  </div>
+                  <span className={`text-xs font-bold px-2 py-1 rounded-md h-fit ${alert.prioridad === 'rojo' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                    {statusLabels[alert.prioridad] || alert.prioridad}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 font-semibold mt-2">{expiration.fullText}</p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DocumentSummary({ title, total, alerts, stats = null }) {
+  const totalValue = stats?.total ?? total;
+
+  return (
+    <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+      <p className="text-sm text-gray-500">{title}</p>
+      <p className="text-2xl font-black text-syntix-navy mt-1">{totalValue}</p>
+      {stats && (
+        <div className="grid grid-cols-2 gap-2 mt-3 text-xs text-gray-600">
+          <span>Vigentes: <strong>{stats.vigente}</strong></span>
+          <span>Proximos: <strong>{stats.proximo}</strong></span>
+          <span>Vencidos: <strong>{stats.vencido}</strong></span>
+          <span>Sin registro: <strong>{stats.faltantes}</strong></span>
+        </div>
+      )}
+      <p className="text-xs text-gray-500 mt-1">
+        {alerts} alertas activas
+      </p>
     </div>
   );
 }
