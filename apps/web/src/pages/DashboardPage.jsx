@@ -20,8 +20,8 @@ export default function DashboardPage() {
       { label: 'Conductores', value: conductores.length, hint: 'Activos' },
       {
         label: 'Docs vencen pronto',
-        value: vehiculos.filter((v) => v.estadoGeneral === 'amarillo').length,
-        hint: 'SOAT / Tecno'
+        value: alerts.filter((alert) => alert.prioridad === 'amarillo').length,
+        hint: 'Alertas amarillas'
       },
       { label: 'Alertas', value: alerts.length, hint: 'Pendientes' },
     ],

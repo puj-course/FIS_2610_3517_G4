@@ -1,13 +1,19 @@
-.PHONY: build clean up down
+.PHONY: build clean up down logs ps
 
 build:
-	docker build -t fis-app .
+	docker compose build
 
 clean:
-	docker rmi fis-app
+	docker compose down --rmi local --volumes --remove-orphans
 
 up:
-	docker-compose up -d
+	docker compose up -d --build
 
 down:
-	docker-compose down
+	docker compose down
+
+logs:
+	docker compose logs -f
+
+ps:
+	docker compose ps
