@@ -1,30 +1,13 @@
-const fs = require('fs');
-const path = require('path');
-const dotenv = require('dotenv');
-
-const envPath = path.resolve(__dirname, '.env');
-const envExamplePath = path.resolve(__dirname, '.env.example');
-let envLoadedFrom = null;
 const hasRuntimeMongoEnv = Boolean(process.env.MONGO_URI || process.env.MONGO_USER);
+const { loadProjectEnv } = require('./config/load-env');
 
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath });
-  envLoadedFrom = '.env';
-} else if (hasRuntimeMongoEnv) {
-  envLoadedFrom = 'variables de entorno del contenedor';
-} else if (fs.existsSync(envExamplePath)) {
-  dotenv.config({ path: envExamplePath });
-  envLoadedFrom = '.env.example';
-  console.warn('[ENV] No se encontro backend/.env. Se cargo backend/.env.example como respaldo.');
-} else {
-  console.error('[ENV] No se encontro backend/.env ni backend/.env.example');
-}
+const loadedEnvSources = loadProjectEnv();
+const hasLoadedEnvFile = loadedEnvSources.length > 0;
 
-if (envLoadedFrom) {
-  const envPrefix = envLoadedFrom.startsWith('.')
-    ? `backend/${envLoadedFrom}`
-    : envLoadedFrom;
-  console.log(`[ENV] Variables cargadas desde ${envPrefix}`);
+if (!hasLoadedEnvFile && !hasRuntimeMongoEnv) {
+  console.error('[ENV] No se encontro configuracion en backend/.env, backend/.env.example ni .env raiz.');
+} else if (loadedEnvSources.length > 0) {
+  console.log(`[ENV] Variables cargadas desde ${loadedEnvSources.join(', ')}`);
 }
 
 const missingEmailVars = ['EMAIL_USER', 'EMAIL_PASS'].filter((key) => !process.env[key]);
