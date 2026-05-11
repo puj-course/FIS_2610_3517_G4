@@ -37,11 +37,13 @@ export default function ReportesPage() {
   );
 
   const stateStats = useMemo(() => {
-    const estadosDocumentales = vehiculos.flatMap((vehiculo) => [
-      vehiculo.soat?.estado || 'rojo',
-      vehiculo.rtm?.estado || 'rojo',
-      vehiculo.conductor?.estado || 'rojo',
-    ]);
+    const missingDocumentAlerts = alerts.filter((alert) => alert.tipo === 'Documento Faltante');
+    const estadosDocumentales = [
+      ...soats.map((soat) => soat.estado),
+      ...rtms.map((rtm) => rtm.estado),
+      ...conductores.map((conductor) => conductor.estado),
+      ...missingDocumentAlerts.map((alert) => alert.prioridad),
+    ].filter(Boolean);
 
     return {
       verde: estadosDocumentales.filter((estado) => estado === 'verde').length,
@@ -49,7 +51,7 @@ export default function ReportesPage() {
       rojo: estadosDocumentales.filter((estado) => estado === 'rojo').length,
       total: estadosDocumentales.length,
     };
-  }, [vehiculos]);
+  }, [alerts, conductores, rtms, soats]);
 
   const alertStats = useMemo(() => ({
     soat: vehicleAlerts.filter((alert) => alert.grupo === 'SOAT').length,
@@ -74,8 +76,8 @@ export default function ReportesPage() {
     },
   }), [rtms, soats, vehiculos]);
 
-  const cumplimiento = stateStats.total > 0
-    ? Math.round((stateStats.verde / stateStats.total) * 100)
+  const cumplimiento = vehiculos.length > 0
+    ? Math.round((vehiculos.filter((vehiculo) => vehiculo.estadoGeneral === 'verde').length / vehiculos.length) * 100)
     : 0;
 
   const handleExportCSV = () => {
@@ -164,7 +166,7 @@ export default function ReportesPage() {
             <div className="flex items-end gap-2">
               <span className="text-6xl font-black text-syntix-green">{cumplimiento}%</span>
             </div>
-            <p className="mt-4 text-gray-400">Vehiculos al dia segun la Regla de Oro</p>
+            <p className="mt-4 text-gray-400">Vehiculos al dia segun la Regla de Oro, incluyendo documentos faltantes</p>
           </div>
         </div>
 

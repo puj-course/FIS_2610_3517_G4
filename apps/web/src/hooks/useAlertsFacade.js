@@ -7,6 +7,7 @@ import { useRtm } from '@/contexts/RtmContext.jsx';
 import SoatAlertAdapter from '@/patterns/adapters/SoatAlertAdapter.js';
 import RtmAlertAdapter from '@/patterns/adapters/RtmAlertAdapter.js';
 import ConductorAlertAdapter from '@/patterns/adapters/ConductorAlertAdapter.js';
+import VehicleAlertAdapter from '@/patterns/adapters/VehicleAlertAdapter.js';
 import PriorityAlertSortStrategy from '@/patterns/strategy/PriorityAlertSortStrategy.js';
 import UrgencyAlertSortStrategy from '@/patterns/strategy/UrgencyAlertSortStrategy.js';
 import { isValidPlate, normalizePlate } from '@/utils/colombiaFormats.js';
@@ -14,9 +15,10 @@ import { isValidPlate, normalizePlate } from '@/utils/colombiaFormats.js';
 const soatAlertAdapter = new SoatAlertAdapter();
 const rtmAlertAdapter = new RtmAlertAdapter();
 const conductorAlertAdapter = new ConductorAlertAdapter();
+const vehicleAlertAdapter = new VehicleAlertAdapter();
 
 const UNKNOWN_VEHICLE_LABEL = 'Vehiculo no encontrado';
-const ALERT_SOURCE_KEYS = ['soats', 'rtms', 'conductores'];
+const ALERT_SOURCE_KEYS = ['soats', 'rtms', 'conductores', 'vehiculos'];
 const sourceOwners = new Map();
 
 const retainAlertSource = (sourceKey, ownerId) => {
@@ -108,6 +110,10 @@ export function useAlertsFacade(sortMode = 'priority') {
   useEffect(() => {
     registerSourceAlerts('conductores', conductorAlertAdapter.adaptMany(conductores));
   }, [conductores, registerSourceAlerts]);
+
+  useEffect(() => {
+    registerSourceAlerts('vehiculos', vehicleAlertAdapter.adaptMany(vehiculos));
+  }, [registerSourceAlerts, vehiculos]);
 
   useEffect(() => {
     // Cambiar la estrategia no recrea las alertas; solo altera la forma de priorizarlas en pantalla.
