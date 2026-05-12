@@ -391,6 +391,7 @@ const normalizePhone = (value) => normalizeText(value).replace(/[^\d+]/g, '');
 const getPhoneLookupKey = (value) => normalizePhone(value).replace(/\D/g, '');
 
 const GOOGLE_CLIENT_ID = normalizeText(process.env.GOOGLE_CLIENT_ID);
+// El cliente OAuth de Google solo se crea si el backend tiene client ID configurado.
 const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -420,6 +421,7 @@ const buildSmsDestination = (value) => {
 };
 
 const maskEmail = (email) => {
+  // Se deja visible solo una pequeña parte del correo para orientar al usuario sin exponerlo completo.
   const normalizedEmail = normalizeEmail(email);
   const [localPart = '', domain = ''] = normalizedEmail.split('@');
   if (!domain) {
@@ -431,6 +433,7 @@ const maskEmail = (email) => {
 };
 
 const maskPhone = (phone) => {
+  // El teléfono se devuelve casi oculto cuando el backend reporta el canal de recuperación usado.
   const digits = getPhoneLookupKey(phone);
   if (digits.length <= 4) {
     return digits;
@@ -439,14 +442,18 @@ const maskPhone = (phone) => {
   return `${'*'.repeat(Math.max(digits.length - 4, 4))}${digits.slice(-4)}`;
 };
 
+// Token opaco que viaja al cliente y referencia el intento de recuperación.
 const buildRecoveryToken = () => crypto.randomBytes(24).toString('hex');
 
+// En Mongo solo se guarda el hash del token para no persistirlo en claro.
 const hashRecoveryToken = (token) =>
   crypto.createHash('sha256').update(String(token || '')).digest('hex');
 
+// Permite distinguir si el identificador de recuperación parece ser teléfono.
 const isPhoneIdentifier = (value) => getPhoneLookupKey(value).length >= 7;
 
 const findUserByPhone = async (phoneLookupKey) => {
+  // Se compara por versión normalizada porque el teléfono puede venir con prefijos o separadores.
   const usuariosConTelefono = await Usuario.find({
     telefono: { $exists: true, $ne: null },
   });
@@ -455,6 +462,7 @@ const findUserByPhone = async (phoneLookupKey) => {
 };
 
 const findUserByRecoveryIdentifier = async (identifier) => {
+  // Este helper habilita recuperación por correo o por teléfono con una sola entrada.
   const normalizedIdentifier = normalizeText(identifier);
 
   if (EMAIL_REGEX.test(normalizedIdentifier)) {
@@ -633,20 +641,24 @@ const buildRtmPayload = async (body, ownerEmailFallback = '') => {
 };
 
 const generateToken = (id) => {
+  // JWT simple del proyecto usado para autenticar peticiones del dashboard.
   return jwt.sign({ id }, process.env.JWT_SECRET || 'syntix_super_secret_key', {
     expiresIn: '30d',
   });
 };
 
+// Las cuentas creadas con Google reciben una contraseña aleatoria no conocida por el usuario.
 const generateRandomPassword = () => crypto.randomBytes(24).toString('hex');
 
 const verifyGoogleIdentity = async (idToken) => {
+  // Sin client ID configurado no se puede validar audiencia ni firma del token.
   if (!GOOGLE_CLIENT_ID || !googleClient) {
     const error = new Error('Google Auth no esta configurado en el backend.');
     error.statusCode = 503;
     throw error;
   }
 
+  // Google valida firma, expiración y audiencia del idToken emitido en frontend.
   const ticket = await googleClient.verifyIdToken({
     idToken,
     audience: GOOGLE_CLIENT_ID,
@@ -654,6 +666,7 @@ const verifyGoogleIdentity = async (idToken) => {
 
   const payload = ticket.getPayload();
 
+  // Solo aceptamos perfiles con correo realmente verificado por Google.
   if (!payload?.email || !payload?.email_verified) {
     const error = new Error('Google no devolvio un correo verificado para esta cuenta.');
     error.statusCode = 400;
@@ -670,8 +683,10 @@ const verifyGoogleIdentity = async (idToken) => {
 // Registro: crea usuario no verificado y dispara envío de OTP al correo.
 app.post('/api/auth/register', async (req, res) => {
   try {
+    // Datos mínimos del alta tradicional con verificación por correo.
     const { email, password, nombre, empresa, telefono } = req.body;
 
+    // Todo se normaliza antes de validar o consultar MongoDB.
     const emailNormalizado = normalizeEmail(email);
     const nombreNormalizado = normalizeText(nombre);
     const empresaNormalizada = normalizeText(empresa);
@@ -701,12 +716,14 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
     }
 
+    // Se evita registrar dos veces el mismo correo.
     const existe = await Usuario.findOne({ email: emailNormalizado });
 
     if (existe) {
       return res.status(400).json({ message: DUPLICATE_EMAIL_MESSAGE });
     }
 
+    // El usuario nace sin verificar hasta completar el OTP.
     const nuevoUsuario = new Usuario({
       nombre: nombreNormalizado,
       email: emailNormalizado,
@@ -718,10 +735,12 @@ app.post('/api/auth/register', async (req, res) => {
 
     await nuevoUsuario.save();
 
+    // Se crea un OTP de 6 dígitos, se hashea y se persiste con expiración.
     const codigo = String(secureRandomInt(100000, 999999));
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
 
+    // Solo puede existir un OTP activo por correo.
     await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
 
     await new VerificacionOTP({
@@ -731,10 +750,12 @@ app.post('/api/auth/register', async (req, res) => {
     }).save();
 
     try {
+      // El envío se hace después de guardar el OTP para que el código ya exista en BD.
       await enviarCodigoVerificacion(emailNormalizado, nombreNormalizado || empresaNormalizada, codigo);
     } catch (emailErr) {
       console.error('Error al enviar correo:', emailErr.message);
 
+      // Si el correo falla, el frontend no debe avanzar al paso OTP.
       return res.status(500).json({
         message: `No se pudo enviar el correo de verificacion: ${emailErr.message}`,
       });
@@ -749,6 +770,7 @@ app.post('/api/auth/register', async (req, res) => {
       },
     });
   } catch (err) {
+    // Código especial para que el frontend detecte caída de base de datos.
     if (err?.name === 'MongooseServerSelectionError' || err?.name === 'MongoServerSelectionError') {
       return res.status(503).json({
         message: getDbUnavailableMessage(),
@@ -762,6 +784,7 @@ app.post('/api/auth/register', async (req, res) => {
 
 app.post('/api/auth/verificar-codigo', async (req, res) => {
   try {
+    // El frontend envía el correo pendiente y el código OTP digitado.
     const { email, codigo } = req.body;
     const emailNormalizado = normalizeEmail(email);
 
@@ -769,6 +792,7 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
       return res.status(400).json({ message: 'Email y codigo son requeridos' });
     }
 
+    // Debe existir un OTP pendiente para ese correo.
     const verificacion = await VerificacionOTP.findOne({ email: emailNormalizado });
 
     if (!verificacion) {
@@ -777,6 +801,7 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
       });
     }
 
+    // Si expiró, se elimina para obligar un reenvío limpio.
     if (new Date() > verificacion.expiresAt) {
       await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
 
@@ -785,6 +810,7 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
       });
     }
 
+    // Se corta el flujo si se superó el máximo de intentos permitidos.
     if (verificacion.intentos >= OTP_MAX_INTENTOS) {
       await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
 
@@ -793,9 +819,11 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
       });
     }
 
+    // El código digitado se compara contra el hash guardado.
     const codigoCorrecto = await bcrypt.compare(String(codigo), verificacion.codigoHash);
 
     if (!codigoCorrecto) {
+      // Cada error consume un intento adicional.
       verificacion.intentos += 1;
       await verificacion.save();
 
@@ -806,14 +834,17 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
       });
     }
 
+    // Una vez correcto, la cuenta se marca como verificada.
     await Usuario.findOneAndUpdate(
       { email: emailNormalizado },
       { isVerified: true },
       { new: true }
     );
 
+    // El OTP ya no vuelve a servir después del éxito.
     await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
 
+    // Se carga de nuevo el usuario para construir la sesión que vuelve al cliente.
     const usuario = await Usuario.findOne({ email: emailNormalizado });
 
     return res.json({
@@ -844,6 +875,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
       return res.status(400).json({ message: 'Email es requerido' });
     }
 
+    // Solo se puede reenviar a usuarios existentes.
     const usuario = await Usuario.findOne({ email: emailNormalizado });
 
     if (!usuario) {
@@ -854,6 +886,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
       return res.status(400).json({ message: 'Esta cuenta ya esta verificada' });
     }
 
+    // El cooldown evita abuso del correo transaccional.
     const verificacionExistente = await VerificacionOTP.findOne({ email: emailNormalizado });
 
     if (verificacionExistente) {
@@ -869,6 +902,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
       }
     }
 
+    // El reenvío invalida el OTP anterior y crea uno completamente nuevo.
     const codigo = String(secureRandomInt(100000, 999999));
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
@@ -883,6 +917,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
     }).save();
 
     try {
+      // Se intenta enviar usando nombre y, si falta, empresa como identificador visual.
       await enviarCodigoVerificacion(emailNormalizado, usuario.nombre || usuario.empresa, codigo);
     } catch (emailErr) {
       console.error('Error al enviar correo:', emailErr.message);
@@ -902,6 +937,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
 
 app.post('/api/auth/login', async (req, res) => {
   try {
+    // Login tradicional por correo y contraseña.
     const { email, password } = req.body;
     const emailNormalizado = normalizeEmail(email);
 
@@ -909,6 +945,7 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ message: 'Email y contrasena son requeridos' });
     }
 
+    // Se busca el usuario y luego se compara la contraseña contra su hash.
     const usuario = await Usuario.findOne({ email: emailNormalizado });
 
     if (usuario && (await usuario.comparePassword(password))) {
@@ -938,13 +975,16 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/google', async (req, res) => {
   try {
+    // El frontend manda el idToken de Google y datos extra solo para cuentas nuevas.
     const { idToken, empresa, telefono } = req.body;
 
     if (!idToken) {
       return res.status(400).json({ message: 'El token de Google es requerido.' });
     }
 
+    // El token se valida con Google antes de tocar la base de datos.
     const googleProfile = await verifyGoogleIdentity(idToken);
+    // Luego se normalizan campos del perfil federado y del formulario local.
     const emailNormalizado = normalizeEmail(googleProfile.email);
     const empresaNormalizada = normalizeText(empresa);
     const telefonoNormalizado = normalizePhone(telefono);
@@ -960,6 +1000,7 @@ app.post('/api/auth/google', async (req, res) => {
     let created = false;
 
     if (!usuario) {
+      // Si no existe cuenta, Google completa un registro verificado en un solo paso.
       if (!empresaNormalizada) {
         return res.status(400).json({
           message: 'Ingresa el nombre de la empresa para completar el registro con Google.',
@@ -975,6 +1016,7 @@ app.post('/api/auth/google', async (req, res) => {
       usuario = new Usuario({
         nombre: nombreNormalizado,
         email: emailNormalizado,
+        // La contraseña aleatoria cumple el esquema aunque el acceso sea federado.
         password: generateRandomPassword(),
         empresa: empresaNormalizada,
         telefono: telefonoNormalizado,
@@ -985,6 +1027,7 @@ app.post('/api/auth/google', async (req, res) => {
       await usuario.save();
       created = true;
     } else {
+      // Si el usuario ya existe, solo rellenamos huecos sin sobreescribir datos ya capturados.
       let shouldSave = false;
 
       if (!usuario.googleId && googleProfile.sub) {
@@ -1013,6 +1056,7 @@ app.post('/api/auth/google', async (req, res) => {
       }
 
       if (shouldSave) {
+        // Solo se guarda si realmente cambió algo.
         await usuario.save();
       }
     }
@@ -1035,6 +1079,7 @@ app.post('/api/auth/google', async (req, res) => {
       },
     });
   } catch (err) {
+    // Si falla Atlas, el frontend debe saber que Google auth no puede degradar a modo local.
     if (err?.name === 'MongooseServerSelectionError' || err?.name === 'MongoServerSelectionError') {
       return res.status(503).json({
         message: getDbUnavailableMessage(),
@@ -1043,6 +1088,7 @@ app.post('/api/auth/google', async (req, res) => {
     }
 
     const googleErrorMessage = String(err?.message || '').toLowerCase();
+    // Varios mensajes de la librería de Google significan token inválido o expirado.
     if (
       googleErrorMessage.includes('token used too late') ||
       googleErrorMessage.includes('jwt') ||
@@ -1059,13 +1105,16 @@ app.post('/api/auth/google', async (req, res) => {
 
 app.post('/api/auth/recuperar-cuenta', async (req, res) => {
   try {
+    // Se acepta un único identificador que puede ser correo o teléfono.
     const identifier = normalizeText(req.body?.identifier || req.body?.email || req.body?.telefono);
 
     if (!identifier) {
       return res.status(400).json({ message: 'Ingresa el correo o telefono registrado.' });
     }
 
+    // Este helper decide cómo buscar la cuenta objetivo.
     const { usuario, tipo } = await findUserByRecoveryIdentifier(identifier);
+    // Respuesta neutra para no revelar existencia de cuentas.
     const genericMessage = 'Si existe una cuenta asociada, enviaremos un codigo de recuperacion al contacto registrado.';
 
     if (!tipo) {
@@ -1073,6 +1122,7 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
     }
 
     if (!usuario) {
+      // Se responde éxito genérico aunque no haya usuario.
       return res.json({
         success: true,
         message: genericMessage,
@@ -1080,6 +1130,7 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
     }
 
     const emailRegistrado = normalizeEmail(usuario.email);
+    // Solo se mantiene un intento de recuperación activo por cuenta.
     const recuperacionExistente = await PasswordResetOTP.findOne({ email: emailRegistrado });
 
     if (recuperacionExistente) {
@@ -1095,6 +1146,7 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
       }
     }
 
+    // Se genera OTP + token opaco; el token viaja al cliente y el hash queda en Mongo.
     const codigo = String(secureRandomInt(100000, 999999));
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
@@ -1103,13 +1155,16 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
     let canalEntrega = 'email';
     let destinoEnmascarado = maskEmail(emailRegistrado);
 
+    // Se limpia cualquier recuperación anterior antes de crear la nueva.
     await PasswordResetOTP.findOneAndDelete({ email: emailRegistrado });
 
     try {
+      // Canal preferido: correo.
       await enviarCodigoRecuperacion(emailRegistrado, usuario.nombre || usuario.empresa, codigo);
     } catch (emailErr) {
       console.error('Error al enviar correo de recuperacion:', emailErr.message);
 
+      // Si correo falla, se intenta SMS con el número normalizado del usuario.
       const smsDestination = buildSmsDestination(usuario.telefono);
       if (!smsDestination) {
         return res.status(500).json({
@@ -1118,6 +1173,7 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
       }
 
       try {
+        // Canal de respaldo: Twilio SMS.
         await enviarCodigoRecuperacionSms(smsDestination, usuario.nombre || usuario.empresa, codigo);
         canalEntrega = 'sms';
         destinoEnmascarado = maskPhone(smsDestination);
@@ -1129,6 +1185,7 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
       }
     }
 
+    // El intento se persiste solo después de confirmar el canal elegido.
     await new PasswordResetOTP({
       email: emailRegistrado,
       recoveryTokenHash,
@@ -1139,6 +1196,7 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
       destinoEnmascarado,
     }).save();
 
+    // El frontend necesita token, canal y pista del destino para abrir el paso final.
     return res.json({
       success: true,
       message:
@@ -1158,6 +1216,7 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
 
 app.post('/api/auth/restablecer-password', async (req, res) => {
   try {
+    // Se soporta payload nuevo (`nuevaPassword`) y legado (`password`).
     const { email, codigo, password, nuevaPassword, recoveryToken } = req.body;
     const passwordNueva = String(nuevaPassword || password || '');
 
@@ -1172,10 +1231,12 @@ app.post('/api/auth/restablecer-password', async (req, res) => {
     let recuperacion = null;
 
     if (recoveryToken) {
+      // Camino preferido: recuperar por token opaco hasheado.
       recuperacion = await PasswordResetOTP.findOne({
         recoveryTokenHash: hashRecoveryToken(recoveryToken),
       });
     } else {
+      // Compatibilidad con clientes que aún envían solo el correo.
       recuperacion = await PasswordResetOTP.findOne({ email: normalizeEmail(email) });
     }
 
@@ -1183,21 +1244,25 @@ app.post('/api/auth/restablecer-password', async (req, res) => {
       return res.status(400).json({ message: 'No hay una recuperacion pendiente o el token ya no es valido.' });
     }
 
+    // Si expiró, se invalida el intento completo.
     if (new Date() > recuperacion.expiresAt) {
       await PasswordResetOTP.findOneAndDelete({ email: recuperacion.email });
 
       return res.status(400).json({ message: 'El codigo ha expirado. Solicita uno nuevo.' });
     }
 
+    // También se invalida si agotó intentos máximos.
     if (recuperacion.intentos >= OTP_MAX_INTENTOS) {
       await PasswordResetOTP.findOneAndDelete({ email: recuperacion.email });
 
       return res.status(400).json({ message: 'Demasiados intentos fallidos. Solicita un nuevo codigo.' });
     }
 
+    // El OTP se compara contra su hash guardado.
     const codigoCorrecto = await bcrypt.compare(String(codigo), recuperacion.codigoHash);
 
     if (!codigoCorrecto) {
+      // Los intentos fallidos se acumulan para cortar fuerza bruta.
       recuperacion.intentos += 1;
       await recuperacion.save();
 
@@ -1208,6 +1273,7 @@ app.post('/api/auth/restablecer-password', async (req, res) => {
       });
     }
 
+    // El intento de recuperación ya conoce el correo real de la cuenta objetivo.
     const emailNormalizado = normalizeEmail(recuperacion.email);
     const usuario = await Usuario.findOne({ email: emailNormalizado });
 
@@ -1216,10 +1282,12 @@ app.post('/api/auth/restablecer-password', async (req, res) => {
       return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
+    // Al guardar, el hook del modelo vuelve a hashear la contraseña.
     usuario.password = passwordNueva;
     usuario.isVerified = true;
     await usuario.save();
 
+    // El intento queda invalidado definitivamente después del cambio exitoso.
     await PasswordResetOTP.findOneAndDelete({ email: emailNormalizado });
 
     return res.json({

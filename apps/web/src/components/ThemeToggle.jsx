@@ -19,6 +19,8 @@ export default function ThemeToggle({ label = 'Modo oscuro', compact = false }) 
           : 'border-gray-200 bg-white text-gray-900 hover:bg-gray-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800'
       }`}
     >
+      {/* El icono cambia entre sol y luna para comunicar el estado actual
+          sin obligar al usuario a leer el texto del switch. */}
       <div className={`rounded-full p-2 ${compact ? 'bg-white/10' : 'bg-amber-50 dark:bg-slate-800'}`}>
         {isDarkMode ? (
           <Moon className={`h-4 w-4 ${compact ? 'text-syntix-green' : 'text-syntix-green'}`} />

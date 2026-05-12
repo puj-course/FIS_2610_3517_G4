@@ -83,6 +83,8 @@ export default function ReportesPage() {
     : 0;
 
   const handleExportCSV = () => {
+    // El CSV sale desde los datos ya visibles en la UI para que el exportable
+    // coincida con la misma lectura operativa que ve el usuario en pantalla.
     const headers = [
       'Placa',
       'Marca/Modelo',
@@ -165,6 +167,8 @@ export default function ReportesPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* La tarjeta de cumplimiento resume el panorama general y la de
+            distribución explica dónde está concentrado el riesgo documental. */}
         <div data-onboarding="reports-compliance-card" className={`relative overflow-hidden rounded-2xl p-8 text-white shadow-lg ${
           isDarkMode ? 'bg-slate-900' : 'bg-syntix-navy'
         }`}>

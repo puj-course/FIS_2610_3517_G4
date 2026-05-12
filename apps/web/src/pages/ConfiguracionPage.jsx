@@ -14,6 +14,8 @@ export default function ConfiguracionPage() {
   const { isDarkMode } = useTheme();
 
   const showMessage = (type, text) => {
+    // El mensaje es efímero para no dejar ruido visual permanente después
+    // de acciones rápidas como guardar umbral o exportar respaldo.
     setMessage({ type, text });
     setTimeout(() => setMessage({ type: '', text: '' }), 5000);
   };
@@ -78,6 +80,8 @@ export default function ConfiguracionPage() {
         if (typeof data !== 'object' || data === null) throw new Error('Formato inválido');
         
         if (window.confirm('¿Está seguro de importar este respaldo? Se sobrescribirán los datos actuales.')) {
+          // Se reinyectan solo claves del espacio del proyecto para evitar que
+          // un backup corrompa otras preferencias locales ajenas a Drive Control.
           Object.keys(data).forEach(key => {
             if (key.startsWith('syntix_')) {
               localStorage.setItem(key, data[key]);
@@ -129,6 +133,8 @@ export default function ConfiguracionPage() {
       <div className={`overflow-hidden rounded-2xl border shadow-sm ${
         isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
       }`}>
+        {/* Esta primera sección combina preferencia visual y umbral documental
+            porque ambos son ajustes de comportamiento global de la app. */}
         <div className={`p-6 border-b ${isDarkMode ? 'border-slate-800' : 'border-gray-100'}`}>
           <h2 className={`mb-4 flex items-center gap-2 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>
             <Settings className={`w-5 h-5 ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`} /> Parámetros de Alertas
@@ -164,6 +170,8 @@ export default function ConfiguracionPage() {
         </div>
 
         <div data-onboarding="settings-data-management" className={`p-6 ${isDarkMode ? 'bg-slate-950/60' : 'bg-gray-50'}`}>
+          {/* Exportar/importar/reset se mantienen aquí porque operan sobre
+              almacenamiento local y no sobre configuración del backend. */}
           <h2 className={`mb-4 flex items-center gap-2 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>
             <Database className={`w-5 h-5 ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`} /> Gestión de Datos
           </h2>

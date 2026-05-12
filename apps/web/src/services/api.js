@@ -2,7 +2,9 @@ import axios from 'axios';
 
 // Normaliza la URL base para que el frontend acepte variables con o sin sufijo /api.
 const normalizeApiBaseUrl = (value) => {
+  // Se limpia slash final para evitar dobles `//` en las rutas.
   const baseUrl = String(value || 'http://localhost:5000/api').replace(/\/+$/, '');
+  // Si el usuario configuró solo el host, aquí se agrega `/api` automáticamente.
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
 };
 
@@ -20,6 +22,7 @@ const api = axios.create({
 // Cada request intenta recuperar el token desde las dos fuentes que usa hoy el frontend.
 api.interceptors.request.use(
   (config) => {
+    // Se revisan ambos storages porque el proyecto convivió con dos formas de persistir sesión.
     const tokenStr = localStorage.getItem('syntix_token');
     const userStr = localStorage.getItem('syntix_user');
     let token = null;
@@ -38,11 +41,13 @@ api.interceptors.request.use(
         // Si el perfil ya trae token embebido, se usa como respaldo del storage plano.
         token = token || parsed?.token;
       } catch (error) {
+        // Si falla el parse del usuario, no se rompe el request; solo se pierde ese respaldo.
         console.error('Error al leer el token:', error);
       }
     }
 
     if (token) {
+      // Cada request autenticado envía JWT Bearer al backend.
       config.headers.Authorization = `Bearer ${token}`;
     }
 
@@ -67,6 +72,7 @@ const normalizeApiErrorMessage = (error, fallbackMessage) => {
   const backendMessage = error?.response?.data?.message;
   const requestPath = error?.config?.url || '';
 
+  // Se normaliza a minúsculas para comparar textos devueltos por backend sin depender del casing.
   const normalizedBackendMessage = backendMessage?.toLowerCase() || '';
 
   if (status === 400 && normalizedBackendMessage.includes('ya') && normalizedBackendMessage.includes('registr')) {
@@ -74,6 +80,7 @@ const normalizeApiErrorMessage = (error, fallbackMessage) => {
   }
 
   if (backendMessage) {
+    // Si backend ya envió un mensaje claro, se respeta tal cual.
     return backendMessage;
   }
 
@@ -99,6 +106,7 @@ const normalizeApiErrorMessage = (error, fallbackMessage) => {
 const shouldUseLocalStorage = (error) => {
   const status = error?.response?.status;
   const code = error?.response?.data?.code;
+  // Solo se activa fallback en fallos de conectividad/DB, no en errores funcionales del usuario.
   return (
     error.code === 'ERR_NETWORK' ||
     error.code === 'ECONNREFUSED' ||
@@ -110,6 +118,7 @@ const shouldUseLocalStorage = (error) => {
 export const authService = {
   async register(userData) {
     try {
+      // Registro clásico con OTP por correo.
       const response = await api.post('/auth/register', userData);
       return {
         success: true,
@@ -135,6 +144,7 @@ export const authService = {
 
   async login(email, password) {
     try {
+      // Login tradicional con correo + contraseña.
       const response = await api.post('/auth/login', { email, password });
       return { success: true, data: response.data.data };
     } catch (error) {
@@ -151,6 +161,7 @@ export const authService = {
 
   async googleAuth(payload) {
     try {
+      // Login/registro federado usando el idToken emitido por Google.
       const response = await api.post('/auth/google', payload);
       return {
         success: true,
@@ -202,6 +213,7 @@ export const authService = {
 
   async solicitarRecuperacion(identifier) {
     try {
+      // Inicia el flujo de recuperación por correo o por SMS según disponibilidad.
       const response = await api.post('/auth/recuperar-cuenta', { identifier });
       return { success: true, data: response.data.data || response.data, message: response.data.message };
     } catch (error) {
@@ -217,6 +229,7 @@ export const authService = {
 
   async restablecerPassword(recoveryToken, codigo, nuevaPassword) {
     try {
+      // Completa el reset validando token de recuperación + OTP.
       const response = await api.post('/auth/restablecer-password', { recoveryToken, codigo, nuevaPassword });
       return { success: true, data: response.data.data || response.data, message: response.data.message };
     } catch (error) {
