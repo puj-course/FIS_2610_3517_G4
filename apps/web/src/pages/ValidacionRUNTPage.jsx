@@ -7,7 +7,6 @@ import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useRUNTSimulator } from '@/hooks/useRUNTSimulator.js';
 import { useValidationHistory } from '@/hooks/useValidationHistory.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
-import { useConductors } from '@/hooks/useConductors.js';
 
 // ValidacionRUNTPage orquesta la búsqueda externa simulada y la guarda como evidencia interna.
 export default function ValidacionRUNTPage() {
@@ -22,7 +21,6 @@ export default function ValidacionRUNTPage() {
   const { searchByPlaca, searchByVIN } = useRUNTSimulator();
   const { addValidation } = useValidationHistory();
   const { vehiculos } = useVehicles();
-  const { conductores } = useConductors();
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -70,6 +68,7 @@ export default function ValidacionRUNTPage() {
       setSearchInput('');
       setResult(null);
     } catch (err) {
+      console.error('Error guardando validacion RUNT:', err);
       setSaveError('Error al guardar la validación. Intenta de nuevo.');
     } finally {
       setSaving(false);
@@ -208,7 +207,7 @@ export default function ValidacionRUNTPage() {
               vehiculoSistema={vehiculos.find(v => v.placa === result.data.placa)}
               conductorAsignado={vehiculos.find(v => v.placa === result.data.placa)?.conductor}
               onGuardar={handleSaveValidation}
-              loading={loading}
+              loading={loading || saving}
               isDarkMode={isDarkMode}
             />
           )}

@@ -201,7 +201,7 @@ export default function ReportesPage() {
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           {qualityMetrics.map((metric) => (
-            <QualityMetricCard key={metric.id} metric={metric} isDarkMode={isDarkMode} />
+            renderQualityMetricCard(metric, isDarkMode)
           ))}
         </div>
       </section>
@@ -263,33 +263,14 @@ export default function ReportesPage() {
   );
 }
 
-function MetricCard({ icon: Icon, label, value, hint, isDarkMode }) {
-  return (
-    <div className={`rounded-xl border p-4 shadow-sm ${
-      isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
-    }`}>
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{label}</p>
-          <p className={`mt-1 text-3xl font-black ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>{value}</p>
-          <p className={`mt-1 text-xs ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>{hint}</p>
-        </div>
-        <div className={`rounded-lg p-3 ${isDarkMode ? 'bg-slate-800 text-slate-100' : 'bg-gray-50 text-syntix-navy'}`}>
-          <Icon className="w-5 h-5" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function QualityMetricCard({ metric, isDarkMode }) {
+function renderQualityMetricCard(metric, isDarkMode) {
   const styles = qualityStatusStyles[metric.status] || qualityStatusStyles.neutral;
   const neutralBadge = isDarkMode && metric.status === 'neutral'
     ? 'bg-slate-800 text-slate-300 border-slate-700'
     : styles.badge;
 
   return (
-    <div className={`rounded-xl border p-5 shadow-sm ${
+    <div key={metric.id} className={`rounded-xl border p-5 shadow-sm ${
       isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
     }`}>
       <div className="flex items-start justify-between gap-3">
@@ -317,6 +298,25 @@ function QualityMetricCard({ metric, isDarkMode }) {
           <span className={`block text-xs font-bold uppercase ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Accion de mejora</span>
           {metric.improvementAction}
         </p>
+      </div>
+    </div>
+  );
+}
+
+function MetricCard({ icon: Icon, label, value, hint, isDarkMode }) {
+  return (
+    <div className={`rounded-xl border p-4 shadow-sm ${
+      isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
+    }`}>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{label}</p>
+          <p className={`mt-1 text-3xl font-black ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>{value}</p>
+          <p className={`mt-1 text-xs ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>{hint}</p>
+        </div>
+        <div className={`rounded-lg p-3 ${isDarkMode ? 'bg-slate-800 text-slate-100' : 'bg-gray-50 text-syntix-navy'}`}>
+          <Icon className="w-5 h-5" />
+        </div>
       </div>
     </div>
   );
