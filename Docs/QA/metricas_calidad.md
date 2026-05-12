@@ -27,8 +27,13 @@ Estas métricas son propias del dominio funcional del sistema. Evalúan el estad
 
 ## Métricas SonarCloud
 
-- Coverage: Pendiente de completar con evidencia real de SonarCloud.
-- Maintainability, Security o Duplications: Pendiente de completar con evidencia real de SonarCloud.
+- PR #564: Quality Gate falló por coverage de New Code en 72.5%, con umbral requerido de 80%.
+- Maintainability: se priorizaron los code smells reportados en New Code para `qualityMetrics.js`, `ReportesPage.jsx`, `useValidationHistory.js` y `ValidacionRUNTPage.jsx`.
+- Duplications y Security Hotspots: sin fallas reportadas en la evidencia visual del PR #564.
+
+## Pendientes SonarCloud
+
+Se priorizó New Code del PR #564 para recuperar el Quality Gate sin bajar umbrales, excluir archivos ni cerrar issues manualmente. Los issues legacy de Overall Code deben abordarse por tandas seguras, empezando por validación de props en componentes pequeños, variables no usadas, asignaciones inútiles, ternarios anidados simples, reemplazos `replace` a `replaceAll` equivalentes y `catch` sin manejo claro.
 
 ## Evidencia requerida
 
