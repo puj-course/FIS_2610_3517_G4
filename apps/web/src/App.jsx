@@ -21,6 +21,7 @@ import ValidacionRUNTPage from '@/pages/ValidacionRUNTPage.jsx';
 import HistorialValidacionesPage from '@/pages/HistorialValidacionesPage.jsx';
 import ReportesPage from '@/pages/ReportesPage.jsx';
 import ConfiguracionPage from '@/pages/ConfiguracionPage.jsx';
+import UserProfilePage from '@/pages/UserProfilePage.jsx';
 
 // App arma el árbol principal de providers y define qué vistas son públicas
 // y cuáles deben pasar por la protección de autenticación.
@@ -29,32 +30,36 @@ function App() {
     <AuthProvider>
       <DocumentsProvider>
         <RtmProvider>
-        <Router>
-          <Routes>
-            {/* Las rutas públicas alimentan la landing y el acceso inicial al sistema. */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/team" element={<TeamPage />} />
-            <Route path="/login" element={<LoginPage />} />
-             <Route path="/planes" element={<PlanesPage />} /> {/* Ruta agregada */}
+          <Router>
+            <Routes>
+              {/* Las rutas públicas alimentan la landing y el acceso inicial al sistema. */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/team" element={<TeamPage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/planes" element={<PlanesPage />} />
 
-             {/* Las rutas protegidas comparten el layout del dashboard y dependen de sesión activa. */}
-             <Route element={<ProtectedRoute />}>
-              <Route element={<OnboardingProvider><DashboardLayout /></OnboardingProvider>}>
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/vehiculos" element={<VehiculosPage />} />
-                <Route path="/conductores" element={<ConductoresPage />} />
-                <Route path="/documentos" element={<DocumentosPage />} />
-                <Route path="/alertas" element={<AlertasPage />} />
-                <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
-                <Route path="/historial-validaciones" element={<HistorialValidacionesPage />} />
-                <Route path="/reportes" element={<ReportesPage />} />
-                <Route path="/configuracion" element={<ConfiguracionPage />} />
+              {/* El perfil, reportes y demás módulos viven dentro del mismo shell
+                  autenticado para compartir sidebar, header y tema oscuro. */}
+              <Route element={<ProtectedRoute />}>
+                <Route element={<OnboardingProvider><DashboardLayout /></OnboardingProvider>}>
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/vehiculos" element={<VehiculosPage />} />
+                  <Route path="/conductores" element={<ConductoresPage />} />
+                  <Route path="/documentos" element={<DocumentosPage />} />
+                  <Route path="/alertas" element={<AlertasPage />} />
+                  <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
+                  <Route path="/historial-validaciones" element={<HistorialValidacionesPage />} />
+                  <Route path="/reportes" element={<ReportesPage />} />
+                  <Route path="/perfil" element={<UserProfilePage />} />
+                  <Route path="/configuracion" element={<ConfiguracionPage />} />
+                </Route>
               </Route>
-            </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Router>
+              {/* Cualquier ruta desconocida vuelve a la landing para evitar
+                  pantallas muertas en navegación manual o enlaces rotos. */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Router>
         </RtmProvider>
       </DocumentsProvider>
     </AuthProvider>

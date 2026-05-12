@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Helmet } from 'react-helmet';
 import { Settings, Save, Database, AlertTriangle, Upload, Download, CheckCircle } from 'lucide-react';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
+import ThemeToggle from '@/components/ThemeToggle.jsx';
+import { useTheme } from '@/contexts/ThemeContext.jsx';
 
 // Configuración concentra ajustes de simulación y operaciones de respaldo local del MVP.
 export default function ConfiguracionPage() {
@@ -9,8 +11,11 @@ export default function ConfiguracionPage() {
   const [message, setMessage] = useState({ type: '', text: '' });
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const fileInputRef = useRef(null);
+  const { isDarkMode } = useTheme();
 
   const showMessage = (type, text) => {
+    // El mensaje es efímero para no dejar ruido visual permanente después
+    // de acciones rápidas como guardar umbral o exportar respaldo.
     setMessage({ type, text });
     setTimeout(() => setMessage({ type: '', text: '' }), 5000);
   };
@@ -75,6 +80,8 @@ export default function ConfiguracionPage() {
         if (typeof data !== 'object' || data === null) throw new Error('Formato inválido');
         
         if (window.confirm('¿Está seguro de importar este respaldo? Se sobrescribirán los datos actuales.')) {
+          // Se reinyectan solo claves del espacio del proyecto para evitar que
+          // un backup corrompa otras preferencias locales ajenas a Drive Control.
           Object.keys(data).forEach(key => {
             if (key.startsWith('syntix_')) {
               localStorage.setItem(key, data[key]);
@@ -104,24 +111,39 @@ export default function ConfiguracionPage() {
       </Helmet>
 
       <div data-onboarding="settings-header">
-        <h1 className="text-2xl font-bold text-syntix-navy">Configuración del Sistema</h1>
-        <p className="text-gray-500 text-sm mt-1">Ajustes generales y gestión de datos</p>
+        <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>Configuración del Sistema</h1>
+        <p className={`mt-1 text-sm ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Ajustes generales y gestión de datos</p>
       </div>
 
       {message.text && (
-        <div className={`p-4 rounded-lg flex items-center gap-3 ${message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' : 'bg-red-50 text-red-800 border border-red-200'}`}>
+        <div className={`flex items-center gap-3 rounded-lg border p-4 ${
+          message.type === 'success'
+            ? isDarkMode
+              ? 'border-emerald-900 bg-emerald-950/70 text-emerald-300'
+              : 'border-green-200 bg-green-50 text-green-800'
+            : isDarkMode
+              ? 'border-red-950 bg-red-950/70 text-red-300'
+              : 'border-red-200 bg-red-50 text-red-800'
+        }`}>
           {message.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
           <p className="text-sm font-medium">{message.text}</p>
         </div>
       )}
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-            <Settings className="w-5 h-5 text-syntix-navy" /> Parámetros de Alertas
+      <div className={`overflow-hidden rounded-2xl border shadow-sm ${
+        isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
+      }`}>
+        {/* Esta primera sección combina preferencia visual y umbral documental
+            porque ambos son ajustes de comportamiento global de la app. */}
+        <div className={`p-6 border-b ${isDarkMode ? 'border-slate-800' : 'border-gray-100'}`}>
+          <h2 className={`mb-4 flex items-center gap-2 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>
+            <Settings className={`w-5 h-5 ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`} /> Parámetros de Alertas
           </h2>
+          <div className="mb-6">
+            <ThemeToggle label="Modo oscuro" />
+          </div>
           <div data-onboarding="settings-threshold" className="max-w-md">
-            <label className="block text-sm font-bold text-gray-700 mb-2">
+            <label className={`mb-2 block text-sm font-bold ${isDarkMode ? 'text-slate-200' : 'text-gray-700'}`}>
               Umbral de Alerta Amarilla (Días)
             </label>
             <div className="flex gap-4">
@@ -129,7 +151,11 @@ export default function ConfiguracionPage() {
                 type="number" 
                 value={threshold}
                 onChange={(e) => setThreshold(Number(e.target.value))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none"
+                className={`w-full rounded-lg border px-4 py-2 outline-none focus:ring-2 focus:ring-syntix-green ${
+                  isDarkMode
+                    ? 'border-slate-700 bg-slate-950 text-slate-100'
+                    : 'border-gray-300 bg-white text-gray-900'
+                }`}
                 min="1"
                 max="60"
               />
@@ -137,18 +163,24 @@ export default function ConfiguracionPage() {
                 <Save className="w-4 h-4" /> Guardar
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className={`mt-2 text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
               Los documentos se marcarán en amarillo cuando falten {threshold} días o menos para su vencimiento.
             </p>
           </div>
         </div>
 
-        <div data-onboarding="settings-data-management" className="p-6 bg-gray-50">
-          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2 mb-4">
-            <Database className="w-5 h-5 text-syntix-navy" /> Gestión de Datos
+        <div data-onboarding="settings-data-management" className={`p-6 ${isDarkMode ? 'bg-slate-950/60' : 'bg-gray-50'}`}>
+          {/* Exportar/importar/reset se mantienen aquí porque operan sobre
+              almacenamiento local y no sobre configuración del backend. */}
+          <h2 className={`mb-4 flex items-center gap-2 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>
+            <Database className={`w-5 h-5 ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`} /> Gestión de Datos
           </h2>
           <div className="flex flex-wrap gap-4">
-            <button data-onboarding="settings-export" onClick={handleExportBackup} className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors shadow-sm flex items-center gap-2">
+            <button data-onboarding="settings-export" onClick={handleExportBackup} className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors ${
+              isDarkMode
+                ? 'border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800'
+                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+            }`}>
               <Download className="w-4 h-4" /> Exportar Respaldo
             </button>
             
@@ -159,11 +191,19 @@ export default function ConfiguracionPage() {
               ref={fileInputRef}
               onChange={handleImportBackup}
             />
-            <button data-onboarding="settings-import" onClick={() => fileInputRef.current?.click()} className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors shadow-sm flex items-center gap-2">
+            <button data-onboarding="settings-import" onClick={() => fileInputRef.current?.click()} className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors ${
+              isDarkMode
+                ? 'border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800'
+                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+            }`}>
               <Upload className="w-4 h-4" /> Importar Respaldo
             </button>
             
-            <button data-onboarding="settings-reset" onClick={() => setShowResetConfirm(true)} className="bg-red-50 border border-red-200 text-syntix-red px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors shadow-sm flex items-center gap-2 ml-auto">
+            <button data-onboarding="settings-reset" onClick={() => setShowResetConfirm(true)} className={`ml-auto flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-bold shadow-sm transition-colors ${
+              isDarkMode
+                ? 'border-red-950 bg-red-950/50 text-red-300 hover:bg-red-950/70'
+                : 'border-red-200 bg-red-50 text-syntix-red hover:bg-red-100'
+            }`}>
               <AlertTriangle className="w-4 h-4" /> Restablecer Datos
             </button>
           </div>
@@ -173,16 +213,20 @@ export default function ConfiguracionPage() {
       {/* Reset Confirmation Modal */}
       {showResetConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden p-6">
-            <div className="flex items-center gap-3 text-syntix-red mb-4">
+          <div className={`w-full max-w-md overflow-hidden rounded-2xl p-6 shadow-2xl ${
+            isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-white'
+          }`}>
+            <div className="mb-4 flex items-center gap-3 text-syntix-red">
               <AlertTriangle className="w-8 h-8" />
               <h2 className="text-xl font-bold">¿Restablecer todos los datos?</h2>
             </div>
-            <p className="text-gray-600 mb-6">
+            <p className={`mb-6 ${isDarkMode ? 'text-slate-300' : 'text-gray-600'}`}>
               Esta acción eliminará permanentemente todos los vehículos, conductores, documentos y configuraciones. La aplicación se reiniciará y volverá a la página de inicio. Esta acción no se puede deshacer.
             </p>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowResetConfirm(false)} className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">
+              <button onClick={() => setShowResetConfirm(false)} className={`rounded-lg px-4 py-2 font-medium transition-colors ${
+                isDarkMode ? 'text-slate-300 hover:bg-slate-800' : 'text-gray-600 hover:bg-gray-100'
+              }`}>
                 Cancelar
               </button>
               <button onClick={handleResetData} className="bg-syntix-red text-white px-6 py-2 rounded-lg font-medium hover:bg-red-600 transition-colors">

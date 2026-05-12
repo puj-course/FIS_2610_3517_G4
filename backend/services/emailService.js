@@ -2,9 +2,12 @@ const nodemailer = require('nodemailer');
 
 const EMAIL_USER = process.env.EMAIL_USER;
 const EMAIL_PASS = process.env.EMAIL_PASS;
+// Permiten cambiar proveedor SMTP sin tocar el código.
 const EMAIL_HOST = process.env.EMAIL_HOST || 'smtp.gmail.com';
 const EMAIL_PORT = parseInt(process.env.EMAIL_PORT || '587');
+// Puerto 465 implica TLS directo; en otros puertos se usa STARTTLS/no seguro según SMTP.
 const EMAIL_SECURE = process.env.EMAIL_SECURE === 'true' || EMAIL_PORT === 465;
+// Solo consideramos el servicio habilitado si tenemos credenciales mínimas.
 const EMAIL_ENABLED = Boolean(EMAIL_USER && EMAIL_PASS);
 
 // Transporter SMTP reutilizable para todos los correos transaccionales.
@@ -19,6 +22,7 @@ const transporter = nodemailer.createTransport({
 });
 
 async function verificarServicioCorreo() {
+  // Este chequeo se usa en healthchecks y diagnósticos de despliegue.
   if (!EMAIL_ENABLED) {
     return {
       ok: false,
@@ -31,6 +35,7 @@ async function verificarServicioCorreo() {
   }
 
   try {
+    // `verify()` confirma conexión/auth con el SMTP antes de enviar correos reales.
     await transporter.verify();
     return {
       ok: true,
@@ -54,6 +59,7 @@ async function verificarServicioCorreo() {
 }
 
 async function enviarCodigoVerificacion(email, nombre, codigo) {
+  // Sin credenciales no intentamos enviar nada para evitar errores opacos de nodemailer.
   if (!EMAIL_ENABLED) {
     throw new Error('Servicio de correo no configurado: faltan EMAIL_USER y/o EMAIL_PASS en backend/.env');
   }
@@ -79,6 +85,7 @@ async function enviarCodigoVerificacion(email, nombre, codigo) {
   };
 
   const info = await transporter.sendMail(mailOptions);
+  // Nodemailer reporta arreglos separados de aceptados/rechazados; ambos se revisan explícitamente.
   const accepted = Array.isArray(info.accepted) ? info.accepted : [];
   const rejected = Array.isArray(info.rejected) ? info.rejected : [];
 
@@ -90,6 +97,7 @@ async function enviarCodigoVerificacion(email, nombre, codigo) {
 }
 
 async function enviarCodigoRecuperacion(email, nombre, codigo) {
+  // Reutiliza el mismo canal SMTP, pero con una plantilla y asunto distintos.
   if (!EMAIL_ENABLED) {
     throw new Error('Servicio de correo no configurado: faltan EMAIL_USER y/o EMAIL_PASS en backend/.env');
   }

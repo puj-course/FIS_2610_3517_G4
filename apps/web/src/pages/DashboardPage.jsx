@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import ModalFactory from '@/components/ModalFactory.jsx';
+import { useTheme } from '@/contexts/ThemeContext.jsx';
 import useModalManager from '@/hooks/useModalManager.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
 import { useConductors } from '@/hooks/useConductors.js';
@@ -11,6 +12,7 @@ export default function DashboardPage() {
   const { vehiculos } = useVehicles();
   const { conductores } = useConductors();
   const { alerts } = useAlerts();
+  const { isDarkMode } = useTheme();
   const { activeModal, openModal, closeModal } = useModalManager();
 
   // Las tarjetas superiores sintetizan el estado del sistema sin obligar a entrar a cada módulo.
@@ -30,32 +32,37 @@ export default function DashboardPage() {
 
   const recentVehicles = useMemo(() => vehiculos.slice(-3).reverse(), [vehiculos]);
   const openVehicleModal = () => openModal('addVehicle');
+  // Estos colores viven en variables porque esta vista usa estilos inline y
+  // necesitábamos adaptar el contraste al modo oscuro sin reescribirla completa.
+  const pageTextColor = isDarkMode ? '#e2e8f0' : '#111827';
+  const mutedTextColor = isDarkMode ? '#94a3b8' : '#555';
+  const secondaryTextColor = isDarkMode ? '#64748b' : '#888';
 
   return (
-    <div style={{ padding: 20, fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Arial' }}>
+    <div style={{ padding: 20, fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Arial', color: pageTextColor }}>
       <div
         data-onboarding="dashboard-summary"
         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}
       >
         <div>
-          <h1 style={{ margin: 0, fontSize: 26 }}>Dashboard</h1>
-          <p style={{ marginTop: 6, color: '#555' }}>
+          <h1 style={{ margin: 0, fontSize: 26, color: pageTextColor }}>Dashboard</h1>
+          <p style={{ marginTop: 6, color: mutedTextColor }}>
             Resumen operativo de DriveControl con accesos rápidos para navegar y registrar vehículos.
           </p>
         </div>
 
         <div data-onboarding="dashboard-header-actions" style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-          <Link to="/vehiculos" data-onboarding="dashboard-action-vehicles" style={btnSecondary}>
+          <Link to="/vehiculos" data-onboarding="dashboard-action-vehicles" style={btnSecondary(isDarkMode)}>
             Ir a Vehículos
           </Link>
-          <button type="button" onClick={openVehicleModal} data-onboarding="dashboard-action-add-vehicle" style={btnPrimary}>
+          <button type="button" onClick={openVehicleModal} data-onboarding="dashboard-action-add-vehicle" style={btnPrimary(isDarkMode)}>
             + Vehículo
           </button> 
           <button
               type="button"
               onClick={() => openModal('addDocument')}
               data-onboarding="dashboard-action-add-soat"
-              style={btnSecondary}
+              style={btnSecondary(isDarkMode)}
             >
               + SOAT
             </button>
@@ -63,7 +70,7 @@ export default function DashboardPage() {
               type="button"
               onClick={() => openModal('addRtm')}
               data-onboarding="dashboard-action-add-rtm"
-              style={btnSecondary}
+              style={btnSecondary(isDarkMode)}
             >
               + RTM
             </button>
@@ -75,81 +82,83 @@ export default function DashboardPage() {
           <div
             key={s.label}
             data-onboarding={`dashboard-stat-${s.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
-            style={card}
+            style={card(isDarkMode)}
           >
-            <div style={{ color: '#666', fontSize: 13 }}>{s.label}</div>
-            <div style={{ fontSize: 28, fontWeight: 700, marginTop: 6 }}>{s.value}</div>
-            <div style={{ color: '#888', fontSize: 12, marginTop: 4 }}>{s.hint}</div>
+            <div style={{ color: mutedTextColor, fontSize: 13 }}>{s.label}</div>
+            <div style={{ fontSize: 28, fontWeight: 700, marginTop: 6, color: pageTextColor }}>{s.value}</div>
+            <div style={{ color: secondaryTextColor, fontSize: 12, marginTop: 4 }}>{s.hint}</div>
           </div>
         ))}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 12, marginTop: 14 }}>
-        <div data-onboarding="dashboard-quick-actions" style={card}>
-          <h2 style={h2}>Accesos rápidos</h2>
+        {/* Cada tarjeta usa helpers inline para mantener la compatibilidad con
+            la implementación original del dashboard y aun así soportar dark mode. */}
+        <div data-onboarding="dashboard-quick-actions" style={card(isDarkMode)}>
+          <h2 style={h2(isDarkMode)}>Accesos rápidos</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
-            <Link to="/vehiculos" data-onboarding="dashboard-quick-vehicles" style={quickLink}>Vehículos</Link>
-            <Link to="/conductores" data-onboarding="dashboard-quick-conductores" style={quickLink}>Conductores</Link>
-            <Link to="/documentos" data-onboarding="dashboard-quick-documentos" style={quickLink}>Documentos</Link>
-            <Link to="/alertas" data-onboarding="dashboard-quick-alertas" style={quickLink}>Alertas</Link>
-            <Link to="/validacion-runt" data-onboarding="dashboard-quick-runt" style={quickLink}>Validación RUNT</Link>
-            <Link to="/reportes" data-onboarding="dashboard-quick-reportes" style={quickLink}>Reportes</Link>
+            <Link to="/vehiculos" data-onboarding="dashboard-quick-vehicles" style={quickLink(isDarkMode)}>Vehículos</Link>
+            <Link to="/conductores" data-onboarding="dashboard-quick-conductores" style={quickLink(isDarkMode)}>Conductores</Link>
+            <Link to="/documentos" data-onboarding="dashboard-quick-documentos" style={quickLink(isDarkMode)}>Documentos</Link>
+            <Link to="/alertas" data-onboarding="dashboard-quick-alertas" style={quickLink(isDarkMode)}>Alertas</Link>
+            <Link to="/validacion-runt" data-onboarding="dashboard-quick-runt" style={quickLink(isDarkMode)}>Validación RUNT</Link>
+            <Link to="/reportes" data-onboarding="dashboard-quick-reportes" style={quickLink(isDarkMode)}>Reportes</Link>
           </div>
         </div>
 
-        <div data-onboarding="dashboard-recent-vehicles" style={card}>
+        <div data-onboarding="dashboard-recent-vehicles" style={card(isDarkMode)}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-            <h2 style={h2}>Vehículos recientes</h2>
-            <Link to="/vehiculos" style={smallLink}>Ver todos →</Link>
+            <h2 style={h2(isDarkMode)}>Vehículos recientes</h2>
+            <Link to="/vehiculos" style={smallLink(isDarkMode)}>Ver todos →</Link>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
             {recentVehicles.length > 0 ? (
               recentVehicles.map((vehicle) => (
-                <div key={vehicle.id} style={alertRow}>
+                <div key={vehicle.id} style={alertRow(isDarkMode)}>
                   <span style={badge(vehicle.estadoGeneral === 'verde' ? 'Baja' : vehicle.estadoGeneral === 'amarillo' ? 'Media' : 'Alta')}>
                     {vehicle.placa}
                   </span>
                   <div>
-                    <div style={{ fontWeight: 600 }}>{vehicle.marca} {vehicle.modelo}</div>
-                    <div style={{ fontSize: 13, color: '#666', marginTop: 2 }}>
+                    <div style={{ fontWeight: 600, color: pageTextColor }}>{vehicle.marca} {vehicle.modelo}</div>
+                    <div style={{ fontSize: 13, color: mutedTextColor, marginTop: 2 }}>
                       {vehicle.tipo}
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <p style={{ color: '#666', fontSize: 13, marginTop: 8 }}>
+              <p style={{ color: mutedTextColor, fontSize: 13, marginTop: 8 }}>
                 No hay vehículos registrados todavía.
               </p>
             )}
           </div>
         </div>
 
-        <div data-onboarding="dashboard-recent-alerts" style={card}>
+        <div data-onboarding="dashboard-recent-alerts" style={card(isDarkMode)}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-            <h2 style={h2}>Alertas recientes</h2>
-            <Link to="/alertas" style={smallLink}>Ver todas →</Link>
+            <h2 style={h2(isDarkMode)}>Alertas recientes</h2>
+            <Link to="/alertas" style={smallLink(isDarkMode)}>Ver todas →</Link>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
             {alerts.slice(0, 3).map((a) => (
-              <div key={a.id} style={alertRow}>
+              <div key={a.id} style={alertRow(isDarkMode)}>
                 <span style={badge(a.prioridad === 'rojo' ? 'Alta' : a.prioridad === 'amarillo' ? 'Media' : 'Baja')}>
                   {a.tipo}
                 </span>
                 <div>
-                  <div style={{ fontWeight: 600 }}>{a.mensaje}</div>
-                  <div style={{ fontSize: 13, color: '#666', marginTop: 2 }}>{a.entidad}</div>
+                  <div style={{ fontWeight: 600, color: pageTextColor }}>{a.mensaje}</div>
+                  <div style={{ fontSize: 13, color: mutedTextColor, marginTop: 2 }}>{a.entidad}</div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div data-onboarding="dashboard-doc-status" style={card}>
-          <h2 style={h2}>Estado documental</h2>
-          <p style={{ marginTop: 6, color: '#666', fontSize: 13 }}>
+        <div data-onboarding="dashboard-doc-status" style={card(isDarkMode)}>
+          <h2 style={h2(isDarkMode)}>Estado documental</h2>
+          <p style={{ marginTop: 6, color: mutedTextColor, fontSize: 13 }}>
             Aquí puedes revisar el semáforo documental de los vehículos y entrar rápidamente al módulo correspondiente.
           </p>
 
@@ -160,8 +169,8 @@ export default function DashboardPage() {
           </div>
 
           <div data-onboarding="dashboard-doc-links" style={{ marginTop: 12, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            <Link to="/documentos" style={btnSecondary}>Ir a Documentos</Link>
-            <Link to="/vehiculos" style={btnSecondary}>Ir a Vehículos</Link>
+            <Link to="/documentos" style={btnSecondary(isDarkMode)}>Ir a Documentos</Link>
+            <Link to="/vehiculos" style={btnSecondary(isDarkMode)}>Ir a Vehículos</Link>
           </div>
         </div>
       </div>
@@ -171,19 +180,21 @@ export default function DashboardPage() {
   );
 }
 
-const card = {
-  border: '1px solid #eee',
+const card = (isDarkMode) => ({
+  border: isDarkMode ? '1px solid #1e293b' : '1px solid #eee',
   borderRadius: 14,
   padding: 14,
-  background: '#fff',
-  boxShadow: '0 1px 8px rgba(0,0,0,0.04)',
-};
+  background: isDarkMode ? '#0f172a' : '#fff',
+  boxShadow: isDarkMode ? '0 1px 8px rgba(0,0,0,0.18)' : '0 1px 8px rgba(0,0,0,0.04)',
+});
 
-const h2 = { margin: 0, fontSize: 16 };
+// Los helpers siguientes encapsulan los estilos repetidos del dashboard para
+// que el ajuste de tema oscuro no quede disperso en JSX difícil de mantener.
+const h2 = (isDarkMode) => ({ margin: 0, fontSize: 16, color: isDarkMode ? '#f8fafc' : '#111827' });
 
-const btnPrimary = {
+const btnPrimary = (isDarkMode) => ({
   textDecoration: 'none',
-  background: '#111',
+  background: isDarkMode ? '#1f2937' : '#111',
   color: '#fff',
   padding: '10px 12px',
   borderRadius: 10,
@@ -191,47 +202,48 @@ const btnPrimary = {
   fontSize: 13,
   border: 'none',
   cursor: 'pointer',
-};
+});
 
-const btnSecondary = {
+const btnSecondary = (isDarkMode) => ({
   textDecoration: 'none',
-  background: '#f3f4f6',
-  color: '#111',
+  background: isDarkMode ? '#111827' : '#f3f4f6',
+  color: isDarkMode ? '#e2e8f0' : '#111',
   padding: '10px 12px',
   borderRadius: 10,
   fontWeight: 600,
   fontSize: 13,
-};
+  border: isDarkMode ? '1px solid #334155' : 'none',
+});
 
-const quickLink = {
+const quickLink = (isDarkMode) => ({
   textDecoration: 'none',
-  border: '1px solid #eee',
+  border: isDarkMode ? '1px solid #334155' : '1px solid #eee',
   borderRadius: 12,
   padding: '12px 10px',
-  color: '#111',
+  color: isDarkMode ? '#e2e8f0' : '#111',
   fontWeight: 600,
   fontSize: 13,
-  background: '#fafafa',
+  background: isDarkMode ? '#020617' : '#fafafa',
   textAlign: 'center',
-};
+});
 
-const smallLink = {
+const smallLink = (isDarkMode) => ({
   textDecoration: 'none',
-  color: '#111',
+  color: isDarkMode ? '#f8fafc' : '#111',
   fontSize: 13,
   fontWeight: 600,
-};
+});
 
-const alertRow = {
+const alertRow = (isDarkMode) => ({
   display: 'grid',
   gridTemplateColumns: '64px 1fr',
   gap: 10,
   alignItems: 'start',
   padding: 10,
-  border: '1px solid #eee',
+  border: isDarkMode ? '1px solid #1e293b' : '1px solid #eee',
   borderRadius: 12,
-  background: '#fafafa',
-};
+  background: isDarkMode ? '#020617' : '#fafafa',
+});
 
 function badge(level) {
   const map = {
