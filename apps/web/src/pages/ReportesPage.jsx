@@ -7,16 +7,37 @@ import { useDocuments } from '@/hooks/useDocuments.js';
 import { useRtm } from '@/contexts/RtmContext.jsx';
 import { useAlerts } from '@/hooks/useAlerts.js';
 import { formatColombianDate, getExpirationAlertText } from '@/utils/dateUtils.js';
+import { buildQualityMetricsSummary } from '@/utils/qualityMetrics.js';
 
 const statusLabels = {
   verde: 'Al dia',
   amarillo: 'Por vencer',
   rojo: 'Critico',
+  neutral: 'Sin datos',
 };
 
 const progressWidth = (value, total) => (total > 0 ? `${Math.round((value / total) * 100)}%` : '0%');
 
 const quoteCsv = (field) => `"${String(field ?? '').replaceAll('"', '""')}"`;
+
+const qualityStatusStyles = {
+  verde: {
+    badge: 'bg-syntix-green/10 text-syntix-green border-syntix-green/20',
+    value: 'text-syntix-green',
+  },
+  amarillo: {
+    badge: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20',
+    value: 'text-yellow-600',
+  },
+  rojo: {
+    badge: 'bg-syntix-red/10 text-syntix-red border-syntix-red/20',
+    value: 'text-syntix-red',
+  },
+  neutral: {
+    badge: 'bg-gray-100 text-gray-700 border-gray-200',
+    value: 'text-gray-500',
+  },
+};
 
 // ReportesPage traduce el estado real de la flota a metricas y exportables simples.
 export default function ReportesPage() {
@@ -79,6 +100,14 @@ export default function ReportesPage() {
   const cumplimiento = vehiculos.length > 0
     ? Math.round((vehiculos.filter((vehiculo) => vehiculo.estadoGeneral === 'verde').length / vehiculos.length) * 100)
     : 0;
+
+  const qualityMetrics = useMemo(() => buildQualityMetricsSummary({
+    vehicles: vehiculos,
+    conductors: conductores,
+    soats,
+    rtms,
+    alerts,
+  }), [alerts, conductores, rtms, soats, vehiculos]);
 
   const handleExportCSV = () => {
     const headers = [
@@ -158,6 +187,17 @@ export default function ReportesPage() {
         <MetricCard icon={AlertTriangle} label="Alertas" value={alerts.length} hint="Activas" />
       </div>
 
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">Métricas de calidad del sistema</h2>
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          {qualityMetrics.map((metric) => (
+            <QualityMetricCard key={metric.id} metric={metric} />
+          ))}
+        </div>
+      </section>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div data-onboarding="reports-compliance-card" className="bg-syntix-navy rounded-2xl p-8 text-white relative overflow-hidden shadow-lg">
           <div className="absolute top-0 right-0 w-64 h-64 bg-syntix-green rounded-full opacity-20 blur-3xl -mr-20 -mt-20" />
@@ -217,6 +257,41 @@ function MetricCard({ icon: Icon, label, value, hint }) {
         <div className="p-3 rounded-lg bg-gray-50 text-syntix-navy">
           <Icon className="w-5 h-5" />
         </div>
+      </div>
+    </div>
+  );
+}
+
+function QualityMetricCard({ metric }) {
+  const styles = qualityStatusStyles[metric.status] || qualityStatusStyles.neutral;
+
+  return (
+    <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-gray-500">{metric.name}</p>
+          <p className={`text-4xl font-black mt-2 ${styles.value}`}>{metric.value}%</p>
+        </div>
+        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${styles.badge}`}>
+          {statusLabels[metric.status] || metric.status}
+        </span>
+      </div>
+
+      <p className="text-xs font-semibold text-gray-500 mt-3">Total evaluado: {metric.total}</p>
+
+      <div className="mt-4 space-y-3 text-sm text-gray-600">
+        <p>
+          <span className="block text-xs font-bold uppercase text-gray-400">Interpretacion</span>
+          {metric.interpretation}
+        </p>
+        <p>
+          <span className="block text-xs font-bold uppercase text-gray-400">Impacto</span>
+          {metric.impact}
+        </p>
+        <p>
+          <span className="block text-xs font-bold uppercase text-gray-400">Accion de mejora</span>
+          {metric.improvementAction}
+        </p>
       </div>
     </div>
   );
