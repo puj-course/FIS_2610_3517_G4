@@ -17,13 +17,32 @@ export default function ConfiguracionPage() {
 
   const handleExportBackup = () => {
     try {
-      // Solo se exportan claves del espacio syntix_ para no contaminar el respaldo con datos ajenos.
+      // Solo se exportan claves del espacio syntix_ y se omiten datos de sesión o sensibles.
+      const excludedKeys = new Set(['syntix_token', 'syntix_user']);
       const data = {};
+
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key.startsWith('syntix_')) {
-          data[key] = localStorage.getItem(key);
+        if (!key?.startsWith('syntix_') || excludedKeys.has(key)) continue;
+
+        let value = localStorage.getItem(key);
+
+        if (key === 'syntix_users_db') {
+          try {
+            const users = JSON.parse(value);
+            if (Array.isArray(users)) {
+              const sanitizedUsers = users.map((user) => {
+                const { password, ...rest } = user;
+                return rest;
+              });
+              value = JSON.stringify(sanitizedUsers, null, 2);
+            }
+          } catch (error) {
+            // Si no es JSON válido, dejamos el valor original para no bloquear la exportación.
+          }
         }
+
+        data[key] = value;
       }
       
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
