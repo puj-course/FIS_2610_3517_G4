@@ -10,17 +10,23 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Registro en dos pasos: alta inicial y luego verificación OTP para cerrar el onboarding.
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
+  // `formData` concentra el paso inicial del registro tradicional.
   const [formData, setFormData] = useState({ email: '', password: '', empresa: '', telefono: '' });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  // `step` define si estamos rellenando datos o confirmando el OTP.
   const [step, setStep] = useState('register'); // 'register' | 'verify'
+  // `pendingEmail` conserva el correo que debe verificarse en el segundo paso.
   const [pendingEmail, setPendingEmail] = useState('');
+  // El OTP se separa en 6 casillas para mejorar legibilidad y foco.
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  // Cooldown visual para limitar reenvíos desde el cliente.
   const [resendCooldown, setResendCooldown] = useState(0);
   const inputRefs = useRef([]);
   const { register, loginAfterVerification, loginWithGoogle } = useAuth();
 
+  // Si el modal está cerrado, no se renderiza ni mantiene listeners visuales.
   if (!isOpen) return null;
 
   // Paso 1: registro base. Si el backend responde OK, se avanza al paso OTP.
@@ -31,10 +37,12 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     const telefono = formData.telefono.trim();
     const email = formData.email.trim().toLowerCase();
 
+    // La empresa es requisito del modelo de negocio.
     if (!empresa) {
       setError('Ingresa el nombre de la empresa.');
       return;
     }
+    // El teléfono alimenta recuperación y perfil del usuario.
     if (!telefono) {
       setError('Ingresa el teléfono.');
       return;
@@ -43,6 +51,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       setError('El celular debe tener 10 digitos e iniciar por 3.');
       return;
     }
+    // El correo es la llave principal de identidad y del OTP.
     if (!EMAIL_REGEX.test(email)) {
       setError('Ingresa un correo electrónico válido.');
       return;
@@ -55,14 +64,17 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       setError('La contraseña debe tener al menos 6 caracteres');
       return;
     }
+    // Se inicia la llamada al contexto solo después de pasar todas las validaciones locales.
     setIsSubmitting(true);
     try {
       const res = await register(email, formData.password, empresa, telefono);
       if (res.needsVerification) {
+        // El backend ya guardó el usuario pendiente y disparó el correo OTP.
         setPendingEmail(res.email || email);
         setStep('verify');
         startCooldown();
       } else if (res.success) {
+        // Fallback reservado para registros que no requieran OTP en otros escenarios.
         queueOnboardingForUser(res.user?.email || email);
         onClose();
       } else {
@@ -76,6 +88,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   };
 
   const handleGoogleRegister = async (credential) => {
+    // Con Google, empresa y teléfono siguen siendo obligatorios porque no vienen del perfil federado.
     const empresa = formData.empresa.trim();
     const telefono = formData.telefono.trim();
 
@@ -103,8 +116,10 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     setIsSubmitting(true);
 
     try {
+      // El backend decide si la cuenta Google se crea o si simplemente inicia sesión.
       const res = await loginWithGoogle({ idToken: credential, empresa, telefono });
       if (res.success) {
+        // Solo se cola onboarding si realmente fue una cuenta nueva.
         if (res.created && res.user?.email) {
           queueOnboardingForUser(res.user.email);
         }
@@ -119,6 +134,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   // Cooldown visual para evitar spam de reenvios.
   const startCooldown = () => {
+    // Arranca en 60 y baja cada segundo hasta liberar el botón.
     setResendCooldown(60);
     const interval = setInterval(() => {
       setResendCooldown(prev => {
@@ -130,10 +146,13 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   // Permite solo digitos y avanza automaticamente entre inputs.
   const handleOtpChange = (index, value) => {
+    // Se rechaza cualquier carácter que no sea numérico.
     if (!/^\d*$/.test(value)) return;
     const newOtp = [...otp];
+    // Cada input guarda solo el último dígito ingresado.
     newOtp[index] = value.slice(-1);
     setOtp(newOtp);
+    // Si el usuario escribió algo, el foco salta al siguiente cuadro.
     if (value && index < 5) inputRefs.current[index + 1]?.focus();
   };
 
@@ -147,14 +166,17 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   // Paso 2: valida OTP y activa sesion del usuario verificado.
   const handleVerify = async (e) => {
     e.preventDefault();
+    // Se recompone el OTP completo antes de enviarlo al backend.
     const codigo = otp.join('');
     if (codigo.length < 6) { setError('Ingresa el código completo de 6 dígitos'); return; }
     setError('');
     setIsSubmitting(true);
     try {
+      // El backend verifica hash, expiración e intentos restantes.
       const res = await authService.verificarCodigo(pendingEmail, codigo);
       if (res.success) {
         queueOnboardingForUser(res.data.user?.email || pendingEmail);
+        // Esta llamada crea la sesión real justo después de validar el OTP.
         if (loginAfterVerification) loginAfterVerification(res.data.user, res.data.token);
         onClose();
       } else {
@@ -169,11 +191,13 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   // Solicita un OTP nuevo respetando el cooldown configurado.
   const handleResend = async () => {
+    // El cliente no deja reenviar si el contador aún no llegó a cero.
     if (resendCooldown > 0) return;
     setError('');
     try {
       const res = await authService.reenviarCodigo(pendingEmail);
       if (res.success) {
+        // Al reenviar, se limpia el OTP anterior y se devuelve el foco al primer cuadro.
         setOtp(['', '', '', '', '', '']);
         startCooldown();
         inputRefs.current[0]?.focus();
@@ -249,12 +273,14 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
               <div className="flex flex-col items-center gap-2">
                 <GoogleAuthButton
+                  // El botón usa el mismo proveedor global configurado en main.jsx.
                   onSuccess={handleGoogleRegister}
                   onError={() => setError('No se pudo completar el registro con Google.')}
                   disabled={isSubmitting}
                   text="signup_with"
                 />
                 <p className="text-center text-xs text-gray-500">
+                  {/* Se explica por qué Google no elimina por completo el formulario del registro. */}
                   Google aporta el correo verificado; empresa y teléfono siguen siendo obligatorios para crear la cuenta.
                 </p>
               </div>
@@ -279,6 +305,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
               <div className="text-center">
                 <p className="text-gray-600 text-sm">Enviamos un código de 6 dígitos a</p>
                 <p className="font-semibold text-syntix-navy mt-1">{pendingEmail}</p>
+                {/* Se avisa spam porque varios profesores/equipos suelen probar con Gmail. */}
                 <p className="text-gray-500 text-xs mt-2">Revisa tu bandeja de entrada y carpeta de spam.</p>
               </div>
 

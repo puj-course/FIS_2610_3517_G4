@@ -6,14 +6,17 @@ import { Helmet } from 'react-helmet';
 
 // Página de login tradicional para accesos directos y redirecciones desde rutas protegidas.
 export default function LoginPage() {
+  // Estado local del formulario clásico de login.
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(false);   // ← nuevo
+  // `loading` bloquea el submit mientras el contexto resuelve backend o fallback.
+  const [loading, setLoading]   = useState(false);
 
   const { login }    = useAuth();
   const navigate     = useNavigate();
   const location     = useLocation();
+  // Si no hay ruta origen, la app vuelve a la home/dashboard por defecto.
   const from         = location.state?.from?.pathname || '/';
 
   // Si el login viene desde una ruta protegida, al autenticarse vuelve exactamente al destino pedido.
@@ -22,7 +25,8 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
-    const result = await login(email, password);   // ← await aquí
+    // `login` abstrae por completo si la autenticación fue remota o local.
+    const result = await login(email, password);
 
     setLoading(false);
 

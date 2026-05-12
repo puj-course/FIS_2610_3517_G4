@@ -46,6 +46,8 @@ export default function ValidacionResultadoCard({
   };
 
   const alertas = [];
+  // Las alertas se construyen en un arreglo simple para poder explicar en una
+  // sola zona todos los hallazgos relevantes de la validación cruzada.
   if (!data.soat.vigente) alertas.push('⚠️ SOAT VENCIDO');
   if (!data.rtm.vigente) alertas.push('⚠️ RTM VENCIDO');
   if (!conductorAsignado) alertas.push('⚠️ SIN CONDUCTOR ASIGNADO');
@@ -74,6 +76,8 @@ export default function ValidacionResultadoCard({
 
       {/* Información del Vehículo */}
       <div className={`rounded-xl border p-6 ${isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-200 bg-white'}`}>
+        {/* Primero se muestra el activo consultado y luego cada documento para
+            que la lectura siga el mismo orden mental de una revisión real. */}
         <h3 className={`mb-4 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>Información del Vehículo</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div>

@@ -9,6 +9,8 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
   const { totalAlerts } = useAlerts();
   const { isDarkMode } = useTheme();
 
+  // Perfil quedó primero para reforzar que es la nueva puerta de entrada del usuario
+  // a sus preferencias y datos de cuenta.
   const navItems = [
     { path: '/perfil', icon: User, label: 'Perfil' },
     { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -65,6 +67,8 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                 }`
               }
             >
+              {/* Se separa badge de alerta del contenido para que solo ese módulo
+                  muestre señal visual cuando existan pendientes activos. */}
               <div className="flex items-center gap-3">
                 <item.icon className="w-5 h-5" />
                 {item.label}

@@ -46,6 +46,8 @@ export default function VehiculosPage() {
   }, [vehiculos, searchTerm, filterState]);
 
   useEffect(() => {
+    // Durante el onboarding el modal se fuerza abierto cuando el paso actual
+    // necesita explicar el formulario de vehículo en contexto real.
     const vehicleTutorialSteps = new Set([
       'vehicle-form',
       'vehicle-plate-field',
@@ -102,6 +104,8 @@ export default function VehiculosPage() {
       <div className={`overflow-hidden rounded-2xl border shadow-sm ${
         isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
       }`}>
+        {/* Buscador y filtro comparten la misma banda superior para que la tabla
+            responda rápido sin obligar a cambiar de vista o abrir otro panel. */}
         <div className={`flex flex-col justify-between gap-4 border-b p-4 sm:flex-row ${
           isDarkMode ? 'border-slate-800 bg-slate-950/60' : 'border-gray-100 bg-gray-50/50'
         }`}>

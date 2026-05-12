@@ -58,7 +58,9 @@ export default function ValidacionRUNTPage() {
     const vehiculoEnSistema = vehiculos.find(v => v.placa === result.data.placa);
     const conductorAsignado = vehiculoEnSistema?.conductor;
 
-    const newValidation = addValidation(
+    // Se persiste solo la información útil de auditoría; no hace falta navegar
+    // fuera de la página para que la validación quede guardada.
+    addValidation(
       result.data.placa,
       result,
       'usuario_actual'
@@ -90,6 +92,8 @@ export default function ValidacionRUNTPage() {
       <div data-onboarding="runt-search" className={`space-y-4 rounded-2xl border p-8 shadow-lg ${
         isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
       }`}>
+        {/* El usuario puede alternar entre placa y VIN sin cambiar de vista;
+            el formulario adapta placeholder y longitud máxima sobre la marcha. */}
         <form onSubmit={handleSearch} className="space-y-4">
           {/* Selector de Tipo de Búsqueda */}
           <div data-onboarding="runt-search-type" className="flex gap-4">
