@@ -1,9 +1,6 @@
-const fs = require('fs');
-const path = require('path');
 const dns = require('dns').promises;
 const https = require('https');
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
 const {
   DEFAULT_MONGO_DB_NAME,
   DEFAULT_MONGO_HOST,
@@ -11,6 +8,7 @@ const {
   getMongoConfigErrors,
   hasPlaceholderValue,
 } = require('../config/mongo');
+const { loadProjectEnv } = require('../config/load-env');
 
 const args = process.argv.slice(2);
 const noConnect = args.includes('--no-connect');
@@ -18,29 +16,13 @@ const ciMode = args.includes('--ci');
 const envFileArg = args.find((arg) => arg.startsWith('--env-file='));
 
 const explicitEnvFile = envFileArg ? envFileArg.split('=')[1] : null;
-const backendDir = path.resolve(__dirname, '..');
-
-const resolveEnvPath = () => {
-  if (explicitEnvFile) {
-    return path.resolve(backendDir, explicitEnvFile);
-  }
-
-  const defaultPath = path.resolve(backendDir, '.env');
-  if (fs.existsSync(defaultPath)) {
-    return defaultPath;
-  }
-
-  return path.resolve(backendDir, '.env.example');
-};
-
-const envPath = resolveEnvPath();
-if (!fs.existsSync(envPath)) {
-  console.error('[AUTH-DOCTOR] No se encontro archivo de entorno (.env o .env.example).');
+const loadedEnvSources = loadProjectEnv({ explicitEnvFile });
+if (loadedEnvSources.length === 0) {
+  console.error('[AUTH-DOCTOR] No se encontro archivo de entorno (.env, backend/.env o backend/.env.example).');
   process.exit(1);
 }
 
-dotenv.config({ path: envPath });
-console.log(`[AUTH-DOCTOR] Variables cargadas desde ${path.basename(envPath)}`);
+console.log(`[AUTH-DOCTOR] Variables cargadas desde ${loadedEnvSources.join(', ')}`);
 
 const requiredKeys = ['PORT', 'EMAIL_HOST', 'EMAIL_PORT', 'OTP_EXPIRACION_MINUTOS', 'OTP_MAX_INTENTOS', 'OTP_COOLDOWN_SEGUNDOS'];
 const missing = requiredKeys.filter((key) => !String(process.env[key] || '').trim());

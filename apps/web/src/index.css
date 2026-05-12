@@ -25,9 +25,42 @@
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
   }
+
+  .dark {
+    --background: 222 34% 9%;
+    --foreground: 210 40% 96%;
+    --card: 221 33% 13%;
+    --card-foreground: 210 40% 96%;
+    --popover: 221 33% 13%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 146 39% 37%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217 24% 18%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 217 24% 18%;
+    --muted-foreground: 215 20% 70%;
+    --accent: 217 24% 18%;
+    --accent-foreground: 210 40% 96%;
+    --destructive: 0 72% 54%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 24% 22%;
+    --input: 217 24% 22%;
+    --ring: 146 39% 37%;
+  }
+
+  html {
+    @apply bg-white dark:bg-slate-950;
+  }
 }
 
 body {
 	font-family: 'DM Sans', sans-serif;
     background-color: #f9fafb;
+    color: #0f172a;
+    transition: background-color 200ms ease, color 200ms ease;
+}
+
+.dark body {
+  background-color: #020617;
+  color: #e2e8f0;
 }

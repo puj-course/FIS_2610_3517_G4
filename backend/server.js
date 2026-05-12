@@ -1,24 +1,13 @@
-const fs = require('fs');
-const path = require('path');
-const dotenv = require('dotenv');
+const hasRuntimeMongoEnv = Boolean(process.env.MONGO_URI || process.env.MONGO_USER);
+const { loadProjectEnv } = require('./config/load-env');
 
-const envPath = path.resolve(__dirname, '.env');
-const envExamplePath = path.resolve(__dirname, '.env.example');
-let envLoadedFrom = null;
+const loadedEnvSources = loadProjectEnv();
+const hasLoadedEnvFile = loadedEnvSources.length > 0;
 
-if (fs.existsSync(envPath)) {
-  dotenv.config({ path: envPath });
-  envLoadedFrom = '.env';
-} else if (fs.existsSync(envExamplePath)) {
-  dotenv.config({ path: envExamplePath });
-  envLoadedFrom = '.env.example';
-  console.warn('[ENV] No se encontro backend/.env. Se cargo backend/.env.example como respaldo.');
-} else {
-  console.error('[ENV] No se encontro backend/.env ni backend/.env.example');
-}
-
-if (envLoadedFrom) {
-  console.log(`[ENV] Variables cargadas desde backend/${envLoadedFrom}`);
+if (!hasLoadedEnvFile && !hasRuntimeMongoEnv) {
+  console.error('[ENV] No se encontro configuracion en backend/.env, backend/.env.example ni .env raiz.');
+} else if (loadedEnvSources.length > 0) {
+  console.log(`[ENV] Variables cargadas desde ${loadedEnvSources.join(', ')}`);
 }
 
 const missingEmailVars = ['EMAIL_USER', 'EMAIL_PASS'].filter((key) => !process.env[key]);
@@ -45,6 +34,7 @@ const {
   enviarCodigoRecuperacion,
   verificarServicioCorreo,
 } = require('./services/emailService');
+const { enviarCodigoRecuperacionSms } = require('./services/smsService');
 
 const DB_UNAVAILABLE_MESSAGE =
   'Base de datos no disponible. Verifica la IP permitida en MongoDB Atlas y la variable MONGO_URI.';
@@ -178,6 +168,28 @@ app.get('/api/health/email', async (_req, res) => {
 const MONGO_URI = buildMongoUri(process.env);
 const mongoConfigErrors = getMongoConfigErrors(process.env);
 
+const describeMongoTarget = (mongoUri = '') => {
+  const value = String(mongoUri);
+  const protocol = value.startsWith('mongodb+srv://') ? 'mongodb+srv' : 'mongodb';
+  const withoutProtocol = value.replace(/^mongodb(\+srv)?:\/\//, '');
+  const withoutCredentials = withoutProtocol.includes('@')
+    ? withoutProtocol.slice(withoutProtocol.indexOf('@') + 1)
+    : withoutProtocol;
+  const [hostSegment = '', pathSegment = ''] = withoutCredentials.split('/');
+  const dbName = (pathSegment.split('?')[0] || DEFAULT_MONGO_DB_NAME).trim();
+
+  return {
+    protocol,
+    hosts: hostSegment,
+    database: dbName || DEFAULT_MONGO_DB_NAME,
+    source: hostSegment.includes('mongodb') && !hostSegment.startsWith('mongodb:')
+      ? 'atlas'
+      : 'local-compose',
+  };
+};
+
+const mongoTarget = describeMongoTarget(MONGO_URI);
+
 if (mongoConfigErrors.length > 0) {
   console.error(
     `[ENV] Configuracion Mongo incompleta. Usa MONGO_URI o configura MONGO_USER/MONGO_PASSWORD para ${DEFAULT_MONGO_HOST}/${DEFAULT_MONGO_DB_NAME}.`
@@ -190,7 +202,7 @@ mongoose.set('bufferCommands', false);
 mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 10000 })
   .then(() => {
     lastMongoConnectionMessage = null;
-    console.log('Conexion exitosa a MongoDB Atlas usando MONGO_URI');
+    console.log(`Conexion exitosa a MongoDB (${mongoTarget.source}) usando ${mongoTarget.database}`);
   })
   .catch((err) => {
     lastMongoConnectionMessage = getMongoConnectionMessage(err);
@@ -211,12 +223,18 @@ const getDbUnavailableMessage = () => lastMongoConnectionMessage || DB_UNAVAILAB
 
 app.get('/api/health/db', (_req, res) => {
   if (isDbConnected()) {
-    return res.json({ ok: true, state: mongoose.connection.readyState });
+    return res.json({
+      ok: true,
+      state: mongoose.connection.readyState,
+      database: mongoose.connection.name || mongoTarget.database,
+      target: mongoTarget,
+    });
   }
 
   return res.status(503).json({
     ok: false,
     state: mongoose.connection.readyState,
+    target: mongoTarget,
     message: getDbUnavailableMessage(),
   });
 });
@@ -293,20 +311,37 @@ const Usuario = mongoose.model('Usuario', UsuarioSchema);
 
 const SoatSchema = new mongoose.Schema({
   vehiculoId: { type: String, required: true },
+  placaVehiculo: String,
   numeroPoliza: { type: String, required: true },
-  fechaInicio: { type: String, required: true },
-  fechaVencimiento: { type: String, required: true },
+  aseguradora: String,
+  fechaExpedicion: String,
+  fechaInicioVigencia: String,
+  fechaFinVigencia: String,
+  fechaInicio: String,
+  fechaVencimiento: String,
+  observaciones: String,
   ownerEmail: { type: String, required: true },
+  ownerEmpresa: String,
+  seedTag: String,
 });
 
 const Soat = mongoose.model('Soat', SoatSchema);
 
 const RtmSchema = new mongoose.Schema({
   vehiculoId: { type: String, required: true },
-  numeroRtm: { type: String, required: true },
-  fechaInicio: { type: String, required: true },
+  placaVehiculo: String,
+  numeroCertificado: String,
+  numeroRtm: String,
+  cda: String,
+  nitCda: String,
+  fechaExpedicion: String,
+  fechaInicio: String,
   fechaVencimiento: { type: String, required: true },
+  resultado: String,
+  observaciones: String,
   ownerEmail: { type: String, required: true },
+  ownerEmpresa: String,
+  seedTag: String,
 });
 
 const Rtm = mongoose.model('Rtm', RtmSchema);
@@ -327,14 +362,18 @@ const VerificacionOTP = mongoose.model('VerificacionOTP', VerificacionOTPSchema)
 
 const PasswordResetOTPSchema = new mongoose.Schema({
   email: { type: String, required: true },
+  recoveryTokenHash: { type: String, required: true },
   codigoHash: { type: String, required: true },
   expiresAt: { type: Date, required: true },
   intentos: { type: Number, default: 0 },
   ultimoEnvio: { type: Date, default: Date.now },
+  canalEntrega: { type: String, enum: ['email', 'sms'], required: true },
+  destinoEnmascarado: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
 PasswordResetOTPSchema.index({ email: 1 });
+PasswordResetOTPSchema.index({ recoveryTokenHash: 1 }, { unique: true });
 PasswordResetOTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 const PasswordResetOTP = mongoose.model('PasswordResetOTP', PasswordResetOTPSchema);
@@ -346,6 +385,10 @@ const PasswordResetOTP = mongoose.model('PasswordResetOTP', PasswordResetOTPSche
 const normalizeText = (value) => String(value ?? '').trim();
 
 const normalizeEmail = (value) => normalizeText(value).toLowerCase();
+
+const normalizePhone = (value) => normalizeText(value).replace(/[^\d+]/g, '');
+
+const getPhoneLookupKey = (value) => normalizePhone(value).replace(/\D/g, '');
 
 const GOOGLE_CLIENT_ID = normalizeText(process.env.GOOGLE_CLIENT_ID);
 const googleClient = GOOGLE_CLIENT_ID ? new OAuth2Client(GOOGLE_CLIENT_ID) : null;
@@ -359,10 +402,112 @@ const normalizeNullableText = (value) => {
   return normalized || null;
 };
 
+const buildSmsDestination = (value) => {
+  const digits = getPhoneLookupKey(value);
+  if (!digits) {
+    return null;
+  }
+
+  if (digits.startsWith('57')) {
+    return `+${digits}`;
+  }
+
+  if (digits.length === 10) {
+    return `+57${digits}`;
+  }
+
+  return `+${digits}`;
+};
+
+const maskEmail = (email) => {
+  const normalizedEmail = normalizeEmail(email);
+  const [localPart = '', domain = ''] = normalizedEmail.split('@');
+  if (!domain) {
+    return normalizedEmail;
+  }
+
+  const visibleLocal = localPart.slice(0, 2);
+  return `${visibleLocal}${'*'.repeat(Math.max(localPart.length - visibleLocal.length, 2))}@${domain}`;
+};
+
+const maskPhone = (phone) => {
+  const digits = getPhoneLookupKey(phone);
+  if (digits.length <= 4) {
+    return digits;
+  }
+
+  return `${'*'.repeat(Math.max(digits.length - 4, 4))}${digits.slice(-4)}`;
+};
+
+const buildRecoveryToken = () => crypto.randomBytes(24).toString('hex');
+
+const hashRecoveryToken = (token) =>
+  crypto.createHash('sha256').update(String(token || '')).digest('hex');
+
+const isPhoneIdentifier = (value) => getPhoneLookupKey(value).length >= 7;
+
+const findUserByPhone = async (phoneLookupKey) => {
+  const usuariosConTelefono = await Usuario.find({
+    telefono: { $exists: true, $ne: null },
+  });
+
+  return usuariosConTelefono.find((usuario) => getPhoneLookupKey(usuario.telefono) === phoneLookupKey) || null;
+};
+
+const findUserByRecoveryIdentifier = async (identifier) => {
+  const normalizedIdentifier = normalizeText(identifier);
+
+  if (EMAIL_REGEX.test(normalizedIdentifier)) {
+    const emailNormalizado = normalizeEmail(normalizedIdentifier);
+    const usuario = await Usuario.findOne({ email: emailNormalizado });
+    return { usuario, tipo: 'email', valor: emailNormalizado };
+  }
+
+  if (isPhoneIdentifier(normalizedIdentifier)) {
+    const phoneLookupKey = getPhoneLookupKey(normalizedIdentifier);
+    const usuario = await findUserByPhone(phoneLookupKey);
+    return { usuario, tipo: 'phone', valor: phoneLookupKey };
+  }
+
+  return { usuario: null, tipo: null, valor: '' };
+};
+
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object, key);
 
+const PLATE_REGEX = /^[A-Z]{3}[0-9]{3}$/;
+const CEDULA_REGEX = /^[0-9]{10}$/;
+const COLOMBIAN_MOBILE_REGEX = /^3[0-9]{9}$/;
+const DOCUMENT_CODE_REGEX = /^[A-Z0-9-]{6,30}$/;
+
+const normalizePlate = (value) =>
+  normalizeText(value).toUpperCase().replace(/[\s.-]+/g, '');
+
+const normalizeDocumentCode = (value) => normalizeText(value).toUpperCase();
+
+const isValidPlate = (value) => PLATE_REGEX.test(normalizePlate(value));
+
+const isValidDateValue = (value) => {
+  const dateText = normalizeText(value);
+  const match = dateText.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return false;
+
+  const [, year, month, day] = match;
+  const parsed = new Date(Number(year), Number(month) - 1, Number(day));
+
+  return (
+    !Number.isNaN(parsed.getTime()) &&
+    parsed.getFullYear() === Number(year) &&
+    parsed.getMonth() === Number(month) - 1 &&
+    parsed.getDate() === Number(day)
+  );
+};
+
 const isValidDateRange = (fechaInicio, fechaVencimiento) =>
-  Boolean(fechaInicio && fechaVencimiento && new Date(fechaVencimiento) > new Date(fechaInicio));
+  Boolean(
+    isValidDateValue(fechaInicio) &&
+    isValidDateValue(fechaVencimiento) &&
+    new Date(fechaVencimiento).getTime() >= new Date(fechaInicio).getTime()
+  );
 
 const findOwnedVehicle = (vehiculoId, ownerEmail) => {
   if (!mongoose.Types.ObjectId.isValid(vehiculoId)) {
@@ -370,6 +515,121 @@ const findOwnedVehicle = (vehiculoId, ownerEmail) => {
   }
 
   return Vehiculo.findOne({ _id: vehiculoId, ownerEmail });
+};
+
+const buildSoatPayload = async (body, ownerEmailFallback = '') => {
+  const vehiculoId = normalizeText(body.vehiculoId);
+  const ownerEmail = normalizeEmail(ownerEmailFallback || body.ownerEmail);
+  const numeroPoliza = normalizeDocumentCode(body.numeroPoliza);
+  const aseguradora = normalizeText(body.aseguradora);
+  const fechaExpedicion = normalizeText(body.fechaExpedicion);
+  const fechaInicioVigencia = normalizeText(body.fechaInicioVigencia || body.fechaInicio);
+  const fechaFinVigencia = normalizeText(body.fechaFinVigencia || body.fechaVencimiento);
+  const placaRecibida = normalizePlate(body.placaVehiculo || body.placa);
+
+  if (!vehiculoId || !numeroPoliza || !aseguradora || !fechaExpedicion || !fechaInicioVigencia || !fechaFinVigencia || !ownerEmail) {
+    return { error: 'Todos los campos obligatorios del SOAT deben estar completos.' };
+  }
+
+  if (!DOCUMENT_CODE_REGEX.test(numeroPoliza)) {
+    return { error: 'El numero de poliza debe ser alfanumerico y tener entre 6 y 30 caracteres.' };
+  }
+
+  if (!isValidDateValue(fechaExpedicion)) {
+    return { error: 'La fecha de expedicion no es valida.' };
+  }
+
+  if (!isValidDateRange(fechaInicioVigencia, fechaFinVigencia)) {
+    return { error: 'La fecha fin de vigencia no puede ser anterior a la fecha de inicio.' };
+  }
+
+  const vehiculo = await findOwnedVehicle(vehiculoId, ownerEmail);
+
+  if (!vehiculo) {
+    return { error: 'El vehiculo seleccionado no existe o no pertenece al usuario.' };
+  }
+
+  const placaVehiculo = placaRecibida || normalizePlate(vehiculo.placa);
+
+  if (!isValidPlate(placaVehiculo)) {
+    return { error: 'La placa asociada debe tener formato ABC123.' };
+  }
+
+  return {
+    payload: {
+      vehiculoId,
+      placaVehiculo,
+      numeroPoliza,
+      aseguradora,
+      fechaExpedicion,
+      fechaInicioVigencia,
+      fechaFinVigencia,
+      fechaInicio: fechaInicioVigencia,
+      fechaVencimiento: fechaFinVigencia,
+      observaciones: normalizeText(body.observaciones),
+      ownerEmail,
+      ownerEmpresa: normalizeText(body.ownerEmpresa),
+      seedTag: normalizeText(body.seedTag),
+    },
+  };
+};
+
+const buildRtmPayload = async (body, ownerEmailFallback = '') => {
+  const vehiculoId = normalizeText(body.vehiculoId);
+  const ownerEmail = normalizeEmail(ownerEmailFallback || body.ownerEmail);
+  const numeroCertificado = normalizeDocumentCode(body.numeroCertificado || body.numeroRtm);
+  const cda = normalizeText(body.cda);
+  const fechaExpedicion = normalizeText(body.fechaExpedicion || body.fechaInicio);
+  const fechaVencimiento = normalizeText(body.fechaVencimiento);
+  const placaRecibida = normalizePlate(body.placaVehiculo || body.placa);
+  const resultado = normalizeText(body.resultado || 'Aprobado');
+
+  if (!vehiculoId || !numeroCertificado || !cda || !fechaExpedicion || !fechaVencimiento || !ownerEmail) {
+    return { error: 'Todos los campos obligatorios de la RTM deben estar completos.' };
+  }
+
+  if (!DOCUMENT_CODE_REGEX.test(numeroCertificado)) {
+    return { error: 'El numero de certificado debe ser alfanumerico y tener entre 6 y 30 caracteres.' };
+  }
+
+  if (!isValidDateRange(fechaExpedicion, fechaVencimiento)) {
+    return { error: 'La fecha de vencimiento no puede ser anterior a la fecha de expedicion.' };
+  }
+
+  if (!['Aprobado', 'Rechazado', 'Pendiente'].includes(resultado)) {
+    return { error: 'El resultado de la RTM no es valido.' };
+  }
+
+  const vehiculo = await findOwnedVehicle(vehiculoId, ownerEmail);
+
+  if (!vehiculo) {
+    return { error: 'El vehiculo seleccionado no existe o no pertenece al usuario.' };
+  }
+
+  const placaVehiculo = placaRecibida || normalizePlate(vehiculo.placa);
+
+  if (!isValidPlate(placaVehiculo)) {
+    return { error: 'La placa asociada debe tener formato ABC123.' };
+  }
+
+  return {
+    payload: {
+      vehiculoId,
+      placaVehiculo,
+      numeroCertificado,
+      numeroRtm: numeroCertificado,
+      cda,
+      nitCda: normalizeText(body.nitCda),
+      fechaExpedicion,
+      fechaInicio: fechaExpedicion,
+      fechaVencimiento,
+      resultado,
+      observaciones: normalizeText(body.observaciones),
+      ownerEmail,
+      ownerEmpresa: normalizeText(body.ownerEmpresa),
+      seedTag: normalizeText(body.seedTag),
+    },
+  };
 };
 
 const generateToken = (id) => {
@@ -415,7 +675,7 @@ app.post('/api/auth/register', async (req, res) => {
     const emailNormalizado = normalizeEmail(email);
     const nombreNormalizado = normalizeText(nombre);
     const empresaNormalizada = normalizeText(empresa);
-    const telefonoNormalizado = normalizeText(telefono);
+    const telefonoNormalizado = normalizePhone(telefono);
 
     if (!empresaNormalizada) {
       return res.status(400).json({ message: 'Ingresa el nombre de la empresa.' });
@@ -423,6 +683,10 @@ app.post('/api/auth/register', async (req, res) => {
 
     if (!telefonoNormalizado) {
       return res.status(400).json({ message: 'Ingresa el teléfono.' });
+    }
+
+    if (!COLOMBIAN_MOBILE_REGEX.test(telefonoNormalizado)) {
+      return res.status(400).json({ message: 'El celular debe tener 10 digitos e iniciar por 3.' });
     }
 
     if (!EMAIL_REGEX.test(emailNormalizado)) {
@@ -683,8 +947,14 @@ app.post('/api/auth/google', async (req, res) => {
     const googleProfile = await verifyGoogleIdentity(idToken);
     const emailNormalizado = normalizeEmail(googleProfile.email);
     const empresaNormalizada = normalizeText(empresa);
-    const telefonoNormalizado = normalizeText(telefono);
+    const telefonoNormalizado = normalizePhone(telefono);
     const nombreNormalizado = normalizeText(googleProfile.name);
+
+    if (telefonoNormalizado && !COLOMBIAN_MOBILE_REGEX.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        message: 'El celular debe tener 10 digitos e iniciar por 3.',
+      });
+    }
 
     let usuario = await Usuario.findOne({ email: emailNormalizado });
     let created = false;
@@ -789,20 +1059,28 @@ app.post('/api/auth/google', async (req, res) => {
 
 app.post('/api/auth/recuperar-cuenta', async (req, res) => {
   try {
-    const { email } = req.body;
-    const emailNormalizado = normalizeEmail(email);
+    const identifier = normalizeText(req.body?.identifier || req.body?.email || req.body?.telefono);
 
-    if (!EMAIL_REGEX.test(emailNormalizado)) {
-      return res.status(400).json({ message: 'Ingresa un correo electronico valido.' });
+    if (!identifier) {
+      return res.status(400).json({ message: 'Ingresa el correo o telefono registrado.' });
     }
 
-    const usuario = await Usuario.findOne({ email: emailNormalizado });
+    const { usuario, tipo } = await findUserByRecoveryIdentifier(identifier);
+    const genericMessage = 'Si existe una cuenta asociada, enviaremos un codigo de recuperacion al contacto registrado.';
+
+    if (!tipo) {
+      return res.status(400).json({ message: 'Ingresa un correo o telefono valido.' });
+    }
 
     if (!usuario) {
-      return res.status(404).json({ message: 'No existe una cuenta con este correo.' });
+      return res.json({
+        success: true,
+        message: genericMessage,
+      });
     }
 
-    const recuperacionExistente = await PasswordResetOTP.findOne({ email: emailNormalizado });
+    const emailRegistrado = normalizeEmail(usuario.email);
+    const recuperacionExistente = await PasswordResetOTP.findOne({ email: emailRegistrado });
 
     if (recuperacionExistente) {
       const segundosDesdeUltimoEnvio =
@@ -820,30 +1098,58 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
     const codigo = String(secureRandomInt(100000, 999999));
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
+    const recoveryToken = buildRecoveryToken();
+    const recoveryTokenHash = hashRecoveryToken(recoveryToken);
+    let canalEntrega = 'email';
+    let destinoEnmascarado = maskEmail(emailRegistrado);
 
-    await PasswordResetOTP.findOneAndDelete({ email: emailNormalizado });
-
-    await new PasswordResetOTP({
-      email: emailNormalizado,
-      codigoHash,
-      expiresAt,
-      ultimoEnvio: new Date(),
-    }).save();
+    await PasswordResetOTP.findOneAndDelete({ email: emailRegistrado });
 
     try {
-      await enviarCodigoRecuperacion(emailNormalizado, usuario.nombre || usuario.empresa, codigo);
+      await enviarCodigoRecuperacion(emailRegistrado, usuario.nombre || usuario.empresa, codigo);
     } catch (emailErr) {
       console.error('Error al enviar correo de recuperacion:', emailErr.message);
 
-      return res.status(500).json({
-        message: `Error al enviar el correo de recuperacion: ${emailErr.message}`,
-      });
+      const smsDestination = buildSmsDestination(usuario.telefono);
+      if (!smsDestination) {
+        return res.status(500).json({
+          message: 'No fue posible enviar el codigo por correo y no hay un telefono valido registrado para SMS.',
+        });
+      }
+
+      try {
+        await enviarCodigoRecuperacionSms(smsDestination, usuario.nombre || usuario.empresa, codigo);
+        canalEntrega = 'sms';
+        destinoEnmascarado = maskPhone(smsDestination);
+      } catch (smsErr) {
+        console.error('Error al enviar SMS de recuperacion:', smsErr.message);
+        return res.status(500).json({
+          message: 'No fue posible enviar el codigo de recuperacion por correo ni por SMS.',
+        });
+      }
     }
+
+    await new PasswordResetOTP({
+      email: emailRegistrado,
+      recoveryTokenHash,
+      codigoHash,
+      expiresAt,
+      ultimoEnvio: new Date(),
+      canalEntrega,
+      destinoEnmascarado,
+    }).save();
 
     return res.json({
       success: true,
-      message: 'Codigo de recuperacion enviado. Revisa tu correo.',
-      data: { email: emailNormalizado },
+      message:
+        canalEntrega === 'sms'
+          ? 'No pudimos usar el correo registrado. Enviamos el codigo por SMS al telefono asociado.'
+          : 'Codigo de recuperacion enviado al correo registrado.',
+      data: {
+        recoveryToken,
+        channel: canalEntrega,
+        destinationHint: destinoEnmascarado,
+      },
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -852,32 +1158,39 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
 
 app.post('/api/auth/restablecer-password', async (req, res) => {
   try {
-    const { email, codigo, password, nuevaPassword } = req.body;
-    const emailNormalizado = normalizeEmail(email);
+    const { email, codigo, password, nuevaPassword, recoveryToken } = req.body;
     const passwordNueva = String(nuevaPassword || password || '');
 
-    if (!emailNormalizado || !codigo || !passwordNueva) {
-      return res.status(400).json({ message: 'Email, codigo y nueva contrasena son requeridos.' });
+    if (!codigo || !passwordNueva || (!recoveryToken && !email)) {
+      return res.status(400).json({ message: 'Codigo, nueva contrasena y token de recuperacion son requeridos.' });
     }
 
     if (passwordNueva.length < 6) {
       return res.status(400).json({ message: 'La contrasena debe tener al menos 6 caracteres.' });
     }
 
-    const recuperacion = await PasswordResetOTP.findOne({ email: emailNormalizado });
+    let recuperacion = null;
+
+    if (recoveryToken) {
+      recuperacion = await PasswordResetOTP.findOne({
+        recoveryTokenHash: hashRecoveryToken(recoveryToken),
+      });
+    } else {
+      recuperacion = await PasswordResetOTP.findOne({ email: normalizeEmail(email) });
+    }
 
     if (!recuperacion) {
-      return res.status(400).json({ message: 'No hay un codigo de recuperacion pendiente para este correo.' });
+      return res.status(400).json({ message: 'No hay una recuperacion pendiente o el token ya no es valido.' });
     }
 
     if (new Date() > recuperacion.expiresAt) {
-      await PasswordResetOTP.findOneAndDelete({ email: emailNormalizado });
+      await PasswordResetOTP.findOneAndDelete({ email: recuperacion.email });
 
       return res.status(400).json({ message: 'El codigo ha expirado. Solicita uno nuevo.' });
     }
 
     if (recuperacion.intentos >= OTP_MAX_INTENTOS) {
-      await PasswordResetOTP.findOneAndDelete({ email: emailNormalizado });
+      await PasswordResetOTP.findOneAndDelete({ email: recuperacion.email });
 
       return res.status(400).json({ message: 'Demasiados intentos fallidos. Solicita un nuevo codigo.' });
     }
@@ -895,6 +1208,7 @@ app.post('/api/auth/restablecer-password', async (req, res) => {
       });
     }
 
+    const emailNormalizado = normalizeEmail(recuperacion.email);
     const usuario = await Usuario.findOne({ email: emailNormalizado });
 
     if (!usuario) {
@@ -911,6 +1225,9 @@ app.post('/api/auth/restablecer-password', async (req, res) => {
     return res.json({
       success: true,
       message: 'Contrasena actualizada. Ya puedes iniciar sesion.',
+      data: {
+        email: usuario.email,
+      },
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -957,6 +1274,32 @@ app.post('/api/conductores', async (req, res) => {
     ) {
       return res.status(400).json({
         error: 'Todos los campos obligatorios deben estar completos.',
+      });
+    }
+
+    if (!CEDULA_REGEX.test(documentoNormalizado)) {
+      return res.status(400).json({
+        error: 'La cedula debe tener exactamente 10 digitos numericos.',
+      });
+    }
+
+    // Validación adicional: rechazar documentos con caracteres no numéricos
+    if (!/^\d+$/.test(documentoNormalizado)) {
+      return res.status(400).json({
+        error: 'La cedula solo debe contener numeros.',
+      });
+    }
+
+    if (!COLOMBIAN_MOBILE_REGEX.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        error: 'El celular debe tener 10 digitos e iniciar por 3.',
+      });
+    }
+
+    // Validación adicional: rechazar teléfono con caracteres no numéricos
+    if (!/^\d+$/.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        error: 'El celular solo debe contener numeros.',
       });
     }
 
@@ -1010,6 +1353,32 @@ app.put('/api/conductores/:id', async (req, res) => {
     ) {
       return res.status(400).json({
         error: 'Todos los campos obligatorios deben estar completos.',
+      });
+    }
+
+    if (!CEDULA_REGEX.test(documentoNormalizado)) {
+      return res.status(400).json({
+        error: 'La cedula debe tener exactamente 10 digitos numericos.',
+      });
+    }
+
+    // Validación adicional: rechazar documentos con caracteres no numéricos
+    if (!/^\d+$/.test(documentoNormalizado)) {
+      return res.status(400).json({
+        error: 'La cedula solo debe contener numeros.',
+      });
+    }
+
+    if (!COLOMBIAN_MOBILE_REGEX.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        error: 'El celular debe tener 10 digitos e iniciar por 3.',
+      });
+    }
+
+    // Validación adicional: rechazar teléfono con caracteres no numéricos
+    if (!/^\d+$/.test(telefonoNormalizado)) {
+      return res.status(400).json({
+        error: 'El celular solo debe contener numeros.',
       });
     }
 
@@ -1079,7 +1448,7 @@ app.post('/api/vehiculos', async (req, res) => {
   try {
     const { placa, marca, modelo, anio, tipo, conductorId, ownerEmail, ownerEmpresa } = req.body;
 
-    const placaNormalizada = normalizeText(placa).toUpperCase();
+    const placaNormalizada = normalizePlate(placa);
     const marcaNormalizada = normalizeText(marca);
     const modeloNormalizado = normalizeText(modelo);
     const anioNormalizado = normalizeText(anio);
@@ -1104,6 +1473,19 @@ app.post('/api/vehiculos', async (req, res) => {
     if (!Number.isInteger(anioNumero) || anioNumero < 1990 || anioNumero > new Date().getFullYear() + 1) {
       return res.status(400).json({
         error: 'El anio del vehiculo no es valido.',
+      });
+    }
+
+    if (!isValidPlate(placaNormalizada)) {
+      return res.status(400).json({
+        error: 'La placa debe tener formato ABC123: tres letras y tres numeros, sin guiones ni espacios.',
+      });
+    }
+
+    // Validación adicional: rechazar placas con más de 6 caracteres
+    if (placaNormalizada.length !== 6) {
+      return res.status(400).json({
+        error: 'La placa debe tener exactamente 6 caracteres.',
       });
     }
 
@@ -1163,7 +1545,7 @@ app.put('/api/vehiculos/:id', async (req, res) => {
       return res.status(404).json({ error: 'Vehiculo no encontrado' });
     }
 
-    const placaNormalizada = normalizeText(req.body.placa).toUpperCase();
+    const placaNormalizada = normalizePlate(req.body.placa);
     const marcaNormalizada = normalizeText(req.body.marca);
     const modeloNormalizado = normalizeText(req.body.modelo);
     const anioNormalizado = normalizeText(req.body.anio);
@@ -1185,6 +1567,19 @@ app.put('/api/vehiculos/:id', async (req, res) => {
     if (!Number.isInteger(anioNumero) || anioNumero < 1990 || anioNumero > new Date().getFullYear() + 1) {
       return res.status(400).json({
         error: 'El anio del vehiculo no es valido.',
+      });
+    }
+
+    if (!isValidPlate(placaNormalizada)) {
+      return res.status(400).json({
+        error: 'La placa debe tener formato ABC123: tres letras y tres numeros, sin guiones ni espacios.',
+      });
+    }
+
+    // Validación adicional: rechazar placas con más de 6 caracteres
+    if (placaNormalizada.length !== 6) {
+      return res.status(400).json({
+        error: 'La placa debe tener exactamente 6 caracteres.',
       });
     }
 
@@ -1313,56 +1708,50 @@ app.get('/api/soats', async (req, res) => {
 
 app.post('/api/soats', async (req, res) => {
   try {
-    const { vehiculoId, numeroPoliza, fechaInicio, fechaVencimiento, ownerEmail } = req.body;
+    const { error, payload } = await buildSoatPayload(req.body);
 
-    const vehiculoIdNorm = normalizeText(vehiculoId);
-    const numeroPolizaNorm = normalizeText(numeroPoliza);
-    const fechaInicioNorm = normalizeText(fechaInicio);
-    const fechaVencimientoNorm = normalizeText(fechaVencimiento);
-    const ownerEmailNorm = normalizeEmail(ownerEmail);
-
-    if (
-      !vehiculoIdNorm ||
-      !numeroPolizaNorm ||
-      !fechaInicioNorm ||
-      !fechaVencimientoNorm ||
-      !ownerEmailNorm
-    ) {
-      return res.status(400).json({
-        error: 'Todos los campos son obligatorios.',
-      });
-    }
-
-    if (!isValidDateRange(fechaInicioNorm, fechaVencimientoNorm)) {
-      return res.status(400).json({
-        error: 'La fecha de vencimiento debe ser posterior a la fecha de inicio.',
-      });
-    }
-
-    const vehiculo = await findOwnedVehicle(vehiculoIdNorm, ownerEmailNorm);
-
-    if (!vehiculo) {
-      return res.status(400).json({
-        error: 'El vehiculo seleccionado no existe o no pertenece al usuario.',
-      });
+    if (error) {
+      return res.status(400).json({ error });
     }
 
     await Soat.deleteMany({
-      vehiculoId: vehiculoIdNorm,
-      ownerEmail: ownerEmailNorm,
+      vehiculoId: payload.vehiculoId,
+      ownerEmail: payload.ownerEmail,
     });
 
-    const nuevo = new Soat({
-      vehiculoId: vehiculoIdNorm,
-      numeroPoliza: numeroPolizaNorm,
-      fechaInicio: fechaInicioNorm,
-      fechaVencimiento: fechaVencimientoNorm,
-      ownerEmail: ownerEmailNorm,
-    });
-
+    const nuevo = new Soat(payload);
     await nuevo.save();
 
     return res.status(201).json(nuevo);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/soats/:id', async (req, res) => {
+  try {
+    const soatExistente = await Soat.findById(req.params.id);
+
+    if (!soatExistente) {
+      return res.status(404).json({ error: 'SOAT no encontrado.' });
+    }
+
+    const { error, payload } = await buildSoatPayload(
+      {
+        ...req.body,
+        vehiculoId: req.body.vehiculoId || soatExistente.vehiculoId,
+      },
+      soatExistente.ownerEmail
+    );
+
+    if (error) {
+      return res.status(400).json({ error });
+    }
+
+    Object.assign(soatExistente, payload);
+    await soatExistente.save();
+
+    return res.json(soatExistente);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }
@@ -1404,56 +1793,50 @@ app.get('/api/rtms', async (req, res) => {
 
 app.post('/api/rtms', async (req, res) => {
   try {
-    const { vehiculoId, numeroRtm, fechaInicio, fechaVencimiento, ownerEmail } = req.body;
+    const { error, payload } = await buildRtmPayload(req.body);
 
-    const vehiculoIdNorm = normalizeText(vehiculoId);
-    const numeroRtmNorm = normalizeText(numeroRtm);
-    const fechaInicioNorm = normalizeText(fechaInicio);
-    const fechaVencimientoNorm = normalizeText(fechaVencimiento);
-    const ownerEmailNorm = normalizeEmail(ownerEmail);
-
-    if (
-      !vehiculoIdNorm ||
-      !numeroRtmNorm ||
-      !fechaInicioNorm ||
-      !fechaVencimientoNorm ||
-      !ownerEmailNorm
-    ) {
-      return res.status(400).json({
-        error: 'Todos los campos son obligatorios.',
-      });
-    }
-
-    if (!isValidDateRange(fechaInicioNorm, fechaVencimientoNorm)) {
-      return res.status(400).json({
-        error: 'La fecha de vencimiento debe ser posterior a la fecha de inicio.',
-      });
-    }
-
-    const vehiculo = await findOwnedVehicle(vehiculoIdNorm, ownerEmailNorm);
-
-    if (!vehiculo) {
-      return res.status(400).json({
-        error: 'El vehiculo seleccionado no existe o no pertenece al usuario.',
-      });
+    if (error) {
+      return res.status(400).json({ error });
     }
 
     await Rtm.deleteMany({
-      vehiculoId: vehiculoIdNorm,
-      ownerEmail: ownerEmailNorm,
+      vehiculoId: payload.vehiculoId,
+      ownerEmail: payload.ownerEmail,
     });
 
-    const nuevo = new Rtm({
-      vehiculoId: vehiculoIdNorm,
-      numeroRtm: numeroRtmNorm,
-      fechaInicio: fechaInicioNorm,
-      fechaVencimiento: fechaVencimientoNorm,
-      ownerEmail: ownerEmailNorm,
-    });
-
+    const nuevo = new Rtm(payload);
     await nuevo.save();
 
     return res.status(201).json(nuevo);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/rtms/:id', async (req, res) => {
+  try {
+    const rtmExistente = await Rtm.findById(req.params.id);
+
+    if (!rtmExistente) {
+      return res.status(404).json({ error: 'RTM no encontrada.' });
+    }
+
+    const { error, payload } = await buildRtmPayload(
+      {
+        ...req.body,
+        vehiculoId: req.body.vehiculoId || rtmExistente.vehiculoId,
+      },
+      rtmExistente.ownerEmail
+    );
+
+    if (error) {
+      return res.status(400).json({ error });
+    }
+
+    Object.assign(rtmExistente, payload);
+    await rtmExistente.save();
+
+    return res.json(rtmExistente);
   } catch (err) {
     return res.status(400).json({ error: err.message });
   }

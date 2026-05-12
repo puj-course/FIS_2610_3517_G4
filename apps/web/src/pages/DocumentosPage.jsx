@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Shield, Wrench, Pencil, Trash2 } from 'lucide-react';
+import { Search, Shield, Wrench, Pencil, Trash2 } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext.jsx';
 import { useDocuments } from '@/hooks/useDocuments.js';
 import { useRtm } from '@/contexts/RtmContext.jsx';
 import { useVehicles } from '@/hooks/useVehicles.js';
@@ -8,27 +9,115 @@ import ModalFactory from '@/components/ModalFactory.jsx';
 import useModalManager from '@/hooks/useModalManager.js';
 import EditSoatModal from '@/components/EditSoatModal.jsx';
 import EditRtmModal from '@/components/EditRtmModal.jsx';
+import { formatColombianDate, getExpirationAlertText } from '@/utils/dateUtils.js';
+import { isValidPlate, normalizePlate } from '@/utils/colombiaFormats.js';
 
-// Esta página cruza vehículos con sus documentos para visualizar SOAT y RTM en paralelo.
+const UNKNOWN_VEHICLE_LABEL = 'Vehiculo no encontrado';
+
+const statusLabels = {
+  verde: 'Vigente',
+  amarillo: 'Proximo',
+  rojo: 'Vencido',
+};
+
 function getBadgeClasses(estado) {
   if (estado === 'rojo') return 'bg-red-50 text-red-500 border border-red-200';
   if (estado === 'amarillo') return 'bg-yellow-50 text-yellow-600 border border-yellow-200';
   return 'bg-green-50 text-green-600 border border-green-200';
 }
 
+const normalizeSearchText = (value) => String(value ?? '').toLowerCase().trim();
+
+const getVehicleLabel = (vehiculo) => {
+  const placa = normalizePlate(vehiculo?.placa || '');
+  if (!vehiculo || !isValidPlate(placa)) return UNKNOWN_VEHICLE_LABEL;
+  return placa;
+};
+
+const getDocumentPlate = (documento) => {
+  const placa = normalizePlate(documento.placaVehiculo || documento.placa || '');
+  return isValidPlate(placa) ? placa : '';
+};
+
+const getVehicleSubtitle = (vehiculo) => {
+  if (!vehiculo) return '';
+  return vehiculo.tipo || 'Otro';
+};
+
+const matchesSearch = (values, searchTerm) => {
+  const query = normalizeSearchText(searchTerm);
+  if (!query) return true;
+  return values.some((value) => normalizeSearchText(value).includes(query));
+};
+
+const getStatusSearchValues = (estado) => [
+  estado,
+  statusLabels[estado],
+  estado === 'verde' ? 'vigente al dia' : '',
+  estado === 'amarillo' ? 'proximo por vencer' : '',
+  estado === 'rojo' ? 'vencido critico' : '',
+];
+
 export default function DocumentosPage() {
   const { soats, removeSoat } = useDocuments();
   const { rtms, removeRtm } = useRtm();
   const { vehiculos } = useVehicles();
+  const { isDarkMode } = useTheme();
   const { activeModal, openModal, closeModal } = useModalManager();
 
   const [soatEditando, setSoatEditando] = useState(null);
   const [rtmEditando, setRtmEditando] = useState(null);
-  const [confirmDelete, setConfirmDelete] = useState(null); // { tipo, id, nombre }
+  const [confirmDelete, setConfirmDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [soatSearch, setSoatSearch] = useState('');
+  const [rtmSearch, setRtmSearch] = useState('');
 
   const getVehiculo = (vehiculoId) =>
     vehiculos.find((v) => String(v.id) === String(vehiculoId));
+
+  const filteredSoats = useMemo(
+    () =>
+      soats.filter((soat) => {
+        const vehiculo = getVehiculo(soat.vehiculoId);
+        const placa = getVehicleLabel(vehiculo);
+        return matchesSearch(
+          [
+            placa,
+            getDocumentPlate(soat),
+            soat.numeroPoliza,
+            soat.aseguradora,
+            soat.fechaFinVigencia,
+            formatColombianDate(soat.fechaFinVigencia),
+            ...getStatusSearchValues(soat.estado),
+          ],
+          soatSearch
+        );
+      }),
+    [soats, soatSearch, vehiculos]
+  );
+
+  const filteredRtms = useMemo(
+    () =>
+      rtms.filter((rtm) => {
+        const vehiculo = getVehiculo(rtm.vehiculoId);
+        const placa = getVehicleLabel(vehiculo);
+        return matchesSearch(
+          [
+            placa,
+            getDocumentPlate(rtm),
+            rtm.numeroCertificado,
+            rtm.numeroRtm,
+            rtm.cda,
+            rtm.resultado,
+            rtm.fechaVencimiento,
+            formatColombianDate(rtm.fechaVencimiento),
+            ...getStatusSearchValues(rtm.estado),
+          ],
+          rtmSearch
+        );
+      }),
+    [rtms, rtmSearch, vehiculos]
+  );
 
   const handleDeleteConfirm = async () => {
     if (!confirmDelete) return;
@@ -43,191 +132,185 @@ export default function DocumentosPage() {
   };
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className={`min-h-screen p-8 ${isDarkMode ? 'bg-slate-950' : 'bg-gray-50'}`}>
       <Helmet>
         <title>Documentos | SYNTIX Drive Control</title>
       </Helmet>
 
-      {/* Header */}
-      <div className="mb-8 flex items-start justify-between gap-3 flex-wrap">
+      <div data-onboarding="documents-header" className="mb-8 flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-4xl font-extrabold text-syntix-navy mb-2">
-            Gestión de Documentos
+          <h1 className={`mb-2 text-4xl font-extrabold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>
+            Gestion de Documentos
           </h1>
-          <p className="text-gray-500 text-lg">Control de SOAT y Tecnomecánica</p>
+          <p className={`text-lg ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Control de SOAT y Tecnomecanica</p>
         </div>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={() => openModal('addDocument')}
-            style={{ background: '#111', color: '#fff', padding: '10px 16px', borderRadius: 10, fontWeight: 600, fontSize: 13, border: 'none', cursor: 'pointer' }}
+            data-onboarding="documents-add-soat"
+            className="bg-syntix-navy text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-syntix-navy/90"
           >
             + SOAT
           </button>
           <button
             type="button"
             onClick={() => openModal('addRtm')}
-            style={{ background: '#f3f4f6', color: '#111', padding: '10px 16px', borderRadius: 10, fontWeight: 600, fontSize: 13, border: 'none', cursor: 'pointer' }}
+            data-onboarding="documents-add-rtm"
+            className={`rounded-lg border px-4 py-2 text-sm font-semibold ${
+              isDarkMode
+                ? 'border-slate-700 bg-slate-900 text-slate-100 hover:bg-slate-800'
+                : 'border-gray-200 bg-white text-gray-900 hover:bg-gray-50'
+            }`}
           >
             + RTM
           </button>
         </div>
       </div>
 
-      {/* Tabla SOAT */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
-          <Shield className="w-6 h-6 text-syntix-navy" />
-          <h2 className="text-2xl font-bold text-syntix-navy">Pólizas SOAT</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px]">
-            <thead className="bg-gray-50 text-left">
-              <tr>
-                <th className="px-6 py-4 text-syntix-navy font-bold">Vehículo</th>
-                <th className="px-6 py-4 text-syntix-navy font-bold">N° Póliza</th>
-                <th className="px-6 py-4 text-syntix-navy font-bold">Vencimiento</th>
-                <th className="px-6 py-4 text-syntix-navy font-bold">Días Restantes</th>
-                <th className="px-6 py-4 text-syntix-navy font-bold">Estado</th>
-                <th className="px-6 py-4 text-syntix-navy font-bold">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {soats.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
-                    No hay SOATs registrados.
-                  </td>
-                </tr>
-              ) : (
-                soats.map((s) => {
-                  const vehiculo = getVehiculo(s.vehiculoId);
-                  return (
-                    <tr key={s.id} className="border-t border-gray-100 hover:bg-gray-50">
-                      <td className="px-6 py-4 font-bold text-gray-900">
-                        {vehiculo ? vehiculo.placa : 'Vehículo no encontrado'}
-                      </td>
-                      <td className="px-6 py-4 text-gray-700">{s.numeroPoliza}</td>
-                      <td className="px-6 py-4 text-gray-700">{s.fechaVencimiento}</td>
-                      <td className="px-6 py-4 text-gray-700">{s.diasRestantes} días</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getBadgeClasses(s.estado)}`}>
-                          {s.estado}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setSoatEditando(s)}
-                            className="p-2 rounded-lg text-gray-400 hover:text-syntix-navy hover:bg-gray-100 transition-colors"
-                            title="Editar"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setConfirmDelete({ tipo: 'soat', id: s.id, nombre: s.numeroPoliza })}
-                            className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                            title="Eliminar"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <DocumentTableShell
+        onboardingId="documents-soat-table"
+        icon={Shield}
+        title="Polizas SOAT"
+        count={filteredSoats.length}
+        total={soats.length}
+        searchTerm={soatSearch}
+        onSearchChange={setSoatSearch}
+        placeholder="Buscar SOAT por placa, poliza, aseguradora, estado o vencimiento..."
+        isDarkMode={isDarkMode}
+      >
+        <table className="w-full min-w-[1100px]">
+          <thead className={`text-left ${isDarkMode ? 'bg-slate-950' : 'bg-gray-50'}`}>
+            <tr>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Vehiculo</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>N° Poliza</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Aseguradora</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Inicio</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Fin vigencia</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Estado</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredSoats.length === 0 ? (
+              <EmptyRows colSpan={7} hasData={soats.length > 0} isDarkMode={isDarkMode} />
+            ) : (
+              filteredSoats.map((soat) => {
+                const vehiculo = getVehiculo(soat.vehiculoId);
+                const placa = getVehicleLabel(vehiculo);
+                const expirationText = getExpirationAlertText(soat.diasRestantes, soat.fechaFinVigencia);
 
-      {/* Tabla RTM */}
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-100">
-          <Wrench className="w-6 h-6 text-syntix-navy" />
-          <h2 className="text-2xl font-bold text-syntix-navy">Revisiones Técnico-Mecánicas</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px]">
-            <thead className="bg-gray-50 text-left">
-              <tr>
-                <th className="px-6 py-4 text-syntix-navy font-bold">Vehículo</th>
-                <th className="px-6 py-4 text-syntix-navy font-bold">N° RTM</th>
-                <th className="px-6 py-4 text-syntix-navy font-bold">Vencimiento</th>
-                <th className="px-6 py-4 text-syntix-navy font-bold">Días Restantes</th>
-                <th className="px-6 py-4 text-syntix-navy font-bold">Estado</th>
-                <th className="px-6 py-4 text-syntix-navy font-bold">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rtms.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
-                    No hay RTMs registradas.
-                  </td>
-                </tr>
-              ) : (
-                rtms.map((r) => {
-                  const vehiculo = getVehiculo(r.vehiculoId);
-                  return (
-                    <tr key={r.id} className="border-t border-gray-100 hover:bg-gray-50">
-                      <td className="px-6 py-4 font-bold text-gray-900">
-                        {vehiculo ? vehiculo.placa : 'Vehículo no encontrado'}
-                      </td>
-                      <td className="px-6 py-4 text-gray-700">{r.numeroRtm}</td>
-                      <td className="px-6 py-4 text-gray-700">{r.fechaVencimiento}</td>
-                      <td className="px-6 py-4 text-gray-700">{r.diasRestantes} días</td>
-                      <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getBadgeClasses(r.estado)}`}>
-                          {r.estado}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setRtmEditando(r)}
-                            className="p-2 rounded-lg text-gray-400 hover:text-syntix-navy hover:bg-gray-100 transition-colors"
-                            title="Editar"
-                          >
-                            <Pencil className="w-4 h-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setConfirmDelete({ tipo: 'rtm', id: r.id, nombre: r.numeroRtm })}
-                            className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                            title="Eliminar"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                return (
+                  <tr key={soat.id} className={`border-t ${isDarkMode ? 'border-slate-800 hover:bg-slate-800/70' : 'border-gray-100 hover:bg-gray-50'}`}>
+                    <td className="px-6 py-4">
+                      <div className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{placa}</div>
+                      <div className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{getVehicleSubtitle(vehiculo)}</div>
+                    </td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{soat.numeroPoliza}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{soat.aseguradora || 'Sin dato'}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{formatColombianDate(soat.fechaInicioVigencia)}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>
+                      <div>{formatColombianDate(soat.fechaFinVigencia)}</div>
+                      <div className={`mt-1 text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{expirationText.primaryText}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getBadgeClasses(soat.estado)}`}>
+                        {statusLabels[soat.estado] || soat.estado}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <RowActions
+                        onEdit={() => setSoatEditando(soat)}
+                        onDelete={() => setConfirmDelete({ tipo: 'soat', id: soat.id, nombre: soat.numeroPoliza })}
+                        isDarkMode={isDarkMode}
+                      />
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </DocumentTableShell>
 
-      {/* Modal confirmación eliminar */}
+      <DocumentTableShell
+        onboardingId="documents-rtm-table"
+        icon={Wrench}
+        title="Revisiones Tecnico-Mecanicas"
+        count={filteredRtms.length}
+        total={rtms.length}
+        searchTerm={rtmSearch}
+        onSearchChange={setRtmSearch}
+        placeholder="Buscar RTM por placa, certificado, CDA, resultado, estado o vencimiento..."
+        isDarkMode={isDarkMode}
+      >
+        <table className="w-full min-w-[1100px]">
+          <thead className={`text-left ${isDarkMode ? 'bg-slate-950' : 'bg-gray-50'}`}>
+            <tr>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Vehiculo</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Certificado</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>CDA</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Resultado</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Vencimiento</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Estado</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredRtms.length === 0 ? (
+              <EmptyRows colSpan={7} hasData={rtms.length > 0} isDarkMode={isDarkMode} />
+            ) : (
+              filteredRtms.map((rtm) => {
+                const vehiculo = getVehiculo(rtm.vehiculoId);
+                const placa = getVehicleLabel(vehiculo);
+                const expirationText = getExpirationAlertText(rtm.diasRestantes, rtm.fechaVencimiento);
+
+                return (
+                  <tr key={rtm.id} className={`border-t ${isDarkMode ? 'border-slate-800 hover:bg-slate-800/70' : 'border-gray-100 hover:bg-gray-50'}`}>
+                    <td className="px-6 py-4">
+                      <div className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{placa}</div>
+                      <div className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{getVehicleSubtitle(vehiculo)}</div>
+                    </td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{rtm.numeroCertificado}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{rtm.cda || 'Sin dato'}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{rtm.resultado || 'Sin dato'}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>
+                      <div>{formatColombianDate(rtm.fechaVencimiento)}</div>
+                      <div className={`mt-1 text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{expirationText.primaryText}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getBadgeClasses(rtm.estado)}`}>
+                        {statusLabels[rtm.estado] || rtm.estado}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <RowActions
+                        onEdit={() => setRtmEditando(rtm)}
+                        onDelete={() => setConfirmDelete({ tipo: 'rtm', id: rtm.id, nombre: rtm.numeroCertificado })}
+                        isDarkMode={isDarkMode}
+                      />
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </DocumentTableShell>
+
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">¿Eliminar documento?</h2>
-            <p className="text-gray-500 mb-6">
-              Vas a eliminar <span className="font-bold text-gray-800">{confirmDelete.nombre}</span>. Esta acción no se puede deshacer.
+          <div className={`w-full max-w-md rounded-2xl p-6 shadow-2xl ${
+            isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-white'
+          }`}>
+            <h2 className={`mb-2 text-xl font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>Eliminar documento</h2>
+            <p className={`mb-6 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
+              Vas a eliminar <span className={`font-bold ${isDarkMode ? 'text-slate-200' : 'text-gray-800'}`}>{confirmDelete.nombre}</span>. Esta accion no se puede deshacer.
             </p>
             <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setConfirmDelete(null)}
-                className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg"
-              >
+              <button type="button" onClick={() => setConfirmDelete(null)} className={`rounded-lg px-4 py-2 font-medium ${
+                isDarkMode ? 'text-slate-300 hover:bg-slate-800' : 'text-gray-600 hover:bg-gray-100'
+              }`}>
                 Cancelar
               </button>
               <button
@@ -236,26 +319,102 @@ export default function DocumentosPage() {
                 disabled={deleting}
                 className="bg-red-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-red-600 disabled:opacity-60"
               >
-                {deleting ? 'Eliminando...' : 'Sí, eliminar'}
+                {deleting ? 'Eliminando...' : 'Si, eliminar'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Modales de edición */}
-      <EditSoatModal
-        isOpen={!!soatEditando}
-        soat={soatEditando}
-        onClose={() => setSoatEditando(null)}
-      />
-      <EditRtmModal
-        isOpen={!!rtmEditando}
-        rtm={rtmEditando}
-        onClose={() => setRtmEditando(null)}
-      />
-
+      <EditSoatModal isOpen={!!soatEditando} soat={soatEditando} onClose={() => setSoatEditando(null)} />
+      <EditRtmModal isOpen={!!rtmEditando} rtm={rtmEditando} onClose={() => setRtmEditando(null)} />
       <ModalFactory modalType={activeModal} onClose={closeModal} />
+    </div>
+  );
+}
+
+function DocumentTableShell({
+  onboardingId,
+  icon: Icon,
+  title,
+  count,
+  total,
+  searchTerm,
+  onSearchChange,
+  placeholder,
+  children,
+  isDarkMode,
+}) {
+  return (
+    <div data-onboarding={onboardingId} className={`mb-8 overflow-hidden rounded-3xl border shadow-sm ${
+      isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
+    }`}>
+      <div className={`flex flex-col justify-between gap-4 border-b px-6 py-5 lg:flex-row lg:items-center ${
+        isDarkMode ? 'border-slate-800 bg-slate-950/60' : 'border-gray-100'
+      }`}>
+        <div className="flex items-center gap-3">
+          <Icon className={`w-6 h-6 ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`} />
+          <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>
+            {title} ({count}/{total})
+          </h2>
+        </div>
+        <div className="relative w-full lg:w-96">
+          <Search className={`absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder={placeholder}
+            className={`w-full rounded-lg border py-2 pl-9 pr-4 text-sm outline-none focus:border-syntix-green focus:ring-2 focus:ring-syntix-green ${
+              isDarkMode
+                ? 'border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-500'
+                : 'border-gray-300 bg-white text-gray-900'
+            }`}
+          />
+        </div>
+      </div>
+      <div className="overflow-x-auto">{children}</div>
+    </div>
+  );
+}
+
+function EmptyRows({ colSpan, hasData, isDarkMode }) {
+  return (
+    <tr>
+      <td colSpan={colSpan} className={`px-6 py-8 text-center ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
+        {hasData ? 'No se encontraron registros con ese criterio.' : 'No hay registros para mostrar.'}
+      </td>
+    </tr>
+  );
+}
+
+function RowActions({ onEdit, onDelete, isDarkMode }) {
+  return (
+    <div className="flex gap-2">
+      <button
+        type="button"
+        onClick={onEdit}
+        className={`rounded-lg p-2 transition-colors ${
+          isDarkMode
+            ? 'text-slate-500 hover:bg-slate-800 hover:text-slate-100'
+            : 'text-gray-400 hover:bg-gray-100 hover:text-syntix-navy'
+        }`}
+        title="Editar"
+      >
+        <Pencil className="w-4 h-4" />
+      </button>
+      <button
+        type="button"
+        onClick={onDelete}
+        className={`rounded-lg p-2 transition-colors ${
+          isDarkMode
+            ? 'text-slate-500 hover:bg-red-500/10 hover:text-red-300'
+            : 'text-gray-400 hover:bg-red-50 hover:text-red-500'
+        }`}
+        title="Eliminar"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
     </div>
   );
 }

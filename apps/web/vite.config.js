@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename)
 
 export default defineConfig({
   plugins: [react()],
+  envDir: path.resolve(__dirname, '../..'),
   resolve: {
     alias: {
       // El alias @ evita imports relativos largos dentro de src.
