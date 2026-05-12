@@ -32,6 +32,8 @@ export default function DashboardPage() {
 
   const recentVehicles = useMemo(() => vehiculos.slice(-3).reverse(), [vehiculos]);
   const openVehicleModal = () => openModal('addVehicle');
+  // Estos colores viven en variables porque esta vista usa estilos inline y
+  // necesitábamos adaptar el contraste al modo oscuro sin reescribirla completa.
   const pageTextColor = isDarkMode ? '#e2e8f0' : '#111827';
   const mutedTextColor = isDarkMode ? '#94a3b8' : '#555';
   const secondaryTextColor = isDarkMode ? '#64748b' : '#888';
@@ -90,6 +92,8 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 12, marginTop: 14 }}>
+        {/* Cada tarjeta usa helpers inline para mantener la compatibilidad con
+            la implementación original del dashboard y aun así soportar dark mode. */}
         <div data-onboarding="dashboard-quick-actions" style={card(isDarkMode)}>
           <h2 style={h2(isDarkMode)}>Accesos rápidos</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 10 }}>
@@ -184,6 +188,8 @@ const card = (isDarkMode) => ({
   boxShadow: isDarkMode ? '0 1px 8px rgba(0,0,0,0.18)' : '0 1px 8px rgba(0,0,0,0.04)',
 });
 
+// Los helpers siguientes encapsulan los estilos repetidos del dashboard para
+// que el ajuste de tema oscuro no quede disperso en JSX difícil de mantener.
 const h2 = (isDarkMode) => ({ margin: 0, fontSize: 16, color: isDarkMode ? '#f8fafc' : '#111827' });
 
 const btnPrimary = (isDarkMode) => ({

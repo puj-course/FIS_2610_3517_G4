@@ -11,11 +11,14 @@ const {
 const { loadProjectEnv } = require('../config/load-env');
 
 const args = process.argv.slice(2);
+// `--no-connect` valida config/DNS sin abrir sesión real con Mongo.
 const noConnect = args.includes('--no-connect');
+// `--ci` tolera placeholders para que el pipeline no necesite secretos reales.
 const ciMode = args.includes('--ci');
 const envFileArg = args.find((arg) => arg.startsWith('--env-file='));
 
 const explicitEnvFile = envFileArg ? envFileArg.split('=')[1] : null;
+// Reutiliza el mismo cargador de variables del backend para evitar diferencias de entorno.
 const loadedEnvSources = loadProjectEnv({ explicitEnvFile });
 if (loadedEnvSources.length === 0) {
   console.error('[AUTH-DOCTOR] No se encontro archivo de entorno (.env, backend/.env o backend/.env.example).');
@@ -24,6 +27,7 @@ if (loadedEnvSources.length === 0) {
 
 console.log(`[AUTH-DOCTOR] Variables cargadas desde ${loadedEnvSources.join(', ')}`);
 
+// Estas claves mínimas sostienen auth, OTP y notificaciones.
 const requiredKeys = ['PORT', 'EMAIL_HOST', 'EMAIL_PORT', 'OTP_EXPIRACION_MINUTOS', 'OTP_MAX_INTENTOS', 'OTP_COOLDOWN_SEGUNDOS'];
 const missing = requiredKeys.filter((key) => !String(process.env[key] || '').trim());
 
@@ -34,6 +38,7 @@ if (missing.length > 0) {
 
 const mongoErrors = getMongoConfigErrors(process.env);
 const isCiOrNoConnect = ciMode || noConnect;
+// En CI se ignoran placeholders, pero no errores reales de configuración incompleta.
 const nonPlaceholderMongoErrors = mongoErrors.filter((error) => !error.includes('placeholders'));
 
 if (nonPlaceholderMongoErrors.length > 0) {
@@ -53,6 +58,7 @@ if (!validMongoPrefix) {
 }
 
 const getHosts = (uri) => {
+  // Las URIs SRV contienen un solo host semilla; luego DNS resuelve el resto.
   if (uri.startsWith('mongodb+srv://')) {
     const withoutProtocol = uri.replace('mongodb+srv://', '');
     const afterCreds = withoutProtocol.includes('@') ? withoutProtocol.split('@')[1] : withoutProtocol;
@@ -60,6 +66,7 @@ const getHosts = (uri) => {
     return host ? [host] : [];
   }
 
+  // Las URIs directas pueden contener varios hosts separados por coma.
   const withoutProtocol = uri.replace('mongodb://', '');
   const afterCreds = withoutProtocol.includes('@') ? withoutProtocol.split('@')[1] : withoutProtocol;
   const hostSegment = afterCreds.split('/')[0];
@@ -83,6 +90,7 @@ const hasPlaceholderCredentials =
 
 const lookupHosts = async () => {
   if (isSrvUri) {
+    // Para SRV primero resolvemos `_mongodb._tcp.<host>` y luego cada target resultante.
     console.log(`[AUTH-DOCTOR] Verificando SRV de ${hosts.length} host(s)...`);
     for (const host of hosts) {
       try {
@@ -107,6 +115,7 @@ const lookupHosts = async () => {
     return;
   }
 
+  // En URIs directas basta con resolver cada host declarado.
   console.log(`[AUTH-DOCTOR] Verificando DNS de ${hosts.length} host(s)...`);
   for (const host of hosts) {
     try {
@@ -121,6 +130,7 @@ const lookupHosts = async () => {
 
 const getPublicIp = () =>
   new Promise((resolve) => {
+    // Se usa ipify solo para ayudar al usuario a whitelistear la IP correcta en Atlas.
     const req = https.get('https://api.ipify.org', (res) => {
       let data = '';
       res.on('data', (chunk) => {
@@ -141,10 +151,12 @@ const getPublicIp = () =>
 const testMongoConnection = async () => {
   console.log('[AUTH-DOCTOR] Probando conexion real a MongoDB Atlas...');
   try {
+    // Si conecta aquí, auth y correo ya tienen la base lista para operar.
     await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000 });
     console.log('[AUTH-DOCTOR] Conexion MongoDB OK');
     await mongoose.disconnect();
   } catch (error) {
+    // El diagnóstico muestra además la IP pública para acelerar el ajuste en Network Access.
     const publicIp = await getPublicIp();
     const message = String(error?.message || '').toLowerCase();
     console.error(`[AUTH-DOCTOR] Error de conexion MongoDB: ${error.name}: ${error.message}`);
@@ -164,6 +176,7 @@ const testMongoConnection = async () => {
 
 (async () => {
   if (hasPlaceholderHosts || hasPlaceholderCredentials) {
+    // En CI/no-connect se permite seguir porque el objetivo es validar estructura, no secretos reales.
     if (isCiOrNoConnect) {
       console.log('[AUTH-DOCTOR] Se detectaron placeholders en la configuracion Mongo. Se omite DNS en modo CI/no-connect.');
     } else {
@@ -175,6 +188,7 @@ const testMongoConnection = async () => {
   }
 
   if (noConnect) {
+    // Corta después de validar entorno y DNS.
     console.log('[AUTH-DOCTOR] Modo --no-connect activado. Se omite prueba de conexion Mongo.');
     process.exit(0);
   }

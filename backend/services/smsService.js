@@ -3,9 +3,11 @@ const axios = require('axios');
 const TWILIO_ACCOUNT_SID = String(process.env.TWILIO_ACCOUNT_SID || '').trim();
 const TWILIO_AUTH_TOKEN = String(process.env.TWILIO_AUTH_TOKEN || '').trim();
 const TWILIO_PHONE_NUMBER = String(process.env.TWILIO_PHONE_NUMBER || '').trim();
+// El servicio SMS es opcional y actúa como fallback cuando falla el correo.
 const SMS_ENABLED = Boolean(TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN && TWILIO_PHONE_NUMBER);
 
 async function enviarCodigoRecuperacionSms(phoneNumber, nombre, codigo) {
+  // Si no hay credenciales Twilio, el backend responde error controlado y no intenta el request.
   if (!SMS_ENABLED) {
     throw new Error(
       'Servicio SMS no configurado: faltan TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN o TWILIO_PHONE_NUMBER.'
@@ -13,6 +15,7 @@ async function enviarCodigoRecuperacionSms(phoneNumber, nombre, codigo) {
   }
 
   const body = new URLSearchParams({
+    // Twilio espera payload x-www-form-urlencoded con estos tres campos obligatorios.
     To: phoneNumber,
     From: TWILIO_PHONE_NUMBER,
     Body: `Drive Control: ${nombre || 'Usuario'}, tu codigo de recuperacion es ${codigo}. Expira en ${process.env.OTP_EXPIRACION_MINUTOS || 10} minutos.`,
@@ -33,6 +36,7 @@ async function enviarCodigoRecuperacionSms(phoneNumber, nombre, codigo) {
     }
   );
 
+  // Si no hay SID, Twilio no confirmó realmente la creación del mensaje.
   if (!response?.data?.sid) {
     throw new Error('Twilio no confirmo el envio del SMS.');
   }

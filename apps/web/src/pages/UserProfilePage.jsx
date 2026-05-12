@@ -29,6 +29,8 @@ export default function UserProfilePage() {
   );
 
   const recentVehicles = useMemo(() => vehiculos.slice(-3).reverse(), [vehiculos]);
+  // El avatar toma la inicial de empresa/correo para no depender de una imagen
+  // que todavía no existe en el MVP del perfil.
   const userInitial = useMemo(
     () => String(user?.empresa || user?.email || 'U').charAt(0).toUpperCase(),
     [user?.empresa, user?.email]
@@ -43,6 +45,8 @@ export default function UserProfilePage() {
       <section className={`overflow-hidden rounded-3xl border shadow-sm ${
         isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
       }`}>
+        {/* Hero del perfil: concentra identidad de usuario, acceso a tema oscuro
+            y accesos rápidos hacia los módulos más relacionados. */}
         <div className={`flex flex-col gap-6 px-6 py-8 text-white lg:flex-row lg:items-center lg:justify-between ${
           isDarkMode ? 'bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800' : 'bg-gradient-to-r from-syntix-navy to-slate-800'
         }`}>
@@ -115,6 +119,8 @@ export default function UserProfilePage() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
+        {/* Las tarjetas resumen reutilizan datos ya presentes en hooks del sistema
+            para evitar duplicar consultas o crear otra fuente de verdad. */}
         {stats.map((stat) => (
           <article key={stat.label} className={`rounded-2xl border p-5 shadow-sm ${
             isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'

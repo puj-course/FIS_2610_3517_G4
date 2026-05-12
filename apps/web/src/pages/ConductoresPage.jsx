@@ -66,6 +66,8 @@ export default function ConductoresPage() {
 
   const filtered = conductores.filter(
     (c) => {
+      // La búsqueda también contempla el vehículo asignado porque en operación
+      // muchas veces se recuerda el conductor por la placa y no por el nombre.
       const query = searchTerm.toLowerCase();
       const assignedVehicleLabel = getAssignedVehicleLabel(c, vehiculos).toLowerCase();
 
@@ -98,6 +100,8 @@ export default function ConductoresPage() {
       <div className={`overflow-hidden rounded-2xl border shadow-sm ${
         isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
       }`}>
+        {/* La tabla mezcla datos del conductor y del vehículo asignado para
+            resolver la trazabilidad sin tener que navegar entre módulos. */}
         <div className={`border-b p-4 ${isDarkMode ? 'border-slate-800 bg-slate-950/60' : 'border-gray-100 bg-gray-50/50'}`}>
           <div data-onboarding="conductors-search" className="relative w-full sm:w-96">
             <Search className={`absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />

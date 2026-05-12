@@ -30,6 +30,7 @@ export default function Header({ toggleSidebar }) {
       isDarkMode ? 'bg-slate-900 border-b border-slate-800' : 'bg-syntix-navy'
     }`}>
       <div className="flex items-center gap-4">
+        {/* El botón móvil abre el sidebar sin duplicar navegación dentro del contenido. */}
         <button onClick={toggleSidebar} className="lg:hidden p-2 text-gray-300 hover:bg-white/10 rounded-md">
           <Menu className="w-5 h-5" />
         </button>
@@ -41,6 +42,8 @@ export default function Header({ toggleSidebar }) {
       </div>
 
       <div className="flex items-center gap-4">
+        {/* El tutorial sigue accesible desde la cabecera para no perderse cuando
+            el usuario navega entre módulos del dashboard. */}
         <button
           type="button"
           onClick={startTour}
@@ -54,6 +57,7 @@ export default function Header({ toggleSidebar }) {
           <Sparkles className="w-4 h-4" />
           Tutorial
         </button>
+        {/* El centro de alertas conserva acceso rápido desde cualquier módulo. */}
         <button
           onClick={handleAlertsClick}
           className={`relative rounded-full p-2 ${

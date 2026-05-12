@@ -41,6 +41,8 @@ export default function AlertasPage() {
   const alertCount = alerts.length;
 
   const groupedAlerts = useMemo(() => {
+    // Se agrupan por categoría y subgrupo para que el usuario entienda rápido
+    // si el problema pertenece a vehículos, licencias u otro frente operativo.
     return alerts.reduce((acc, alert) => {
       const category = alert.categoria || 'general';
       const group = alert.grupo || alert.tipo || 'General';
@@ -145,6 +147,8 @@ function AlertSection({
   const Icon = isOpen ? ChevronDown : ChevronRight;
 
   return (
+    // Cada sección agrupa una familia de alertas y puede contraerse para
+    // mantener la vista compacta incluso cuando el volumen crece.
     <section className={`overflow-hidden rounded-xl border ${
       isDarkMode ? 'border-slate-800 bg-slate-950/60' : 'border-gray-100 bg-gray-50/60'
     }`}>

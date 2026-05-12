@@ -58,6 +58,8 @@ const getStatusSearchValues = (estado) => [
   estado === 'rojo' ? 'vencido critico' : '',
 ];
 
+// DocumentosPage organiza SOAT y RTM en una sola vista para que el usuario
+// revise el estado documental sin saltar entre dos módulos distintos.
 export default function DocumentosPage() {
   const { soats, removeSoat } = useDocuments();
   const { rtms, removeRtm } = useRtm();
@@ -78,6 +80,8 @@ export default function DocumentosPage() {
   const filteredSoats = useMemo(
     () =>
       soats.filter((soat) => {
+        // Se indexan tanto placa como fechas y estado para permitir búsquedas
+        // operativas más flexibles en una tabla grande.
         const vehiculo = getVehiculo(soat.vehiculoId);
         const placa = getVehicleLabel(vehiculo);
         return matchesSearch(
@@ -346,6 +350,8 @@ function DocumentTableShell({
   isDarkMode,
 }) {
   return (
+    // Este shell reutilizable evita duplicar la estructura visual de SOAT y RTM
+    // y deja el comportamiento de dark mode centralizado en un solo punto.
     <div data-onboarding={onboardingId} className={`mb-8 overflow-hidden rounded-3xl border shadow-sm ${
       isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
     }`}>

@@ -38,6 +38,8 @@ export default function UserProfileDropdown({ variant = 'light' }) {
     : 'flex items-center gap-3 rounded-full p-1.5 transition-colors focus:outline-none hover:bg-gray-100';
   const companyClassName = isDark ? 'text-sm font-bold text-white' : 'text-sm font-bold text-syntix-navy';
   const emailClassName = isDark ? 'text-xs text-gray-300' : 'text-xs text-gray-500';
+  // El menú oscuro solo se aplica dentro del header autenticado cuando además
+  // el modo oscuro está activo; así evitamos romper el header público.
   const useDarkMenu = isDark && isDarkMode;
   const menuClassName = useDarkMenu
     ? 'absolute right-0 z-50 mt-2 w-56 rounded-xl border border-slate-800 bg-slate-900 py-2 shadow-lg animate-in fade-in slide-in-from-top-2 duration-200'
@@ -63,6 +65,8 @@ export default function UserProfileDropdown({ variant = 'light' }) {
 
       {isOpen && (
         <div className={menuClassName}>
+          {/* Este bloque solo se muestra en móvil porque en desktop ya se ve
+              empresa/correo al lado del avatar dentro del trigger. */}
           <div className={`border-b px-4 py-3 md:hidden ${useDarkMenu ? 'border-slate-800' : 'border-gray-100'}`}>
             <p className={`truncate text-sm font-bold ${useDarkMenu ? 'text-slate-100' : 'text-gray-900'}`}>{user.empresa}</p>
             <p className={`truncate text-xs ${useDarkMenu ? 'text-slate-400' : 'text-gray-500'}`}>{user.email}</p>

@@ -6,29 +6,39 @@ import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const isValidRecoveryIdentifier = (value) => {
+  // Se acepta correo o un teléfono con longitud suficiente para cubrir recuperación por SMS.
   const normalizedValue = String(value || '').trim();
   return EMAIL_REGEX.test(normalizedValue) || normalizedValue.replace(/\D/g, '').length >= 7;
 };
 
 // Modal ligero para autenticación desde la landing sin abandonar el flujo público.
 export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
+  // `mode` controla las tres pantallas internas del mismo modal: login, recover y reset.
   const [mode, setMode] = useState('login');
+  // Credenciales del acceso tradicional.
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // Datos de recuperación de cuenta.
   const [resetIdentifier, setResetIdentifier] = useState('');
   const [resetCode, setResetCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  // `recoveryToken` amarra el segundo paso al intento de recuperación emitido por backend.
   const [recoveryToken, setRecoveryToken] = useState('');
+  // Estos dos valores permiten decirle al usuario por dónde fue enviado el código.
   const [resetChannel, setResetChannel] = useState('');
   const [resetDestinationHint, setResetDestinationHint] = useState('');
+  // Los toggles separan la visibilidad de la contraseña actual y la nueva.
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
+  // `error` y `notice` pintan feedback contextual según el paso actual.
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  // Se usa un único flag para deshabilitar envíos simultáneos.
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login, loginWithGoogle } = useAuth();
 
+  // El modal se desmonta por completo cuando no está abierto.
   if (!isOpen) return null;
 
   const clearMessages = () => {
@@ -37,6 +47,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   };
 
   const goToLogin = () => {
+    // Al volver al login se limpia cualquier residuo del flujo de recuperación.
     clearMessages();
     setRecoveryToken('');
     setResetChannel('');
@@ -45,6 +56,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   };
 
   const goToRecover = () => {
+    // Si el usuario ya escribió un correo en login, se reutiliza como pista inicial.
     clearMessages();
     setResetIdentifier(email.trim().toLowerCase());
     setResetCode('');
@@ -62,6 +74,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     setIsSubmitting(true);
 
     try {
+      // El contexto resuelve si autentica vía backend o fallback local.
       const res = await login(email, password);
       if (res.success) {
         onClose();
@@ -77,6 +90,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   };
 
   const handleGoogleLogin = async (credential) => {
+    // Sin credential no tiene sentido llamar al backend.
     if (!credential) {
       setError('Google no devolvio un token valido.');
       return;
@@ -86,6 +100,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     setIsSubmitting(true);
 
     try {
+      // Para login con Google no se envían empresa/teléfono; eso solo es obligatorio al crear cuenta.
       const res = await loginWithGoogle({ idToken: credential });
       if (res.success) {
         onClose();
@@ -100,6 +115,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const handleRecoverSubmit = async (e) => {
     e.preventDefault();
     clearMessages();
+    // El identificador puede ser correo o teléfono según lo que el usuario recuerde.
     const normalizedIdentifier = resetIdentifier.trim();
 
     if (!isValidRecoveryIdentifier(normalizedIdentifier)) {
@@ -110,10 +126,12 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     setIsSubmitting(true);
 
     try {
+      // El backend decide si responde mensaje genérico o habilita el paso de reset con token.
       const res = await authService.solicitarRecuperacion(normalizedIdentifier);
 
       if (res.success) {
         if (res.data?.recoveryToken) {
+          // Si hay token, el backend ya emitió el OTP y podemos pasar al paso 2.
           setRecoveryToken(res.data.recoveryToken);
           setResetChannel(res.data.channel || '');
           setResetDestinationHint(res.data.destinationHint || '');
@@ -123,6 +141,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
           setNotice(res.message || 'Codigo enviado al contacto registrado.');
           setMode('reset');
         } else {
+          // Respuesta genérica para no filtrar si la cuenta realmente existe.
           setNotice(res.message || 'Si existe una cuenta asociada, enviaremos un codigo al contacto registrado.');
         }
       } else {
@@ -138,6 +157,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   const handleResetSubmit = async (e) => {
     e.preventDefault();
     clearMessages();
+    // El código se limpia para evitar espacios y caracteres extraños.
     const normalizedCode = resetCode.trim();
 
     if (!recoveryToken) {
@@ -163,9 +183,11 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     setIsSubmitting(true);
 
     try {
+      // El backend valida token, OTP y contraseña nueva en una sola operación.
       const res = await authService.restablecerPassword(recoveryToken, normalizedCode, newPassword);
 
       if (res.success) {
+        // Se deja precargado el correo recuperado para facilitar el login posterior.
         setEmail(res.data?.email || '');
         setPassword('');
         setResetCode('');
@@ -188,6 +210,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   };
 
   const titleByMode = {
+    // El título cambia con el paso para evitar renderizar modales distintos.
     login: 'Iniciar Sesion',
     recover: 'Recuperar Cuenta',
     reset: 'Nueva Contrasena',
@@ -218,7 +241,9 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
         {mode === 'login' && (
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            {/* Error de negocio o validación del backend/local fallback. */}
             {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}
+            {/* Aviso positivo como recuperación completada o código enviado. */}
             {notice && <div className="p-3 bg-green-50 text-syntix-green text-sm rounded-lg border border-green-100">{notice}</div>}
 
             <div>
@@ -275,6 +300,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
             <div className="flex justify-center">
               <GoogleAuthButton
+                // El modal solo transforma el credential de Google en login federado del contexto.
                 onSuccess={handleGoogleLogin}
                 onError={() => setError('No se pudo completar la autenticacion con Google.')}
                 disabled={isSubmitting}
@@ -299,6 +325,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
                 <input type="text" required value={resetIdentifier} onChange={e => setResetIdentifier(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="admin@empresa.com o 3001234567" />
               </div>
               <p className="mt-2 text-xs text-gray-500">
+                {/* Se deja explícito que ambos canales apuntan a la misma cuenta. */}
                 Puedes iniciar la recuperacion con el correo registrado o con el telefono asociado a tu cuenta.
               </p>
             </div>
@@ -316,6 +343,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
             <div className="flex items-center gap-2 text-sm text-gray-600">
               <ShieldCheck className="w-4 h-4 text-syntix-green" />
               <span>
+                {/* Este texto confirma si el backend tuvo que degradar de email a SMS. */}
                 {resetChannel === 'sms' ? 'SMS enviado a ' : 'Codigo enviado a '}
                 {resetDestinationHint || 'tu contacto registrado'}
               </span>
