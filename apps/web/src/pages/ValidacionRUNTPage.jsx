@@ -3,10 +3,10 @@ import { Helmet } from 'react-helmet';
 import { Search, Database, XCircle } from 'lucide-react';
 import ValidacionResultadoCard from '@/components/ValidacionResultadoCard.jsx';
 import { useTheme } from '@/contexts/ThemeContext.jsx';
+import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useRUNTSimulator } from '@/hooks/useRUNTSimulator.js';
 import { useValidationHistory } from '@/hooks/useValidationHistory.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
-import { useConductors } from '@/hooks/useConductors.js';
 
 // ValidacionRUNTPage orquesta la búsqueda externa simulada y la guarda como evidencia interna.
 export default function ValidacionRUNTPage() {
@@ -17,10 +17,10 @@ export default function ValidacionRUNTPage() {
   const [loading, setLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
 
+  const { user } = useAuth();
   const { searchByPlaca, searchByVIN } = useRUNTSimulator();
   const { addValidation } = useValidationHistory();
   const { vehiculos } = useVehicles();
-  const { conductores } = useConductors();
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -52,24 +52,27 @@ export default function ValidacionRUNTPage() {
     }, 600);
   };
 
-  const handleSaveValidation = () => {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
+  const handleSaveValidation = async () => {
     if (!result?.encontrado) return;
-
-    const vehiculoEnSistema = vehiculos.find(v => v.placa === result.data.placa);
-    const conductorAsignado = vehiculoEnSistema?.conductor;
-
-    // Se persiste solo la información útil de auditoría; no hace falta navegar
-    // fuera de la página para que la validación quede guardada.
-    addValidation(
-      result.data.placa,
-      result,
-      'usuario_actual'
-    );
-
-    // La confirmación explícita refuerza que la consulta quedó auditada en el historial.
-    alert('✅ Validación guardada correctamente en el historial');
-    setSearchInput('');
-    setResult(null);
+    setSaving(true);
+    setSaveError('');
+    try {
+      await addValidation(
+        result.data.placa,
+        result,
+        user?.email || 'Admin User',
+      );
+      setSearchInput('');
+      setResult(null);
+    } catch (err) {
+      console.error('Error guardando validacion RUNT:', err);
+      setSaveError('Error al guardar la validación. Intenta de nuevo.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -176,6 +179,13 @@ export default function ValidacionRUNTPage() {
         </form>
       </div>
 
+      {/* Error al guardar */}
+      {saveError && (
+        <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+          {saveError}
+        </div>
+      )}
+
       {/* Resultado */}
       {result && (
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -197,7 +207,7 @@ export default function ValidacionRUNTPage() {
               vehiculoSistema={vehiculos.find(v => v.placa === result.data.placa)}
               conductorAsignado={vehiculos.find(v => v.placa === result.data.placa)?.conductor}
               onGuardar={handleSaveValidation}
-              loading={loading}
+              loading={loading || saving}
               isDarkMode={isDarkMode}
             />
           )}

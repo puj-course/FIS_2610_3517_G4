@@ -1925,6 +1925,85 @@ app.delete('/api/rtms/:id', async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// HISTORIAL DE VALIDACIONES RUNT
+// ─────────────────────────────────────────────────────────────────────────────
+
+const ValidationHistorySchema = new mongoose.Schema({
+  placa: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now },
+  usuario: { type: String, required: true },
+  ownerEmail: { type: String, required: true },
+  resultadoRUNT: { type: mongoose.Schema.Types.Mixed, required: true },
+  notas: { type: String, default: '' },
+});
+
+ValidationHistorySchema.index({ ownerEmail: 1 });
+ValidationHistorySchema.index({ placa: 1 });
+
+const ValidationHistory = mongoose.model('ValidationHistory', ValidationHistorySchema);
+
+app.get('/api/validaciones', async (req, res) => {
+  try {
+    const email = normalizeEmail(req.query.email);
+    if (!email) return res.status(400).json({ error: 'El email es obligatorio.' });
+    const data = await ValidationHistory.find({ ownerEmail: email }).sort({ timestamp: -1 });
+    return res.json(data);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+app.post('/api/validaciones', async (req, res) => {
+  try {
+    const { placa, usuario, ownerEmail, resultadoRUNT, notas } = req.body;
+    const placaNorm = normalizeText(placa).toUpperCase();
+    const usuarioNorm = normalizeText(usuario);
+    const ownerEmailNorm = normalizeEmail(ownerEmail);
+
+    if (!placaNorm || !usuarioNorm || !ownerEmailNorm || !resultadoRUNT) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    const nueva = new ValidationHistory({
+      placa: placaNorm,
+      usuario: usuarioNorm,
+      ownerEmail: ownerEmailNorm,
+      resultadoRUNT,
+      notas: normalizeText(notas),
+      timestamp: new Date(),
+    });
+
+    await nueva.save();
+    return res.status(201).json(nueva);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+app.put('/api/validaciones/:id/notas', async (req, res) => {
+  try {
+    const validacion = await ValidationHistory.findById(req.params.id);
+    if (!validacion) return res.status(404).json({ error: 'Validación no encontrada.' });
+
+    validacion.notas = normalizeText(req.body.notas);
+    await validacion.save();
+    return res.json(validacion);
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+app.delete('/api/validaciones/:id', async (req, res) => {
+  try {
+    const eliminada = await ValidationHistory.findByIdAndDelete(req.params.id);
+    if (!eliminada) return res.status(404).json({ error: 'Validación no encontrada.' });
+    return res.json({ ok: true });
+  } catch (err) {
+    return res.status(400).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // SERVER
 // ─────────────────────────────────────────────────────────────────────────────
 
