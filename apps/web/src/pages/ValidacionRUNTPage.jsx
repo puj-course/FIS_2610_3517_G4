@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { Search, Database, XCircle } from 'lucide-react';
 import ValidacionResultadoCard from '@/components/ValidacionResultadoCard.jsx';
 import { useTheme } from '@/contexts/ThemeContext.jsx';
+import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useRUNTSimulator } from '@/hooks/useRUNTSimulator.js';
 import { useValidationHistory } from '@/hooks/useValidationHistory.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
@@ -17,6 +18,7 @@ export default function ValidacionRUNTPage() {
   const [loading, setLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
 
+  const { user } = useAuth();
   const { searchByPlaca, searchByVIN } = useRUNTSimulator();
   const { addValidation } = useValidationHistory();
   const { vehiculos } = useVehicles();
@@ -52,24 +54,26 @@ export default function ValidacionRUNTPage() {
     }, 600);
   };
 
-  const handleSaveValidation = () => {
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
+  const handleSaveValidation = async () => {
     if (!result?.encontrado) return;
-
-    const vehiculoEnSistema = vehiculos.find(v => v.placa === result.data.placa);
-    const conductorAsignado = vehiculoEnSistema?.conductor;
-
-    // Se persiste solo la información útil de auditoría; no hace falta navegar
-    // fuera de la página para que la validación quede guardada.
-    addValidation(
-      result.data.placa,
-      result,
-      'usuario_actual'
-    );
-
-    // La confirmación explícita refuerza que la consulta quedó auditada en el historial.
-    alert('✅ Validación guardada correctamente en el historial');
-    setSearchInput('');
-    setResult(null);
+    setSaving(true);
+    setSaveError('');
+    try {
+      await addValidation(
+        result.data.placa,
+        result,
+        user?.email || 'Admin User',
+      );
+      setSearchInput('');
+      setResult(null);
+    } catch (err) {
+      setSaveError('Error al guardar la validación. Intenta de nuevo.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -175,6 +179,13 @@ export default function ValidacionRUNTPage() {
           )}
         </form>
       </div>
+
+      {/* Error al guardar */}
+      {saveError && (
+        <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg border border-red-100">
+          {saveError}
+        </div>
+      )}
 
       {/* Resultado */}
       {result && (
