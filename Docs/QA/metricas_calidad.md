@@ -27,9 +27,11 @@ Estas métricas son propias del dominio funcional del sistema. Evalúan el estad
 
 ## Métricas SonarCloud
 
-- PR #564: Quality Gate falló por coverage de New Code en 72.5%, con umbral requerido de 80%.
+- PR #564: Quality Gate aprobado. Coverage on New Code: 83.7%. Duplication on New Code: 0.0%.
 - Maintainability: se priorizaron los code smells reportados en New Code para `qualityMetrics.js`, `ReportesPage.jsx`, `useValidationHistory.js` y `ValidacionRUNTPage.jsx`.
 - Duplications y Security Hotspots: sin fallas reportadas en la evidencia visual del PR #564.
+<img width="1904" height="940" alt="image" src="https://github.com/user-attachments/assets/c3f124b8-be26-4238-bef1-4f26529a8fb5" />
+
 
 ## Pendientes SonarCloud
 
