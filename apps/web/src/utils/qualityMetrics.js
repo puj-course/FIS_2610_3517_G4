@@ -67,7 +67,7 @@ const parseLocalDate = (value) => {
   }
 
   const dateText = String(value).trim();
-  const isoMatch = dateText.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})/.exec(dateText);
 
   if (isoMatch) {
     const [, year, month, day] = isoMatch;
@@ -145,16 +145,20 @@ const resolveDocumentState = (document, options = {}) => {
 
 const calculatePercentage = (part, total) => (total > 0 ? Math.round((part / total) * 100) : 0);
 
-const buildDocumentRecords = (data = {}) => [
-  ...asArray(data.soats),
-  ...asArray(data.rtms),
-  ...asArray(data.licenses),
-  ...asArray(data.licencias),
-  ...asArray(data.conductors),
-  ...asArray(data.conductores),
-  ...asArray(data.documents),
-  ...asArray(data.documentos),
-];
+const buildDocumentRecords = (data = {}) => {
+  const source = data ?? {};
+
+  return [
+    ...asArray(source.soats),
+    ...asArray(source.rtms),
+    ...asArray(source.licenses),
+    ...asArray(source.licencias),
+    ...asArray(source.conductors),
+    ...asArray(source.conductores),
+    ...asArray(source.documents),
+    ...asArray(source.documentos),
+  ];
+};
 
 const hasAnyField = (record, fieldNames) => fieldNames.some((fieldName) => hasValue(record?.[fieldName]));
 
@@ -171,16 +175,20 @@ const getDocumentCompletenessFields = (document) => {
   return GENERIC_DOCUMENT_REQUIRED_FIELDS;
 };
 
-const buildCompletenessRecords = (data = {}) => [
-  ...asArray(data.vehicles).map((record) => ({ record, requiredFields: VEHICLE_REQUIRED_FIELDS })),
-  ...asArray(data.vehiculos).map((record) => ({ record, requiredFields: VEHICLE_REQUIRED_FIELDS })),
-  ...asArray(data.conductors).map((record) => ({ record, requiredFields: CONDUCTOR_REQUIRED_FIELDS })),
-  ...asArray(data.conductores).map((record) => ({ record, requiredFields: CONDUCTOR_REQUIRED_FIELDS })),
-  ...asArray(data.soats).map((record) => ({ record, requiredFields: SOAT_REQUIRED_FIELDS })),
-  ...asArray(data.rtms).map((record) => ({ record, requiredFields: RTM_REQUIRED_FIELDS })),
-  ...asArray(data.documents).map((record) => ({ record, requiredFields: getDocumentCompletenessFields(record) })),
-  ...asArray(data.documentos).map((record) => ({ record, requiredFields: getDocumentCompletenessFields(record) })),
-];
+const buildCompletenessRecords = (data = {}) => {
+  const source = data ?? {};
+
+  return [
+    ...asArray(source.vehicles).map((record) => ({ record, requiredFields: VEHICLE_REQUIRED_FIELDS })),
+    ...asArray(source.vehiculos).map((record) => ({ record, requiredFields: VEHICLE_REQUIRED_FIELDS })),
+    ...asArray(source.conductors).map((record) => ({ record, requiredFields: CONDUCTOR_REQUIRED_FIELDS })),
+    ...asArray(source.conductores).map((record) => ({ record, requiredFields: CONDUCTOR_REQUIRED_FIELDS })),
+    ...asArray(source.soats).map((record) => ({ record, requiredFields: SOAT_REQUIRED_FIELDS })),
+    ...asArray(source.rtms).map((record) => ({ record, requiredFields: RTM_REQUIRED_FIELDS })),
+    ...asArray(source.documents).map((record) => ({ record, requiredFields: getDocumentCompletenessFields(record) })),
+    ...asArray(source.documentos).map((record) => ({ record, requiredFields: getDocumentCompletenessFields(record) })),
+  ];
+};
 
 const resolveRiskStatus = (percentage, total) => {
   if (total === 0) return 'neutral';
@@ -203,6 +211,78 @@ const resolveCriticalityStatus = (percentage, total) => {
   return 'amarillo';
 };
 
+const getDocumentRiskMessages = (total, affected) => {
+  if (total === 0) {
+    return {
+      interpretation: 'Sin documentos evaluables para calcular el riesgo documental.',
+      impact: 'No hay evidencia documental suficiente para estimar exposicion operativa.',
+      improvementAction: 'Registrar SOAT, RTM y licencias para habilitar seguimiento automatizado.',
+    };
+  }
+
+  if (affected === 0) {
+    return {
+      interpretation: 'Todos los documentos evaluables estan vigentes.',
+      impact: 'La flota mantiene bajo riesgo documental operativo.',
+      improvementAction: 'Mantener el monitoreo preventivo y revisar los proximos vencimientos periodicamente.',
+    };
+  }
+
+  return {
+    interpretation: `${affected} de ${total} documentos evaluables estan vencidos o proximos a vencer.`,
+    impact: 'Los vencimientos pueden afectar continuidad operativa, cumplimiento legal y disponibilidad de la flota.',
+    improvementAction: 'Priorizar renovaciones vencidas y programar gestion preventiva de documentos proximos a vencer.',
+  };
+};
+
+const getCompletenessMessages = (total, incomplete) => {
+  if (total === 0) {
+    return {
+      interpretation: 'Sin registros operativos para evaluar completitud.',
+      impact: 'La ausencia de registros limita la trazabilidad de la operacion.',
+      improvementAction: 'Crear registros base de vehiculos, conductores y documentos.',
+    };
+  }
+
+  if (incomplete === 0) {
+    return {
+      interpretation: 'Todos los registros operativos evaluados tienen los campos minimos completos.',
+      impact: 'La informacion disponible soporta reportes y alertas confiables.',
+      improvementAction: 'Conservar validaciones de captura para evitar deterioro de la calidad de datos.',
+    };
+  }
+
+  return {
+    interpretation: `${incomplete} de ${total} registros operativos tienen campos minimos pendientes.`,
+    impact: 'Los datos incompletos reducen confiabilidad de reportes, alertas y decisiones operativas.',
+    improvementAction: 'Completar placas, identificadores, fechas y datos obligatorios de los registros pendientes.',
+  };
+};
+
+const getAlertCriticalityMessages = (total, critical) => {
+  if (total === 0) {
+    return {
+      interpretation: 'Sin alertas activas para evaluar criticidad.',
+      impact: 'No se observan eventos activos que requieran priorizacion.',
+      improvementAction: 'Mantener monitoreo continuo de fuentes de alertas.',
+    };
+  }
+
+  if (critical === 0) {
+    return {
+      interpretation: 'No hay alertas criticas dentro del conjunto evaluado.',
+      impact: 'La operacion se mantiene en un nivel preventivo o estable.',
+      improvementAction: 'Gestionar alertas preventivas antes de que escalen a estado critico.',
+    };
+  }
+
+  return {
+    interpretation: `${critical} de ${total} alertas activas son criticas.`,
+    impact: 'Las alertas criticas requieren atencion inmediata para reducir riesgo operativo.',
+    improvementAction: 'Atender primero alertas rojas y cerrar las causas documentales u operativas asociadas.',
+  };
+};
+
 export function calculateDocumentRiskMetric(data = {}, options = {}) {
   const states = buildDocumentRecords(data)
     .map((document) => resolveDocumentState(document, options))
@@ -211,6 +291,7 @@ export function calculateDocumentRiskMetric(data = {}, options = {}) {
   const affected = states.filter((state) => state === 'rojo' || state === 'amarillo').length;
   const percentage = calculatePercentage(affected, total);
   const status = resolveRiskStatus(percentage, total);
+  const messages = getDocumentRiskMessages(total, affected);
 
   return {
     id: 'document-risk',
@@ -220,21 +301,9 @@ export function calculateDocumentRiskMetric(data = {}, options = {}) {
     total,
     affected,
     status,
-    interpretation: total === 0
-      ? 'Sin documentos evaluables para calcular el riesgo documental.'
-      : affected === 0
-        ? 'Todos los documentos evaluables estan vigentes.'
-        : `${affected} de ${total} documentos evaluables estan vencidos o proximos a vencer.`,
-    impact: total === 0
-      ? 'No hay evidencia documental suficiente para estimar exposicion operativa.'
-      : affected === 0
-        ? 'La flota mantiene bajo riesgo documental operativo.'
-        : 'Los vencimientos pueden afectar continuidad operativa, cumplimiento legal y disponibilidad de la flota.',
-    improvementAction: total === 0
-      ? 'Registrar SOAT, RTM y licencias para habilitar seguimiento automatizado.'
-      : affected === 0
-        ? 'Mantener el monitoreo preventivo y revisar los proximos vencimientos periodicamente.'
-        : 'Priorizar renovaciones vencidas y programar gestion preventiva de documentos proximos a vencer.',
+    interpretation: messages.interpretation,
+    impact: messages.impact,
+    improvementAction: messages.improvementAction,
   };
 }
 
@@ -245,6 +314,7 @@ export function calculateOperationalCompletenessMetric(data = {}) {
   const incomplete = total - complete;
   const percentage = calculatePercentage(complete, total);
   const status = resolveCompletenessStatus(percentage, total);
+  const messages = getCompletenessMessages(total, incomplete);
 
   return {
     id: 'operational-completeness',
@@ -255,21 +325,9 @@ export function calculateOperationalCompletenessMetric(data = {}) {
     complete,
     incomplete,
     status,
-    interpretation: total === 0
-      ? 'Sin registros operativos para evaluar completitud.'
-      : incomplete === 0
-        ? 'Todos los registros operativos evaluados tienen los campos minimos completos.'
-        : `${incomplete} de ${total} registros operativos tienen campos minimos pendientes.`,
-    impact: total === 0
-      ? 'La ausencia de registros limita la trazabilidad de la operacion.'
-      : incomplete === 0
-        ? 'La informacion disponible soporta reportes y alertas confiables.'
-        : 'Los datos incompletos reducen confiabilidad de reportes, alertas y decisiones operativas.',
-    improvementAction: total === 0
-      ? 'Crear registros base de vehiculos, conductores y documentos.'
-      : incomplete === 0
-        ? 'Conservar validaciones de captura para evitar deterioro de la calidad de datos.'
-        : 'Completar placas, identificadores, fechas y datos obligatorios de los registros pendientes.',
+    interpretation: messages.interpretation,
+    impact: messages.impact,
+    improvementAction: messages.improvementAction,
   };
 }
 
@@ -283,6 +341,7 @@ export function calculateAlertCriticalityMetric(alerts = []) {
   const preventive = states.filter((state) => state === 'amarillo').length;
   const percentage = calculatePercentage(critical, total);
   const status = resolveCriticalityStatus(percentage, total);
+  const messages = getAlertCriticalityMessages(total, critical);
 
   return {
     id: 'alert-criticality',
@@ -293,28 +352,18 @@ export function calculateAlertCriticalityMetric(alerts = []) {
     critical,
     preventive,
     status,
-    interpretation: total === 0
-      ? 'Sin alertas activas para evaluar criticidad.'
-      : critical === 0
-        ? 'No hay alertas criticas dentro del conjunto evaluado.'
-        : `${critical} de ${total} alertas activas son criticas.`,
-    impact: total === 0
-      ? 'No se observan eventos activos que requieran priorizacion.'
-      : critical === 0
-        ? 'La operacion se mantiene en un nivel preventivo o estable.'
-        : 'Las alertas criticas requieren atencion inmediata para reducir riesgo operativo.',
-    improvementAction: total === 0
-      ? 'Mantener monitoreo continuo de fuentes de alertas.'
-      : critical === 0
-        ? 'Gestionar alertas preventivas antes de que escalen a estado critico.'
-        : 'Atender primero alertas rojas y cerrar las causas documentales u operativas asociadas.',
+    interpretation: messages.interpretation,
+    impact: messages.impact,
+    improvementAction: messages.improvementAction,
   };
 }
 
 export function buildQualityMetricsSummary(data = {}, options = {}) {
+  const source = data ?? {};
+
   return [
-    calculateDocumentRiskMetric(data, options),
-    calculateOperationalCompletenessMetric(data),
-    calculateAlertCriticalityMetric(data.alerts || data.alertas),
+    calculateDocumentRiskMetric(source, options),
+    calculateOperationalCompletenessMetric(source),
+    calculateAlertCriticalityMetric(source.alerts || source.alertas),
   ];
 }
