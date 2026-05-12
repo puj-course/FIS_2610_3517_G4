@@ -21,11 +21,11 @@ export default function UserProfilePage() {
 
   const stats = useMemo(
     () => [
-      { label: 'Vehiculos registrados', value: vehiculos.length, icon: Car, tone: 'text-syntix-navy' },
+      { label: 'Vehiculos registrados', value: vehiculos.length, icon: Car, tone: isDarkMode ? 'text-slate-100' : 'text-syntix-navy' },
       { label: 'Conductores activos', value: conductores.length, icon: Users, tone: 'text-syntix-green' },
       { label: 'Alertas pendientes', value: alerts.length, icon: TriangleAlert, tone: 'text-syntix-red' },
     ],
-    [vehiculos.length, conductores.length, alerts.length]
+    [vehiculos.length, conductores.length, alerts.length, isDarkMode]
   );
 
   const recentVehicles = useMemo(() => vehiculos.slice(-3).reverse(), [vehiculos]);
@@ -103,7 +103,7 @@ export default function UserProfilePage() {
             isDarkMode ? 'border-slate-700 bg-slate-950/60' : 'border-gray-200 bg-gray-50'
           }`}>
             <div className="flex items-center gap-3">
-              <UserCircle2 className="h-5 w-5 text-syntix-navy" />
+              <UserCircle2 className={`h-5 w-5 ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`} />
               <h2 className={`text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>Estado del modulo</h2>
             </div>
             <p className={`mt-3 text-sm ${isDarkMode ? 'text-slate-300' : 'text-gray-600'}`}>
@@ -136,7 +136,7 @@ export default function UserProfilePage() {
         }`}>
           <div className="flex items-center justify-between gap-3">
             <h2 className={`text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>Vehiculos recientes</h2>
-            <Link to="/vehiculos" className="text-sm font-semibold text-syntix-navy hover:underline">
+            <Link to="/vehiculos" className={`text-sm font-semibold hover:underline ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>
               Ver todos
             </Link>
           </div>
@@ -189,7 +189,7 @@ function ProfileField({ icon: Icon, label, value, isDarkMode }) {
     <div className={`flex items-start gap-3 rounded-2xl border px-4 py-3 ${
       isDarkMode ? 'border-slate-800 bg-slate-950/70' : 'border-gray-100 bg-gray-50'
     }`}>
-      <div className={`rounded-xl p-2 text-syntix-navy shadow-sm ${isDarkMode ? 'bg-slate-800' : 'bg-white'}`}>
+      <div className={`rounded-xl p-2 shadow-sm ${isDarkMode ? 'bg-slate-800 text-slate-200' : 'bg-white text-syntix-navy'}`}>
         <Icon className="h-4 w-4" />
       </div>
       <div>

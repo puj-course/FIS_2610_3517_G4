@@ -5,7 +5,6 @@ import { Menu, Bell, Sparkles } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAlerts } from '@/hooks/useAlerts.js';
 import UserProfileDropdown from '@/components/UserProfileDropdown.jsx';
-import ThemeToggle from '@/components/ThemeToggle.jsx';
 import { useTheme } from '@/contexts/ThemeContext.jsx';
 
 // Header muestra el contexto actual del dashboard y concentra acciones globales:
@@ -55,9 +54,6 @@ export default function Header({ toggleSidebar }) {
           <Sparkles className="w-4 h-4" />
           Tutorial
         </button>
-        <div className="hidden lg:block">
-          <ThemeToggle compact label="Tema" />
-        </div>
         <button
           onClick={handleAlertsClick}
           className={`relative rounded-full p-2 ${

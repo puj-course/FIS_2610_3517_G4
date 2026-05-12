@@ -112,7 +112,7 @@ export default function ConfiguracionPage() {
       }`}>
         <div className={`p-6 border-b ${isDarkMode ? 'border-slate-800' : 'border-gray-100'}`}>
           <h2 className={`mb-4 flex items-center gap-2 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>
-            <Settings className="w-5 h-5 text-syntix-navy" /> Parámetros de Alertas
+            <Settings className={`w-5 h-5 ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`} /> Parámetros de Alertas
           </h2>
           <div className="mb-6">
             <ThemeToggle label="Modo oscuro" />
@@ -146,7 +146,7 @@ export default function ConfiguracionPage() {
 
         <div data-onboarding="settings-data-management" className={`p-6 ${isDarkMode ? 'bg-slate-950/60' : 'bg-gray-50'}`}>
           <h2 className={`mb-4 flex items-center gap-2 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>
-            <Database className="w-5 h-5 text-syntix-navy" /> Gestión de Datos
+            <Database className={`w-5 h-5 ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`} /> Gestión de Datos
           </h2>
           <div className="flex flex-wrap gap-4">
             <button data-onboarding="settings-export" onClick={handleExportBackup} className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors ${
