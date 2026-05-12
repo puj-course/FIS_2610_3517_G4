@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 import { AlertTriangle, Car, Download, FileText, ShieldCheck, Users } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext.jsx';
 import { useVehicles } from '@/hooks/useVehicles.js';
 import { useConductors } from '@/hooks/useConductors.js';
 import { useDocuments } from '@/hooks/useDocuments.js';
@@ -41,6 +42,7 @@ const qualityStatusStyles = {
 
 // ReportesPage traduce el estado real de la flota a metricas y exportables simples.
 export default function ReportesPage() {
+  const { isDarkMode } = useTheme();
   const { vehiculos } = useVehicles();
   const { conductores } = useConductors();
   const { soats } = useDocuments();
@@ -110,6 +112,8 @@ export default function ReportesPage() {
   }), [alerts, conductores, rtms, soats, vehiculos]);
 
   const handleExportCSV = () => {
+    // El CSV sale desde los datos ya visibles en la UI para que el exportable
+    // coincida con la misma lectura operativa que ve el usuario en pantalla.
     const headers = [
       'Placa',
       'Marca/Modelo',
@@ -167,39 +171,47 @@ export default function ReportesPage() {
 
       <div data-onboarding="reports-header" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-syntix-navy">Reportes y Analitica</h1>
-          <p className="text-gray-500 text-sm mt-1">Metricas reales de cumplimiento de la flota</p>
+          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>Reportes y Analitica</h1>
+          <p className={`mt-1 text-sm ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Metricas reales de cumplimiento de la flota</p>
         </div>
         <button
           data-onboarding="reports-export"
           onClick={handleExportCSV}
-          className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm"
+          className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium shadow-sm transition-colors ${
+            isDarkMode
+              ? 'border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800'
+              : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+          }`}
         >
           <Download className="w-4 h-4" /> Descargar CSV
         </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
-        <MetricCard icon={Car} label="Vehiculos" value={vehiculos.length} hint="Registrados" />
-        <MetricCard icon={Users} label="Conductores" value={conductores.length} hint="Registrados" />
-        <MetricCard icon={ShieldCheck} label="SOAT" value={soats.length} hint="Documentos" />
-        <MetricCard icon={FileText} label="RTM" value={rtms.length} hint="Revisiones" />
-        <MetricCard icon={AlertTriangle} label="Alertas" value={alerts.length} hint="Activas" />
+        <MetricCard icon={Car} label="Vehiculos" value={vehiculos.length} hint="Registrados" isDarkMode={isDarkMode} />
+        <MetricCard icon={Users} label="Conductores" value={conductores.length} hint="Registrados" isDarkMode={isDarkMode} />
+        <MetricCard icon={ShieldCheck} label="SOAT" value={soats.length} hint="Documentos" isDarkMode={isDarkMode} />
+        <MetricCard icon={FileText} label="RTM" value={rtms.length} hint="Revisiones" isDarkMode={isDarkMode} />
+        <MetricCard icon={AlertTriangle} label="Alertas" value={alerts.length} hint="Activas" isDarkMode={isDarkMode} />
       </div>
 
       <section className="space-y-4">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Métricas de calidad del sistema</h2>
+          <h2 className={`text-xl font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>Metricas de calidad del sistema</h2>
         </div>
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           {qualityMetrics.map((metric) => (
-            <QualityMetricCard key={metric.id} metric={metric} />
+            <QualityMetricCard key={metric.id} metric={metric} isDarkMode={isDarkMode} />
           ))}
         </div>
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div data-onboarding="reports-compliance-card" className="bg-syntix-navy rounded-2xl p-8 text-white relative overflow-hidden shadow-lg">
+        {/* La tarjeta de cumplimiento resume el panorama general y la de
+            distribucion explica donde esta concentrado el riesgo documental. */}
+        <div data-onboarding="reports-compliance-card" className={`relative overflow-hidden rounded-2xl p-8 text-white shadow-lg ${
+          isDarkMode ? 'bg-slate-900' : 'bg-syntix-navy'
+        }`}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-syntix-green rounded-full opacity-20 blur-3xl -mr-20 -mt-20" />
           <div className="relative z-10">
             <h3 className="text-lg font-medium text-gray-300 mb-2">Cumplimiento Total</h3>
@@ -210,12 +222,14 @@ export default function ReportesPage() {
           </div>
         </div>
 
-        <div data-onboarding="reports-distribution-card" className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex flex-col justify-center">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Distribucion Documental</h3>
+        <div data-onboarding="reports-distribution-card" className={`flex flex-col justify-center rounded-2xl border p-8 shadow-sm ${
+          isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
+        }`}>
+          <h3 className={`mb-6 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>Distribucion Documental</h3>
           <div className="space-y-4">
-            <StatusBar label="Al Dia (Verde)" value={stateStats.verde} total={stateStats.total} colorClass="bg-syntix-green" textClass="text-syntix-green" />
-            <StatusBar label="Por Vencer (Amarillo)" value={stateStats.amarillo} total={stateStats.total} colorClass="bg-yellow-500" textClass="text-yellow-500" />
-            <StatusBar label="Critico (Rojo)" value={stateStats.rojo} total={stateStats.total} colorClass="bg-syntix-red" textClass="text-syntix-red" />
+            <StatusBar label="Al Dia (Verde)" value={stateStats.verde} total={stateStats.total} colorClass="bg-syntix-green" textClass="text-syntix-green" isDarkMode={isDarkMode} />
+            <StatusBar label="Por Vencer (Amarillo)" value={stateStats.amarillo} total={stateStats.total} colorClass="bg-yellow-500" textClass="text-yellow-500" isDarkMode={isDarkMode} />
+            <StatusBar label="Critico (Rojo)" value={stateStats.rojo} total={stateStats.total} colorClass="bg-syntix-red" textClass="text-syntix-red" isDarkMode={isDarkMode} />
           </div>
         </div>
       </div>
@@ -225,36 +239,42 @@ export default function ReportesPage() {
           title={`Alertas de vehiculos (${vehicleAlerts.length})`}
           emptyMessage="No hay alertas de vehiculos para reportar."
           alerts={vehicleAlerts}
+          isDarkMode={isDarkMode}
         />
         <ReportSection
           title={`Alertas de conductores (${conductorAlerts.length})`}
           emptyMessage="No hay alertas de conductores para reportar."
           alerts={conductorAlerts}
+          isDarkMode={isDarkMode}
         />
       </div>
 
-      <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-        <h3 className="text-lg font-bold text-gray-900 mb-4">Resumen Documental</h3>
+      <div className={`rounded-2xl border p-6 shadow-sm ${
+        isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
+      }`}>
+        <h3 className={`mb-4 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>Resumen Documental</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <DocumentSummary title="SOAT" stats={documentStats.soat} alerts={alertStats.soat} />
-          <DocumentSummary title="RTM" stats={documentStats.rtm} alerts={alertStats.rtm} />
-          <DocumentSummary title="Licencias" total={conductores.length} alerts={alertStats.licencias} />
+          <DocumentSummary title="SOAT" stats={documentStats.soat} alerts={alertStats.soat} isDarkMode={isDarkMode} />
+          <DocumentSummary title="RTM" stats={documentStats.rtm} alerts={alertStats.rtm} isDarkMode={isDarkMode} />
+          <DocumentSummary title="Licencias" total={conductores.length} alerts={alertStats.licencias} isDarkMode={isDarkMode} />
         </div>
       </div>
     </div>
   );
 }
 
-function MetricCard({ icon: Icon, label, value, hint }) {
+function MetricCard({ icon: Icon, label, value, hint, isDarkMode }) {
   return (
-    <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+    <div className={`rounded-xl border p-4 shadow-sm ${
+      isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
+    }`}>
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm text-gray-500">{label}</p>
-          <p className="text-3xl font-black text-syntix-navy mt-1">{value}</p>
-          <p className="text-xs text-gray-400 mt-1">{hint}</p>
+          <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{label}</p>
+          <p className={`mt-1 text-3xl font-black ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>{value}</p>
+          <p className={`mt-1 text-xs ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>{hint}</p>
         </div>
-        <div className="p-3 rounded-lg bg-gray-50 text-syntix-navy">
+        <div className={`rounded-lg p-3 ${isDarkMode ? 'bg-slate-800 text-slate-100' : 'bg-gray-50 text-syntix-navy'}`}>
           <Icon className="w-5 h-5" />
         </div>
       </div>
@@ -262,34 +282,39 @@ function MetricCard({ icon: Icon, label, value, hint }) {
   );
 }
 
-function QualityMetricCard({ metric }) {
+function QualityMetricCard({ metric, isDarkMode }) {
   const styles = qualityStatusStyles[metric.status] || qualityStatusStyles.neutral;
+  const neutralBadge = isDarkMode && metric.status === 'neutral'
+    ? 'bg-slate-800 text-slate-300 border-slate-700'
+    : styles.badge;
 
   return (
-    <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+    <div className={`rounded-xl border p-5 shadow-sm ${
+      isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
+    }`}>
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-gray-500">{metric.name}</p>
-          <p className={`text-4xl font-black mt-2 ${styles.value}`}>{metric.value}%</p>
+          <p className={`text-sm font-semibold ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{metric.name}</p>
+          <p className={`mt-2 text-4xl font-black ${styles.value}`}>{metric.value}%</p>
         </div>
-        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${styles.badge}`}>
+        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${neutralBadge}`}>
           {statusLabels[metric.status] || metric.status}
         </span>
       </div>
 
-      <p className="text-xs font-semibold text-gray-500 mt-3">Total evaluado: {metric.total}</p>
+      <p className={`mt-3 text-xs font-semibold ${isDarkMode ? 'text-slate-500' : 'text-gray-500'}`}>Total evaluado: {metric.total}</p>
 
-      <div className="mt-4 space-y-3 text-sm text-gray-600">
+      <div className={`mt-4 space-y-3 text-sm ${isDarkMode ? 'text-slate-300' : 'text-gray-600'}`}>
         <p>
-          <span className="block text-xs font-bold uppercase text-gray-400">Interpretacion</span>
+          <span className={`block text-xs font-bold uppercase ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Interpretacion</span>
           {metric.interpretation}
         </p>
         <p>
-          <span className="block text-xs font-bold uppercase text-gray-400">Impacto</span>
+          <span className={`block text-xs font-bold uppercase ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Impacto</span>
           {metric.impact}
         </p>
         <p>
-          <span className="block text-xs font-bold uppercase text-gray-400">Accion de mejora</span>
+          <span className={`block text-xs font-bold uppercase ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Accion de mejora</span>
           {metric.improvementAction}
         </p>
       </div>
@@ -297,27 +322,31 @@ function QualityMetricCard({ metric }) {
   );
 }
 
-function StatusBar({ label, value, total, colorClass, textClass }) {
+function StatusBar({ label, value, total, colorClass, textClass, isDarkMode }) {
   return (
     <div>
       <div className="flex justify-between text-sm font-bold mb-1">
         <span className={textClass}>{label}</span>
-        <span>{value}</span>
+        <span className={isDarkMode ? 'text-slate-200' : 'text-gray-700'}>{value}</span>
       </div>
-      <div className="w-full bg-gray-100 rounded-full h-2.5">
+      <div className={`h-2.5 w-full rounded-full ${isDarkMode ? 'bg-slate-800' : 'bg-gray-100'}`}>
         <div className={`${colorClass} h-2.5 rounded-full`} style={{ width: progressWidth(value, total) }} />
       </div>
     </div>
   );
 }
 
-function ReportSection({ title, alerts, emptyMessage }) {
+function ReportSection({ title, alerts, emptyMessage, isDarkMode }) {
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">{title}</h3>
+    <div className={`rounded-2xl border p-6 shadow-sm ${
+      isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
+    }`}>
+      <h3 className={`mb-4 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{title}</h3>
 
       {alerts.length === 0 ? (
-        <div className="text-sm text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-200 p-4">
+        <div className={`rounded-lg border border-dashed p-4 text-sm ${
+          isDarkMode ? 'border-slate-700 bg-slate-950/60 text-slate-400' : 'border-gray-200 bg-gray-50 text-gray-500'
+        }`}>
           {emptyMessage}
         </div>
       ) : (
@@ -326,11 +355,13 @@ function ReportSection({ title, alerts, emptyMessage }) {
             const expiration = getExpirationAlertText(alert.diasRestantes, alert.fechaVencimiento);
 
             return (
-              <div key={alert.id} className="border border-gray-100 rounded-xl p-4 bg-gray-50">
+              <div key={alert.id} className={`rounded-xl border p-4 ${
+                isDarkMode ? 'border-slate-800 bg-slate-950/60' : 'border-gray-100 bg-gray-50'
+              }`}>
                 <div className="flex justify-between gap-3">
                   <div>
-                    <p className="font-bold text-gray-900">{alert.mensaje}</p>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{alert.mensaje}</p>
+                    <p className={`mt-1 text-sm ${isDarkMode ? 'text-slate-400' : 'text-gray-600'}`}>
                       {alert.tipo}: {alert.entidad}
                     </p>
                   </div>
@@ -338,7 +369,7 @@ function ReportSection({ title, alerts, emptyMessage }) {
                     {statusLabels[alert.prioridad] || alert.prioridad}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 font-semibold mt-2">{expiration.fullText}</p>
+                <p className={`mt-2 text-xs font-semibold ${isDarkMode ? 'text-slate-500' : 'text-gray-500'}`}>{expiration.fullText}</p>
               </div>
             );
           })}
@@ -348,22 +379,24 @@ function ReportSection({ title, alerts, emptyMessage }) {
   );
 }
 
-function DocumentSummary({ title, total, alerts, stats = null }) {
+function DocumentSummary({ title, total, alerts, stats = null, isDarkMode }) {
   const totalValue = stats?.total ?? total;
 
   return (
-    <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className="text-2xl font-black text-syntix-navy mt-1">{totalValue}</p>
+    <div className={`rounded-xl border p-4 ${
+      isDarkMode ? 'border-slate-800 bg-slate-950/60' : 'border-gray-100 bg-gray-50'
+    }`}>
+      <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{title}</p>
+      <p className={`mt-1 text-2xl font-black ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>{totalValue}</p>
       {stats && (
-        <div className="grid grid-cols-2 gap-2 mt-3 text-xs text-gray-600">
+        <div className={`mt-3 grid grid-cols-2 gap-2 text-xs ${isDarkMode ? 'text-slate-300' : 'text-gray-600'}`}>
           <span>Vigentes: <strong>{stats.vigente}</strong></span>
           <span>Proximos: <strong>{stats.proximo}</strong></span>
           <span>Vencidos: <strong>{stats.vencido}</strong></span>
           <span>Sin registro: <strong>{stats.faltantes}</strong></span>
         </div>
       )}
-      <p className="text-xs text-gray-500 mt-1">
+      <p className={`mt-1 text-xs ${isDarkMode ? 'text-slate-500' : 'text-gray-500'}`}>
         {alerts} alertas activas
       </p>
     </div>
