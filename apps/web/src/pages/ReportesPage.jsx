@@ -8,16 +8,37 @@ import { useDocuments } from '@/hooks/useDocuments.js';
 import { useRtm } from '@/contexts/RtmContext.jsx';
 import { useAlerts } from '@/hooks/useAlerts.js';
 import { formatColombianDate, getExpirationAlertText } from '@/utils/dateUtils.js';
+import { buildQualityMetricsSummary } from '@/utils/qualityMetrics.js';
 
 const statusLabels = {
   verde: 'Al dia',
   amarillo: 'Por vencer',
   rojo: 'Critico',
+  neutral: 'Sin datos',
 };
 
 const progressWidth = (value, total) => (total > 0 ? `${Math.round((value / total) * 100)}%` : '0%');
 
 const quoteCsv = (field) => `"${String(field ?? '').replaceAll('"', '""')}"`;
+
+const qualityStatusStyles = {
+  verde: {
+    badge: 'bg-syntix-green/10 text-syntix-green border-syntix-green/20',
+    value: 'text-syntix-green',
+  },
+  amarillo: {
+    badge: 'bg-yellow-500/10 text-yellow-700 border-yellow-500/20',
+    value: 'text-yellow-600',
+  },
+  rojo: {
+    badge: 'bg-syntix-red/10 text-syntix-red border-syntix-red/20',
+    value: 'text-syntix-red',
+  },
+  neutral: {
+    badge: 'bg-gray-100 text-gray-700 border-gray-200',
+    value: 'text-gray-500',
+  },
+};
 
 // ReportesPage traduce el estado real de la flota a metricas y exportables simples.
 export default function ReportesPage() {
@@ -81,6 +102,14 @@ export default function ReportesPage() {
   const cumplimiento = vehiculos.length > 0
     ? Math.round((vehiculos.filter((vehiculo) => vehiculo.estadoGeneral === 'verde').length / vehiculos.length) * 100)
     : 0;
+
+  const qualityMetrics = useMemo(() => buildQualityMetricsSummary({
+    vehicles: vehiculos,
+    conductors: conductores,
+    soats,
+    rtms,
+    alerts,
+  }), [alerts, conductores, rtms, soats, vehiculos]);
 
   const handleExportCSV = () => {
     // El CSV sale desde los datos ya visibles en la UI para que el exportable
@@ -166,9 +195,20 @@ export default function ReportesPage() {
         <MetricCard icon={AlertTriangle} label="Alertas" value={alerts.length} hint="Activas" isDarkMode={isDarkMode} />
       </div>
 
+      <section className="space-y-4">
+        <div>
+          <h2 className={`text-xl font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>Metricas de calidad del sistema</h2>
+        </div>
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          {qualityMetrics.map((metric) => (
+            <QualityMetricCard key={metric.id} metric={metric} isDarkMode={isDarkMode} />
+          ))}
+        </div>
+      </section>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* La tarjeta de cumplimiento resume el panorama general y la de
-            distribución explica dónde está concentrado el riesgo documental. */}
+            distribucion explica donde esta concentrado el riesgo documental. */}
         <div data-onboarding="reports-compliance-card" className={`relative overflow-hidden rounded-2xl p-8 text-white shadow-lg ${
           isDarkMode ? 'bg-slate-900' : 'bg-syntix-navy'
         }`}>
@@ -237,6 +277,46 @@ function MetricCard({ icon: Icon, label, value, hint, isDarkMode }) {
         <div className={`rounded-lg p-3 ${isDarkMode ? 'bg-slate-800 text-slate-100' : 'bg-gray-50 text-syntix-navy'}`}>
           <Icon className="w-5 h-5" />
         </div>
+      </div>
+    </div>
+  );
+}
+
+function QualityMetricCard({ metric, isDarkMode }) {
+  const styles = qualityStatusStyles[metric.status] || qualityStatusStyles.neutral;
+  const neutralBadge = isDarkMode && metric.status === 'neutral'
+    ? 'bg-slate-800 text-slate-300 border-slate-700'
+    : styles.badge;
+
+  return (
+    <div className={`rounded-xl border p-5 shadow-sm ${
+      isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
+    }`}>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className={`text-sm font-semibold ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{metric.name}</p>
+          <p className={`mt-2 text-4xl font-black ${styles.value}`}>{metric.value}%</p>
+        </div>
+        <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${neutralBadge}`}>
+          {statusLabels[metric.status] || metric.status}
+        </span>
+      </div>
+
+      <p className={`mt-3 text-xs font-semibold ${isDarkMode ? 'text-slate-500' : 'text-gray-500'}`}>Total evaluado: {metric.total}</p>
+
+      <div className={`mt-4 space-y-3 text-sm ${isDarkMode ? 'text-slate-300' : 'text-gray-600'}`}>
+        <p>
+          <span className={`block text-xs font-bold uppercase ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Interpretacion</span>
+          {metric.interpretation}
+        </p>
+        <p>
+          <span className={`block text-xs font-bold uppercase ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Impacto</span>
+          {metric.impact}
+        </p>
+        <p>
+          <span className={`block text-xs font-bold uppercase ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`}>Accion de mejora</span>
+          {metric.improvementAction}
+        </p>
       </div>
     </div>
   );

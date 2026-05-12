@@ -12,7 +12,7 @@
     "start": "vite preview --outDir ../../dist/apps/web --host :: --port 3000",
     "lint": "eslint . --quiet",
     "lint:warn": "eslint .",
-    "test": "vitest run --coverage --coverage.reporter=text --coverage.reporter=lcov --coverage.reporter=html",
+    "test": "vitest run --coverage.enabled=true --coverage.reporter=text --coverage.reporter=lcov --coverage.reporter=html",
     "test:watch": "vitest"
   },
   "dependencies": {
