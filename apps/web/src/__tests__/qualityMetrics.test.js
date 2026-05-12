@@ -220,6 +220,107 @@ describe('calculateDocumentRiskMetric', () => {
       status: 'neutral',
     });
   });
+
+  it('ignora documentos sin fecha, dias o estado reconocible', () => {
+    const result = calculateDocumentRiskMetric(
+      { documents: [{ tipo: 'SOAT', placa: 'SYN106' }] },
+      { baseDate: BASE_DATE }
+    );
+
+    expect(result).toMatchObject({
+      total: 0,
+      affected: 0,
+      status: 'neutral',
+    });
+  });
+
+  it('interpreta diasRestantes como string numerico', () => {
+    const result = calculateDocumentRiskMetric(
+      { documentos: [{ diasRestantes: '10' }] },
+      { baseDate: BASE_DATE, warningThresholdDays: 15 }
+    );
+
+    expect(result).toMatchObject({
+      total: 1,
+      affected: 1,
+      percentage: 100,
+      status: 'rojo',
+    });
+  });
+
+  it('normaliza estados con mayusculas, minusculas y espacios', () => {
+    const result = calculateDocumentRiskMetric(
+      {
+        documents: [
+          { estado: '  VERDE  ' },
+          { status: 'AmArIlLo' },
+          { prioridad: 'RoJo' },
+        ],
+      },
+      { baseDate: BASE_DATE }
+    );
+
+    expect(result).toMatchObject({
+      total: 3,
+      affected: 2,
+      percentage: 67,
+      status: 'rojo',
+    });
+  });
+
+  it('ignora estados desconocidos sin respaldo de fecha o dias', () => {
+    const result = calculateDocumentRiskMetric(
+      { documents: [{ estado: 'sin clasificar' }] },
+      { baseDate: BASE_DATE }
+    );
+
+    expect(result).toMatchObject({
+      total: 0,
+      status: 'neutral',
+    });
+  });
+
+  it('clasifica fechas Date y fechas de texto no ISO con baseDate controlado', () => {
+    const result = calculateDocumentRiskMetric(
+      {
+        documents: [
+          { fechaVencimiento: new Date(2026, 4, 20) },
+          { expirationDate: 'May 30, 2026' },
+          { expiresAt: new Date('fecha invalida') },
+          { vencimiento: 'fecha invalida' },
+        ],
+      },
+      { baseDate: new Date(2026, 4, 12), warningThresholdDays: 15 }
+    );
+
+    expect(result).toMatchObject({
+      total: 2,
+      affected: 1,
+      percentage: 50,
+      status: 'rojo',
+    });
+  });
+
+  it('mantiene estado amarillo de riesgo cuando menos de la mitad esta afectada', () => {
+    const result = calculateDocumentRiskMetric(
+      {
+        soats: [
+          { estado: 'warning' },
+          { estado: 'verde' },
+          { estado: 'vigente' },
+          { diasRestantes: '90' },
+        ],
+      },
+      { baseDate: BASE_DATE }
+    );
+
+    expect(result).toMatchObject({
+      total: 4,
+      affected: 1,
+      percentage: 25,
+      status: 'amarillo',
+    });
+  });
 });
 
 describe('calculateOperationalCompletenessMetric', () => {
@@ -275,6 +376,32 @@ describe('calculateOperationalCompletenessMetric', () => {
     });
   });
 
+  it('acepta vehiculos con campo año en vez de anio', () => {
+    const result = calculateOperationalCompletenessMetric({
+      vehicles: [{ placa: 'ABC123', marca: 'Toyota', modelo: 'Hilux', año: 2026, tipo: 'Camioneta' }],
+    });
+
+    expect(result).toMatchObject({
+      total: 1,
+      complete: 1,
+      incomplete: 0,
+      status: 'verde',
+    });
+  });
+
+  it('trata campos vacios o con espacios como incompletos', () => {
+    const result = calculateOperationalCompletenessMetric({
+      vehicles: [{ placa: '   ', marca: 'Toyota', modelo: 'Hilux', anio: 2026, tipo: '' }],
+    });
+
+    expect(result).toMatchObject({
+      total: 1,
+      complete: 0,
+      incomplete: 1,
+      status: 'rojo',
+    });
+  });
+
   it('identifica conductores completos', () => {
     const result = calculateOperationalCompletenessMetric({
       conductors: [completeConductor],
@@ -296,6 +423,22 @@ describe('calculateOperationalCompletenessMetric', () => {
       total: 1,
       complete: 0,
       incomplete: 1,
+      status: 'rojo',
+    });
+  });
+
+  it('marca conductores sin categoria o sin fechaVencimiento como incompletos', () => {
+    const result = calculateOperationalCompletenessMetric({
+      conductors: [
+        { ...completeConductor, categoria: '' },
+        { ...completeConductor, fechaVencimiento: undefined },
+      ],
+    });
+
+    expect(result).toMatchObject({
+      total: 2,
+      complete: 0,
+      incomplete: 2,
       status: 'rojo',
     });
   });
@@ -325,6 +468,19 @@ describe('calculateOperationalCompletenessMetric', () => {
     });
   });
 
+  it('marca SOAT con placa pero sin vehiculoId como incompleto', () => {
+    const result = calculateOperationalCompletenessMetric({
+      soats: [{ ...completeSoat, vehiculoId: undefined, placaVehiculo: 'SYN106' }],
+    });
+
+    expect(result).toMatchObject({
+      total: 1,
+      complete: 0,
+      incomplete: 1,
+      status: 'rojo',
+    });
+  });
+
   it('identifica RTM completos', () => {
     const result = calculateOperationalCompletenessMetric({
       rtms: [completeRtm],
@@ -333,6 +489,19 @@ describe('calculateOperationalCompletenessMetric', () => {
     expect(result).toMatchObject({
       total: 1,
       complete: 1,
+      status: 'verde',
+    });
+  });
+
+  it('acepta RTM con numeroRtm en vez de numeroCertificado', () => {
+    const result = calculateOperationalCompletenessMetric({
+      rtms: [{ ...completeRtm, numeroCertificado: undefined, numeroRtm: 'RTM-ALT-2026' }],
+    });
+
+    expect(result).toMatchObject({
+      total: 1,
+      complete: 1,
+      incomplete: 0,
       status: 'verde',
     });
   });
@@ -386,6 +555,23 @@ describe('calculateOperationalCompletenessMetric', () => {
       complete: 5,
       incomplete: 0,
       status: 'verde',
+    });
+  });
+
+  it('evalua documentos desde la clave documentos', () => {
+    const result = calculateOperationalCompletenessMetric({
+      documentos: [
+        { tipo: 'Permiso especial', conductorId: 'driver-1', fechaVencimiento: '2026-12-31' },
+        { tipo: 'Permiso especial', placa: 'SYN106' },
+      ],
+    });
+
+    expect(result).toMatchObject({
+      total: 2,
+      complete: 1,
+      incomplete: 1,
+      percentage: 50,
+      status: 'rojo',
     });
   });
 });
@@ -457,6 +643,39 @@ describe('calculateAlertCriticalityMetric', () => {
       status: 'amarillo',
     });
   });
+
+  it('usa severidad, estado, tipo o prioridad cuando contienen estados reales', () => {
+    const result = calculateAlertCriticalityMetric([
+      { prioridad: 'sin clasificar', severity: 'critical' },
+      { estado: 'warning' },
+      { tipo: 'danger' },
+      { prioridad: 'verde' },
+    ]);
+
+    expect(result).toMatchObject({
+      total: 4,
+      critical: 2,
+      preventive: 1,
+      percentage: 50,
+      status: 'rojo',
+    });
+  });
+
+  it('mantiene estados desconocidos como neutrales para criticidad', () => {
+    const result = calculateAlertCriticalityMetric([
+      { prioridad: 'informativa' },
+      { severity: 'baja' },
+      { tipo: 'Documento Faltante' },
+    ]);
+
+    expect(result).toMatchObject({
+      total: 3,
+      critical: 0,
+      preventive: 0,
+      percentage: 0,
+      status: 'verde',
+    });
+  });
 });
 
 describe('buildQualityMetricsSummary', () => {
@@ -500,6 +719,17 @@ describe('buildQualityMetricsSummary', () => {
       { baseDate: BASE_DATE }
     );
 
+    result.forEach(expectMetricRenderShape);
+  });
+
+  it.each([
+    ['solo vehicles', { vehicles: [completeVehicle] }],
+    ['solo conductors', { conductors: [completeConductor] }],
+    ['solo alerts', { alerts: [{ prioridad: 'critical' }] }],
+  ])('construye resumen con datos parciales: %s', (_caseName, data) => {
+    const result = buildQualityMetricsSummary(data, { baseDate: BASE_DATE });
+
+    expect(result).toHaveLength(3);
     result.forEach(expectMetricRenderShape);
   });
 });

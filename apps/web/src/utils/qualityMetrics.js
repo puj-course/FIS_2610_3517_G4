@@ -15,7 +15,7 @@ const DATE_FIELDS = [
 
 const DAY_FIELDS = ['diasRestantes', 'daysRemaining', 'remainingDays'];
 
-const VEHICLE_REQUIRED_FIELDS = [['placa'], ['marca'], ['modelo'], ['anio'], ['tipo']];
+const VEHICLE_REQUIRED_FIELDS = [['placa'], ['marca'], ['modelo'], ['anio', 'año'], ['tipo']];
 const CONDUCTOR_REQUIRED_FIELDS = [['nombre', 'name'], ['documento'], ['telefono'], ['categoria'], ['fechaVencimiento']];
 const SOAT_REQUIRED_FIELDS = [
   ['vehiculoId'],
@@ -119,6 +119,9 @@ const normalizeDocumentState = (value) => {
 
   return null;
 };
+
+const normalizeFirstKnownState = (record, keys) =>
+  keys.map((key) => normalizeDocumentState(record?.[key])).find(Boolean) ?? null;
 
 const resolveDocumentState = (document, options = {}) => {
   const explicitState = firstValue(document, ['estado', 'status', 'prioridad', 'severity', 'state']);
@@ -335,7 +338,7 @@ export function calculateAlertCriticalityMetric(alerts = []) {
   const safeAlerts = asArray(alerts);
   const total = safeAlerts.length;
   const states = safeAlerts.map((alert) =>
-    normalizeDocumentState(firstValue(alert, ['prioridad', 'severity', 'status', 'estado', 'state']))
+    normalizeFirstKnownState(alert, ['prioridad', 'severity', 'status', 'estado', 'state', 'tipo'])
   );
   const critical = states.filter((state) => state === 'rojo').length;
   const preventive = states.filter((state) => state === 'amarillo').length;
