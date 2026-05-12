@@ -8,7 +8,8 @@ export default function ValidacionResultadoCard({
   vehiculoSistema,
   conductorAsignado,
   onGuardar,
-  loading = false
+  loading = false,
+  isDarkMode = false
 }) {
   if (!datosRUNT?.encontrado) {
     return (
@@ -72,61 +73,61 @@ export default function ValidacionResultadoCard({
       )}
 
       {/* Información del Vehículo */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h3 className="font-bold text-lg text-syntix-navy mb-4">Información del Vehículo</h3>
+      <div className={`rounded-xl border p-6 ${isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-200 bg-white'}`}>
+        <h3 className={`mb-4 text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>Información del Vehículo</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Placa</p>
-            <p className="text-lg font-black text-gray-900">{data.placa}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Placa</p>
+            <p className={`text-lg font-black ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{data.placa}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Marca</p>
-            <p className="text-lg font-bold text-gray-900">{data.marca}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Marca</p>
+            <p className={`text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{data.marca}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Línea</p>
-            <p className="text-lg font-bold text-gray-900">{data.linea}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Línea</p>
+            <p className={`text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{data.linea}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Modelo</p>
-            <p className="text-lg font-bold text-gray-900">{data.modelo}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Modelo</p>
+            <p className={`text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{data.modelo}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Color</p>
-            <p className="text-lg font-bold text-gray-900">{data.color}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Color</p>
+            <p className={`text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{data.color}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">VIN</p>
-            <p className="text-xs font-mono text-gray-900">{data.vin}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>VIN</p>
+            <p className={`text-xs font-mono ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{data.vin}</p>
           </div>
         </div>
       </div>
 
       {/* Validación SOAT */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className={`rounded-xl border p-6 ${isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-200 bg-white'}`}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-lg text-syntix-navy">Validación SOAT</h3>
+          <h3 className={`text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>Validación SOAT</h3>
           <StatusBadge status={soatState} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Número Póliza</p>
-            <p className="font-mono font-bold text-gray-900">{data.soat.numero}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Número Póliza</p>
+            <p className={`font-mono font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{data.soat.numero}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Aseguradora</p>
-            <p className="font-bold text-gray-900">{data.soat.aseguradora}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Aseguradora</p>
+            <p className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{data.soat.aseguradora}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Inicio Vigencia</p>
-            <p className="font-bold text-gray-900">{new Date(data.soat.fechaInicio).toLocaleDateString('es-CO')}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Inicio Vigencia</p>
+            <p className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{new Date(data.soat.fechaInicio).toLocaleDateString('es-CO')}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Vencimiento</p>
-            <p className="font-bold text-gray-900">{new Date(data.soat.fechaVencimiento).toLocaleDateString('es-CO')}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Vencimiento</p>
+            <p className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{new Date(data.soat.fechaVencimiento).toLocaleDateString('es-CO')}</p>
           </div>
           <div className="col-span-2">
-            <p className="text-xs font-bold text-gray-500 uppercase">Días Restantes</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Días Restantes</p>
             <p className={`text-2xl font-black ${
               soatState === 'verde' ? 'text-green-600' : 
               soatState === 'amarillo' ? 'text-amber-600' : 'text-syntix-red'
@@ -138,26 +139,26 @@ export default function ValidacionResultadoCard({
       </div>
 
       {/* Validación RTM */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className={`rounded-xl border p-6 ${isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-200 bg-white'}`}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-lg text-syntix-navy">Validación RTM (Tecnomecánica)</h3>
+          <h3 className={`text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>Validación RTM (Tecnomecánica)</h3>
           <StatusBadge status={rtmState} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Número RTM</p>
-            <p className="font-mono font-bold text-gray-900">{data.rtm.numero}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Número RTM</p>
+            <p className={`font-mono font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{data.rtm.numero}</p>
           </div>
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase">Responsable</p>
-            <p className="font-bold text-gray-900">{data.rtm.responsable}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Responsable</p>
+            <p className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{data.rtm.responsable}</p>
           </div>
           <div className="col-span-2">
-            <p className="text-xs font-bold text-gray-500 uppercase">Vencimiento</p>
-            <p className="font-bold text-gray-900">{new Date(data.rtm.fechaVencimiento).toLocaleDateString('es-CO')}</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Vencimiento</p>
+            <p className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{new Date(data.rtm.fechaVencimiento).toLocaleDateString('es-CO')}</p>
           </div>
           <div className="col-span-2">
-            <p className="text-xs font-bold text-gray-500 uppercase">Días Restantes</p>
+            <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Días Restantes</p>
             <p className={`text-2xl font-black ${
               rtmState === 'verde' ? 'text-green-600' : 
               rtmState === 'amarillo' ? 'text-amber-600' : 'text-syntix-red'
@@ -169,9 +170,9 @@ export default function ValidacionResultadoCard({
       </div>
 
       {/* Validación Licencia */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className={`rounded-xl border p-6 ${isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-200 bg-white'}`}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-lg text-syntix-navy">Validación Licencia</h3>
+          <h3 className={`text-lg font-bold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>Validación Licencia</h3>
           {conductorAsignado ? (
             <StatusBadge status={licenciaState} />
           ) : (
@@ -181,20 +182,20 @@ export default function ValidacionResultadoCard({
         {conductorAsignado ? (
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase">Conductor</p>
-              <p className="font-bold text-gray-900">{conductorAsignado.nombre}</p>
+              <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Conductor</p>
+              <p className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{conductorAsignado.nombre}</p>
             </div>
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase">Documento</p>
-              <p className="font-bold text-gray-900">{conductorAsignado.documento}</p>
+              <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Documento</p>
+              <p className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{conductorAsignado.documento}</p>
             </div>
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase">Categoría</p>
-              <p className="font-bold text-gray-900">{conductorAsignado.categoria}</p>
+              <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Categoría</p>
+              <p className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{conductorAsignado.categoria}</p>
             </div>
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase">Vencimiento</p>
-              <p className="font-bold text-gray-900">{new Date(conductorAsignado.fechaVencimiento).toLocaleDateString('es-CO')}</p>
+              <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Vencimiento</p>
+              <p className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{new Date(conductorAsignado.fechaVencimiento).toLocaleDateString('es-CO')}</p>
             </div>
           </div>
         ) : (

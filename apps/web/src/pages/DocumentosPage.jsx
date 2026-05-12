@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Search, Shield, Wrench, Pencil, Trash2 } from 'lucide-react';
+import { useTheme } from '@/contexts/ThemeContext.jsx';
 import { useDocuments } from '@/hooks/useDocuments.js';
 import { useRtm } from '@/contexts/RtmContext.jsx';
 import { useVehicles } from '@/hooks/useVehicles.js';
@@ -61,6 +62,7 @@ export default function DocumentosPage() {
   const { soats, removeSoat } = useDocuments();
   const { rtms, removeRtm } = useRtm();
   const { vehiculos } = useVehicles();
+  const { isDarkMode } = useTheme();
   const { activeModal, openModal, closeModal } = useModalManager();
 
   const [soatEditando, setSoatEditando] = useState(null);
@@ -130,17 +132,17 @@ export default function DocumentosPage() {
   };
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
+    <div className={`min-h-screen p-8 ${isDarkMode ? 'bg-slate-950' : 'bg-gray-50'}`}>
       <Helmet>
         <title>Documentos | SYNTIX Drive Control</title>
       </Helmet>
 
       <div data-onboarding="documents-header" className="mb-8 flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-4xl font-extrabold text-syntix-navy mb-2">
+          <h1 className={`mb-2 text-4xl font-extrabold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>
             Gestion de Documentos
           </h1>
-          <p className="text-gray-500 text-lg">Control de SOAT y Tecnomecanica</p>
+          <p className={`text-lg ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Control de SOAT y Tecnomecanica</p>
         </div>
         <div className="flex gap-2">
           <button
@@ -155,7 +157,11 @@ export default function DocumentosPage() {
             type="button"
             onClick={() => openModal('addRtm')}
             data-onboarding="documents-add-rtm"
-            className="bg-white text-gray-900 border border-gray-200 px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-50"
+            className={`rounded-lg border px-4 py-2 text-sm font-semibold ${
+              isDarkMode
+                ? 'border-slate-700 bg-slate-900 text-slate-100 hover:bg-slate-800'
+                : 'border-gray-200 bg-white text-gray-900 hover:bg-gray-50'
+            }`}
           >
             + RTM
           </button>
@@ -171,22 +177,23 @@ export default function DocumentosPage() {
         searchTerm={soatSearch}
         onSearchChange={setSoatSearch}
         placeholder="Buscar SOAT por placa, poliza, aseguradora, estado o vencimiento..."
+        isDarkMode={isDarkMode}
       >
         <table className="w-full min-w-[1100px]">
-          <thead className="bg-gray-50 text-left">
+          <thead className={`text-left ${isDarkMode ? 'bg-slate-950' : 'bg-gray-50'}`}>
             <tr>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Vehiculo</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">N° Poliza</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Aseguradora</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Inicio</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Fin vigencia</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Estado</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Acciones</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Vehiculo</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>N° Poliza</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Aseguradora</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Inicio</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Fin vigencia</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Estado</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {filteredSoats.length === 0 ? (
-              <EmptyRows colSpan={7} hasData={soats.length > 0} />
+              <EmptyRows colSpan={7} hasData={soats.length > 0} isDarkMode={isDarkMode} />
             ) : (
               filteredSoats.map((soat) => {
                 const vehiculo = getVehiculo(soat.vehiculoId);
@@ -194,17 +201,17 @@ export default function DocumentosPage() {
                 const expirationText = getExpirationAlertText(soat.diasRestantes, soat.fechaFinVigencia);
 
                 return (
-                  <tr key={soat.id} className="border-t border-gray-100 hover:bg-gray-50">
+                  <tr key={soat.id} className={`border-t ${isDarkMode ? 'border-slate-800 hover:bg-slate-800/70' : 'border-gray-100 hover:bg-gray-50'}`}>
                     <td className="px-6 py-4">
-                      <div className="font-bold text-gray-900">{placa}</div>
-                      <div className="text-xs text-gray-500">{getVehicleSubtitle(vehiculo)}</div>
+                      <div className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{placa}</div>
+                      <div className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{getVehicleSubtitle(vehiculo)}</div>
                     </td>
-                    <td className="px-6 py-4 text-gray-700">{soat.numeroPoliza}</td>
-                    <td className="px-6 py-4 text-gray-700">{soat.aseguradora || 'Sin dato'}</td>
-                    <td className="px-6 py-4 text-gray-700">{formatColombianDate(soat.fechaInicioVigencia)}</td>
-                    <td className="px-6 py-4 text-gray-700">
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{soat.numeroPoliza}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{soat.aseguradora || 'Sin dato'}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{formatColombianDate(soat.fechaInicioVigencia)}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>
                       <div>{formatColombianDate(soat.fechaFinVigencia)}</div>
-                      <div className="text-xs text-gray-500 mt-1">{expirationText.primaryText}</div>
+                      <div className={`mt-1 text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{expirationText.primaryText}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getBadgeClasses(soat.estado)}`}>
@@ -215,6 +222,7 @@ export default function DocumentosPage() {
                       <RowActions
                         onEdit={() => setSoatEditando(soat)}
                         onDelete={() => setConfirmDelete({ tipo: 'soat', id: soat.id, nombre: soat.numeroPoliza })}
+                        isDarkMode={isDarkMode}
                       />
                     </td>
                   </tr>
@@ -234,22 +242,23 @@ export default function DocumentosPage() {
         searchTerm={rtmSearch}
         onSearchChange={setRtmSearch}
         placeholder="Buscar RTM por placa, certificado, CDA, resultado, estado o vencimiento..."
+        isDarkMode={isDarkMode}
       >
         <table className="w-full min-w-[1100px]">
-          <thead className="bg-gray-50 text-left">
+          <thead className={`text-left ${isDarkMode ? 'bg-slate-950' : 'bg-gray-50'}`}>
             <tr>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Vehiculo</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Certificado</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">CDA</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Resultado</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Vencimiento</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Estado</th>
-              <th className="px-6 py-4 text-syntix-navy font-bold">Acciones</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Vehiculo</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Certificado</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>CDA</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Resultado</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Vencimiento</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Estado</th>
+              <th className={`px-6 py-4 font-bold ${isDarkMode ? 'text-slate-200' : 'text-syntix-navy'}`}>Acciones</th>
             </tr>
           </thead>
           <tbody>
             {filteredRtms.length === 0 ? (
-              <EmptyRows colSpan={7} hasData={rtms.length > 0} />
+              <EmptyRows colSpan={7} hasData={rtms.length > 0} isDarkMode={isDarkMode} />
             ) : (
               filteredRtms.map((rtm) => {
                 const vehiculo = getVehiculo(rtm.vehiculoId);
@@ -257,17 +266,17 @@ export default function DocumentosPage() {
                 const expirationText = getExpirationAlertText(rtm.diasRestantes, rtm.fechaVencimiento);
 
                 return (
-                  <tr key={rtm.id} className="border-t border-gray-100 hover:bg-gray-50">
+                  <tr key={rtm.id} className={`border-t ${isDarkMode ? 'border-slate-800 hover:bg-slate-800/70' : 'border-gray-100 hover:bg-gray-50'}`}>
                     <td className="px-6 py-4">
-                      <div className="font-bold text-gray-900">{placa}</div>
-                      <div className="text-xs text-gray-500">{getVehicleSubtitle(vehiculo)}</div>
+                      <div className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{placa}</div>
+                      <div className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{getVehicleSubtitle(vehiculo)}</div>
                     </td>
-                    <td className="px-6 py-4 text-gray-700">{rtm.numeroCertificado}</td>
-                    <td className="px-6 py-4 text-gray-700">{rtm.cda || 'Sin dato'}</td>
-                    <td className="px-6 py-4 text-gray-700">{rtm.resultado || 'Sin dato'}</td>
-                    <td className="px-6 py-4 text-gray-700">
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{rtm.numeroCertificado}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{rtm.cda || 'Sin dato'}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>{rtm.resultado || 'Sin dato'}</td>
+                    <td className={`px-6 py-4 ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}>
                       <div>{formatColombianDate(rtm.fechaVencimiento)}</div>
-                      <div className="text-xs text-gray-500 mt-1">{expirationText.primaryText}</div>
+                      <div className={`mt-1 text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{expirationText.primaryText}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getBadgeClasses(rtm.estado)}`}>
@@ -278,6 +287,7 @@ export default function DocumentosPage() {
                       <RowActions
                         onEdit={() => setRtmEditando(rtm)}
                         onDelete={() => setConfirmDelete({ tipo: 'rtm', id: rtm.id, nombre: rtm.numeroCertificado })}
+                        isDarkMode={isDarkMode}
                       />
                     </td>
                   </tr>
@@ -290,13 +300,17 @@ export default function DocumentosPage() {
 
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Eliminar documento</h2>
-            <p className="text-gray-500 mb-6">
-              Vas a eliminar <span className="font-bold text-gray-800">{confirmDelete.nombre}</span>. Esta accion no se puede deshacer.
+          <div className={`w-full max-w-md rounded-2xl p-6 shadow-2xl ${
+            isDarkMode ? 'bg-slate-900 text-slate-100' : 'bg-white'
+          }`}>
+            <h2 className={`mb-2 text-xl font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>Eliminar documento</h2>
+            <p className={`mb-6 ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
+              Vas a eliminar <span className={`font-bold ${isDarkMode ? 'text-slate-200' : 'text-gray-800'}`}>{confirmDelete.nombre}</span>. Esta accion no se puede deshacer.
             </p>
             <div className="flex justify-end gap-3">
-              <button type="button" onClick={() => setConfirmDelete(null)} className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg">
+              <button type="button" onClick={() => setConfirmDelete(null)} className={`rounded-lg px-4 py-2 font-medium ${
+                isDarkMode ? 'text-slate-300 hover:bg-slate-800' : 'text-gray-600 hover:bg-gray-100'
+              }`}>
                 Cancelar
               </button>
               <button
@@ -329,24 +343,33 @@ function DocumentTableShell({
   onSearchChange,
   placeholder,
   children,
+  isDarkMode,
 }) {
   return (
-    <div data-onboarding={onboardingId} className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 px-6 py-5 border-b border-gray-100">
+    <div data-onboarding={onboardingId} className={`mb-8 overflow-hidden rounded-3xl border shadow-sm ${
+      isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-gray-100 bg-white'
+    }`}>
+      <div className={`flex flex-col justify-between gap-4 border-b px-6 py-5 lg:flex-row lg:items-center ${
+        isDarkMode ? 'border-slate-800 bg-slate-950/60' : 'border-gray-100'
+      }`}>
         <div className="flex items-center gap-3">
-          <Icon className="w-6 h-6 text-syntix-navy" />
-          <h2 className="text-2xl font-bold text-syntix-navy">
+          <Icon className={`w-6 h-6 ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`} />
+          <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-slate-100' : 'text-syntix-navy'}`}>
             {title} ({count}/{total})
           </h2>
         </div>
         <div className="relative w-full lg:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className={`absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder={placeholder}
-            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none"
+            className={`w-full rounded-lg border py-2 pl-9 pr-4 text-sm outline-none focus:border-syntix-green focus:ring-2 focus:ring-syntix-green ${
+              isDarkMode
+                ? 'border-slate-700 bg-slate-900 text-slate-100 placeholder:text-slate-500'
+                : 'border-gray-300 bg-white text-gray-900'
+            }`}
           />
         </div>
       </div>
@@ -355,23 +378,27 @@ function DocumentTableShell({
   );
 }
 
-function EmptyRows({ colSpan, hasData }) {
+function EmptyRows({ colSpan, hasData, isDarkMode }) {
   return (
     <tr>
-      <td colSpan={colSpan} className="px-6 py-8 text-center text-gray-500">
+      <td colSpan={colSpan} className={`px-6 py-8 text-center ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
         {hasData ? 'No se encontraron registros con ese criterio.' : 'No hay registros para mostrar.'}
       </td>
     </tr>
   );
 }
 
-function RowActions({ onEdit, onDelete }) {
+function RowActions({ onEdit, onDelete, isDarkMode }) {
   return (
     <div className="flex gap-2">
       <button
         type="button"
         onClick={onEdit}
-        className="p-2 rounded-lg text-gray-400 hover:text-syntix-navy hover:bg-gray-100 transition-colors"
+        className={`rounded-lg p-2 transition-colors ${
+          isDarkMode
+            ? 'text-slate-500 hover:bg-slate-800 hover:text-slate-100'
+            : 'text-gray-400 hover:bg-gray-100 hover:text-syntix-navy'
+        }`}
         title="Editar"
       >
         <Pencil className="w-4 h-4" />
@@ -379,7 +406,11 @@ function RowActions({ onEdit, onDelete }) {
       <button
         type="button"
         onClick={onDelete}
-        className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+        className={`rounded-lg p-2 transition-colors ${
+          isDarkMode
+            ? 'text-slate-500 hover:bg-red-500/10 hover:text-red-300'
+            : 'text-gray-400 hover:bg-red-50 hover:text-red-500'
+        }`}
         title="Eliminar"
       >
         <Trash2 className="w-4 h-4" />

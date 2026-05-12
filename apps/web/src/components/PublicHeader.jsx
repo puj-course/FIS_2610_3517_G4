@@ -29,7 +29,7 @@ export default function PublicHeader({ onLoginClick, onRegisterClick }) {
 
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
-              <UserProfileDropdown />
+              <UserProfileDropdown variant="light" />
             ) : (
               <>
                 <button onClick={onLoginClick} className="text-syntix-navy font-medium hover:text-syntix-green transition-colors">
@@ -61,7 +61,7 @@ export default function PublicHeader({ onLoginClick, onRegisterClick }) {
           <div className="pt-4 flex flex-col gap-3 border-t border-gray-100">
             {isAuthenticated ? (
               <div className="flex justify-center py-2">
-                <UserProfileDropdown />
+                <UserProfileDropdown variant="light" />
               </div>
             ) : (
               <>

@@ -21,6 +21,7 @@ import ValidacionRUNTPage from '@/pages/ValidacionRUNTPage.jsx';
 import HistorialValidacionesPage from '@/pages/HistorialValidacionesPage.jsx';
 import ReportesPage from '@/pages/ReportesPage.jsx';
 import ConfiguracionPage from '@/pages/ConfiguracionPage.jsx';
+import UserProfilePage from '@/pages/UserProfilePage.jsx';
 
 // App arma el árbol principal de providers y define qué vistas son públicas
 // y cuáles deben pasar por la protección de autenticación.
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/validacion-runt" element={<ValidacionRUNTPage />} />
                 <Route path="/historial-validaciones" element={<HistorialValidacionesPage />} />
                 <Route path="/reportes" element={<ReportesPage />} />
+                <Route path="/perfil" element={<UserProfilePage />} />
                 <Route path="/configuracion" element={<ConfiguracionPage />} />
               </Route>
             </Route>
