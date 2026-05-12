@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import App from '@/App';
+import { ThemeProvider } from '@/contexts/ThemeContext.jsx';
 import './index.css';
 
 // Punto de arranque único de React: aquí se monta toda la SPA sobre el nodo root.
@@ -11,10 +12,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {googleClientId ? (
       <GoogleOAuthProvider clientId={googleClientId}>
-        <App />
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
       </GoogleOAuthProvider>
     ) : (
-      <App />
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
     )}
   </React.StrictMode>
 )
