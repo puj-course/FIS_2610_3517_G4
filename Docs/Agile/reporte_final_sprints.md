@@ -4,10 +4,10 @@
 
 | Milestone | Descripción | Progreso | Issues (Abiertos/Cerrados) | Estado | Fecha Límite |
 |-----------|-------------|----------|----------------------------|--------|--------------|
-| **1. Base funcional del sistema** | Implementación del entorno, repositorio, despliegue inicial, Login/Registro y diseño base (Navbar/Sidebar). | 100% | 0 / 85 | ✅ Finalizado | 13/03/2026 |
-| **2. Gestión básica de flota** | CRUD completo de vehículos (placas, modelo, marca), filtros de búsqueda e integración de base de datos. | 100% | 0 / 39 | ✅ Finalizado | 10/04/2026 |
-| **3. Gestión documental y monitoreo** | Motor de vigilancia de vencimientos (SOAT, RTM, Licencias), semaforización y exportación de reportes PDF/Excel. | 100% | 0 / 32 | ✅ Finalizado | 01/05/2026 |
-| **4. Dashboard, alertas y cierre del sistema** | Dashboard resumen de flota, validación de integridad de datos y pruebas finales en el sistema. | 99% | 1 / 119 | 🔄 En Curso | 19/05/2026 |
+| **1. Base funcional del sistema** | Implementación del entorno, repositorio, despliegue inicial, Login/Registro y diseño base (Navbar/Sidebar). | 100% | 0 / 144 | ✅ Finalizado | 15/03/2026 |
+| **2. Gestión básica de flota** | CRUD completo de vehículos (placas, modelo, marca), filtros de búsqueda e integración de base de datos. | 100% | 0 / 133 | ✅ Finalizado | 12/04/2026 |
+| **3. Gestión documental y monitoreo** | Motor de vigilancia de vencimientos (SOAT, RTM, Licencias), semaforización y exportación de reportes PDF/Excel. | 100% | 0 / 57 | ✅ Finalizado | 26/04/2026 |
+| **4. Dashboard, alertas y cierre del sistema** | Dashboard resumen de flota, validación de integridad de datos y pruebas finales en el sistema. | 99% | 1 / 40 | 🔄 En Curso | 19/05/2026 |
 
 ---
 
@@ -15,223 +15,48 @@
 
 ### Resumen de Planificación vs Ejecución
 
-| Sprint | HU Planificadas | HU Cerradas | % Cumplimiento |
-|--------|-----------------|------------|-----------------|
-| Sprint 1 | 5 | 5 | 100% | 
-| Sprint 2 | 6 | 6 | 100% | 
-| Sprint 3 | 7 | 7 | 100% | 
-| Sprint 4 | 6 | 6 | 100% | 
-| Sprint 5 | 8 | 8 | 100% | 
-| Sprint 6 | 7 | 7 | 100% | 
-| Sprint 7 | 8 | 8 | 100% | 
-| Sprint 8 | 6 | 6 | 100% | 
-| Sprint 9 | 9 | 9 | 100% | 
-| Sprint 10 | 8 | 8 | 100% | 
-| Sprint 11 | 9 | 9 | 100% | 
-| Sprint 12 | 10 | 10 | 100% | 
-| Sprint 13 | 8 | 7 | 87.5% | 
-| **PROMEDIO GENERAL** | **7.46** | **7.38** | **98.9%** |
-
-### Detalles por Sprint
-
-#### Sprint 1 (12/02 - 19/02)
-- **Objetivo**: Configuración del entorno, repositorio y despliegue inicial
-- **HU Completadas**: 5
-- **Issues Cerradas**: 15
-- **Commits**: ~30
-- **Milestone Relacionado**: Milestone 1
-
-#### Sprint 2 (20/02 - 27/02)
-- **Objetivo**: Diseño base de UI, creación de Navbar y Sidebar
-- **HU Completadas**: 6
-- **Issues Cerradas**: 20
-- **Commits**: ~35
-- **Milestone Relacionado**: Milestone 1
-
-#### Sprint 3 (28/02 - 06/03)
-- **Objetivo**: Módulo de Login y Registro (Frontend y Backend base)
-- **HU Completadas**: 7
-- **Issues Cerradas**: 25
-- **Commits**: ~40
-- **Milestone Relacionado**: Milestone 1
-
-#### Sprint 4 (07/03 - 13/03)
-- **Objetivo**: Persistencia de sesión local y pruebas iniciales
-- **HU Completadas**: 6
-- **Issues Cerradas**: 25
-- **Commits**: ~38
-- **Milestone Relacionado**: Milestone 1
-
-#### Sprint 5 (14/03 - 21/03)
-- **Objetivo**: Registro y edición de vehículos (CRUD parcial)
-- **HU Completadas**: 8
-- **Issues Cerradas**: 12
-- **Commits**: ~42
-- **Milestone Relacionado**: Milestone 2
-
-#### Sprint 6 (22/03 - 28/03)
-- **Objetivo**: Visualización y baja de vehículos
-- **HU Completadas**: 7
-- **Issues Cerradas**: 10
-- **Commits**: ~36
-- **Milestone Relacionado**: Milestone 2
-
-#### Sprint 7 (29/03 - 04/04)
-- **Objetivo**: Implementación de filtros de búsqueda avanzados
-- **HU Completadas**: 8
-- **Issues Cerradas**: 9
-- **Commits**: ~40
-- **Milestone Relacionado**: Milestone 2
-
-#### Sprint 8 (05/04 - 11/04)
-- **Objetivo**: Integración final de BD de flota y refinamiento
-- **HU Completadas**: 6
-- **Issues Cerradas**: 8
-- **Commits**: ~32
-- **Milestone Relacionado**: Milestone 2
-
-#### Sprint 9 (12/04 - 19/04)
-- **Objetivo**: Módulo de carga documental y reportes iniciales
-- **HU Completadas**: 9
-- **Issues Cerradas**: 18
-- **Commits**: ~48
-- **Milestone Relacionado**: Milestone 3
-
-#### Sprint 10 (20/04 - 26/04)
-- **Objetivo**: Consolidar base de datos MongoDB y autenticación
-- **HU Completadas**: 8
-- **Issues Cerradas**: 8
-- **Commits**: ~45
-- **Milestone Relacionado**: Milestone 3
-
-#### Sprint 11 (27/04 - 03/05)
-- **Objetivo**: Documentación, Google OAuth, validación end-to-end
-- **HU Completadas**: 9
-- **Issues Cerradas**: 9
-- **Commits**: ~52
-- **Milestone Relacionado**: Milestone 3
-
-#### Sprint 12 (04/05 - 11/05)
-- **Objetivo**: Onboarding guiado, recuperación de cuenta, perfil
-- **HU Completadas**: 10
-- **Issues Cerradas**: 10
-- **Commits**: ~58
-- **Merge Requests**: 12
-- **Milestone Relacionado**: Milestone 4
-
-#### Sprint 13 (12/05 - En Curso)
-- **Objetivo**: Métricas de calidad, navegación, modo oscuro
-- **HU Completadas**: 7 de 8 planeadas
-- **Issues Cerradas**: 7
-- **Commits**: ~35 (en curso)
-- **Merge Requests**: 6 (en curso)
-- **Milestone Relacionado**: Milestone 4
+| Sprint | Periodo | HU Completadas | Issues Cerradas | Commits | Milestone Relacionado |
+|--------|---------|----------------|-----------------|---------|-----------------------|
+| Sprint 1 | 16/02 - 22/02 | 5 | 44 | 20 | Milestone 1 |
+| Sprint 2 | 23/02 - 01/03 | 2 | 12 | 7 | Milestone 1 |
+| Sprint 3 | 02/03 - 08/03 | 12 | 31 | 20 | Milestone 1 |
+| Sprint 4 | 09/03 - 15/03 | 18 | 57 | 38 | Milestone 1 |
+| Sprint 5 | 16/03 - 22/03 | 6 | 33 | 22 | Milestone 2 |
+| Sprint 6 | 23/03 - 29/03 | 6 | 30 | 17 | Milestone 2 |
+| Sprint 7 | 30/03 - 05/04 | 4 | 28 | 10 | Milestone 2 |
+| Sprint 8 | 06/04 - 12/04 | 5 | 42 | 55 | Milestone 2 |
+| Sprint 9 | 13/04 - 19/04 | 7 | 31 | 54 | Milestone 3 |
+| Sprint 10 | 20/04 - 26/04 | 5 | 26 | 15 | Milestone 3 |
+| Sprint 11 | 27/04 - 03/05 | 5 | 23 | 41 | Milestone 4 |
+| Sprint 12 | 04/05 - 11/05 | 6 | 10 | 47 | Milestone 4 |
+| Sprint 13 | 12/05 - 17/05 | 7 | 7 | 59 | Milestone 4 |
+| **TOTAL** | | **88** | **374** | **405** | - |
 
 ---
 
 ## 👥 Participación y Contribuciones (Datos Reales del Repositorio)
 
-Para cumplir con el criterio de distribución equilibrada de la rúbrica, se presenta el análisis de actividad extraído directamente de los **Insights de GitHub**:
+Para cumplir con el criterio de distribución equilibrada, se presenta el análisis de actividad extraído directamente de los **Insights de GitHub (Período: Enero 2026 - Mayo 2026)**:
 
 ### Resumen de Participación
 
-| Integrante | Commits | % Participación | Rol Estratégico |
-|------------|---------|-----------------|-----------------|
-| **Sarm-m** | 174 | 27.2% | 	Scrum Master |
-| **samuelfl680** | 149 | 23.3% | Configuration Manager |
-| **solonlosada2006** | 97 | 15.2% | DevOps Engineer |
-| **juanvargax** | 93 | 14.5% | Product Owner y Sprint Planner |
-| **Juserora / jSebastianRR** | 41 | 6.4% | Quality Assurance Lead (QA Lead) |
-| **Otros / Bots** | 81 | 13.4% | Automatización y Soporte |
-| **TOTAL** | **639** | **100%** | - |
+| Integrante | Commits | % Participación | Líneas Agregadas (++) | Rol Estratégico |
+|------------|---------|-----------------|-----------------------|-----------------|
+| **Sarm-m** | 150 | 34.0% | 47,144 | Scrum Master |
+| **samuelfl680** | 99 | 22.4% | 7,672 | Configuration Manager |
+| **solonlosada2006** | 87 | 19.7% | 10,567 | DevOps Engineer |
+| **juanvargax** | 52 | 11.8% | 14,526 | Product Owner y Sprint Planner |
+| **jSebastianRR / Juserora** | 29 | 6.6% | 2,085 | Quality Assurance Lead (QA Lead) |
+| **Otros / Bots (Copilot, etc.)** | 24 | 5.5% | 1,985 | Automatización y Soporte |
+| **TOTAL** | **441** | **100%** | **84,137** | - |
 
-### Análisis de Colaboración
-
-#### Balance Técnico
-El 80.2% del desarrollo fue ejecutado de forma **equitativa por los cuatro perfiles principales**, garantizando que el conocimiento del sistema esté distribuido:
-- **Núcleo Técnico (4 integrantes)**: 514 commits (80.4%)
-  - Sarm-m + samuelfl680 + solonlosada2006 + juanvargax
-  - Cobertura completa: Backend, Frontend, Arquitectura y QA
-- **Distribución**: Ningún integrante supera el 30%, evitando centralización de riesgos
-
-#### Flujo de Trabajo
-Se observa una **correlación directa entre el volumen de commits y la complejidad** de los módulos asignados:
-- **Módulos complejos** (Autenticación, Alertas): Sarm-m (174) y samuelfl680 (149)
-- **Módulos integrados** (Frontend, Documentos): solonlosada2006 (97) y juanvargax (93)
-- **Aseguramiento de calidad**: Juserora (41), enfocado en testing e integración
-
-#### Revisiones Cruzadas
-Aunque los commits son individuales, **cada bloque de código pasó por un proceso de Pull Request revisado por al menos un par**, cumpliendo con los estándares de calidad del curso:
-- Total de PRs procesadas: 71 mergeadas + 12 cerradas = 83
-- Tasa de integración exitosa: 85% (71/83)
-- Procesos de validación: Code Review obligatorio en ramas protegidas
-
-### Detalles de Participación
-
-#### Sebastian Ramírez (Sarm-m) - 27.2% del proyecto (174 commits)
-- **Especialidades**: 
-  - Gestión de alertas con patrón **Facade**
-  - Base de datos MongoDB: Schema, índices, optimizaciones
-  - Validación y normalización de datos
-  - Reportes y métricas del sistema
-- **Hitos Principales**: Alertas críticas, Sistema de notificaciones, Reporteria
-- **Contribución**: Líder técnico de lógica de negocio
-
-#### Samuel Freile (samuelfl680) - 23.3% del proyecto (149 commits)
-- **Especialidades**: 
-  - Arquitectura del Backend: Rutas, controladores, servicios
-  - Autenticación: Google OAuth, OTP, recuperación de cuenta
-  - Configuración Docker y CI/CD
-  - Documentación y comentarios del código
-- **Hitos Principales**: Seguridad, Deployment, Pipeline automatizado
-- **Contribución**: Arquitecto Backend e Ingeniero DevOps
-
-#### Solon Losada (solonlosada2006) - 15.2% del proyecto (97 commits)
-- **Especialidades**:
-  - Frontend: Componentes de gestión de documentos
-  - Historial de validaciones y auditoría
-  - Integración de APIs y endpoints
-  - UX/UI consistente
-- **Hitos Principales**: Gestión de documentos, Historial, Interfaces
-- **Contribución**: Especialista Frontend de documentación
-
-#### Juan Vargas (juanvargax) - 14.5% del proyecto (93 commits)
-- **Especialidades**:
-  - Diseño e interfaz de usuario (Tailwind CSS)
-  - Navegación y componentes reutilizables
-  - Experiencia de usuario y accesibilidad
-  - Storytelling visual del sistema
-- **Hitos Principales**: Diseño visual, Navegación, Componentes UI
-- **Contribución**: Diseñador/Frontend Developer
-
-#### Juan Sebastián Rodriguez (Juserora / jSebastianRR) - 6.4% del proyecto (41 commits)
-- **Especialidades**:
-  - Aseguramiento de calidad (QA)
-  - Testing y cobertura de código
-  - Validación end-to-end
-  - Interfaces gráficas de prueba
-- **Hitos Principales**: Tests, Cobertura, Validación
-- **Contribución**: QA Engineer y Tester principal
-
-#### Automatización (Bots, CI/CD) - 13.4% del proyecto (81 commits)
-- **Origen**: GitHub Actions, Dependabot, herramientas automatizadas
-- **Función**: Mantenimiento de dependencias, builds automáticos
-- **Contribución**: Soporte transversal de calidad y seguridad
-
----
 
 ## 🎯 Análisis de Productividad
 
-### Velocidad del Equipo
-- **Promedio de commits por sprint**: 47.5
-- **Promedio de PRs por sprint**: 9
-- **Tasa de merging**: 85% (71 de 83 PRs mergeadas)
-- **Tasa de cierre**: 15% (12 PRs cerradas sin merge)
-
-### Calidad de Código
-- **Cobertura de Tests**: Implementados en Sprints 11-13
-- **Análisis SonarCloud**: Ejecutado en Sprint 11 ([#475](https://github.com/puj-course/FIS_2610_3517_G4/pull/475))
-- **Documentación**: 100% de funciones principales comentadas
+*   **Promedio de commits por desarrollador principal**: ~97 commits.
+*   **Volumen total de código gestionado**: +84,000 líneas de código implementadas.
+*   **Tasa de merging**: 85% de integración exitosa.
+*   **Consistencia**: Actividad sostenida sin brechas prolongadas desde el 25 de enero hasta el 10 de mayo de 2026.
 
 ---
 
@@ -280,5 +105,3 @@ Siguiendo la instrucción de realizar el ejercicio por cada Milestone, a continu
 | **Dejar de hacer** | 1. Postergación de la trazabilidad.<br>2. Dejar HU abiertas.<br>3. Desatender el DoD. | Evitar pérdida de puntos en la rúbrica.<br>Tener el tablero de GitHub al 100%.<br>No entregar nada sin sus tests. |
 
 ---
-
-### Distribución de Esfuerzo
