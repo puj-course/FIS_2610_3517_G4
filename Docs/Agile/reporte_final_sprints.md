@@ -15,22 +15,22 @@
 
 ### Resumen de Planificación vs Ejecución
 
-| Sprint | Periodo | HU Completadas | Issues Cerradas | Commits | Milestone Relacionado |
-|--------|---------|----------------|-----------------|---------|-----------------------|
-| Sprint 1 | 16/02 - 22/02 | 5 | 44 | 20 | Milestone 1 |
-| Sprint 2 | 23/02 - 01/03 | 2 | 12 | 7 | Milestone 1 |
-| Sprint 3 | 02/03 - 08/03 | 12 | 31 | 20 | Milestone 1 |
-| Sprint 4 | 09/03 - 15/03 | 18 | 57 | 38 | Milestone 1 |
-| Sprint 5 | 16/03 - 22/03 | 6 | 33 | 22 | Milestone 2 |
-| Sprint 6 | 23/03 - 29/03 | 6 | 30 | 17 | Milestone 2 |
-| Sprint 7 | 30/03 - 05/04 | 4 | 28 | 10 | Milestone 2 |
-| Sprint 8 | 06/04 - 12/04 | 5 | 42 | 55 | Milestone 2 |
-| Sprint 9 | 13/04 - 19/04 | 7 | 31 | 54 | Milestone 3 |
-| Sprint 10 | 20/04 - 26/04 | 5 | 26 | 15 | Milestone 3 |
-| Sprint 11 | 27/04 - 03/05 | 5 | 23 | 41 | Milestone 4 |
-| Sprint 12 | 04/05 - 11/05 | 6 | 10 | 47 | Milestone 4 |
-| Sprint 13 | 12/05 - 17/05 | 7 | 7 | 59 | Milestone 4 |
-| **TOTAL** | | **88** | **374** | **405** | - |
+| Sprint | Periodo | Objetivo Principal | HU Completadas | Issues Cerradas | Commits | Milestone Relacionado |
+|--------|---------|--------------------|----------------|-----------------|---------|-----------------------|
+| Sprint 1 | 16/02 - 22/02 | - | 5 | 44 | 20 | Milestone 1 |
+| Sprint 2 | 23/02 - 01/03 | - | 2 | 12 | 7 | Milestone 1 |
+| Sprint 3 | 02/03 - 08/03 | Módulo de Login y Registro (Frontend y Backend base) | 12 | 31 | 20 | Milestone 1 |
+| Sprint 4 | 09/03 - 15/03 | - | 18 | 57 | ~38 | Milestone 1 |
+| Sprint 5 | 16/03 - 22/03 | - | 6 | 33 | 22 | Milestone 2 |
+| Sprint 6 | 23/03 - 29/03 | Visualización y baja de vehículos | 6 | 30 | 17 | Milestone 2 |
+| Sprint 7 | 30/03 - 05/04 | - | 4 | 28 | 10 | Milestone 2 |
+| Sprint 8 | 06/04 - 12/04 | - | 5 | 42 | 55 | Milestone 2 |
+| Sprint 9 | 13/04 - 19/04 | - | 7 | 31 | 54 | Milestone 3 |
+| Sprint 10 | 20/04 - 26/04 | - | 5 | 26 | 15 | Milestone 3 |
+| Sprint 11 | 27/04 - 03/05 | - | 5 | 23 | 41 | Milestone 4 |
+| Sprint 12 | 04/05 - 11/05 | - | 6 | 10 | 47 | Milestone 4 |
+| Sprint 13 | 12/05 - 17/05 | Métricas de calidad, navegación, modo oscuro | 7 de 8 planeadas | 7 | 59 | Milestone 4 |
+| **TOTAL** | | | **88** | **374** | **405** | - |
 
 ---
 
