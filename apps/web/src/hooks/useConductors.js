@@ -1,26 +1,28 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import api from '@/services/api.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { calculateDaysRemaining, calculateDocumentState } from '../utils/dateUtils.js';
 import { useSimulatedDate } from './useSimulatedDate.js';
+import { useLocalStorage } from './useLocalStorage.js';
 
 const CONDUCTORS_UPDATED_EVENT = 'syntix:conductors-updated';
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
+// Normaliza IDs del backend para que el resto de hooks no dependa de _id vs id.
 const normalizeConductor = (conductor) => ({
   ...conductor,
   id: conductor._id || conductor.id,
 });
 
 const notifyConductorsUpdated = () => {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(CONDUCTORS_UPDATED_EVENT));
+  if (typeof globalThis !== 'undefined' && globalThis.dispatchEvent) {
+    globalThis.dispatchEvent(new Event(CONDUCTORS_UPDATED_EVENT));
   }
 };
 
 const notifyVehiclesUpdated = () => {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(VEHICLES_UPDATED_EVENT));
+  if (typeof globalThis !== 'undefined' && globalThis.dispatchEvent) {
+    globalThis.dispatchEvent(new Event(VEHICLES_UPDATED_EVENT));
   }
 };
 
@@ -28,7 +30,7 @@ export function useConductors() {
   const [conductores, setConductores] = useState([]);
   const { user } = useAuth();
   const { simulatedDate } = useSimulatedDate();
-  const threshold = 15;
+  const [threshold] = useLocalStorage('syntix_threshold', 15);
 
   const fetchConductors = useCallback(async () => {
     if (!user?.email) {
@@ -48,18 +50,20 @@ export function useConductors() {
   }, [user?.email]);
 
   useEffect(() => {
+    // Cada sesión ve solo sus conductores, por eso la consulta depende del usuario autenticado.
     fetchConductors();
   }, [fetchConductors]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
+    if (typeof globalThis === 'undefined' || !globalThis.addEventListener) return undefined;
 
+    // El evento permite refrescar la lista desde cualquier pantalla que muta conductores.
     const handleConductorsUpdated = () => {
       fetchConductors();
     };
 
-    window.addEventListener(CONDUCTORS_UPDATED_EVENT, handleConductorsUpdated);
-    return () => window.removeEventListener(CONDUCTORS_UPDATED_EVENT, handleConductorsUpdated);
+    globalThis.addEventListener(CONDUCTORS_UPDATED_EVENT, handleConductorsUpdated);
+    return () => globalThis.removeEventListener(CONDUCTORS_UPDATED_EVENT, handleConductorsUpdated);
   }, [fetchConductors]);
 
   const addConductor = async (data) => {
@@ -100,7 +104,8 @@ export function useConductors() {
     notifyVehiclesUpdated();
   };
 
-  const conductorsWithState = conductores.map((conductor) => {
+  const conductorsWithState = useMemo(() => conductores.map((conductor) => {
+    // El estado de la licencia se deriva en cliente para responder a la fecha simulada del dashboard.
     const days = calculateDaysRemaining(conductor.fechaVencimiento, simulatedDate);
 
     return {
@@ -108,7 +113,7 @@ export function useConductors() {
       diasRestantes: days,
       estado: calculateDocumentState(days, threshold),
     };
-  });
+  }), [conductores, simulatedDate, threshold]);
 
   return {
     conductores: conductorsWithState,

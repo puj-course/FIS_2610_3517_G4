@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
+// Badge visual reutilizable para traducir estados del dominio a un código de color consistente.
 export default function StatusBadge({ status, label }) {
   const colors = {
     verde: 'bg-syntix-green/10 text-syntix-green border-syntix-green/20',
@@ -16,3 +18,8 @@ export default function StatusBadge({ status, label }) {
     </span>
   );
 }
+
+StatusBadge.propTypes = {
+  status: PropTypes.string,
+  label: PropTypes.string,
+};

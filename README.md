@@ -42,6 +42,7 @@
 9. [Estructura del repositorio](#-estructura-del-repositorio)  
 10. [Requisitos](#-requisitos)  
 11. [Instalación](#-instalación)  
+12. [Ejecucion con Docker](#ejecucion-con-docker)  
 13. [Wiki y enlaces](#-wiki-y-enlaces)  
 14. [Licencia](#-licencia)  
 15. [Contexto académico](#-contexto-académico)  
@@ -184,6 +185,39 @@ assets/     → recursos gráficos
 ```bash
 git clone https://github.com/puj-course/FIS_2610_3517_G4.git
 cd FIS_2610_3517_G4
+```
+
+---
+
+# Ejecucion con Docker
+
+El proyecto incluye una configuracion de contenedores para ejecutar la aplicacion completa con MongoDB, backend y frontend.
+
+```bash
+docker compose up -d --build
+```
+
+Servicios expuestos:
+
+- Frontend: http://localhost:3000
+- Backend: http://localhost:5000
+- Healthcheck base de datos: http://localhost:5000/api/health/db
+- Healthcheck por proxy del frontend: http://localhost:3000/api/health/db
+
+La configuracion de Compose toma `MONGO_URI` desde el archivo `.env` de la raiz para conectar el backend a la base compartida del equipo. Si esa variable no existe, usa el servicio local `mongodb` definido en `docker-compose.yml` como respaldo.
+
+Comandos utiles de verificacion:
+
+```bash
+docker compose ps
+docker compose logs backend --tail 100
+docker compose logs frontend --tail 100
+```
+
+Para detener y limpiar los contenedores, red y volumen local:
+
+```bash
+docker compose down -v
 ```
 
 ---

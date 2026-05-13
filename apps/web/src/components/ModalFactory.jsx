@@ -1,7 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import AuthModalFactory from '@/patterns/factory/AuthModalFactory.jsx';
 import FleetModalFactory from '@/patterns/factory/FleetModalFactory.jsx';
 
+// Esta fachada evita que cada página conozca el detalle de creación de cada modal.
 export default function ModalFactory({ modalType, ...props }) {
   if (!modalType) return null;
 
@@ -18,3 +20,7 @@ export default function ModalFactory({ modalType, ...props }) {
 
   return factory.createModal(modalType, commonProps);
 }
+
+ModalFactory.propTypes = {
+  modalType: PropTypes.string,
+};

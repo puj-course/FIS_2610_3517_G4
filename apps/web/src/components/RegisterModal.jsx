@@ -1,21 +1,35 @@
 import React, { useState, useRef } from 'react';
-import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw } from 'lucide-react';
+import PropTypes from 'prop-types';
+import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
+import { queueOnboardingForUser } from '@/contexts/OnboardingContext.jsx';
 import { authService } from '@/services/api.js';
+import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
+import { isValidColombianMobile } from '@/utils/colombiaFormats.js';
+import { isValidEmailFormat } from '@/utils/emailValidation.js';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isOnlyDigits = (value) =>
+  Array.from(String(value ?? '')).every((character) => character >= '0' && character <= '9');
 
+// Registro en dos pasos: alta inicial y luego verificación OTP para cerrar el onboarding.
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
+  // `formData` concentra el paso inicial del registro tradicional.
   const [formData, setFormData] = useState({ email: '', password: '', empresa: '', telefono: '' });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  // `step` define si estamos rellenando datos o confirmando el OTP.
   const [step, setStep] = useState('register'); // 'register' | 'verify'
+  // `pendingEmail` conserva el correo que debe verificarse en el segundo paso.
   const [pendingEmail, setPendingEmail] = useState('');
+  // El OTP se separa en 6 casillas para mejorar legibilidad y foco.
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  // Cooldown visual para limitar reenvíos desde el cliente.
   const [resendCooldown, setResendCooldown] = useState(0);
   const inputRefs = useRef([]);
-  const { register, loginAfterVerification } = useAuth();
+  const { register, loginAfterVerification, loginWithGoogle } = useAuth();
 
+  // Si el modal está cerrado, no se renderiza ni mantiene listeners visuales.
   if (!isOpen) return null;
 
   // Paso 1: registro base. Si el backend responde OK, se avanza al paso OTP.
@@ -26,15 +40,22 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     const telefono = formData.telefono.trim();
     const email = formData.email.trim().toLowerCase();
 
+    // La empresa es requisito del modelo de negocio.
     if (!empresa) {
       setError('Ingresa el nombre de la empresa.');
       return;
     }
+    // El teléfono alimenta recuperación y perfil del usuario.
     if (!telefono) {
       setError('Ingresa el teléfono.');
       return;
     }
-    if (!EMAIL_REGEX.test(email)) {
+    if (!isValidColombianMobile(telefono)) {
+      setError('El celular debe tener 10 digitos e iniciar por 3.');
+      return;
+    }
+    // El correo es la llave principal de identidad y del OTP.
+    if (!isValidEmailFormat(email)) {
       setError('Ingresa un correo electrónico válido.');
       return;
     }
@@ -46,20 +67,70 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       setError('La contraseña debe tener al menos 6 caracteres');
       return;
     }
+    // Se inicia la llamada al contexto solo después de pasar todas las validaciones locales.
     setIsSubmitting(true);
     try {
       const res = await register(email, formData.password, empresa, telefono);
       if (res.needsVerification) {
+        // El backend ya guardó el usuario pendiente y disparó el correo OTP.
         setPendingEmail(res.email || email);
         setStep('verify');
         startCooldown();
       } else if (res.success) {
+        // Fallback reservado para registros que no requieran OTP en otros escenarios.
+        queueOnboardingForUser(res.user?.email || email);
         onClose();
       } else {
         setError(res.message || 'Error al registrar usuario');
       }
     } catch (err) {
       setError('Error inesperado al registrar. Intente nuevamente.');
+      console.error('Error registrando usuario:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleRegister = async (credential) => {
+    // Con Google, empresa y teléfono siguen siendo obligatorios porque no vienen del perfil federado.
+    const empresa = formData.empresa.trim();
+    const telefono = formData.telefono.trim();
+
+    if (!empresa) {
+      setError('Ingresa el nombre de la empresa antes de continuar con Google.');
+      return;
+    }
+
+    if (!telefono) {
+      setError('Ingresa el teléfono antes de continuar con Google.');
+      return;
+    }
+
+    if (!isValidColombianMobile(telefono)) {
+      setError('El celular debe tener 10 digitos e iniciar por 3.');
+      return;
+    }
+
+    if (!credential) {
+      setError('Google no devolvio un token valido.');
+      return;
+    }
+
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      // El backend decide si la cuenta Google se crea o si simplemente inicia sesión.
+      const res = await loginWithGoogle({ idToken: credential, empresa, telefono });
+      if (res.success) {
+        // Solo se cola onboarding si realmente fue una cuenta nueva.
+        if (res.created && res.user?.email) {
+          queueOnboardingForUser(res.user.email);
+        }
+        onClose();
+      } else {
+        setError(res.message || 'No se pudo completar el registro con Google.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -67,6 +138,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   // Cooldown visual para evitar spam de reenvios.
   const startCooldown = () => {
+    // Arranca en 60 y baja cada segundo hasta liberar el botón.
     setResendCooldown(60);
     const interval = setInterval(() => {
       setResendCooldown(prev => {
@@ -78,10 +150,13 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   // Permite solo digitos y avanza automaticamente entre inputs.
   const handleOtpChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return;
+    // Se rechaza cualquier carácter que no sea numérico.
+    if (!isOnlyDigits(value)) return;
     const newOtp = [...otp];
+    // Cada input guarda solo el último dígito ingresado.
     newOtp[index] = value.slice(-1);
     setOtp(newOtp);
+    // Si el usuario escribió algo, el foco salta al siguiente cuadro.
     if (value && index < 5) inputRefs.current[index + 1]?.focus();
   };
 
@@ -95,13 +170,17 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   // Paso 2: valida OTP y activa sesion del usuario verificado.
   const handleVerify = async (e) => {
     e.preventDefault();
+    // Se recompone el OTP completo antes de enviarlo al backend.
     const codigo = otp.join('');
     if (codigo.length < 6) { setError('Ingresa el código completo de 6 dígitos'); return; }
     setError('');
     setIsSubmitting(true);
     try {
+      // El backend verifica hash, expiración e intentos restantes.
       const res = await authService.verificarCodigo(pendingEmail, codigo);
       if (res.success) {
+        queueOnboardingForUser(res.data.user?.email || pendingEmail);
+        // Esta llamada crea la sesión real justo después de validar el OTP.
         if (loginAfterVerification) loginAfterVerification(res.data.user, res.data.token);
         onClose();
       } else {
@@ -109,6 +188,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       }
     } catch (err) {
       setError('Error al verificar. Intente nuevamente.');
+      console.error('Error verificando codigo de registro:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -116,19 +196,22 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   // Solicita un OTP nuevo respetando el cooldown configurado.
   const handleResend = async () => {
+    // El cliente no deja reenviar si el contador aún no llegó a cero.
     if (resendCooldown > 0) return;
     setError('');
     try {
       const res = await authService.reenviarCodigo(pendingEmail);
       if (res.success) {
+        // Al reenviar, se limpia el OTP anterior y se devuelve el foco al primer cuadro.
         setOtp(['', '', '', '', '', '']);
         startCooldown();
         inputRefs.current[0]?.focus();
       } else {
         setError(res.message);
       }
-    } catch {
+    } catch (err) {
       setError('Error al reenviar el código.');
+      console.error('Error reenviando codigo de registro:', err);
     }
   };
 
@@ -145,36 +228,69 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
             <form onSubmit={handleSubmit} noValidate className="p-6 space-y-4">
               {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de Empresa</label>
+                <label htmlFor="register-company" className="block text-sm font-medium text-gray-700 mb-1">Nombre de Empresa</label>
                 <div className="relative">
                   <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input type="text" required value={formData.empresa} onChange={e => setFormData({...formData, empresa: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="Mi Empresa SAS" />
+                  <input id="register-company" type="text" required value={formData.empresa} onChange={e => setFormData({...formData, empresa: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="Mi Empresa SAS" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                <label htmlFor="register-phone" className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input type="tel" required value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="300 123 4567" />
+                  <input id="register-phone" type="tel" required value={formData.telefono} onChange={e => setFormData({...formData, telefono: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="3001234567" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                <label htmlFor="register-email" className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="admin@empresa.com" />
+                  <input id="register-email" type="email" required value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="admin@empresa.com" />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                <label htmlFor="register-password" className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input type="password" required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
+                  <input id="register-password" type={showPassword ? 'text' : 'password'} required value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(prev => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-syntix-green transition-colors"
+                    aria-label={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                    title={showPassword ? 'Ocultar contrasena' : 'Mostrar contrasena'}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
               </div>
               <button type="submit" disabled={isSubmitting} className="w-full bg-syntix-green text-white py-2.5 rounded-lg font-medium hover:bg-syntix-green/90 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
                 {isSubmitting ? (<><Loader2 className="w-5 h-5 animate-spin" />Registrando...</>) : 'Registrarse'}
               </button>
+
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-400">o registrarte con</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-2">
+                <GoogleAuthButton
+                  // El botón usa el mismo proveedor global configurado en main.jsx.
+                  onSuccess={handleGoogleRegister}
+                  onError={() => setError('No se pudo completar el registro con Google.')}
+                  disabled={isSubmitting}
+                  text="signup_with"
+                />
+                <p className="text-center text-xs text-gray-500">
+                  {/* Se explica por qué Google no elimina por completo el formulario del registro. */}
+                  Google aporta el correo verificado; empresa y teléfono siguen siendo obligatorios para crear la cuenta.
+                </p>
+              </div>
+
               <p className="text-center text-sm text-gray-600 mt-4">
                 ¿Ya tienes cuenta? <button type="button" onClick={onSwitchToLogin} className="text-syntix-navy font-semibold hover:underline">Inicia Sesión</button>
               </p>
@@ -195,6 +311,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
               <div className="text-center">
                 <p className="text-gray-600 text-sm">Enviamos un código de 6 dígitos a</p>
                 <p className="font-semibold text-syntix-navy mt-1">{pendingEmail}</p>
+                {/* Se avisa spam porque varios profesores/equipos suelen probar con Gmail. */}
                 <p className="text-gray-500 text-xs mt-2">Revisa tu bandeja de entrada y carpeta de spam.</p>
               </div>
 
@@ -234,3 +351,9 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     </div>
   );
 }
+
+RegisterModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSwitchToLogin: PropTypes.func.isRequired,
+};

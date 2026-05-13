@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 
 const LOCAL_STORAGE_EVENT = 'syntix-local-storage-update';
+const getLocalStorage = () =>
+  (typeof globalThis !== 'undefined' && globalThis.localStorage ? globalThis.localStorage : null);
 
+// useLocalStorage sincroniza estado React, localStorage y eventos cruzados entre pestañas/componentes.
 export function useLocalStorage(key, initialValue) {
   const readValue = () => {
     try {
-      const item = window.localStorage.getItem(key);
+      const item = getLocalStorage()?.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       console.error(error);
@@ -16,10 +19,11 @@ export function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = useState(readValue);
 
   useEffect(() => {
+    // Cada escritura emite un evento propio para que otros hooks reaccionen incluso en la misma pestaña.
     try {
-      window.localStorage.setItem(key, JSON.stringify(storedValue));
-      window.dispatchEvent(
-        new CustomEvent(LOCAL_STORAGE_EVENT, {
+      getLocalStorage()?.setItem(key, JSON.stringify(storedValue));
+      globalThis.dispatchEvent?.(
+        new globalThis.CustomEvent(LOCAL_STORAGE_EVENT, {
           detail: { key, value: storedValue }
         })
       );
@@ -29,6 +33,9 @@ export function useLocalStorage(key, initialValue) {
   }, [key, storedValue]);
 
   useEffect(() => {
+    if (typeof globalThis === 'undefined' || !globalThis.addEventListener) return undefined;
+
+    // Se escuchan tanto eventos nativos como el evento custom para cubrir todos los caminos de actualización.
     const handleStorageChange = (event) => {
       if (event.key && event.key !== key) return;
       setStoredValue(readValue());
@@ -39,12 +46,12 @@ export function useLocalStorage(key, initialValue) {
       setStoredValue(event.detail.value);
     };
 
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener(LOCAL_STORAGE_EVENT, handleCustomStorageChange);
+    globalThis.addEventListener('storage', handleStorageChange);
+    globalThis.addEventListener(LOCAL_STORAGE_EVENT, handleCustomStorageChange);
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener(LOCAL_STORAGE_EVENT, handleCustomStorageChange);
+      globalThis.removeEventListener('storage', handleStorageChange);
+      globalThis.removeEventListener(LOCAL_STORAGE_EVENT, handleCustomStorageChange);
     };
   }, [key]);
 

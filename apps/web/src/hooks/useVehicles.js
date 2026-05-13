@@ -1,21 +1,25 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import api from '@/services/api.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useConductors } from './useConductors.js';
 import { useDocuments } from './useDocuments.js';
 import { useRtm } from '@/contexts/RtmContext.jsx';
 import { getWorstState } from '@/utils/dateUtils.js';
+import { normalizePlate } from '@/utils/colombiaFormats.js';
 
 const VEHICLES_UPDATED_EVENT = 'syntix:vehicles-updated';
 
+// Normaliza el shape de salida del backend para que el resto del frontend trate todos los vehículos igual.
 const normalizeVehicle = (vehiculo) => ({
   ...vehiculo,
   id: vehiculo._id || vehiculo.id,
+  placa: normalizePlate(vehiculo.placa),
+  tipo: vehiculo.tipo || 'Otro',
 });
 
 const notifyVehiclesUpdated = () => {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(VEHICLES_UPDATED_EVENT));
+  if (typeof globalThis !== 'undefined' && globalThis.dispatchEvent) {
+    globalThis.dispatchEvent(new Event(VEHICLES_UPDATED_EVENT));
   }
 };
 
@@ -44,18 +48,20 @@ export function useVehicles() {
   }, [user?.email]);
 
   useEffect(() => {
+    // La lista depende del usuario porque el backend filtra por ownerEmail.
     fetchVehicles();
   }, [fetchVehicles]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
+    if (typeof globalThis === 'undefined' || !globalThis.addEventListener) return undefined;
 
+    // Este listener permite refrescar la flota desde cualquier mutación disparada en otro módulo.
     const handleVehiclesUpdated = () => {
       fetchVehicles();
     };
 
-    window.addEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
-    return () => window.removeEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
+    globalThis.addEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
+    return () => globalThis.removeEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
   }, [fetchVehicles]);
 
   const addVehicle = async (data) => {
@@ -65,8 +71,9 @@ export function useVehicles() {
 
     const response = await api.post('/vehiculos', {
       ...data,
-      placa: String(data.placa ?? '').trim().toUpperCase(),
+      placa: normalizePlate(data.placa),
       anio: Number(data.anio),
+      tipo: data.tipo || 'Otro',
       conductorId: data.conductorId ?? null,
       ownerEmail: user.email,
       ownerEmpresa: user.empresa || '',
@@ -81,8 +88,9 @@ export function useVehicles() {
   const updateVehicle = async (id, data) => {
     const response = await api.put(`/vehiculos/${id}`, {
       ...data,
-      placa: String(data.placa ?? '').trim().toUpperCase(),
+      placa: normalizePlate(data.placa),
       anio: Number(data.anio),
+      tipo: data.tipo || 'Otro',
     });
 
     await fetchVehicles();
@@ -108,7 +116,9 @@ export function useVehicles() {
     return normalizeVehicle(response.data);
   };
 
-  const vehiculosCompletos = vehiculos.map((vehiculo) => {
+  const vehiculosCompletos = useMemo(() => vehiculos.map((vehiculo) => {
+    // Aquí se arma la visión "enriquecida" que consumen las pantallas:
+    // vehículo + conductor + documentos + severidad consolidada.
     const conductor = conductores.find(
       (item) => String(item.id) === String(vehiculo.conductorId)
     );
@@ -126,7 +136,7 @@ export function useVehicles() {
       ownerLabel: vehiculo.ownerEmpresa || user?.empresa || vehiculo.ownerEmail || 'Sin dato',
       estadoGeneral: getWorstState(getWorstState(estadoConductor, estadoSoat), estadoRtm),
     };
-  });
+  }), [vehiculos, conductores, soats, rtms, user?.empresa]);
 
   return {
     vehiculos: vehiculosCompletos,

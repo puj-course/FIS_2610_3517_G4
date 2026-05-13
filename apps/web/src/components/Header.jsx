@@ -1,29 +1,37 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useAuth } from '@/contexts/AuthContext.jsx';
-import { LogOut, Menu, Bell, User } from 'lucide-react';
+import { useOnboarding } from '@/contexts/OnboardingContext.jsx';
+import { Menu, Bell, Sparkles } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAlerts } from '@/hooks/useAlerts.js';
+import UserProfileDropdown from '@/components/UserProfileDropdown.jsx';
+import { useTheme } from '@/contexts/ThemeContext.jsx';
 
+// Header muestra el contexto actual del dashboard y concentra acciones globales:
+// navegación móvil, alertas activas y cierre de sesión.
 export default function Header({ toggleSidebar }) {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const { startTour } = useOnboarding();
   const location = useLocation();
   const navigate = useNavigate();
   const { alerts } = useAlerts();
+  const { isDarkMode } = useTheme();
 
   const alertCount = alerts.length;
   const hasActiveAlerts = alertCount > 0;
   const handleAlertsClick = () => navigate('/alertas');
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
 
+  // El breadcrumb simple se deriva de la ruta activa para evitar títulos hardcodeados por vista.
   const pathNames = location.pathname.split('/').filter(x => x);
   const currentPage = pathNames.length > 0 ? pathNames[pathNames.length - 1] : 'Dashboard';
 
   return (
-    <header className="bg-syntix-navy text-white h-16 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30 shadow-md">
+    <header className={`h-16 sticky top-0 z-30 flex items-center justify-between px-4 text-white shadow-md lg:px-8 ${
+      isDarkMode ? 'bg-slate-900 border-b border-slate-800' : 'bg-syntix-navy'
+    }`}>
       <div className="flex items-center gap-4">
+        {/* El botón móvil abre el sidebar sin duplicar navegación dentro del contenido. */}
         <button onClick={toggleSidebar} className="lg:hidden p-2 text-gray-300 hover:bg-white/10 rounded-md">
           <Menu className="w-5 h-5" />
         </button>
@@ -35,29 +43,46 @@ export default function Header({ toggleSidebar }) {
       </div>
 
       <div className="flex items-center gap-4">
+        {/* El tutorial sigue accesible desde la cabecera para no perderse cuando
+            el usuario navega entre módulos del dashboard. */}
+        <button
+          type="button"
+          onClick={startTour}
+          className={`hidden md:inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${
+            isDarkMode
+              ? 'border-slate-700 text-slate-200 hover:bg-slate-800'
+              : 'border-white/15 text-gray-200 hover:bg-white/10'
+          }`}
+          title="Abrir tutorial"
+        >
+          <Sparkles className="w-4 h-4" />
+          Tutorial
+        </button>
+        {/* El centro de alertas conserva acceso rápido desde cualquier módulo. */}
         <button
           onClick={handleAlertsClick}
-          className="p-2 text-gray-300 hover:bg-white/10 rounded-full relative"
+          className={`relative rounded-full p-2 ${
+            isDarkMode ? 'text-slate-300 hover:bg-slate-800' : 'text-gray-300 hover:bg-white/10'
+          }`}
           title="Ver alertas"
         >
           <Bell className="w-5 h-5" />
           {hasActiveAlerts && (
-            <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-syntix-red rounded-full border-2 border-syntix-navy"></span>
+            <span className={`absolute top-1 right-1 h-2.5 w-2.5 rounded-full border-2 bg-syntix-red ${
+              isDarkMode ? 'border-slate-900' : 'border-syntix-navy'
+            }`}></span>
           )}
         </button>
-        <div className="flex items-center gap-3 border-l pl-4 border-white/20">
-          <div className="hidden md:block text-right">
-            <p className="text-sm font-medium text-white">{user?.empresa || 'Empresa'}</p>
-            <p className="text-xs text-gray-400">{user?.email}</p>
+        {user && (
+          <div className={`border-l pl-4 ${isDarkMode ? 'border-slate-700' : 'border-white/20'}`}>
+            <UserProfileDropdown variant="dark" />
           </div>
-          <div className="w-8 h-8 bg-syntix-green text-white rounded-full flex items-center justify-center font-bold text-sm">
-            <User className="w-4 h-4" />
-          </div>
-          <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-syntix-red hover:bg-white/5 rounded-md transition-colors" title="Cerrar Sesión">
-            <LogOut className="w-5 h-5" />
-          </button>
-        </div>
+        )}
       </div>
     </header>
   );
 }
+
+Header.propTypes = {
+  toggleSidebar: PropTypes.func.isRequired,
+};

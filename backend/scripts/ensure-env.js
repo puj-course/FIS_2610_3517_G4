@@ -1,19 +1,33 @@
 const fs = require('fs');
-const path = require('path');
+const {
+  DEFAULT_MONGO_DB_NAME,
+  DEFAULT_MONGO_HOST,
+  buildMongoUri,
+  getMongoConfigErrors,
+  redactMongoUri,
+} = require('../config/mongo');
+const {
+  backendEnvPath,
+  loadProjectEnv,
+  rootEnvPath,
+} = require('../config/load-env');
 
-const backendDir = path.resolve(__dirname, '..');
-const envPath = path.join(backendDir, '.env');
-const envExamplePath = path.join(backendDir, '.env.example');
-
-if (fs.existsSync(envPath)) {
-  console.log('[ENV] backend/.env ya existe.');
-  process.exit(0);
-}
-
-if (!fs.existsSync(envExamplePath)) {
-  console.error('[ENV] No se encontro backend/.env.example para crear backend/.env automaticamente.');
+// El script falla temprano si no existe ningún archivo de entorno conocido.
+if (!fs.existsSync(backendEnvPath) && !fs.existsSync(rootEnvPath)) {
+  console.error('[ENV] Falta configuracion. Crea backend/.env o .env en la raiz con MONGO_URI o con MONGO_USER/MONGO_PASSWORD.');
   process.exit(1);
 }
 
-fs.copyFileSync(envExamplePath, envPath);
-console.log('[ENV] Se creo backend/.env automaticamente desde backend/.env.example.');
+// Carga variables siguiendo la misma estrategia que usa el servidor.
+const loadedEnvSources = loadProjectEnv();
+const mongoErrors = getMongoConfigErrors(process.env);
+if (mongoErrors.length > 0) {
+  console.error(
+    `[ENV] Configuracion Mongo invalida. Usa MONGO_URI o define MONGO_USER/MONGO_PASSWORD para ${DEFAULT_MONGO_HOST}/${DEFAULT_MONGO_DB_NAME}.`
+  );
+  process.exit(1);
+}
+
+// Se imprime la URI redactada para confirmar el destino sin exponer secretos.
+const mongoUri = buildMongoUri(process.env);
+console.log(`[ENV] Configuracion validada desde ${loadedEnvSources.join(', ')}. MONGO_URI=${redactMongoUri(mongoUri)}`);

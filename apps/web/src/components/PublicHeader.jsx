@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import UserProfileDropdown from './UserProfileDropdown.jsx';
 
+// Cabecera de la zona pública: mezcla navegación de marketing con accesos de autenticación.
 export default function PublicHeader({ onLoginClick, onRegisterClick }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isAuthenticated } = useAuth();
@@ -28,7 +30,7 @@ export default function PublicHeader({ onLoginClick, onRegisterClick }) {
 
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
-              <UserProfileDropdown />
+              <UserProfileDropdown variant="light" />
             ) : (
               <>
                 <button onClick={onLoginClick} className="text-syntix-navy font-medium hover:text-syntix-green transition-colors">
@@ -60,7 +62,7 @@ export default function PublicHeader({ onLoginClick, onRegisterClick }) {
           <div className="pt-4 flex flex-col gap-3 border-t border-gray-100">
             {isAuthenticated ? (
               <div className="flex justify-center py-2">
-                <UserProfileDropdown />
+                <UserProfileDropdown variant="light" />
               </div>
             ) : (
               <>
@@ -78,3 +80,8 @@ export default function PublicHeader({ onLoginClick, onRegisterClick }) {
     </header>
   );
 }
+
+PublicHeader.propTypes = {
+  onLoginClick: PropTypes.func.isRequired,
+  onRegisterClick: PropTypes.func.isRequired,
+};

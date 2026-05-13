@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { X, User, Save } from 'lucide-react';
 import { useConductors } from '@/hooks/useConductors.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
+import { isValidCedula, isValidColombianMobile, sanitizeDocument, sanitizePhone, getVehicleOptionLabel } from '@/utils/colombiaFormats.js';
 
 const createInitialFormData = () => ({
   nombre: '',
@@ -12,6 +14,17 @@ const createInitialFormData = () => ({
   vehiculoId: '',
 });
 
+const conductorShape = PropTypes.shape({
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  nombre: PropTypes.string,
+  documento: PropTypes.string,
+  telefono: PropTypes.string,
+  categoria: PropTypes.string,
+  fechaVencimiento: PropTypes.string,
+});
+
+// El modal de conductores también coordina la asignación opcional a un vehículo
+// para mantener alineadas las dos entidades más consultadas del sistema.
 export default function AddConductorModal({
   isOpen,
   onClose,
@@ -46,6 +59,8 @@ export default function AddConductorModal({
   };
 
   useEffect(() => {
+    // Al editar, el formulario respeta la relación ya existente entre conductor y vehículo
+    // para no perder el contexto operativo del registro.
     if (!isOpen) {
       return;
     }
@@ -88,6 +103,7 @@ export default function AddConductorModal({
       return;
     }
 
+    // El documento se valida como identificador único antes de persistir cambios.
     const isDuplicateDocument = conductores.some((conductor) => {
       const sameDocument = String(conductor.documento ?? '').trim() === documento;
       const isSameConductor =
@@ -100,13 +116,13 @@ export default function AddConductorModal({
       return;
     }
 
-    if (!/^\d{7,15}$/.test(documento)) {
-      setError('El documento debe contener solo numeros y tener entre 7 y 15 digitos.');
+    if (!isValidCedula(documento)) {
+      setError('La cedula debe tener exactamente 10 digitos numericos.');
       return;
     }
 
-    if (!/^[0-9+\s-]{7,20}$/.test(telefono)) {
-      setError('Ingresa un telefono valido.');
+    if (!isValidColombianMobile(telefono)) {
+      setError('El celular debe tener 10 digitos e iniciar por 3.');
       return;
     }
 
@@ -179,8 +195,9 @@ export default function AddConductorModal({
           )}
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Nombre Completo</label>
+            <label htmlFor="conductor-nombre" className="block text-sm font-bold text-gray-700 mb-1">Nombre Completo</label>
             <input
+              id="conductor-nombre"
               type="text"
               required
               value={formData.nombre}
@@ -192,24 +209,30 @@ export default function AddConductorModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Documento</label>
+              <label htmlFor="conductor-documento" className="block text-sm font-bold text-gray-700 mb-1">Documento</label>
               <input
+                id="conductor-documento"
                 type="text"
+                inputMode="numeric"
                 required
+                maxLength={10}
                 value={formData.documento}
-                onChange={(e) => setFormData({ ...formData, documento: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, documento: sanitizeDocument(e.target.value) })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
                 placeholder="1234567890"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Telefono</label>
+              <label htmlFor="conductor-telefono" className="block text-sm font-bold text-gray-700 mb-1">Telefono</label>
               <input
-                type="tel"
+                id="conductor-telefono"
+                type="text"
+                inputMode="numeric"
                 required
+                maxLength={10}
                 value={formData.telefono}
-                onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, telefono: sanitizePhone(e.target.value) })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900"
                 placeholder="3001234567"
               />
@@ -217,8 +240,9 @@ export default function AddConductorModal({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Vehiculo a asignar</label>
+            <label htmlFor="conductor-vehiculo" className="block text-sm font-bold text-gray-700 mb-1">Vehiculo a asignar</label>
             <select
+              id="conductor-vehiculo"
               value={formData.vehiculoId}
               onChange={(e) => setFormData({ ...formData, vehiculoId: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 bg-white"
@@ -226,7 +250,7 @@ export default function AddConductorModal({
               <option value="">Sin asignar</option>
               {vehiculosDisponibles.map((vehiculo) => (
                 <option key={vehiculo.id} value={vehiculo.id}>
-                  {vehiculo.placa} - {vehiculo.marca} {vehiculo.modelo}
+                  {getVehicleOptionLabel(vehiculo)}
                 </option>
               ))}
             </select>
@@ -236,8 +260,9 @@ export default function AddConductorModal({
             <h3 className="text-sm font-bold text-gray-900 mb-3">Informacion de Licencia</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Categoria</label>
+                <label htmlFor="conductor-categoria" className="block text-sm font-bold text-gray-700 mb-1">Categoria</label>
                 <select
+                  id="conductor-categoria"
                   value={formData.categoria}
                   onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 bg-white"
@@ -254,8 +279,9 @@ export default function AddConductorModal({
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Fecha Vencimiento</label>
+                <label htmlFor="conductor-fecha-vencimiento" className="block text-sm font-bold text-gray-700 mb-1">Fecha Vencimiento</label>
                 <input
+                  id="conductor-fecha-vencimiento"
                   type="date"
                   required
                   value={formData.fechaVencimiento}
@@ -289,3 +315,9 @@ export default function AddConductorModal({
     </div>
   );
 }
+
+AddConductorModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  conductorToEdit: conductorShape,
+};

@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { X, Download, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import StatusBadge from './StatusBadge.jsx';
 
+const getDocumentStateTextClass = (state) => {
+  if (state === 'verde') return 'text-green-600';
+  if (state === 'amarillo') return 'text-amber-600';
+  return 'text-syntix-red';
+};
+
+// Este modal profundiza una validación puntual y agrega auditoría, historial por placa
+// y acciones de seguimiento en un mismo panel.
 export default function DetallesValidacionModal({
   isOpen,
   onClose,
@@ -123,10 +132,7 @@ export default function DetallesValidacionModal({
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase">Días Restantes</p>
-                    <p className={`font-black ${
-                      soatState === 'verde' ? 'text-green-600' :
-                      soatState === 'amarillo' ? 'text-amber-600' : 'text-syntix-red'
-                    }`}>
+                    <p className={`font-black ${getDocumentStateTextClass(soatState)}`}>
                       {data.soat.diasRestantes}
                     </p>
                   </div>
@@ -156,10 +162,7 @@ export default function DetallesValidacionModal({
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase">Días Restantes</p>
-                    <p className={`font-black ${
-                      rtmState === 'verde' ? 'text-green-600' :
-                      rtmState === 'amarillo' ? 'text-amber-600' : 'text-syntix-red'
-                    }`}>
+                    <p className={`font-black ${getDocumentStateTextClass(rtmState)}`}>
                       {data.rtm.diasRestantes}
                     </p>
                   </div>
@@ -241,3 +244,28 @@ export default function DetallesValidacionModal({
     </div>
   );
 }
+
+DetallesValidacionModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  validation: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    placa: PropTypes.string,
+    usuario: PropTypes.string,
+    timestamp: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    ip: PropTypes.string,
+    notas: PropTypes.string,
+    resultadoRUNT: PropTypes.shape({
+      data: PropTypes.object,
+    }),
+  }),
+  historialPlaca: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      timestamp: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      usuario: PropTypes.string,
+    })
+  ),
+  onDeleteValidation: PropTypes.func,
+  onDownloadPDF: PropTypes.func,
+};

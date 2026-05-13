@@ -2,6 +2,7 @@ import * as ToastPrimitives from '@radix-ui/react-toast';
 import { cn } from '@/lib/utils';
 import React from 'react';
 
+// Estos wrappers adaptan Radix Toast al estilo del proyecto sin exponer detalles internos.
 const ToastProvider = ToastPrimitives.Provider;
 
 const ToastViewport = React.forwardRef(({ className, ...props }, ref) => (

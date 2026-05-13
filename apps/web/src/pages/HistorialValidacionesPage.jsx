@@ -5,6 +5,7 @@ import StatusBadge from '@/components/StatusBadge.jsx';
 import DetallesValidacionModal from '@/components/DetallesValidacionModal.jsx';
 import { useValidationHistory } from '@/hooks/useValidationHistory.js';
 
+// HistorialValidacionesPage funciona como bitácora de auditoría para consultas RUNT ya realizadas.
 export default function HistorialValidacionesPage() {
   const { validations, deleteValidation, getValidationHistory, exportToCSV, getStatistics } = useValidationHistory();
   
@@ -17,7 +18,7 @@ export default function HistorialValidacionesPage() {
 
   const itemsPerPage = 20;
 
-  // Filtrar validaciones
+  // Los filtros se aplican antes de paginar para que la navegación siempre refleje el subconjunto activo.
   const filteredValidations = useMemo(() => {
     let filtered = [...validations];
 
@@ -54,7 +55,7 @@ export default function HistorialValidacionesPage() {
     return filtered;
   }, [validations, searchTerm, filterState, dateRange]);
 
-  // Paginación
+  // La paginación mantiene liviana la tabla aunque el historial siga creciendo.
   const totalPages = Math.ceil(filteredValidations.length / itemsPerPage);
   const paginatedValidations = filteredValidations.slice(
     (currentPage - 1) * itemsPerPage,
@@ -92,9 +93,10 @@ export default function HistorialValidacionesPage() {
       </Helmet>
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div data-onboarding="runt-history-header" className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-bold text-syntix-navy">Historial de Validaciones RUNT</h1>
         <button 
+          data-onboarding="runt-history-export"
           onClick={handleDownloadCSV}
           disabled={filteredValidations.length === 0}
           className="bg-syntix-green text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-syntix-green/90 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -104,7 +106,7 @@ export default function HistorialValidacionesPage() {
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div data-onboarding="runt-history-stats" className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
           <p className="text-xs font-bold text-gray-500 uppercase mb-1">Total</p>
           <p className="text-3xl font-black text-syntix-navy">{stats.total}</p>
@@ -128,7 +130,7 @@ export default function HistorialValidacionesPage() {
       </div>
 
       {/* Filtros */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-4">
+      <div data-onboarding="runt-history-filters" className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Búsqueda */}
           <div className="relative">
@@ -191,7 +193,7 @@ export default function HistorialValidacionesPage() {
       </div>
 
       {/* Tabla */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div data-onboarding="runt-history-table" className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         {filteredValidations.length === 0 ? (
           <div className="p-8 text-center">
             <p className="text-gray-500 font-medium">No hay validaciones registradas</p>

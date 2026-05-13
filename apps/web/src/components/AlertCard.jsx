@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { AlertTriangle, Info, XCircle } from 'lucide-react';
 
-// Funcion de alerta
+// Tarjeta visual genérica para mostrar una alerta rápida sin acoplarla a una fuente concreta.
 export default function AlertCard({ title, description, type = 'warning', date }) {
   const styles = {
     warning: 'border-yellow-200 bg-yellow-50 text-yellow-800',
@@ -26,3 +27,10 @@ export default function AlertCard({ title, description, type = 'warning', date }
     </div>
   );
 }
+
+AlertCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(['warning', 'danger', 'info']),
+  date: PropTypes.string,
+};
