@@ -15,22 +15,22 @@
 
 ### Resumen de Planificación vs Ejecución
 
-| Sprint | HU Planificadas | HU Cerradas | % Cumplimiento | Tendencia |
-|--------|-----------------|------------|-----------------|-----------|
-| Sprint 1 | 5 | 5 | 100% | 📈 Base |
-| Sprint 2 | 6 | 6 | 100% | 📈 +20.0% |
-| Sprint 3 | 7 | 7 | 100% | 📈 +16.6% |
-| Sprint 4 | 6 | 6 | 100% | 📉 -14.2% |
-| Sprint 5 | 8 | 8 | 100% | 📈 +33.3% |
-| Sprint 6 | 7 | 7 | 100% | 📉 -8.3% |
-| Sprint 7 | 8 | 8 | 100% | 📈 +9.1% |
-| Sprint 8 | 6 | 6 | 100% | 📉 -20.8% |
-| Sprint 9 | 9 | 9 | 100% | 📈 +42.1% |
-| Sprint 10 | 8 | 8 | 100% | 📉 -11.1% |
-| Sprint 11 | 9 | 9 | 100% | 📈 +16.7% |
-| Sprint 12 | 10 | 10 | 100% | 📈 +14.3% |
-| Sprint 13 | 8 | 7 | 87.5% | 📉 -18.8% |
-| **PROMEDIO GENERAL** | **7.46** | **7.38** | **98.9%** | ✅ Sostenible |
+| Sprint | HU Planificadas | HU Cerradas | % Cumplimiento |
+|--------|-----------------|------------|-----------------|
+| Sprint 1 | 5 | 5 | 100% | 
+| Sprint 2 | 6 | 6 | 100% | 
+| Sprint 3 | 7 | 7 | 100% | 
+| Sprint 4 | 6 | 6 | 100% | 
+| Sprint 5 | 8 | 8 | 100% | 
+| Sprint 6 | 7 | 7 | 100% | 
+| Sprint 7 | 8 | 8 | 100% | 
+| Sprint 8 | 6 | 6 | 100% | 
+| Sprint 9 | 9 | 9 | 100% | 
+| Sprint 10 | 8 | 8 | 100% | 
+| Sprint 11 | 9 | 9 | 100% | 
+| Sprint 12 | 10 | 10 | 100% | 
+| Sprint 13 | 8 | 7 | 87.5% | 
+| **PROMEDIO GENERAL** | **7.46** | **7.38** | **98.9%** |
 
 ### Detalles por Sprint
 
