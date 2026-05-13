@@ -1,6 +1,13 @@
 import React from 'react';
-import { CheckCircle, XCircle, AlertCircle, Download } from 'lucide-react';
+import PropTypes from 'prop-types';
+import { XCircle, AlertCircle, Download } from 'lucide-react';
 import StatusBadge from './StatusBadge.jsx';
+
+const getDocumentStateTextClass = (state) => {
+  if (state === 'verde') return 'text-green-600';
+  if (state === 'amarillo') return 'text-amber-600';
+  return 'text-syntix-red';
+};
 
 // Tarjeta de resultado que cruza lo consultado en RUNT con lo registrado en el sistema.
 export default function ValidacionResultadoCard({
@@ -132,10 +139,7 @@ export default function ValidacionResultadoCard({
           </div>
           <div className="col-span-2">
             <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Días Restantes</p>
-            <p className={`text-2xl font-black ${
-              soatState === 'verde' ? 'text-green-600' : 
-              soatState === 'amarillo' ? 'text-amber-600' : 'text-syntix-red'
-            }`}>
+            <p className={`text-2xl font-black ${getDocumentStateTextClass(soatState)}`}>
               {data.soat.diasRestantes} días
             </p>
           </div>
@@ -163,10 +167,7 @@ export default function ValidacionResultadoCard({
           </div>
           <div className="col-span-2">
             <p className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Días Restantes</p>
-            <p className={`text-2xl font-black ${
-              rtmState === 'verde' ? 'text-green-600' : 
-              rtmState === 'amarillo' ? 'text-amber-600' : 'text-syntix-red'
-            }`}>
+            <p className={`text-2xl font-black ${getDocumentStateTextClass(rtmState)}`}>
               {data.rtm.diasRestantes} días
             </p>
           </div>
@@ -221,3 +222,45 @@ export default function ValidacionResultadoCard({
     </div>
   );
 }
+
+const runtDocumentShape = PropTypes.shape({
+  vigente: PropTypes.bool,
+  diasRestantes: PropTypes.number,
+  numero: PropTypes.string,
+  aseguradora: PropTypes.string,
+  responsable: PropTypes.string,
+  fechaInicio: PropTypes.string,
+  fechaVencimiento: PropTypes.string,
+});
+
+ValidacionResultadoCard.propTypes = {
+  datosRUNT: PropTypes.shape({
+    encontrado: PropTypes.bool,
+    data: PropTypes.shape({
+      placa: PropTypes.string,
+      marca: PropTypes.string,
+      linea: PropTypes.string,
+      modelo: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      color: PropTypes.string,
+      vin: PropTypes.string,
+      soat: runtDocumentShape,
+      rtm: runtDocumentShape,
+    }),
+  }).isRequired,
+  vehiculoSistema: PropTypes.shape({
+    placa: PropTypes.string,
+    marca: PropTypes.string,
+    modelo: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }),
+  conductorAsignado: PropTypes.shape({
+    nombre: PropTypes.string,
+    documento: PropTypes.string,
+    categoria: PropTypes.string,
+    fechaVencimiento: PropTypes.string,
+    estado: PropTypes.string,
+    diasRestantes: PropTypes.number,
+  }),
+  onGuardar: PropTypes.func.isRequired,
+  loading: PropTypes.bool,
+  isDarkMode: PropTypes.bool,
+};

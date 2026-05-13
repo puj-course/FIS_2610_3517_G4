@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import AuthModalFactory from '@/patterns/factory/AuthModalFactory.jsx';
 import FleetModalFactory from '@/patterns/factory/FleetModalFactory.jsx';
 
@@ -19,3 +20,7 @@ export default function ModalFactory({ modalType, ...props }) {
 
   return factory.createModal(modalType, commonProps);
 }
+
+ModalFactory.propTypes = {
+  modalType: PropTypes.string,
+};

@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 
@@ -133,6 +134,8 @@ const ONBOARDING_STEPS = [
 
 const normalizeText = (value) => String(value ?? '').trim();
 const normalizeEmail = (value) => normalizeText(value).toLowerCase();
+const getLocalStorage = () =>
+  (typeof globalThis !== 'undefined' && globalThis.localStorage ? globalThis.localStorage : null);
 
 const getStorageKey = (user) => {
   const userId = normalizeEmail(user?.email || user?.empresa || '');
@@ -145,12 +148,13 @@ const getPendingStorageKey = (userOrEmail) => {
 };
 
 const readOnboardingState = (storageKey) => {
-  if (!storageKey || typeof window === 'undefined') {
+  const storage = getLocalStorage();
+  if (!storageKey || !storage) {
     return null;
   }
 
   try {
-    const rawValue = window.localStorage.getItem(storageKey);
+    const rawValue = storage.getItem(storageKey);
     if (!rawValue) {
       return null;
     }
@@ -164,12 +168,13 @@ const readOnboardingState = (storageKey) => {
 };
 
 const writeOnboardingState = (storageKey, status) => {
-  if (!storageKey || typeof window === 'undefined') {
+  const storage = getLocalStorage();
+  if (!storageKey || !storage) {
     return;
   }
 
   try {
-    window.localStorage.setItem(
+    storage.setItem(
       storageKey,
       JSON.stringify({
         version: ONBOARDING_VERSION,
@@ -183,12 +188,13 @@ const writeOnboardingState = (storageKey, status) => {
 };
 
 const readQueuedOnboarding = (pendingStorageKey) => {
-  if (!pendingStorageKey || typeof window === 'undefined') {
+  const storage = getLocalStorage();
+  if (!pendingStorageKey || !storage) {
     return false;
   }
 
   try {
-    return window.localStorage.getItem(pendingStorageKey) === ONBOARDING_VERSION;
+    return storage.getItem(pendingStorageKey) === ONBOARDING_VERSION;
   } catch (error) {
     console.error('No fue posible leer la cola de onboarding.', error);
     return false;
@@ -197,12 +203,13 @@ const readQueuedOnboarding = (pendingStorageKey) => {
 
 export function queueOnboardingForUser(userOrEmail) {
   const pendingStorageKey = getPendingStorageKey(userOrEmail);
-  if (!pendingStorageKey || typeof window === 'undefined') {
+  const storage = getLocalStorage();
+  if (!pendingStorageKey || !storage) {
     return;
   }
 
   try {
-    window.localStorage.setItem(pendingStorageKey, ONBOARDING_VERSION);
+    storage.setItem(pendingStorageKey, ONBOARDING_VERSION);
   } catch (error) {
     console.error('No fue posible programar el onboarding para el usuario.', error);
   }
@@ -210,12 +217,13 @@ export function queueOnboardingForUser(userOrEmail) {
 
 export function clearQueuedOnboardingForUser(userOrEmail) {
   const pendingStorageKey = getPendingStorageKey(userOrEmail);
-  if (!pendingStorageKey || typeof window === 'undefined') {
+  const storage = getLocalStorage();
+  if (!pendingStorageKey || !storage) {
     return;
   }
 
   try {
-    window.localStorage.removeItem(pendingStorageKey);
+    storage.removeItem(pendingStorageKey);
   } catch (error) {
     console.error('No fue posible limpiar la cola de onboarding.', error);
   }
@@ -385,3 +393,7 @@ export function useOnboarding() {
 
   return context;
 }
+
+OnboardingProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};

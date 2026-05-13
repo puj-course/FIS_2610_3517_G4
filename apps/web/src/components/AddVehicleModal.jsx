@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { X, Car, Save } from 'lucide-react';
 import { useVehicles } from '@/hooks/useVehicles.js';
 import { isValidPlate, normalizePlate, sanitizePlate } from '@/utils/colombiaFormats.js';
@@ -179,8 +180,9 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
           )}
 
           <div data-onboarding="vehicle-plate-field">
-            <label className="block text-sm font-bold text-gray-700 mb-1">Placa</label>
+            <label htmlFor="vehicle-plate" className="block text-sm font-bold text-gray-700 mb-1">Placa</label>
             <input
+              id="vehicle-plate"
               type="text"
               required
               maxLength={6}
@@ -195,8 +197,9 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
 
           <div data-onboarding="vehicle-brand-model-fields" className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Marca</label>
+              <label htmlFor="vehicle-brand" className="block text-sm font-bold text-gray-700 mb-1">Marca</label>
               <input
+                id="vehicle-brand"
                 type="text"
                 required
                 value={formData.marca}
@@ -206,8 +209,9 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Modelo</label>
+              <label htmlFor="vehicle-model" className="block text-sm font-bold text-gray-700 mb-1">Modelo</label>
               <input
+                id="vehicle-model"
                 type="text"
                 required
                 value={formData.modelo}
@@ -220,8 +224,9 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
 
           <div data-onboarding="vehicle-year-type-fields" className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Anio</label>
+              <label htmlFor="vehicle-year" className="block text-sm font-bold text-gray-700 mb-1">Anio</label>
               <input
+                id="vehicle-year"
                 type="number"
                 required
                 min="1990"
@@ -234,8 +239,9 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Tipo</label>
+              <label htmlFor="vehicle-type" className="block text-sm font-bold text-gray-700 mb-1">Tipo</label>
               <select
+                id="vehicle-type"
                 value={formData.tipo}
                 onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 bg-white"
@@ -270,3 +276,16 @@ export default function AddVehicleModal({ isOpen, onClose, vehicleToEdit = null 
     </div>
   );
 }
+
+AddVehicleModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  vehicleToEdit: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    placa: PropTypes.string,
+    marca: PropTypes.string,
+    modelo: PropTypes.string,
+    anio: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    tipo: PropTypes.string,
+  }),
+};

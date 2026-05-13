@@ -15,14 +15,14 @@ const normalizeConductor = (conductor) => ({
 });
 
 const notifyConductorsUpdated = () => {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(CONDUCTORS_UPDATED_EVENT));
+  if (typeof globalThis !== 'undefined' && globalThis.dispatchEvent) {
+    globalThis.dispatchEvent(new Event(CONDUCTORS_UPDATED_EVENT));
   }
 };
 
 const notifyVehiclesUpdated = () => {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(VEHICLES_UPDATED_EVENT));
+  if (typeof globalThis !== 'undefined' && globalThis.dispatchEvent) {
+    globalThis.dispatchEvent(new Event(VEHICLES_UPDATED_EVENT));
   }
 };
 
@@ -55,15 +55,15 @@ export function useConductors() {
   }, [fetchConductors]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
+    if (typeof globalThis === 'undefined' || !globalThis.addEventListener) return undefined;
 
     // El evento permite refrescar la lista desde cualquier pantalla que muta conductores.
     const handleConductorsUpdated = () => {
       fetchConductors();
     };
 
-    window.addEventListener(CONDUCTORS_UPDATED_EVENT, handleConductorsUpdated);
-    return () => window.removeEventListener(CONDUCTORS_UPDATED_EVENT, handleConductorsUpdated);
+    globalThis.addEventListener(CONDUCTORS_UPDATED_EVENT, handleConductorsUpdated);
+    return () => globalThis.removeEventListener(CONDUCTORS_UPDATED_EVENT, handleConductorsUpdated);
   }, [fetchConductors]);
 
   const addConductor = async (data) => {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { X, Wrench, Save } from 'lucide-react';
 import { useRtm } from '@/contexts/RtmContext.jsx';
 import { useVehicles } from '@/hooks/useVehicles.js';
@@ -141,7 +142,7 @@ export default function EditRtmModal({ isOpen, onClose, rtm }) {
           )}
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Vehiculo</label>
+            <span className="block text-sm font-bold text-gray-700 mb-1">Vehiculo</span>
             <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 text-sm">
               {vehiculo ? `${vehiculo.placa} · ${vehiculo.tipo || 'Otro'}` : 'Vehiculo no encontrado'}
             </div>
@@ -149,8 +150,9 @@ export default function EditRtmModal({ isOpen, onClose, rtm }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Numero de certificado RTM</label>
+              <label htmlFor="edit-rtm-numero-certificado" className="block text-sm font-bold text-gray-700 mb-1">Numero de certificado RTM</label>
               <input
+                id="edit-rtm-numero-certificado"
                 type="text"
                 required
                 value={formData.numeroCertificado}
@@ -159,8 +161,9 @@ export default function EditRtmModal({ isOpen, onClose, rtm }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">CDA</label>
+              <label htmlFor="edit-rtm-cda" className="block text-sm font-bold text-gray-700 mb-1">CDA</label>
               <input
+                id="edit-rtm-cda"
                 list="cdas-rtm-edit"
                 required
                 value={formData.cda}
@@ -177,8 +180,9 @@ export default function EditRtmModal({ isOpen, onClose, rtm }) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Fecha expedicion</label>
+              <label htmlFor="edit-rtm-fecha-expedicion" className="block text-sm font-bold text-gray-700 mb-1">Fecha expedicion</label>
               <input
+                id="edit-rtm-fecha-expedicion"
                 type="date"
                 required
                 value={formData.fechaExpedicion}
@@ -187,8 +191,9 @@ export default function EditRtmModal({ isOpen, onClose, rtm }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Fecha vencimiento</label>
+              <label htmlFor="edit-rtm-fecha-vencimiento" className="block text-sm font-bold text-gray-700 mb-1">Fecha vencimiento</label>
               <input
+                id="edit-rtm-fecha-vencimiento"
                 type="date"
                 required
                 value={formData.fechaVencimiento}
@@ -197,8 +202,9 @@ export default function EditRtmModal({ isOpen, onClose, rtm }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Resultado</label>
+              <label htmlFor="edit-rtm-resultado" className="block text-sm font-bold text-gray-700 mb-1">Resultado</label>
               <select
+                id="edit-rtm-resultado"
                 value={formData.resultado}
                 onChange={(e) => setFormData({ ...formData, resultado: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white"
@@ -211,8 +217,9 @@ export default function EditRtmModal({ isOpen, onClose, rtm }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Observaciones</label>
+            <label htmlFor="edit-rtm-observaciones" className="block text-sm font-bold text-gray-700 mb-1">Observaciones</label>
             <textarea
+              id="edit-rtm-observaciones"
               value={formData.observaciones}
               onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none min-h-20"
@@ -237,3 +244,22 @@ export default function EditRtmModal({ isOpen, onClose, rtm }) {
     </div>
   );
 }
+
+EditRtmModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  rtm: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    vehiculoId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    placa: PropTypes.string,
+    placaVehiculo: PropTypes.string,
+    numeroCertificado: PropTypes.string,
+    numeroRtm: PropTypes.string,
+    cda: PropTypes.string,
+    fechaExpedicion: PropTypes.string,
+    fechaInicio: PropTypes.string,
+    fechaVencimiento: PropTypes.string,
+    resultado: PropTypes.string,
+    observaciones: PropTypes.string,
+  }),
+};

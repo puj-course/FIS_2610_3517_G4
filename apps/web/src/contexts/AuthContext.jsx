@@ -247,6 +247,7 @@ export function AuthProvider({ children }) {
 
       return { success: false, message: apiResult.message || 'No se pudo autenticar con Google' };
     } catch (err) {
+      console.error('Error inesperado en autenticacion con Google.', err);
       return { success: false, message: 'Error inesperado al autenticar con Google.' };
     } finally {
       setLoading(false);

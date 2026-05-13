@@ -61,14 +61,14 @@ export default function OnboardingTour() {
       }
     };
 
-    const frameId = window.requestAnimationFrame(updateRect);
-    window.addEventListener('resize', updateRect);
-    window.addEventListener('scroll', updateRect, true);
+    const frameId = globalThis.requestAnimationFrame(updateRect);
+    globalThis.addEventListener('resize', updateRect);
+    globalThis.addEventListener('scroll', updateRect, true);
 
     return () => {
-      window.cancelAnimationFrame(frameId);
-      window.removeEventListener('resize', updateRect);
-      window.removeEventListener('scroll', updateRect, true);
+      globalThis.cancelAnimationFrame(frameId);
+      globalThis.removeEventListener('resize', updateRect);
+      globalThis.removeEventListener('scroll', updateRect, true);
     };
   }, [currentStep, isTourActive]);
 

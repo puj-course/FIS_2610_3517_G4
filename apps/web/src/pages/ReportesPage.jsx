@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { AlertTriangle, Car, Download, FileText, ShieldCheck, Users } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext.jsx';
@@ -39,6 +40,16 @@ const qualityStatusStyles = {
     value: 'text-gray-500',
   },
 };
+
+const alertReportShape = PropTypes.shape({
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  mensaje: PropTypes.string,
+  tipo: PropTypes.string,
+  entidad: PropTypes.string,
+  prioridad: PropTypes.string,
+  diasRestantes: PropTypes.number,
+  fechaVencimiento: PropTypes.string,
+});
 
 // ReportesPage traduce el estado real de la flota a metricas y exportables simples.
 export default function ReportesPage() {
@@ -402,3 +413,41 @@ function DocumentSummary({ title, total, alerts, stats = null, isDarkMode }) {
     </div>
   );
 }
+
+MetricCard.propTypes = {
+  icon: PropTypes.elementType.isRequired,
+  label: PropTypes.string.isRequired,
+  value: PropTypes.number.isRequired,
+  hint: PropTypes.string.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};
+
+StatusBar.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.number.isRequired,
+  total: PropTypes.number.isRequired,
+  colorClass: PropTypes.string.isRequired,
+  textClass: PropTypes.string.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};
+
+ReportSection.propTypes = {
+  title: PropTypes.string.isRequired,
+  alerts: PropTypes.arrayOf(alertReportShape).isRequired,
+  emptyMessage: PropTypes.string.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};
+
+DocumentSummary.propTypes = {
+  title: PropTypes.string.isRequired,
+  total: PropTypes.number,
+  alerts: PropTypes.number.isRequired,
+  stats: PropTypes.shape({
+    total: PropTypes.number,
+    vigente: PropTypes.number,
+    proximo: PropTypes.number,
+    vencido: PropTypes.number,
+    faltantes: PropTypes.number,
+  }),
+  isDarkMode: PropTypes.bool.isRequired,
+};
