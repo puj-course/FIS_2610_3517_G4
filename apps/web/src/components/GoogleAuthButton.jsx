@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { GoogleLogin } from '@react-oauth/google';
 
 // La existencia del client ID decide si la app puede mostrar o no el botón federado.
@@ -25,3 +26,10 @@ export default function GoogleAuthButton({ onSuccess, onError, disabled = false,
     </div>
   );
 }
+
+GoogleAuthButton.propTypes = {
+  onSuccess: PropTypes.func,
+  onError: PropTypes.func,
+  disabled: PropTypes.bool,
+  text: PropTypes.string,
+};

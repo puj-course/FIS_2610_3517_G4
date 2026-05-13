@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useOnboarding } from '@/contexts/OnboardingContext.jsx';
 import { Menu, Bell, Sparkles } from 'lucide-react';
@@ -81,3 +82,7 @@ export default function Header({ toggleSidebar }) {
     </header>
   );
 }
+
+Header.propTypes = {
+  toggleSidebar: PropTypes.func.isRequired,
+};

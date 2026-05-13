@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { Building2, Car, Mail, Phone, ShieldCheck, TriangleAlert, Users, UserCircle2 } from 'lucide-react';
@@ -226,3 +227,21 @@ function FutureItem({ title, text, isDarkMode }) {
     </div>
   );
 }
+
+ProfileField.propTypes = {
+  icon: PropTypes.elementType.isRequired,
+  label: PropTypes.string.isRequired,
+  value: PropTypes.node.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};
+
+EmptyState.propTypes = {
+  text: PropTypes.string.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};
+
+FutureItem.propTypes = {
+  title: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};

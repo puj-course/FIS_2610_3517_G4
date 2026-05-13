@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { BellRing, Calendar, ChevronDown, ChevronRight } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext.jsx';
@@ -28,6 +29,26 @@ const alertSections = [
 
 const toggleMapValue = (setter, key) => {
   setter((prev) => ({ ...prev, [key]: !prev[key] }));
+};
+
+const alertShape = PropTypes.shape({
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  categoria: PropTypes.string,
+  grupo: PropTypes.string,
+  tipo: PropTypes.string,
+  prioridad: PropTypes.string,
+  mensaje: PropTypes.string,
+  entidad: PropTypes.string,
+  diasRestantes: PropTypes.number,
+  fechaVencimiento: PropTypes.string,
+});
+
+const getCriticalToneClassName = (isCritical, isDarkMode, criticalClassName, warningClassName) => {
+  if (isCritical) {
+    return isDarkMode ? criticalClassName.dark : criticalClassName.light;
+  }
+
+  return isDarkMode ? warningClassName.dark : warningClassName.light;
 };
 
 // Centro de alertas: deja ver el estado consolidado del sistema para una fecha dada.
@@ -76,8 +97,9 @@ export default function AlertasPage() {
         }`}>
           <Calendar className={`ml-2 w-5 h-5 ${isDarkMode ? 'text-slate-500' : 'text-gray-400'}`} />
           <div className="flex flex-col">
-            <label className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Simular Fecha</label>
+            <label htmlFor="alerts-simulated-date" className={`text-xs font-bold uppercase ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Simular Fecha</label>
             <input
+              id="alerts-simulated-date"
               type="date"
               value={simulatedDate}
               onChange={(e) => setSimulatedDate(e.target.value)}
@@ -238,42 +260,98 @@ function AlertGroup({ title, alerts, isOpen, onToggle, isDarkMode }) {
 function AlertItem({ alert, isDarkMode }) {
   const isCritical = alert.prioridad === 'rojo';
   const expirationText = getExpirationAlertText(alert.diasRestantes, alert.fechaVencimiento);
+  const containerClassName = getCriticalToneClassName(
+    isCritical,
+    isDarkMode,
+    { dark: 'bg-red-950/35 border-red-900', light: 'bg-red-50 border-red-100' },
+    { dark: 'bg-amber-950/30 border-amber-900', light: 'bg-yellow-50 border-yellow-100' }
+  );
+  const iconClassName = getCriticalToneClassName(
+    isCritical,
+    isDarkMode,
+    { dark: 'bg-red-950/80 text-red-300', light: 'bg-red-100 text-syntix-red' },
+    { dark: 'bg-amber-950/80 text-amber-300', light: 'bg-yellow-100 text-yellow-600' }
+  );
+  const titleClassName = getCriticalToneClassName(
+    isCritical,
+    isDarkMode,
+    { dark: 'text-red-200', light: 'text-red-900' },
+    { dark: 'text-amber-200', light: 'text-yellow-900' }
+  );
+  const badgeClassName = getCriticalToneClassName(
+    isCritical,
+    isDarkMode,
+    { dark: 'bg-red-900 text-red-200', light: 'bg-red-200 text-red-800' },
+    { dark: 'bg-amber-900 text-amber-200', light: 'bg-yellow-200 text-yellow-800' }
+  );
+  const bodyClassName = getCriticalToneClassName(
+    isCritical,
+    isDarkMode,
+    { dark: 'text-red-300', light: 'text-red-700' },
+    { dark: 'text-amber-300', light: 'text-yellow-700' }
+  );
+  const detailClassName = getCriticalToneClassName(
+    isCritical,
+    isDarkMode,
+    { dark: 'text-red-200', light: 'text-red-800' },
+    { dark: 'text-amber-200', light: 'text-yellow-800' }
+  );
 
   return (
-    <div
-      className={`p-4 rounded-xl border flex items-start gap-4 shadow-sm ${
-        isCritical
-          ? isDarkMode ? 'bg-red-950/35 border-red-900' : 'bg-red-50 border-red-100'
-          : isDarkMode ? 'bg-amber-950/30 border-amber-900' : 'bg-yellow-50 border-yellow-100'
-      }`}
-    >
-      <div className={`p-2 rounded-lg ${
-        isCritical
-          ? isDarkMode ? 'bg-red-950/80 text-red-300' : 'bg-red-100 text-syntix-red'
-          : isDarkMode ? 'bg-amber-950/80 text-amber-300' : 'bg-yellow-100 text-yellow-600'
-      }`}>
+    <div className={`p-4 rounded-xl border flex items-start gap-4 shadow-sm ${containerClassName}`}>
+      <div className={`p-2 rounded-lg ${iconClassName}`}>
         <BellRing className="w-5 h-5" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-start gap-3">
-          <h5 className={`font-bold ${isCritical ? (isDarkMode ? 'text-red-200' : 'text-red-900') : (isDarkMode ? 'text-amber-200' : 'text-yellow-900')}`}>
+          <h5 className={`font-bold ${titleClassName}`}>
             {alert.mensaje}
           </h5>
-          <span className={`text-xs font-bold px-2 py-1 rounded-md whitespace-nowrap ${
-            isCritical
-              ? isDarkMode ? 'bg-red-900 text-red-200' : 'bg-red-200 text-red-800'
-              : isDarkMode ? 'bg-amber-900 text-amber-200' : 'bg-yellow-200 text-yellow-800'
-          }`}>
+          <span className={`text-xs font-bold px-2 py-1 rounded-md whitespace-nowrap ${badgeClassName}`}>
             {alert.prioridad === 'rojo' ? 'Critica' : 'Proxima'}
           </span>
         </div>
-        <p className={`text-sm mt-1 ${isCritical ? (isDarkMode ? 'text-red-300' : 'text-red-700') : (isDarkMode ? 'text-amber-300' : 'text-yellow-700')}`}>
+        <p className={`text-sm mt-1 ${bodyClassName}`}>
           <span className="font-semibold">{alert.tipo}:</span> {alert.entidad}
         </p>
-        <p className={`text-xs mt-2 font-semibold ${isCritical ? (isDarkMode ? 'text-red-200' : 'text-red-800') : (isDarkMode ? 'text-amber-200' : 'text-yellow-800')}`}>
+        <p className={`text-xs mt-2 font-semibold ${detailClassName}`}>
           {expirationText.fullText}
         </p>
       </div>
     </div>
   );
 }
+
+AlertSection.propTypes = {
+  section: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    groups: PropTypes.arrayOf(
+      PropTypes.shape({
+        key: PropTypes.string.isRequired,
+        title: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+  }).isRequired,
+  count: PropTypes.number.isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired,
+  openGroups: PropTypes.object.isRequired,
+  onGroupToggle: PropTypes.func.isRequired,
+  getGroupAlerts: PropTypes.func.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};
+
+AlertGroup.propTypes = {
+  title: PropTypes.string.isRequired,
+  alerts: PropTypes.arrayOf(alertShape).isRequired,
+  isOpen: PropTypes.bool.isRequired,
+  onToggle: PropTypes.func.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};
+
+AlertItem.propTypes = {
+  alert: alertShape.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};

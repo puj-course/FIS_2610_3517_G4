@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
 import { Search, Shield, Wrench, Pencil, Trash2 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext.jsx';
@@ -424,3 +425,28 @@ function RowActions({ onEdit, onDelete, isDarkMode }) {
     </div>
   );
 }
+
+DocumentTableShell.propTypes = {
+  onboardingId: PropTypes.string.isRequired,
+  icon: PropTypes.elementType.isRequired,
+  title: PropTypes.string.isRequired,
+  count: PropTypes.number.isRequired,
+  total: PropTypes.number.isRequired,
+  searchTerm: PropTypes.string.isRequired,
+  onSearchChange: PropTypes.func.isRequired,
+  placeholder: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};
+
+EmptyRows.propTypes = {
+  colSpan: PropTypes.number.isRequired,
+  hasData: PropTypes.bool.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};
+
+RowActions.propTypes = {
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  isDarkMode: PropTypes.bool.isRequired,
+};

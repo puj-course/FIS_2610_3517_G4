@@ -4,13 +4,23 @@ on:
   push:
     branches:
       - main
+      - develop
+      - feature-sarm-m
+
   pull_request:
     branches:
       - main
+      - develop
     types:
       - opened
       - synchronize
       - reopened
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
   sonarcloud:

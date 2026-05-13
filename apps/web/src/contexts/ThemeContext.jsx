@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 
 const ThemeContext = createContext(null);
@@ -39,3 +40,7 @@ export function useTheme() {
 
   return context;
 }
+
+ThemeProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};

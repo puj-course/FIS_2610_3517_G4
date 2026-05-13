@@ -100,9 +100,10 @@ export default function ValidacionRUNTPage() {
         <form onSubmit={handleSearch} className="space-y-4">
           {/* Selector de Tipo de Búsqueda */}
           <div data-onboarding="runt-search-type" className="flex gap-4">
-            <label className={`flex cursor-pointer items-center gap-2 ${isDarkMode ? 'text-slate-200' : ''}`}>
-              <input 
-                type="radio" 
+            <label htmlFor="runt-search-type-placa" className={`flex cursor-pointer items-center gap-2 ${isDarkMode ? 'text-slate-200' : ''}`}>
+              <input
+                id="runt-search-type-placa"
+                type="radio"
                 value="placa" 
                 checked={searchType === 'placa'}
                 onChange={(e) => setSearchType(e.target.value)}
@@ -110,9 +111,10 @@ export default function ValidacionRUNTPage() {
               />
               <span className={`font-medium ${isDarkMode ? 'text-slate-200' : 'text-gray-700'}`}>Buscar por Placa</span>
             </label>
-            <label className={`flex cursor-pointer items-center gap-2 ${isDarkMode ? 'text-slate-200' : ''}`}>
-              <input 
-                type="radio" 
+            <label htmlFor="runt-search-type-vin" className={`flex cursor-pointer items-center gap-2 ${isDarkMode ? 'text-slate-200' : ''}`}>
+              <input
+                id="runt-search-type-vin"
+                type="radio"
                 value="vin" 
                 checked={searchType === 'vin'}
                 onChange={(e) => setSearchType(e.target.value)}

@@ -5,6 +5,18 @@ import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 import ThemeToggle from '@/components/ThemeToggle.jsx';
 import { useTheme } from '@/contexts/ThemeContext.jsx';
 
+const getMessageClassName = (type, isDarkMode) => {
+  if (type === 'success') {
+    return isDarkMode
+      ? 'border-emerald-900 bg-emerald-950/70 text-emerald-300'
+      : 'border-green-200 bg-green-50 text-green-800';
+  }
+
+  return isDarkMode
+    ? 'border-red-950 bg-red-950/70 text-red-300'
+    : 'border-red-200 bg-red-50 text-red-800';
+};
+
 // Configuración concentra ajustes de simulación y operaciones de respaldo local del MVP.
 export default function ConfiguracionPage() {
   const [threshold, setThreshold] = useLocalStorage('syntix_threshold', 15);
@@ -22,15 +34,16 @@ export default function ConfiguracionPage() {
 
   const handleExportBackup = () => {
     try {
+      const storage = globalThis.localStorage;
       // Solo se exportan claves del espacio syntix_ y se omiten datos de sesión o sensibles.
       const excludedKeys = new Set(['syntix_token', 'syntix_user']);
       const data = {};
 
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
+      for (let i = 0; i < storage.length; i++) {
+        const key = storage.key(i);
         if (!key?.startsWith('syntix_') || excludedKeys.has(key)) continue;
 
-        let value = localStorage.getItem(key);
+        let value = storage.getItem(key);
 
         if (key === 'syntix_users_db') {
           try {
@@ -44,6 +57,7 @@ export default function ConfiguracionPage() {
             }
           } catch (error) {
             // Si no es JSON válido, dejamos el valor original para no bloquear la exportación.
+            console.error('No fue posible sanitizar usuarios del respaldo.', error);
           }
         }
 
@@ -63,6 +77,7 @@ export default function ConfiguracionPage() {
       
       showMessage('success', 'Respaldo exportado correctamente.');
     } catch (error) {
+      console.error('Error exportando respaldo local.', error);
       showMessage('error', 'Error al exportar el respaldo.');
     }
   };
@@ -79,18 +94,19 @@ export default function ConfiguracionPage() {
         // La validación mínima evita cargar archivos que no pertenezcan al formato del proyecto.
         if (typeof data !== 'object' || data === null) throw new Error('Formato inválido');
         
-        if (window.confirm('¿Está seguro de importar este respaldo? Se sobrescribirán los datos actuales.')) {
+        if (globalThis.confirm('¿Está seguro de importar este respaldo? Se sobrescribirán los datos actuales.')) {
           // Se reinyectan solo claves del espacio del proyecto para evitar que
           // un backup corrompa otras preferencias locales ajenas a Drive Control.
           Object.keys(data).forEach(key => {
             if (key.startsWith('syntix_')) {
-              localStorage.setItem(key, data[key]);
+              globalThis.localStorage.setItem(key, data[key]);
             }
           });
           showMessage('success', 'Respaldo importado. Recargando aplicación...');
-          setTimeout(() => window.location.reload(), 1500);
+          setTimeout(() => globalThis.location.reload(), 1500);
         }
       } catch (error) {
+        console.error('Error importando respaldo local.', error);
         showMessage('error', 'El archivo no es un respaldo válido de Drive Control.');
       }
       // Reset input
@@ -100,9 +116,11 @@ export default function ConfiguracionPage() {
   };
 
   const handleResetData = () => {
-    localStorage.clear();
-    window.location.href = '/';
+    globalThis.localStorage.clear();
+    globalThis.location.href = '/';
   };
+
+  const messageClassName = getMessageClassName(message.type, isDarkMode);
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -116,15 +134,7 @@ export default function ConfiguracionPage() {
       </div>
 
       {message.text && (
-        <div className={`flex items-center gap-3 rounded-lg border p-4 ${
-          message.type === 'success'
-            ? isDarkMode
-              ? 'border-emerald-900 bg-emerald-950/70 text-emerald-300'
-              : 'border-green-200 bg-green-50 text-green-800'
-            : isDarkMode
-              ? 'border-red-950 bg-red-950/70 text-red-300'
-              : 'border-red-200 bg-red-50 text-red-800'
-        }`}>
+        <div className={`flex items-center gap-3 rounded-lg border p-4 ${messageClassName}`}>
           {message.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <AlertTriangle className="w-5 h-5" />}
           <p className="text-sm font-medium">{message.text}</p>
         </div>
@@ -143,12 +153,13 @@ export default function ConfiguracionPage() {
             <ThemeToggle label="Modo oscuro" />
           </div>
           <div data-onboarding="settings-threshold" className="max-w-md">
-            <label className={`mb-2 block text-sm font-bold ${isDarkMode ? 'text-slate-200' : 'text-gray-700'}`}>
+            <label htmlFor="settings-threshold-input" className={`mb-2 block text-sm font-bold ${isDarkMode ? 'text-slate-200' : 'text-gray-700'}`}>
               Umbral de Alerta Amarilla (Días)
             </label>
             <div className="flex gap-4">
-              <input 
-                type="number" 
+              <input
+                id="settings-threshold-input"
+                type="number"
                 value={threshold}
                 onChange={(e) => setThreshold(Number(e.target.value))}
                 className={`w-full rounded-lg border px-4 py-2 outline-none focus:ring-2 focus:ring-syntix-green ${
