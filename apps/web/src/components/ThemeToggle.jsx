@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext.jsx';
 
@@ -23,7 +24,7 @@ export default function ThemeToggle({ label = 'Modo oscuro', compact = false }) 
           sin obligar al usuario a leer el texto del switch. */}
       <div className={`rounded-full p-2 ${compact ? 'bg-white/10' : 'bg-amber-50 dark:bg-slate-800'}`}>
         {isDarkMode ? (
-          <Moon className={`h-4 w-4 ${compact ? 'text-syntix-green' : 'text-syntix-green'}`} />
+          <Moon className="h-4 w-4 text-syntix-green" />
         ) : (
           <Sun className={`h-4 w-4 ${compact ? 'text-amber-300' : 'text-amber-500'}`} />
         )}
@@ -52,3 +53,8 @@ export default function ThemeToggle({ label = 'Modo oscuro', compact = false }) 
     </button>
   );
 }
+
+ThemeToggle.propTypes = {
+  label: PropTypes.string,
+  compact: PropTypes.bool,
+};

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { NavLink, Link } from 'react-router-dom';
 import { LayoutDashboard, Car, Users, FileText, BellRing, Search, BarChart3, Settings, User, X } from 'lucide-react';
 import { useAlerts } from '@/hooks/useAlerts.js';
@@ -26,9 +27,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
   return (
     <>
       {isOpen && (
-        <div
+        <button
+          type="button"
           className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={toggleSidebar}
+          aria-label="Cerrar menu lateral"
         />
       )}
 
@@ -92,3 +95,8 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
     </>
   );
 }
+
+Sidebar.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  toggleSidebar: PropTypes.func.isRequired,
+};
