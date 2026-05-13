@@ -2,12 +2,12 @@
 
 ## 📊 Cuadro de Control de Milestones
 
-| Hito | Objetivo | Estado | Evidencia |
-|------|----------|--------|-----------|    
-| **Sprint 10** | Implementar base de datos MongoDB y autenticación básica | ✅ Finalizado | [PR #342](https://github.com/puj-course/FIS_2610_3517_G4/pull/342), [PR #329](https://github.com/puj-course/FIS_2610_3517_G4/pull/329) |
-| **Sprint 11** | Comentar código, Google OAuth, y validación end-to-end | ✅ Finalizado | [PR #502](https://github.com/puj-course/FIS_2610_3517_G4/pull/502), [PR #507](https://github.com/puj-course/FIS_2610_3517_G4/pull/507), [PR #538](https://github.com/puj-course/FIS_2610_3517_G4/pull/538) |
-| **Sprint 12** | Onboarding guiado, recuperación de cuenta, perfil de usuario | ✅ Finalizado | [PR #548](https://github.com/puj-course/FIS_2610_3517_G4/pull/548), [PR #550](https://github.com/puj-course/FIS_2610_3517_G4/pull/550) |
-| **Sprint 13** | Métricas de calidad, interfaces de gestión, modos oscuro | ✅ Finalizado | [PR #554](https://github.com/puj-course/FIS_2610_3517_G4/pull/554), [PR #555](https://github.com/puj-course/FIS_2610_3517_G4/pull/555), [PR #561](https://github.com/puj-course/FIS_2610_3517_G4/pull/561) |
+| Milestone | Descripción | Progreso | Issues (Abiertos/Cerrados) | Estado | Fecha Límite |
+|-----------|-------------|----------|----------------------------|--------|--------------|
+| **1. Base funcional del sistema** | Implementación del entorno, repositorio, despliegue inicial, Login/Registro y diseño base (Navbar/Sidebar). | 100% | 0 / 85 | ✅ Finalizado | 13/03/2026 |
+| **2. Gestión básica de flota** | CRUD completo de vehículos (placas, modelo, marca), filtros de búsqueda e integración de base de datos. | 100% | 0 / 39 | ✅ Finalizado | 10/04/2026 |
+| **3. Gestión documental y monitoreo** | Motor de vigilancia de vencimientos (SOAT, RTM, Licencias), semaforización y exportación de reportes PDF/Excel. | 100% | 0 / 32 | ✅ Finalizado | 01/05/2026 |
+| **4. Dashboard, alertas y cierre del sistema** | Dashboard resumen de flota, validación de integridad de datos y pruebas finales en el sistema. | 99% | 1 / 119 | 🔄 En Curso | 19/05/2026 |
 
 ---
 
@@ -17,13 +17,85 @@
 
 | Sprint | HU Planificadas | HU Cerradas | % Cumplimiento | Velocidad (Pts) | Tendencia |
 |--------|-----------------|------------|-----------------|-----------------|-----------|
-| Sprint 10 | 8 | 8 | 100% | 24 | 📈 Base |
+| Sprint 1 | 5 | 5 | 100% | 15 | 📈 Base |
+| Sprint 2 | 6 | 6 | 100% | 18 | 📈 +20.0% |
+| Sprint 3 | 7 | 7 | 100% | 21 | 📈 +16.6% |
+| Sprint 4 | 6 | 6 | 100% | 18 | 📉 -14.2% |
+| Sprint 5 | 8 | 8 | 100% | 24 | 📈 +33.3% |
+| Sprint 6 | 7 | 7 | 100% | 22 | 📉 -8.3% |
+| Sprint 7 | 8 | 8 | 100% | 24 | 📈 +9.1% |
+| Sprint 8 | 6 | 6 | 100% | 19 | 📉 -20.8% |
+| Sprint 9 | 9 | 9 | 100% | 27 | 📈 +42.1% |
+| Sprint 10 | 8 | 8 | 100% | 24 | 📉 -11.1% |
 | Sprint 11 | 9 | 9 | 100% | 28 | 📈 +16.7% |
 | Sprint 12 | 10 | 10 | 100% | 32 | 📈 +14.3% |
 | Sprint 13 | 8 | 7 | 87.5% | 26 | 📉 -18.8% |
-| **PROMEDIO GENERAL** | **8.75** | **8.5** | **97.1%** | **27.5** | ✅ Sostenible |
+| **PROMEDIO GENERAL** | **7.46** | **7.38** | **98.9%** | **22.9** | ✅ Sostenible |
 
 ### Detalles por Sprint
+
+#### Sprint 1 (12/02 - 19/02)
+- **Objetivo**: Configuración del entorno, repositorio y despliegue inicial
+- **HU Completadas**: 5
+- **Issues Cerradas**: 15
+- **Commits**: ~30
+- **Milestone Relacionado**: Milestone 1
+
+#### Sprint 2 (20/02 - 27/02)
+- **Objetivo**: Diseño base de UI, creación de Navbar y Sidebar
+- **HU Completadas**: 6
+- **Issues Cerradas**: 20
+- **Commits**: ~35
+- **Milestone Relacionado**: Milestone 1
+
+#### Sprint 3 (28/02 - 06/03)
+- **Objetivo**: Módulo de Login y Registro (Frontend y Backend base)
+- **HU Completadas**: 7
+- **Issues Cerradas**: 25
+- **Commits**: ~40
+- **Milestone Relacionado**: Milestone 1
+
+#### Sprint 4 (07/03 - 13/03)
+- **Objetivo**: Persistencia de sesión local y pruebas iniciales
+- **HU Completadas**: 6
+- **Issues Cerradas**: 25
+- **Commits**: ~38
+- **Milestone Relacionado**: Milestone 1
+
+#### Sprint 5 (14/03 - 21/03)
+- **Objetivo**: Registro y edición de vehículos (CRUD parcial)
+- **HU Completadas**: 8
+- **Issues Cerradas**: 12
+- **Commits**: ~42
+- **Milestone Relacionado**: Milestone 2
+
+#### Sprint 6 (22/03 - 28/03)
+- **Objetivo**: Visualización y baja de vehículos
+- **HU Completadas**: 7
+- **Issues Cerradas**: 10
+- **Commits**: ~36
+- **Milestone Relacionado**: Milestone 2
+
+#### Sprint 7 (29/03 - 04/04)
+- **Objetivo**: Implementación de filtros de búsqueda avanzados
+- **HU Completadas**: 8
+- **Issues Cerradas**: 9
+- **Commits**: ~40
+- **Milestone Relacionado**: Milestone 2
+
+#### Sprint 8 (05/04 - 11/04)
+- **Objetivo**: Integración final de BD de flota y refinamiento
+- **HU Completadas**: 6
+- **Issues Cerradas**: 8
+- **Commits**: ~32
+- **Milestone Relacionado**: Milestone 2
+
+#### Sprint 9 (12/04 - 19/04)
+- **Objetivo**: Módulo de carga documental y reportes iniciales
+- **HU Completadas**: 9
+- **Issues Cerradas**: 18
+- **Commits**: ~48
+- **Milestone Relacionado**: Milestone 3
 
 #### Sprint 10 (26/04 - 02/05)
 - **Objetivo**: Consolidar base de datos MongoDB y autenticación
@@ -170,5 +242,53 @@ Aunque los commits son individuales, **cada bloque de código pasó por un proce
 - **Cobertura de Tests**: Implementados en Sprints 11-13
 - **Análisis SonarCloud**: Ejecutado en Sprint 11 ([#475](https://github.com/puj-course/FIS_2610_3517_G4/pull/475))
 - **Documentación**: 100% de funciones principales comentadas
+
+---
+
+## 🌟 Retrospectiva Evolutiva (Dinámica Estrella de Mar)
+
+Siguiendo la instrucción de realizar el ejercicio por cada Milestone, a continuación se detallan las retrospectivas que permitieron la mejora continua del equipo.
+
+### Milestone 1: Base funcional del sistema
+
+| Eje | Acción | Ejemplo / Justificación |
+|-----|--------------------------|-------------------------|
+| **Seguir haciendo** | 1. Mantener flujo GitFlow estricto.<br>2. Realizar Dailies cortos.<br>3. Usar carpetas modulares en React. | Evitó conflictos mayores en la base.<br>Sincronización rápida de tareas.<br>Facilitó encontrar componentes de UI. |
+| **Empezar a hacer** | 1. Definir estándar Tailwind.<br>2. Crear un `.env.example`.<br>3. Usar Conventional Commits. | Corregir desorden visual inicial.<br>Saber qué variables de entorno faltan.<br>Mejorar la lectura del historial. |
+| **Más de** | 1. Comunicación por Discord.<br>2. Pair Programming en Backend.<br>3. Revisión de requisitos. | Samuel y Ramirez unificaron la DB.<br>Resolución rápida de bugs de Auth.<br>Evitar HU mal redactadas. |
+| **Menos de** | 1. Mensajes de commit tipo "fix".<br>2. Reuniones de más de 1 hora.<br>3. Cambios directos en `main`. | Dificultó rastrear cambios en Auth.<br>Pérdida de foco y productividad.<br>Riesgo de romper la versión estable. |
+| **Dejar de hacer** | 1. Commits sin prueba local.<br>2. Ignorar el linter de VSCode.<br>3. Tareas sin Issue asociada. | Rompimos el build una vez.<br>Código con inconsistencias de estilo.<br>Falta de trazabilidad en el tablero. |
+
+### Milestone 2: Gestión básica de flota
+
+| Eje | Acción | Ejemplo / Justificación |
+|-----|--------------------------|-------------------------|
+| **Seguir haciendo** | 1. Validar datos en el Backend.<br>2. Usar Express Validator.<br>3. Mantener Pull Requests. | Aseguró integridad en placas.<br>Evitó inyección de datos basura.<br>Ningún código entró sin revisión. |
+| **Empezar a hacer** | 1. Documentar con JSDoc.<br>2. Implementar logs de error.<br>3. Usar Postman Collections. | Solon pudo entender el código ajeno.<br>Saber por qué fallaba Mongo en nube.<br>Pruebas consistentes entre miembros. |
+| **Más de** | 1. Pruebas de integración.<br>2. Feedback temprano del PO.<br>3. Uso de librerías de fechas. | Filtros de búsqueda ahora funcionan.<br>Sebastian Vargas ajustó la navegación.<br>Cálculo de vencimientos más exacto. |
+| **Menos de** | 1. Dependencia de un solo revisor.<br>2. Tareas multiactividad.<br>3. Pruebas manuales repetitivas. | Cuello de botella para aprobar PRs.<br>Miembros saturados con 3 temas.<br>Se perdió tiempo en el login manual. |
+| **Dejar de hacer** | 1. Subir secretos al repo.<br>2. Usar `any` en validaciones.<br>3. Documentar al final del sprint. | Causa Raíz: Expusimos la URI de DB.<br>Bugs por tipos de datos erróneos.<br>README desactualizado (Vanilla JS). |
+
+### Milestone 3: Gestión documental y monitoreo
+
+| Eje | Acción | Ejemplo / Justificación |
+|-----|--------------------------|-------------------------|
+| **Seguir haciendo** | 1. Usar patrón Facade.<br>2. Semaforización visual.<br>3. Exportación de reportes. | Simplificó alertas de SOAT/RTM.<br>Mejora inmediata en UX de flota.<br>Valor agregado para el usuario final. |
+| **Empezar a hacer** | 1. Pruebas unitarias Jest.<br>2. Configurar SonarCloud.<br>3. Automatizar Coverage. | Asegurar lógica de vencimientos.<br>Identificar deuda técnica real.<br>Ver el progreso en cada PR. |
+| **Más de** | 1. Revisión de code smells.<br>2. Optimización de imágenes.<br>3. Pruebas de carga simples. | Redujimos complejidad en el Dashboard.<br>Carga de la UI más fluida.<br>Estabilidad con muchos vehículos. |
+| **Menos de** | 1. Hardcoding de rutas.<br>2. Uso de librerías pesadas.<br>3. Reuniones sin agenda. | Problemas al mover a producción.<br>Lentitud en el renderizado inicial.<br>Discusiones técnicas circulares. |
+| **Dejar de hacer** | 1. Merges sin Ok de QA.<br>2. Ignorar warnings de consola.<br>3. Trabajar en ramas antiguas. | Evitamos bugs visuales en el M3.<br>Causa de fugas de memoria en React.<br>Conflictos de código innecesarios. |
+
+### Milestone 4: Dashboard, alertas y cierre (En curso)
+
+| Eje | Acción | Ejemplo / Justificación |
+|-----|--------------------------|-------------------------|
+| **Seguir haciendo** | 1. Contenerización Docker.<br>2. Reportes de SonarCloud.<br>3. Sincronización de README. | Despliegue reproducible en cualquier PC.<br>Evidencia visual para la rúbrica.<br>Documentación alineada al código. |
+| **Empezar a hacer** | 1. Pruebas de integración SMS.<br>2. Mocking de servicios externos.<br>3. Auditoría final de seguridad. | Validar que Twilio/SMS funcione.<br>No gastar créditos de SMS en pruebas.<br>Cerrar puertos innecesarios en Docker. |
+| **Más de** | 1. Refactorización de UI.<br>2. Limpieza de logs de consola.<br>3. Preparación de Storytelling. | El Dashboard ahora es profesional.<br>Producción sin rastro de debugging.<br>Asegurar que la sustentación sea fluida. |
+| **Menos de** | 1. Inclusión de features nuevas.<br>2. Cambios de última hora.<br>3. Trabajo individual aislado. | Riesgo de no terminar la estabilidad.<br>Peligro de romper el Dockerfile.<br>Asegurar que todos saben sustentar. |
+| **Dejar de hacer** | 1. Postergación de la trazabilidad.<br>2. Dejar HU abiertas.<br>3. Desatender el DoD. | Evitar pérdida de puntos en la rúbrica.<br>Tener el tablero de GitHub al 100%.<br>No entregar nada sin sus tests. |
+
+---
 
 ### Distribución de Esfuerzo
