@@ -78,8 +78,10 @@ export const sanitizeDocument = (value) => {
  * Resultado: "+573001234567" => "3001234567", "300-123-4567" => "3001234567"
  */
 export const sanitizePhone = (value) => {
-  return String(value ?? '')
-    .replace(/\D/g, '')
+  const digits = String(value ?? '').replace(/\D/g, '');
+
+  return digits
+    .replace(/^57(?=3[0-9]{9})/, '')
     .slice(0, 10);
 };
 
