@@ -11,7 +11,8 @@ on:
 
   # CD al hacer push directo/merge en ramas objetivo.
   push:
-    branches: [develop, main]
+    # Se ejecuta también en ramas feature para no esperar hasta develop/main.
+    branches: [feature-*, feature/**, develop, main]
     paths:
       - 'apps/web/**'
       - 'backend/**'
@@ -85,10 +86,14 @@ jobs:
     name: CD Backend (hook externo)
     runs-on: ubuntu-latest
     needs: [frontend_ci, backend_ci]
-    if: github.event_name == 'push'
 
     steps:
+      - name: Omitir deploy backend fuera de push
+        if: github.event_name != 'push'
+        run: echo "Deploy backend omitido: este workflow solo despliega automaticamente en eventos push."
+
       - name: Disparar deploy de backend por webhook
+        if: github.event_name == 'push'
         env:
           BACKEND_DEPLOY_HOOK_URL: ${{ secrets.BACKEND_DEPLOY_HOOK_URL }}
         run: |
@@ -105,10 +110,14 @@ jobs:
     name: CD Frontend (hook externo)
     runs-on: ubuntu-latest
     needs: [frontend_ci, backend_ci]
-    if: github.event_name == 'push'
 
     steps:
+      - name: Omitir deploy frontend fuera de push
+        if: github.event_name != 'push'
+        run: echo "Deploy frontend omitido: este workflow solo despliega automaticamente en eventos push."
+
       - name: Disparar deploy de frontend por webhook
+        if: github.event_name == 'push'
         env:
           FRONTEND_DEPLOY_HOOK_URL: ${{ secrets.FRONTEND_DEPLOY_HOOK_URL }}
         run: |
