@@ -74,4 +74,92 @@ describe('useRUNTSimulator - Pruebas de validación RUNT', () => {
     expect(resultado.error).toBe('VIN debe tener 17 caracteres');
   });
 
+  it('CP-SL-06: VIN vacío retorna error de validación', () => {
+    const { searchByVIN } = useRUNTSimulator();
+
+    const resultado = searchByVIN('   ');
+
+    expect(resultado.encontrado).toBe(false);
+    expect(resultado.error).toBe('VIN vacío');
+  });
+
+  it('CP-SL-07: VIN existente retorna vehículo con SOAT y RTM', () => {
+    const { searchByVIN } = useRUNTSimulator();
+
+    const resultado = searchByVIN('WVWZZZ3CZ9E123456');
+
+    expect(resultado.encontrado).toBe(true);
+    expect(resultado.data).toMatchObject({
+      placa: 'ABC-123',
+      vin: 'WVWZZZ3CZ9E123456',
+      marca: 'Volkswagen',
+      soat: expect.objectContaining({
+        vigente: true,
+        numero: 'SOAT-VW-001-2025',
+        diasRestantes: expect.any(Number),
+      }),
+      rtm: expect.objectContaining({
+        vigente: true,
+        numero: 'RTM-2025-00123',
+        diasRestantes: expect.any(Number),
+      }),
+    });
+  });
+
+  it('CP-SL-08: VIN acepta minúsculas y espacios al normalizar', () => {
+    const { searchByVIN } = useRUNTSimulator();
+
+    const resultado = searchByVIN('  cheuuzz7gh1234567  ');
+
+    expect(resultado.encontrado).toBe(true);
+    expect(resultado.data).toMatchObject({
+      placa: 'XYZ-987',
+      vin: 'CHEUUZZ7GH1234567',
+      marca: 'Chevrolet',
+      soat: expect.objectContaining({ vigente: false }),
+      rtm: expect.objectContaining({ vigente: true }),
+    });
+  });
+
+  it('CP-SL-09: VIN inexistente de 17 caracteres retorna vehículo no encontrado', () => {
+    const { searchByVIN } = useRUNTSimulator();
+
+    const resultado = searchByVIN('AAAAAAAAAAAAAAAAA');
+
+    expect(resultado.encontrado).toBe(false);
+    expect(resultado.error).toBe('Vehículo no encontrado en RUNT');
+  });
+
+  it('CP-SL-10: getAllVehiculos retorna arreglo con vehículos resumidos', () => {
+    const { getAllVehiculos } = useRUNTSimulator();
+
+    const vehiculos = getAllVehiculos();
+
+    expect(Array.isArray(vehiculos)).toBe(true);
+    expect(vehiculos.length).toBeGreaterThan(0);
+    expect(vehiculos[0]).toEqual({
+      placa: 'ABC-123',
+      marca: 'Volkswagen',
+      modelo: '2022',
+      soatVigente: true,
+      rtmVigente: true,
+    });
+  });
+
+  it('CP-SL-11: getAllVehiculos expone campos resumidos esperados para cada vehículo', () => {
+    const { getAllVehiculos } = useRUNTSimulator();
+
+    const vehiculos = getAllVehiculos();
+
+    vehiculos.forEach((vehiculo) => {
+      expect(vehiculo).toEqual({
+        placa: expect.any(String),
+        marca: expect.any(String),
+        modelo: expect.any(String),
+        soatVigente: expect.any(Boolean),
+        rtmVigente: expect.any(Boolean),
+      });
+    });
+  });
+
 });
