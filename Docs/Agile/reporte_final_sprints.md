@@ -137,11 +137,11 @@ Para cumplir con el criterio de distribución equilibrada de la rúbrica, se pre
 
 | Integrante | Commits | % Participación | Rol Estratégico |
 |------------|---------|-----------------|-----------------|
-| **Sarm-m** | 174 | 27.2% | Lógica de Alertas y Backend (Facade) |
-| **samuelfl680** | 149 | 23.3% | Arquitectura, Auth y DevOps |
-| **solonlosada2006** | 97 | 15.2% | Gestión de Documentos y Frontend |
-| **juanvargax** | 93 | 14.5% | Diseño de UI, Navegación y Storytelling |
-| **Juserora / jSebastianRR** | 41 | 6.4% | QA, Testing y Cobertura de Código |
+| **Sarm-m** | 174 | 27.2% | 	Scrum Master |
+| **samuelfl680** | 149 | 23.3% | Configuration Manager |
+| **solonlosada2006** | 97 | 15.2% | DevOps Engineer |
+| **juanvargax** | 93 | 14.5% | Product Owner y Sprint Planner |
+| **Juserora / jSebastianRR** | 41 | 6.4% | Quality Assurance Lead (QA Lead) |
 | **Otros / Bots** | 81 | 13.4% | Automatización y Soporte |
 | **TOTAL** | **639** | **100%** | - |
 
