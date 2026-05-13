@@ -12,7 +12,8 @@ on:
       - "backend/**"
       - ".github/workflows/docker_ci_cd.yml"
   push:
-    branches: [develop, main]
+    # También valida pushes en ramas feature para detectar problemas antes del PR.
+    branches: [feature-*, feature/**, develop, main]
     paths:
       - "Dockerfile"
       - "docker-compose.yml"
