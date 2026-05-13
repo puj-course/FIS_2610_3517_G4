@@ -1,7 +1,7 @@
-export const PLATE_REGEX = /^[A-Z]{3}[0-9]{3}$/;
-export const CEDULA_REGEX = /^[0-9]{10}$/;
-export const COLOMBIAN_MOBILE_REGEX = /^3[0-9]{9}$/;
-export const DOCUMENT_CODE_REGEX = /^[A-Z0-9-]{6,30}$/;
+export const PLATE_REGEX = /^[A-Z]{3}\d{3}$/;
+export const CEDULA_REGEX = /^\d{10}$/;
+export const COLOMBIAN_MOBILE_REGEX = /^3\d{9}$/;
+export const DOCUMENT_CODE_REGEX = /^[A-Z\d-]{6,30}$/;
 
 export const normalizePlate = (value) =>
   String(value ?? '')
@@ -57,7 +57,7 @@ export const isDateRangeValid = (startDate, endDate) => {
 export const sanitizePlate = (value) => {
   return String(value ?? '')
     .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '')
+    .replace(/[^A-Z\d]/g, '')
     .slice(0, 6);
 };
 
@@ -78,8 +78,10 @@ export const sanitizeDocument = (value) => {
  * Resultado: "+573001234567" => "3001234567", "300-123-4567" => "3001234567"
  */
 export const sanitizePhone = (value) => {
-  return String(value ?? '')
-    .replace(/\D/g, '')
+  const digits = String(value ?? '').replace(/\D/g, '');
+
+  return digits
+    .replace(/^57(?=3\d{9})/, '')
     .slice(0, 10);
 };
 
