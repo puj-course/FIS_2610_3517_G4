@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { X, Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { authService } from '@/services/api.js';
 import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
+import { isValidEmailFormat } from '@/utils/emailValidation.js';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const getDigitsOnly = (value) =>
+  Array.from(String(value ?? ''))
+    .filter((character) => character >= '0' && character <= '9')
+    .join('');
+
 const isValidRecoveryIdentifier = (value) => {
   // Se acepta correo o un teléfono con longitud suficiente para cubrir recuperación por SMS.
   const normalizedValue = String(value || '').trim();
-  return EMAIL_REGEX.test(normalizedValue) || normalizedValue.replace(/\D/g, '').length >= 7;
+  return isValidEmailFormat(normalizedValue) || getDigitsOnly(normalizedValue).length >= 7;
 };
 
 // Modal ligero para autenticación desde la landing sin abandonar el flujo público.
@@ -351,7 +357,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Codigo</label>
-              <input type="text" inputMode="numeric" maxLength={6} required value={resetCode} onChange={e => setResetCode(e.target.value.replace(/\D/g, '').slice(0, 6))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900 text-center tracking-[0.45em] font-semibold" placeholder="000000" />
+              <input type="text" inputMode="numeric" maxLength={6} required value={resetCode} onChange={e => setResetCode(getDigitsOnly(e.target.value).slice(0, 6))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900 text-center tracking-[0.45em] font-semibold" placeholder="000000" />
             </div>
 
             <div>
@@ -388,3 +394,9 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     </div>
   );
 }
+
+LoginModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSwitchToRegister: PropTypes.func.isRequired,
+};

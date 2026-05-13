@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { X, FileText, Save } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
@@ -145,8 +146,9 @@ export default function AddDocumentModal({ isOpen, onClose }) {
           )}
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Vehiculo</label>
+            <label htmlFor="soat-vehiculo" className="block text-sm font-bold text-gray-700 mb-1">Vehiculo</label>
             <select
+              id="soat-vehiculo"
               required
               value={formData.vehiculoId}
               onChange={(e) => setFormData({ ...formData, vehiculoId: e.target.value })}
@@ -163,8 +165,9 @@ export default function AddDocumentModal({ isOpen, onClose }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Numero de poliza</label>
+              <label htmlFor="soat-numero-poliza" className="block text-sm font-bold text-gray-700 mb-1">Numero de poliza</label>
               <input
+                id="soat-numero-poliza"
                 type="text"
                 required
                 value={formData.numeroPoliza}
@@ -174,8 +177,9 @@ export default function AddDocumentModal({ isOpen, onClose }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Aseguradora</label>
+              <label htmlFor="soat-aseguradora" className="block text-sm font-bold text-gray-700 mb-1">Aseguradora</label>
               <input
+                id="soat-aseguradora"
                 list="aseguradoras-soat"
                 required
                 value={formData.aseguradora}
@@ -193,8 +197,9 @@ export default function AddDocumentModal({ isOpen, onClose }) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Fecha expedicion</label>
+              <label htmlFor="soat-fecha-expedicion" className="block text-sm font-bold text-gray-700 mb-1">Fecha expedicion</label>
               <input
+                id="soat-fecha-expedicion"
                 type="date"
                 required
                 value={formData.fechaExpedicion}
@@ -203,8 +208,9 @@ export default function AddDocumentModal({ isOpen, onClose }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Inicio vigencia</label>
+              <label htmlFor="soat-inicio-vigencia" className="block text-sm font-bold text-gray-700 mb-1">Inicio vigencia</label>
               <input
+                id="soat-inicio-vigencia"
                 type="date"
                 required
                 value={formData.fechaInicioVigencia}
@@ -213,8 +219,9 @@ export default function AddDocumentModal({ isOpen, onClose }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Fin vigencia</label>
+              <label htmlFor="soat-fin-vigencia" className="block text-sm font-bold text-gray-700 mb-1">Fin vigencia</label>
               <input
+                id="soat-fin-vigencia"
                 type="date"
                 required
                 value={formData.fechaFinVigencia}
@@ -225,8 +232,9 @@ export default function AddDocumentModal({ isOpen, onClose }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Observaciones</label>
+            <label htmlFor="soat-observaciones" className="block text-sm font-bold text-gray-700 mb-1">Observaciones</label>
             <textarea
+              id="soat-observaciones"
               value={formData.observaciones}
               onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none min-h-20"
@@ -252,3 +260,8 @@ export default function AddDocumentModal({ isOpen, onClose }) {
     </div>
   );
 }
+
+AddDocumentModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+};

@@ -12,7 +12,7 @@
     "start": "vite preview --outDir ../../dist/apps/web --host :: --port 3000",
     "lint": "eslint . --quiet",
     "lint:warn": "eslint .",
-    "test": "vitest run --coverage.enabled=true --coverage.reporter=text --coverage.reporter=lcov --coverage.reporter=html",
+    "test": "sh -c 'vitest run --coverage.enabled=true \"$@\" --coverage.reporter=text --coverage.reporter=lcovonly --coverage.reporter=html' --",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -32,6 +32,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^11.15.0",
     "lucide-react": "^0.469.0",
+    "prop-types": "^15.8.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet": "^6.1.0",

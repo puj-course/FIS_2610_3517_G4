@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { X, User, Save } from 'lucide-react';
 import { useConductors } from '@/hooks/useConductors.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
@@ -11,6 +12,15 @@ const createInitialFormData = () => ({
   categoria: 'B1',
   fechaVencimiento: '',
   vehiculoId: '',
+});
+
+const conductorShape = PropTypes.shape({
+  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  nombre: PropTypes.string,
+  documento: PropTypes.string,
+  telefono: PropTypes.string,
+  categoria: PropTypes.string,
+  fechaVencimiento: PropTypes.string,
 });
 
 // El modal de conductores también coordina la asignación opcional a un vehículo
@@ -185,8 +195,9 @@ export default function AddConductorModal({
           )}
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Nombre Completo</label>
+            <label htmlFor="conductor-nombre" className="block text-sm font-bold text-gray-700 mb-1">Nombre Completo</label>
             <input
+              id="conductor-nombre"
               type="text"
               required
               value={formData.nombre}
@@ -198,8 +209,9 @@ export default function AddConductorModal({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Documento</label>
+              <label htmlFor="conductor-documento" className="block text-sm font-bold text-gray-700 mb-1">Documento</label>
               <input
+                id="conductor-documento"
                 type="text"
                 inputMode="numeric"
                 required
@@ -212,8 +224,9 @@ export default function AddConductorModal({
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Telefono</label>
+              <label htmlFor="conductor-telefono" className="block text-sm font-bold text-gray-700 mb-1">Telefono</label>
               <input
+                id="conductor-telefono"
                 type="text"
                 inputMode="numeric"
                 required
@@ -227,8 +240,9 @@ export default function AddConductorModal({
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Vehiculo a asignar</label>
+            <label htmlFor="conductor-vehiculo" className="block text-sm font-bold text-gray-700 mb-1">Vehiculo a asignar</label>
             <select
+              id="conductor-vehiculo"
               value={formData.vehiculoId}
               onChange={(e) => setFormData({ ...formData, vehiculoId: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 bg-white"
@@ -246,8 +260,9 @@ export default function AddConductorModal({
             <h3 className="text-sm font-bold text-gray-900 mb-3">Informacion de Licencia</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Categoria</label>
+                <label htmlFor="conductor-categoria" className="block text-sm font-bold text-gray-700 mb-1">Categoria</label>
                 <select
+                  id="conductor-categoria"
                   value={formData.categoria}
                   onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green outline-none text-gray-900 bg-white"
@@ -264,8 +279,9 @@ export default function AddConductorModal({
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Fecha Vencimiento</label>
+                <label htmlFor="conductor-fecha-vencimiento" className="block text-sm font-bold text-gray-700 mb-1">Fecha Vencimiento</label>
                 <input
+                  id="conductor-fecha-vencimiento"
                   type="date"
                   required
                   value={formData.fechaVencimiento}
@@ -299,3 +315,9 @@ export default function AddConductorModal({
     </div>
   );
 }
+
+AddConductorModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  conductorToEdit: conductorShape,
+};

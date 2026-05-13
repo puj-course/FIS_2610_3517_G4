@@ -32,6 +32,20 @@ Estas métricas son propias del dominio funcional del sistema. Evalúan el estad
 - Duplications y Security Hotspots: sin fallas reportadas en la evidencia visual del PR #564.
 <img width="1904" height="940" alt="image" src="https://github.com/user-attachments/assets/c3f124b8-be26-4238-bef1-4f26529a8fb5" />
 
+## Alcance de cobertura SonarCloud
+
+La cobertura automatizada se enfoca en lógica de dominio, utilidades, hooks con lógica pura y adaptadores. En este alcance se mantienen medidos archivos como métricas de calidad, formatos colombianos, fechas, simulación RUNT y adaptadores de alertas.
+
+Las páginas, layouts, contextos, componentes visuales y hooks de integración se validan mediante lint, build, revisión funcional/manual y análisis estático de SonarCloud. Por eso `sonar.coverage.exclusions` evita mezclar cobertura unitaria de lógica con superficies visuales o de integración que no se prueban de forma aislada.
+
+Los archivos excluidos del cálculo de coverage siguen dentro de `sonar.sources`; por tanto SonarCloud los continúa analizando para mantenibilidad, confiabilidad, seguridad y hotspots.
+
+## Corrección de Security Hotspots
+
+Se reemplazaron expresiones regulares sensibles por funciones deterministas sin backtracking riesgoso. Las validaciones de correo ahora separan local y dominio con operaciones de string y límites explícitos de longitud.
+
+La normalización de la URL base de la API dejó de usar regex para remover slashes finales y usa una función iterativa con `endsWith` y `slice`, manteniendo el mismo comportamiento funcional.
+
 
 ## Pendientes SonarCloud
 
