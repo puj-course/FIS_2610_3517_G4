@@ -3,6 +3,11 @@
 
 ![DriveControl Banner](https://github.com/user-attachments/assets/70b5b3d2-98c2-4d25-995a-783896a2b28b)
 
+[![CI Verificacion](https://github.com/puj-course/FIS_2610_3517_G4/actions/workflows/ci_verificacion.yml/badge.svg)](https://github.com/puj-course/FIS_2610_3517_G4/actions/workflows/ci_verificacion.yml)
+[![Docker CI/CD](https://github.com/puj-course/FIS_2610_3517_G4/actions/workflows/docker_ci_cd.yml/badge.svg)](https://github.com/puj-course/FIS_2610_3517_G4/actions/workflows/docker_ci_cd.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=puj-course_FIS_2610_3517_G4&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=puj-course_FIS_2610_3517_G4)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=puj-course_FIS_2610_3517_G4&metric=coverage)](https://sonarcloud.io/summary/new_code?id=puj-course_FIS_2610_3517_G4)
+
 **Propuesta de valor:** Transformamos la gestión documental de flotas en una ventaja operativa, disminuyendo el riesgo de inmovilizaciones y multas mediante automatización del cumplimiento, visibilidad en tiempo real y alertas preventivas.
 
 ---
@@ -147,36 +152,67 @@ La demo académica incluye:
 
 # 🧩 Tecnología y enfoque
 
-## Stack del MVP
-- HTML  
-- CSS  
-- JavaScript (Vanilla)  
-- LocalStorage  
+## Stack del sistema
+
+| Capa | Tecnología |
+|------|-----------|
+| Frontend | React 18, Vite 5, Tailwind CSS, React Router, Recharts |
+| Backend | Node.js 20, Express, Mongoose, JWT, Nodemailer |
+| Base de datos | MongoDB Atlas (producción), MongoDB local (Docker) |
+| Pruebas | Vitest 4, @vitest/coverage-v8, LCOV |
+| CI/CD | GitHub Actions (7 workflows), SonarCloud |
+| Despliegue | Docker, Docker Compose, Nginx, DockerHub |
+| Patrones | GoF: Facade, Singleton, Strategy, Adapter, Observer, Factory |
 
 ## Enfoque de ingeniería
-- Metodología Scrum académico  
-- Gestión con GitHub Issues y Projects  
-- Milestones por sprint  
-- Flujo de ramas: feature → develop → main  
+- Metodología Scrum académico con 13 sprints y 4 milestones  
+- Gestión con GitHub Issues y Projects (Kanban automatizado)  
+- Flujo de ramas: feature → develop → main (GitFlow)  
+- Cobertura SonarCloud en New Code: 83.7% (Quality Gate aprobado)
 
 ---
 
 # 📂 Estructura del repositorio
 
 ```text
-frontend/   → interfaz y dashboard  
-backend/    → lógica de negocio (si aplica)  
-docs/       → documentación, UML y evidencias  
-assets/     → recursos gráficos  
+apps/web/               → Frontend React/Vite
+  src/
+    components/         → Componentes reutilizables (StatusBadge, Modals, etc.)
+    pages/              → Vistas del sistema (Dashboard, Vehículos, Conductores…)
+    hooks/              → Custom React hooks (useVehicles, useConductors, useAlerts…)
+    patterns/           → Patrones GoF (adapters, singleton, facade, strategy)
+    utils/              → Utilidades de dominio (qualityMetrics, dateUtils, colombiaFormats…)
+    contexts/           → Contextos React (ThemeContext, AuthContext, OnboardingContext)
+    __tests__/          → Suite de pruebas unitarias (9 archivos, ~1,557 líneas)
+backend/                → API REST Node.js/Express
+  routes/               → Endpoints (vehículos, conductores, SOAT, RTM, auth)
+  models/               → Schemas Mongoose
+  services/             → emailService, authService
+  scripts/              → auth-doctor.js (diagnóstico Atlas)
+Docs/                   → Documentación del proyecto
+  Agile/                → Sprints, retrospectivas, postmortem
+  QA/                   → Métricas, plan de pruebas, datos de demo
+  Arquitectura/         → Patrones GoF, diagramas UML
+.github/workflows/      → 7 pipelines CI/CD
+docker-compose.yml      → Orquestación MongoDB + backend + frontend
+Dockerfile              → Backend multi-stage (node:20-alpine)
+apps/web/Dockerfile     → Frontend multi-stage (node:20-alpine + nginx:1.27-alpine)
+DEPLOYMENT.md           → Guía completa de despliegue
 ```
 
 ---
 
 # 📋 Requisitos
 
-- Navegador actualizado (Chrome, Edge o Firefox)
-- Visual Studio Code (recomendado)
-- Git
+| Herramienta | Versión | Para qué |
+|------------|---------|---------|
+| Git | 2.x+ | Clonar el repositorio |
+| Docker + Compose | 24.x+ / 2.x+ | Ejecución completa del stack |
+| Node.js | 20 LTS | Desarrollo local sin Docker |
+| npm | 10.x+ | Instalación de dependencias |
+| Navegador moderno | Chrome / Edge / Firefox | Usar la aplicación |
+
+Ver la guía completa en [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ---
 

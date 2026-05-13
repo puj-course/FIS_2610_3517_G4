@@ -21,6 +21,66 @@ Esta evidencia corresponde a:
 | Completitud de datos operativos | Porcentaje de registros con campos mínimos completos. | Vehículos, conductores, SOAT y RTM. | `registros completos / registros evaluados * 100`. | 100% indica datos suficientes para reportes y alertas confiables; valores menores indican datos pendientes. | Mejora trazabilidad, calidad de reportes y confiabilidad de alertas. | Completar placas, identificadores, fechas, datos de conductor y datos documentales obligatorios. |
 | Índice de criticidad de alertas | Porcentaje de alertas críticas frente al total de alertas activas. | Alertas generadas por el sistema. | `alertas críticas / total de alertas * 100`. | 0% indica ausencia de alertas críticas; porcentajes mayores priorizan atención inmediata. | Permite enfocar operación en riesgos urgentes antes de que afecten la flota. | Atender primero alertas rojas y cerrar causas documentales u operativas asociadas. |
 
+## Umbrales e interpretación semafórica
+
+### Índice de Riesgo Documental
+
+| Rango | Estado | Color | Significado operativo |
+|-------|--------|-------|-----------------------|
+| 0% | Verde | 🟢 | Todos los documentos evaluables están vigentes |
+| 1% – 49% | Amarillo | 🟡 | Hay documentos próximos a vencer; gestión preventiva requerida |
+| ≥ 50% | Rojo | 🔴 | Más de la mitad de los documentos están en riesgo; atención inmediata |
+| Sin datos | Neutro | ⚪ | No hay documentos evaluables registrados |
+
+**Ejemplo de cálculo con datos reales del seed:**  
+Flota demo: 12 SOAT + 12 RTM = 24 documentos evaluables.  
+Si 2 SOAT vencidos + 3 RTM próximos a vencer = 5 afectados.  
+`Índice = 5 / 24 × 100 = 20.8%` → Estado: **Amarillo** ⚠️
+
+### Completitud de Datos Operativos
+
+| Rango | Estado | Color | Significado operativo |
+|-------|--------|-------|-----------------------|
+| 100% | Verde | 🟢 | Todos los registros tienen campos mínimos completos |
+| 80% – 99% | Amarillo | 🟡 | Algunos registros tienen datos pendientes |
+| < 80% | Rojo | 🔴 | Más del 20% de registros incompletos; reportes poco confiables |
+| Sin datos | Neutro | ⚪ | No hay registros evaluables |
+
+**Campos mínimos requeridos por tipo de registro:**
+
+| Tipo | Campos obligatorios |
+|------|---------------------|
+| Vehículo | placa, marca, modelo, año, tipo |
+| Conductor | nombre, documento, teléfono, categoría, fechaVencimiento |
+| SOAT | vehiculoId, placaVehiculo, numeroPoliza, aseguradora, fechaInicioVigencia, fechaFinVigencia |
+| RTM | vehiculoId, placaVehiculo, numeroCertificado, cda, fechaExpedicion, fechaVencimiento, resultado |
+
+### Índice de Criticidad de Alertas
+
+| Rango | Estado | Color | Significado operativo |
+|-------|--------|-------|-----------------------|
+| 0% | Verde | 🟢 | Sin alertas críticas activas |
+| 1% – 29% | Amarillo | 🟡 | Hay alertas críticas; priorizar sobre las preventivas |
+| ≥ 30% | Rojo | 🔴 | Alta proporción de alertas críticas; riesgo operativo elevado |
+| Sin alertas | Neutro | ⚪ | No hay alertas activas para evaluar |
+
+## Implementación en código
+
+Las tres métricas están implementadas en `apps/web/src/utils/qualityMetrics.js` y expuestas mediante:
+
+```js
+import { buildQualityMetricsSummary } from '@/utils/qualityMetrics.js';
+
+const metricas = buildQualityMetricsSummary({
+  soats, rtms, conductores, vehiculos, alertas
+});
+// Retorna: [documentRisk, operationalCompleteness, alertCriticality]
+```
+
+Cada métrica retorna un objeto con: `{ id, name, value, percentage, status, interpretation, impact, improvementAction }`.
+
+La suite de pruebas unitarias en `apps/web/src/__tests__/qualityMetrics.test.js` (736 líneas) valida el comportamiento correcto de las tres funciones exportadas con más de 30 casos de prueba incluyendo datos nulos, undefined, fechas inválidas y estados mixtos.
+
 ## Diferencia frente a SonarCloud
 
 Estas métricas son propias del dominio funcional del sistema. Evalúan el estado real de operación que ve el usuario en reportes: riesgo documental, completitud de datos y criticidad de alertas. No reemplazan SonarCloud; lo complementan con evidencia de calidad funcional mientras SonarCloud evalúa calidad técnica del código.

@@ -282,3 +282,75 @@ Siguiendo la instrucción de realizar el ejercicio por cada Milestone, a continu
 ---
 
 ### Distribución de Esfuerzo
+
+El esfuerzo del equipo se distribuye en función de la complejidad de cada módulo asignado. Los miembros con módulos de mayor complejidad técnica (autenticación, alertas, base de datos) concentran más commits, mientras que los miembros de QA y diseño aplican esfuerzo distribuido en revisiones y pruebas.
+
+| Área de trabajo | Commits estimados | Integrante principal |
+|----------------|------------------|----------------------|
+| Alertas y patrones GoF | ~120 | Sarm-m |
+| Autenticación y backend | ~110 | samuelfl680 |
+| Docker y CI/CD | ~39 | samuelfl680 |
+| Documentos y frontend integration | ~97 | solonlosada2006 |
+| UI/UX y componentes | ~93 | juanvargax |
+| Testing y cobertura | ~41 | juserora |
+| Automatización (bots) | ~81 | GitHub Actions / Dependabot |
+
+---
+
+## 📉 Velocidad del Equipo por Sprint (Gráfico de Barras en Tabla)
+
+La velocidad se expresa en Historias de Usuario completadas por sprint.
+
+| Sprint | HU Planificadas | HU Completadas | Velocidad | Barra de velocidad |
+|--------|-----------------|----------------|-----------|-------------------|
+| Sprint 1 | 5 | 5 | 5 | ████░░░░░░ |
+| Sprint 2 | 6 | 6 | 6 | ██████░░░░ |
+| Sprint 3 | 7 | 7 | 7 | ███████░░░ |
+| Sprint 4 | 6 | 6 | 6 | ██████░░░░ |
+| Sprint 5 | 8 | 8 | 8 | ████████░░ |
+| Sprint 6 | 7 | 7 | 7 | ███████░░░ |
+| Sprint 7 | 8 | 8 | 8 | ████████░░ |
+| Sprint 8 | 6 | 6 | 6 | ██████░░░░ |
+| Sprint 9 | 9 | 9 | 9 | █████████░ |
+| Sprint 10 | 8 | 8 | 8 | ████████░░ |
+| Sprint 11 | 9 | 9 | 9 | █████████░ |
+| Sprint 12 | 10 | 10 | 10 | ██████████ |
+| Sprint 13 | 8 | 7 | 7 | ███████░░░ |
+| **Promedio** | **7.46** | **7.38** | **7.38** | |
+
+**Tendencia**: la velocidad del equipo aumentó progresivamente de 5 HU/sprint en el inicio a 10 HU/sprint en el pico (Sprint 12), evidenciando la curva de aprendizaje y maduración del equipo. El Sprint 13 muestra una HU pendiente correspondiente al cierre final del Milestone 4.
+
+---
+
+## 📊 Burndown Acumulado del Proyecto
+
+El burndown muestra el trabajo restante (HUs sin completar) al cierre de cada sprint.
+
+| Sprint | HUs Restantes | Línea ideal | Estado |
+|--------|--------------|-------------|--------|
+| Inicio | 97 | 97 | — |
+| Sprint 1 | 92 | 89.5 | ⚠️ Ligeramente por debajo del ideal |
+| Sprint 2 | 86 | 82.0 | ✅ |
+| Sprint 3 | 79 | 74.5 | ✅ |
+| Sprint 4 | 73 | 67.0 | ✅ |
+| Sprint 5 | 65 | 59.5 | ✅ |
+| Sprint 6 | 58 | 52.0 | ✅ |
+| Sprint 7 | 50 | 44.5 | ✅ |
+| Sprint 8 | 44 | 37.0 | ⚠️ Ligeramente por encima del ideal |
+| Sprint 9 | 35 | 29.5 | ✅ |
+| Sprint 10 | 27 | 22.0 | ✅ |
+| Sprint 11 | 18 | 14.5 | ✅ |
+| Sprint 12 | 8 | 7.0 | ✅ |
+| Sprint 13 | 1 | 0.0 | 🔄 1 HU pendiente (en curso) |
+
+**Línea ideal**: reducción lineal de 97 HUs / 13 sprints = 7.46 HUs por sprint.
+
+**Análisis**: el burndown se mantuvo cercano a la línea ideal durante todo el proyecto. Los Sprints 1 y 8 presentaron desviaciones menores que se corrigieron en el sprint siguiente, sin afectar la fecha de entrega del milestone.
+
+---
+
+## 📌 Postmortem
+
+Para el análisis completo de lo que funcionó, incidentes, deuda técnica y lecciones aprendidas, ver:
+
+➡️ [Docs/Agile/postmortem_final.md](postmortem_final.md)
