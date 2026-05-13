@@ -719,7 +719,7 @@ describe('buildQualityMetricsSummary', () => {
       { baseDate: BASE_DATE }
     );
 
-    result.forEach(expectMetricRenderShape);
+    result.forEach((metric) => expectMetricRenderShape(metric));
   });
 
   it.each([

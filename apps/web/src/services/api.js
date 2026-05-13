@@ -1,9 +1,19 @@
 import axios from 'axios';
 
+const removeTrailingSlashes = (value) => {
+  let result = String(value ?? '');
+
+  while (result.endsWith('/')) {
+    result = result.slice(0, -1);
+  }
+
+  return result;
+};
+
 // Normaliza la URL base para que el frontend acepte variables con o sin sufijo /api.
 const normalizeApiBaseUrl = (value) => {
   // Se limpia slash final para evitar dobles `//` en las rutas.
-  const baseUrl = String(value || 'http://localhost:5000/api').replace(/\/+$/, '');
+  const baseUrl = removeTrailingSlashes(value || 'http://localhost:5000/api');
   // Si el usuario configuró solo el host, aquí se agrega `/api` automáticamente.
   return baseUrl.endsWith('/api') ? baseUrl : `${baseUrl}/api`;
 };

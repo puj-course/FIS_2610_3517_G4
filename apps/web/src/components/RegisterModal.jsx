@@ -1,12 +1,15 @@
 import React, { useState, useRef } from 'react';
+import PropTypes from 'prop-types';
 import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { queueOnboardingForUser } from '@/contexts/OnboardingContext.jsx';
 import { authService } from '@/services/api.js';
 import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
 import { isValidColombianMobile } from '@/utils/colombiaFormats.js';
+import { isValidEmailFormat } from '@/utils/emailValidation.js';
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isOnlyDigits = (value) =>
+  Array.from(String(value ?? '')).every((character) => character >= '0' && character <= '9');
 
 // Registro en dos pasos: alta inicial y luego verificación OTP para cerrar el onboarding.
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
@@ -52,7 +55,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       return;
     }
     // El correo es la llave principal de identidad y del OTP.
-    if (!EMAIL_REGEX.test(email)) {
+    if (!isValidEmailFormat(email)) {
       setError('Ingresa un correo electrónico válido.');
       return;
     }
@@ -147,7 +150,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   // Permite solo digitos y avanza automaticamente entre inputs.
   const handleOtpChange = (index, value) => {
     // Se rechaza cualquier carácter que no sea numérico.
-    if (!/^\d*$/.test(value)) return;
+    if (!isOnlyDigits(value)) return;
     const newOtp = [...otp];
     // Cada input guarda solo el último dígito ingresado.
     newOtp[index] = value.slice(-1);
@@ -345,3 +348,9 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     </div>
   );
 }
+
+RegisterModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  onSwitchToLogin: PropTypes.func.isRequired,
+};

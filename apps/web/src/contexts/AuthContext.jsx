@@ -1,14 +1,13 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import { useLocalStorage } from '@/hooks/useLocalStorage.js';
 import { authService } from '@/services/api.js';
+import { isValidEmailFormat } from '@/utils/emailValidation.js';
 
 const AuthContext = createContext(null);
 // Mensaje compartido para no duplicar texto cuando backend y fallback local
 // detectan el mismo caso de correo ya registrado.
 const DUPLICATE_EMAIL_MESSAGE = 'Ya existe una cuenta con este correo electrónico.';
-// Expresión mínima para filtrar correos inválidos antes de consultar la API.
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 // Quita espacios laterales y garantiza que trabajemos siempre con strings.
 const normalizeText = (value) => String(value ?? '').trim();
 // El correo se normaliza en minúsculas para evitar duplicados por casing.
@@ -21,7 +20,7 @@ const validateRegistrationData = ({ email, password, empresa, telefono }) => {
   // El teléfono se usa más adelante para recuperación y contacto de la cuenta.
   if (!normalizeText(telefono)) return 'Ingresa el teléfono.';
   // El correo debe tener forma válida antes de intentar registro o login federado.
-  if (!EMAIL_REGEX.test(normalizeEmail(email))) return 'Ingresa un correo electrónico válido.';
+  if (!isValidEmailFormat(normalizeEmail(email))) return 'Ingresa un correo electrónico válido.';
   // No permitimos continuar sin contraseña en el registro tradicional.
   if (!password) return 'Ingresa una contraseña.';
   // Se exige un mínimo corto pero suficiente para el MVP.
@@ -284,3 +283,7 @@ export function AuthProvider({ children }) {
 }
 
 export const useAuth = () => useContext(AuthContext);
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};
