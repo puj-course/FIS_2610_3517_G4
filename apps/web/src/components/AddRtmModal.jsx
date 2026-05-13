@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
 import { X, FileText, Save } from 'lucide-react';
 import { useRtm } from '@/contexts/RtmContext.jsx';
 import { useVehicles } from '@/hooks/useVehicles.js';
@@ -141,8 +142,9 @@ export default function AddRtmModal({ isOpen, onClose }) {
           )}
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Vehiculo</label>
+            <label htmlFor="rtm-vehiculo" className="block text-sm font-bold text-gray-700 mb-1">Vehiculo</label>
             <select
+              id="rtm-vehiculo"
               required
               value={formData.vehiculoId}
               onChange={(e) => setFormData({ ...formData, vehiculoId: e.target.value })}
@@ -159,8 +161,9 @@ export default function AddRtmModal({ isOpen, onClose }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Numero de certificado RTM</label>
+              <label htmlFor="rtm-numero-certificado" className="block text-sm font-bold text-gray-700 mb-1">Numero de certificado RTM</label>
               <input
+                id="rtm-numero-certificado"
                 type="text"
                 required
                 value={formData.numeroCertificado}
@@ -170,8 +173,9 @@ export default function AddRtmModal({ isOpen, onClose }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">CDA</label>
+              <label htmlFor="rtm-cda" className="block text-sm font-bold text-gray-700 mb-1">CDA</label>
               <input
+                id="rtm-cda"
                 list="cdas-rtm"
                 required
                 value={formData.cda}
@@ -189,8 +193,9 @@ export default function AddRtmModal({ isOpen, onClose }) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Fecha expedicion</label>
+              <label htmlFor="rtm-fecha-expedicion" className="block text-sm font-bold text-gray-700 mb-1">Fecha expedicion</label>
               <input
+                id="rtm-fecha-expedicion"
                 type="date"
                 required
                 value={formData.fechaExpedicion}
@@ -199,8 +204,9 @@ export default function AddRtmModal({ isOpen, onClose }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Fecha vencimiento</label>
+              <label htmlFor="rtm-fecha-vencimiento" className="block text-sm font-bold text-gray-700 mb-1">Fecha vencimiento</label>
               <input
+                id="rtm-fecha-vencimiento"
                 type="date"
                 required
                 value={formData.fechaVencimiento}
@@ -209,8 +215,9 @@ export default function AddRtmModal({ isOpen, onClose }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Resultado</label>
+              <label htmlFor="rtm-resultado" className="block text-sm font-bold text-gray-700 mb-1">Resultado</label>
               <select
+                id="rtm-resultado"
                 value={formData.resultado}
                 onChange={(e) => setFormData({ ...formData, resultado: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none bg-white"
@@ -223,8 +230,9 @@ export default function AddRtmModal({ isOpen, onClose }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Observaciones</label>
+            <label htmlFor="rtm-observaciones" className="block text-sm font-bold text-gray-700 mb-1">Observaciones</label>
             <textarea
+              id="rtm-observaciones"
               value={formData.observaciones}
               onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none min-h-20"
@@ -250,3 +258,8 @@ export default function AddRtmModal({ isOpen, onClose }) {
     </div>
   );
 }
+
+AddRtmModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
