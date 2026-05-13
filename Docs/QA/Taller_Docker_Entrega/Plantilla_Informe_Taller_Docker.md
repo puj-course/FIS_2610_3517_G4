@@ -150,7 +150,8 @@ Inserta captura del sistema abierto en:
 ### Evidencia esperada
 - Pipeline versionado y ejecutado.
 - Build de imagenes automatizado.
-- Publicacion preparada para DockerHub.
+- Publicacion versionada en DockerHub.
+- Despliegue con Docker Compose desde imagenes publicadas.
 
 ### Archivo utilizado
 - Ruta: .github/workflows/docker_ci_cd.yml
@@ -158,7 +159,10 @@ Inserta captura del sistema abierto en:
 ### Flujo implementado
 1. Validacion de docker-compose.
 2. Build imagenes backend y frontend.
-3. Publicacion condicional en DockerHub (si existen secretos).
+3. Lint, pruebas, coverage y build de frontend.
+4. Validacion de sintaxis y preflight del backend.
+5. Publicacion obligatoria en DockerHub para `main` y `develop`.
+6. Despliegue Compose usando `docker-compose.prod.yml`.
 
 ### Captura obligatoria C8 - workflow en Actions
 Inserta captura de la ejecucion del workflow Docker CI/CD en verde.
@@ -172,7 +176,8 @@ Inserta captura donde se vea el job docker-validate completado.
 
 ### Analisis tecnico
 - Como se integra Docker al pipeline:
-- Por que se usa publicacion condicional:
+- Como se versionan las imagenes por SHA, corrida y rama:
+- Como `docker-compose.prod.yml` despliega imagenes publicadas:
 - Mejoras futuras del pipeline:
 
 ---

@@ -8,6 +8,7 @@ assignees: []
 
 ## Objetivo
 Validar que la pipeline de HU-454 ejecuta CI y, cuando aplique, CD por hooks.
+Para la entrega Docker principal, validar tambien `docker_ci_cd.yml`.
 
 ## Checklist de prueba
 - [ ] Abrir PR hacia `develop` con un cambio minimo (ej. comentario).
@@ -15,11 +16,14 @@ Validar que la pipeline de HU-454 ejecuta CI y, cuando aplique, CD por hooks.
 - [ ] Confirmar que el PR queda bloqueado si falla lint/build.
 - [ ] Hacer merge y verificar trigger de `deploy_backend`.
 - [ ] Hacer merge y verificar trigger de `deploy_frontend`.
-- [ ] Confirmar mensajes de omision si faltan secrets de hooks.
+- [ ] Confirmar que `docker_ci_cd.yml` publica imagenes versionadas en DockerHub en `main` o `develop`.
+- [ ] Confirmar que `docker_ci_cd.yml` despliega con Docker Compose desde las imagenes publicadas.
 
 ## Resultado esperado
 - CI en verde para cambios validos.
 - Deploy disparado por hooks si secrets existen.
+- Publicacion DockerHub obligatoria en el workflow Docker principal.
+- Despliegue Docker Compose validado con healthchecks.
 - Trazabilidad en Actions con logs claros.
 
 ## Evidencia
