@@ -4,8 +4,9 @@ on:
   pull_request:
     branches: [ "develop","main" ]
   push:
-    # Este patrón intenta cubrir ramas feature antes de integración.
-    branches: [ "feature/**" ]
+    # Se cubren ramas feature con y sin subcarpetas, además de las ramas de integración.
+    branches: [ "feature-*", "feature/**", "develop", "main" ]
+  workflow_dispatch:
 
 jobs:
   verificacion:
