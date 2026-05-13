@@ -97,23 +97,19 @@
 - **Commits**: ~48
 - **Milestone Relacionado**: Milestone 3
 
-#### Sprint 10 (26/04 - 02/05)
+#### Sprint 10 (20/04 - 26/04)
 - **Objetivo**: Consolidar base de datos MongoDB y autenticación
 - **HU Completadas**: 8
 - **Issues Cerradas**: 8
 - **Commits**: ~45
-- **Merge Requests**: 8
+- **Milestone Relacionado**: Milestone 3
 
-#### Sprint 11 (26/04 - 03/05)
+#### Sprint 11 (27/04 - 03/05)
 - **Objetivo**: Documentación, Google OAuth, validación end-to-end
 - **HU Completadas**: 9
 - **Issues Cerradas**: 9
 - **Commits**: ~52
-- **Merge Requests**: 10
-- **Referencias**:
-  - [#493](https://github.com/puj-course/FIS_2610_3517_G4/issues/493) - Comentar código del proyecto
-  - [#504](https://github.com/puj-course/FIS_2610_3517_G4/issues/504) - Autenticación Google
-  - [#505](https://github.com/puj-course/FIS_2610_3517_G4/issues/505) - Google OAuth local
+- **Milestone Relacionado**: Milestone 3
 
 #### Sprint 12 (04/05 - 11/05)
 - **Objetivo**: Onboarding guiado, recuperación de cuenta, perfil
@@ -121,10 +117,7 @@
 - **Issues Cerradas**: 10
 - **Commits**: ~58
 - **Merge Requests**: 12
-- **Referencias**:
-  - [#528](https://github.com/puj-course/FIS_2610_3517_G4/issues/528) - Onboarding guiado
-  - [#546](https://github.com/puj-course/FIS_2610_3517_G4/issues/546) - Perfil de usuario
-  - [#527](https://github.com/puj-course/FIS_2610_3517_G4/issues/527) - Recuperación por correo
+- **Milestone Relacionado**: Milestone 4
 
 #### Sprint 13 (12/05 - En Curso)
 - **Objetivo**: Métricas de calidad, navegación, modo oscuro
@@ -132,10 +125,7 @@
 - **Issues Cerradas**: 7
 - **Commits**: ~35 (en curso)
 - **Merge Requests**: 6 (en curso)
-- **Referencias**:
-  - [#556](https://github.com/puj-course/FIS_2610_3517_G4/issues/556) - Automatizar métricas
-  - [#557](https://github.com/puj-course/FIS_2610_3517_G4/issues/557) - Implementar métricas propias
-  - [#547](https://github.com/puj-course/FIS_2610_3517_G4/issues/547) - Modo oscuro consistente
+- **Milestone Relacionado**: Milestone 4
 
 ---
 
