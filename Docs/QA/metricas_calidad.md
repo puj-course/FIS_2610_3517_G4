@@ -45,7 +45,7 @@ Estas metricas son de calidad funcional y operativa. No reemplazan a SonarCloud;
 
 ## Metricas SonarCloud requeridas
 
-El workflow de SonarCloud ejecuta pruebas y envia `apps/web/coverage/lcov.info`. Ademas espera el Quality Gate con `sonar.qualitygate.wait=true`, por lo que la revision no queda en "se ejecuto el scan", sino en "el scan aprobo o fallo".
+El workflow de SonarCloud ejecuta pruebas, genera `apps/web/coverage/lcov.info`, publica el artefacto de evidencia y ejecuta el analisis de SonarCloud. El Quality Gate se valida con el check oficial de SonarCloud en GitHub (`SonarCloud Code Analysis - Quality Gate passed`), evitando que un timeout transitorio del endpoint de espera del scanner bloquee el PR aunque el gate ya haya sido calculado correctamente.
 
 Resultado local verificado despues de la correccion:
 
@@ -84,7 +84,7 @@ Para defender calificacion excelente se debe mostrar:
 4. Al menos dos metricas SonarCloud visibles; se recomiendan coverage, duplications, maintainability y security.
 5. Interpretacion de cada metrica con umbrales, impacto y accion concreta de mejora.
 6. Auditoria de dependencias frontend sin vulnerabilidades moderadas o superiores.
-7. Quality Gate aprobado en GitHub Actions.
+7. Quality Gate aprobado en GitHub Actions mediante el check oficial de SonarCloud.
 
 ## Acciones de mejora si una metrica baja
 

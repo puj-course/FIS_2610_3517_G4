@@ -65,14 +65,6 @@ jobs:
         working-directory: apps/web
         run: npm run build
 
-      - name: Run SonarCloud analysis
-        uses: SonarSource/sonarqube-scan-action@v7
-        with:
-          args: >
-            -Dsonar.qualitygate.wait=true
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
       - name: Upload quality evidence
         uses: actions/upload-artifact@v4
         with:
@@ -81,3 +73,8 @@ jobs:
             apps/web/coverage/lcov.info
             apps/web/coverage/quality-metrics-report.json
           retention-days: 14
+
+      - name: Run SonarCloud analysis
+        uses: SonarSource/sonarqube-scan-action@v7
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
