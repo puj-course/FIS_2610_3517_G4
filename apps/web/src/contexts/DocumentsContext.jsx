@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import api from '@/services/api.js';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { useSimulatedDate } from '@/hooks/useSimulatedDate.js';
@@ -54,10 +55,10 @@ export function DocumentsProvider({ children }) {
   }, [fetchSoats]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
+    if (typeof globalThis === 'undefined' || !globalThis.addEventListener) return undefined;
     const handleVehiclesUpdated = () => { fetchSoats(); };
-    window.addEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
-    return () => window.removeEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
+    globalThis.addEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
+    return () => globalThis.removeEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
   }, [fetchSoats]);
 
   const soats = useMemo(() => {
@@ -101,3 +102,7 @@ export function useDocuments() {
   if (!context) throw new Error('useDocuments debe usarse dentro de DocumentsProvider');
   return context;
 }
+
+DocumentsProvider.propTypes = {
+  children: PropTypes.node.isRequired,
+};

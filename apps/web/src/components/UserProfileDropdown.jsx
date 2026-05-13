@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Settings, LogOut, User } from 'lucide-react';
@@ -111,3 +112,7 @@ export default function UserProfileDropdown({ variant = 'light' }) {
     </div>
   );
 }
+
+UserProfileDropdown.propTypes = {
+  variant: PropTypes.oneOf(['light', 'dark']),
+};

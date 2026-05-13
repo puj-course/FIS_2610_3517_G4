@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Menu, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext.jsx';
@@ -79,3 +80,8 @@ export default function PublicHeader({ onLoginClick, onRegisterClick }) {
     </header>
   );
 }
+
+PublicHeader.propTypes = {
+  onLoginClick: PropTypes.func.isRequired,
+  onRegisterClick: PropTypes.func.isRequired,
+};

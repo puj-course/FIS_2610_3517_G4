@@ -18,8 +18,8 @@ const normalizeVehicle = (vehiculo) => ({
 });
 
 const notifyVehiclesUpdated = () => {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(VEHICLES_UPDATED_EVENT));
+  if (typeof globalThis !== 'undefined' && globalThis.dispatchEvent) {
+    globalThis.dispatchEvent(new Event(VEHICLES_UPDATED_EVENT));
   }
 };
 
@@ -53,15 +53,15 @@ export function useVehicles() {
   }, [fetchVehicles]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
+    if (typeof globalThis === 'undefined' || !globalThis.addEventListener) return undefined;
 
     // Este listener permite refrescar la flota desde cualquier mutación disparada en otro módulo.
     const handleVehiclesUpdated = () => {
       fetchVehicles();
     };
 
-    window.addEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
-    return () => window.removeEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
+    globalThis.addEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
+    return () => globalThis.removeEventListener(VEHICLES_UPDATED_EVENT, handleVehiclesUpdated);
   }, [fetchVehicles]);
 
   const addVehicle = async (data) => {

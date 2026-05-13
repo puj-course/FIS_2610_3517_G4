@@ -155,6 +155,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
       }
     } catch (err) {
       setError('Error inesperado al solicitar recuperacion.');
+      console.error('Error solicitando recuperacion de cuenta:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -210,6 +211,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
       }
     } catch (err) {
       setError('Error inesperado al restablecer la contrasena.');
+      console.error('Error restableciendo contrasena:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -253,18 +255,18 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
             {notice && <div className="p-3 bg-green-50 text-syntix-green text-sm rounded-lg border border-green-100">{notice}</div>}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electronico</label>
+              <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 mb-1">Correo Electronico</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="admin@empresa.com" />
+                <input id="login-email" type="email" required value={email} onChange={e => setEmail(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="admin@empresa.com" />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Contrasena</label>
+              <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 mb-1">Contrasena</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input type={showPassword ? 'text' : 'password'} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
+                <input id="login-password" type={showPassword ? 'text' : 'password'} required value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
                 <button
                   type="button"
                   onClick={() => setShowPassword(prev => !prev)}
@@ -325,10 +327,10 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
             {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}
             {notice && <div className="p-3 bg-green-50 text-syntix-green text-sm rounded-lg border border-green-100">{notice}</div>}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Correo o Telefono</label>
+              <label htmlFor="login-recovery-identifier" className="block text-sm font-medium text-gray-700 mb-1">Correo o Telefono</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input type="text" required value={resetIdentifier} onChange={e => setResetIdentifier(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="admin@empresa.com o 3001234567" />
+                <input id="login-recovery-identifier" type="text" required value={resetIdentifier} onChange={e => setResetIdentifier(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="admin@empresa.com o 3001234567" />
               </div>
               <p className="mt-2 text-xs text-gray-500">
                 {/* Se deja explícito que ambos canales apuntan a la misma cuenta. */}
@@ -356,15 +358,15 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Codigo</label>
-              <input type="text" inputMode="numeric" maxLength={6} required value={resetCode} onChange={e => setResetCode(getDigitsOnly(e.target.value).slice(0, 6))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900 text-center tracking-[0.45em] font-semibold" placeholder="000000" />
+              <label htmlFor="login-reset-code" className="block text-sm font-medium text-gray-700 mb-1">Codigo</label>
+              <input id="login-reset-code" type="text" inputMode="numeric" maxLength={6} required value={resetCode} onChange={e => setResetCode(getDigitsOnly(e.target.value).slice(0, 6))} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900 text-center tracking-[0.45em] font-semibold" placeholder="000000" />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nueva Contrasena</label>
+              <label htmlFor="login-new-password" className="block text-sm font-medium text-gray-700 mb-1">Nueva Contrasena</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input type={showNewPassword ? 'text' : 'password'} required value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
+                <input id="login-new-password" type={showNewPassword ? 'text' : 'password'} required value={newPassword} onChange={e => setNewPassword(e.target.value)} className="w-full pl-10 pr-12 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
                 <button
                   type="button"
                   onClick={() => setShowNewPassword(prev => !prev)}
@@ -378,10 +380,10 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar Contrasena</label>
+              <label htmlFor="login-confirm-password" className="block text-sm font-medium text-gray-700 mb-1">Confirmar Contrasena</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input type={showNewPassword ? 'text' : 'password'} required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
+                <input id="login-confirm-password" type={showNewPassword ? 'text' : 'password'} required value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-syntix-green focus:border-syntix-green outline-none text-gray-900" placeholder="••••••••" />
               </div>
             </div>
 

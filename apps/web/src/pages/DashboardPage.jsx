@@ -7,6 +7,18 @@ import { useVehicles } from '@/hooks/useVehicles.js';
 import { useConductors } from '@/hooks/useConductors.js';
 import { useAlerts } from '@/hooks/useAlerts.js';
 
+const getRiskLabel = (estadoGeneral) => {
+  if (estadoGeneral === 'verde') return 'Baja';
+  if (estadoGeneral === 'amarillo') return 'Media';
+  return 'Alta';
+};
+
+const getAlertPriorityLabel = (prioridad) => {
+  if (prioridad === 'rojo') return 'Alta';
+  if (prioridad === 'amarillo') return 'Media';
+  return 'Baja';
+};
+
 // DashboardPage prioriza lectura rápida: KPIs, accesos directos y señales recientes de la operación.
 export default function DashboardPage() {
   const { vehiculos } = useVehicles();
@@ -116,7 +128,7 @@ export default function DashboardPage() {
             {recentVehicles.length > 0 ? (
               recentVehicles.map((vehicle) => (
                 <div key={vehicle.id} style={alertRow(isDarkMode)}>
-                  <span style={badge(vehicle.estadoGeneral === 'verde' ? 'Baja' : vehicle.estadoGeneral === 'amarillo' ? 'Media' : 'Alta')}>
+                  <span style={badge(getRiskLabel(vehicle.estadoGeneral))}>
                     {vehicle.placa}
                   </span>
                   <div>
@@ -144,7 +156,7 @@ export default function DashboardPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 8 }}>
             {alerts.slice(0, 3).map((a) => (
               <div key={a.id} style={alertRow(isDarkMode)}>
-                <span style={badge(a.prioridad === 'rojo' ? 'Alta' : a.prioridad === 'amarillo' ? 'Media' : 'Baja')}>
+                <span style={badge(getAlertPriorityLabel(a.prioridad))}>
                   {a.tipo}
                 </span>
                 <div>

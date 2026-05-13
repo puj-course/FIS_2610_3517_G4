@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { X, FileText, Save } from 'lucide-react';
 import { useDocuments } from '@/hooks/useDocuments.js';
 import { useVehicles } from '@/hooks/useVehicles.js';
@@ -144,7 +145,7 @@ export default function EditSoatModal({ isOpen, onClose, soat }) {
           )}
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Vehiculo</label>
+            <span className="block text-sm font-bold text-gray-700 mb-1">Vehiculo</span>
             <div className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 text-sm">
               {vehiculo ? `${vehiculo.placa} · ${vehiculo.tipo || 'Otro'}` : 'Vehiculo no encontrado'}
             </div>
@@ -152,8 +153,9 @@ export default function EditSoatModal({ isOpen, onClose, soat }) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Numero de poliza</label>
+              <label htmlFor="edit-soat-numero-poliza" className="block text-sm font-bold text-gray-700 mb-1">Numero de poliza</label>
               <input
+                id="edit-soat-numero-poliza"
                 type="text"
                 required
                 value={formData.numeroPoliza}
@@ -162,8 +164,9 @@ export default function EditSoatModal({ isOpen, onClose, soat }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Aseguradora</label>
+              <label htmlFor="edit-soat-aseguradora" className="block text-sm font-bold text-gray-700 mb-1">Aseguradora</label>
               <input
+                id="edit-soat-aseguradora"
                 list="aseguradoras-soat-edit"
                 required
                 value={formData.aseguradora}
@@ -180,8 +183,9 @@ export default function EditSoatModal({ isOpen, onClose, soat }) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Fecha expedicion</label>
+              <label htmlFor="edit-soat-fecha-expedicion" className="block text-sm font-bold text-gray-700 mb-1">Fecha expedicion</label>
               <input
+                id="edit-soat-fecha-expedicion"
                 type="date"
                 required
                 value={formData.fechaExpedicion}
@@ -190,8 +194,9 @@ export default function EditSoatModal({ isOpen, onClose, soat }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Inicio vigencia</label>
+              <label htmlFor="edit-soat-inicio-vigencia" className="block text-sm font-bold text-gray-700 mb-1">Inicio vigencia</label>
               <input
+                id="edit-soat-inicio-vigencia"
                 type="date"
                 required
                 value={formData.fechaInicioVigencia}
@@ -200,8 +205,9 @@ export default function EditSoatModal({ isOpen, onClose, soat }) {
               />
             </div>
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Fin vigencia</label>
+              <label htmlFor="edit-soat-fin-vigencia" className="block text-sm font-bold text-gray-700 mb-1">Fin vigencia</label>
               <input
+                id="edit-soat-fin-vigencia"
                 type="date"
                 required
                 value={formData.fechaFinVigencia}
@@ -212,8 +218,9 @@ export default function EditSoatModal({ isOpen, onClose, soat }) {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Observaciones</label>
+            <label htmlFor="edit-soat-observaciones" className="block text-sm font-bold text-gray-700 mb-1">Observaciones</label>
             <textarea
+              id="edit-soat-observaciones"
               value={formData.observaciones}
               onChange={(e) => setFormData({ ...formData, observaciones: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none min-h-20"
@@ -238,3 +245,22 @@ export default function EditSoatModal({ isOpen, onClose, soat }) {
     </div>
   );
 }
+
+EditSoatModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  soat: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    vehiculoId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    placa: PropTypes.string,
+    placaVehiculo: PropTypes.string,
+    numeroPoliza: PropTypes.string,
+    aseguradora: PropTypes.string,
+    fechaExpedicion: PropTypes.string,
+    fechaInicio: PropTypes.string,
+    fechaInicioVigencia: PropTypes.string,
+    fechaVencimiento: PropTypes.string,
+    fechaFinVigencia: PropTypes.string,
+    observaciones: PropTypes.string,
+  }),
+};

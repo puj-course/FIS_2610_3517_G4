@@ -7,6 +7,11 @@ import { useTheme } from '@/contexts/ThemeContext.jsx';
 // el modo oscuro sin propagar lógica de tema por toda la UI.
 export default function ThemeToggle({ label = 'Modo oscuro', compact = false }) {
   const { isDarkMode, toggleDarkMode } = useTheme();
+  const switchTrackClassName = (() => {
+    if (isDarkMode) return 'bg-syntix-green';
+    if (compact) return 'bg-white/25';
+    return 'bg-gray-300 dark:bg-slate-700';
+  })();
 
   return (
     <button
@@ -41,7 +46,7 @@ export default function ThemeToggle({ label = 'Modo oscuro', compact = false }) 
 
       <span
         className={`relative ml-auto inline-flex h-7 w-12 items-center rounded-full transition-colors ${
-          isDarkMode ? 'bg-syntix-green' : compact ? 'bg-white/25' : 'bg-gray-300 dark:bg-slate-700'
+          switchTrackClassName
         }`}
       >
         <span
