@@ -10,7 +10,7 @@ on:
         required: true
         type: string
     secrets:
-      Discord_url:
+      DISCORD_WEBHOOK_URL:
         required: true
 
 jobs:
@@ -28,4 +28,4 @@ jobs:
           fi
           curl -s -H "Content-Type: application/json" \
             -d "{\"embeds\":[{\"title\":\"$EMOJI Pipeline $MENSAJE\",\"description\":\"**Workflow:** ${{ inputs.workflow_name }}\n**Rama:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\n**Por:** ${{ github.actor }}\",\"color\":$COLOR}]}" \
-            "${{ secrets.Discord_url }}"
+            "${{ secrets.DISCORD_WEBHOOK_URL }}"
