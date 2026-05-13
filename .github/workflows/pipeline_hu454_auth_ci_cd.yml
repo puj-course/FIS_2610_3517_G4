@@ -90,7 +90,8 @@ jobs:
     steps:
       - name: Omitir deploy backend fuera de push
         if: github.event_name != 'push'
-        run: echo "Deploy backend omitido: este workflow solo despliega automaticamente en eventos push."
+        run: |
+          echo "Deploy backend omitido: este workflow solo despliega automaticamente en eventos push."
 
       - name: Disparar deploy de backend por webhook
         if: github.event_name == 'push'
@@ -114,7 +115,8 @@ jobs:
     steps:
       - name: Omitir deploy frontend fuera de push
         if: github.event_name != 'push'
-        run: echo "Deploy frontend omitido: este workflow solo despliega automaticamente en eventos push."
+        run: |
+          echo "Deploy frontend omitido: este workflow solo despliega automaticamente en eventos push."
 
       - name: Disparar deploy de frontend por webhook
         if: github.event_name == 'push'
