@@ -40,6 +40,64 @@ const GENERIC_DOCUMENT_REQUIRED_FIELDS = [
   DATE_FIELDS,
 ];
 
+const QUALITY_METRIC_DEFINITIONS = [
+  {
+    id: 'document-risk',
+    type: 'Metrica propia de dominio',
+    sonarEquivalent: 'No existe equivalente directo en SonarQube; Sonar no evalua vigencia legal de documentos.',
+    whatItMeasures: 'Porcentaje de documentos evaluables que estan vencidos o proximos a vencer.',
+    dataSource: 'SOAT, RTM, licencias, documentos genericos y conductores con campos de vencimiento.',
+    formula: '(documentos vencidos + documentos proximos a vencer) / documentos evaluables * 100',
+    interpretationGuide: '0% es saludable; 1% a 49% requiere gestion preventiva; 50% o mas es riesgo critico.',
+    qualityImpact: 'Reduce riesgo legal, interrupciones operativas y perdida de disponibilidad de la flota.',
+    improvementProtocol: 'Renovar documentos vencidos, agendar proximos vencimientos y mantener alertas preventivas.',
+    thresholds: {
+      verde: '0% de documentos afectados',
+      amarillo: '1% a 49% de documentos afectados',
+      rojo: '50% o mas de documentos afectados',
+      neutral: 'No hay documentos evaluables',
+    },
+  },
+  {
+    id: 'operational-completeness',
+    type: 'Metrica propia de dominio',
+    sonarEquivalent: 'No existe equivalente directo en SonarQube; Sonar no valida completitud de datos de negocio.',
+    whatItMeasures: 'Porcentaje de vehiculos, conductores y documentos con campos minimos completos.',
+    dataSource: 'Vehiculos, conductores, SOAT, RTM y documentos genericos registrados por el usuario.',
+    formula: 'registros completos / registros evaluados * 100',
+    interpretationGuide: '100% es saludable; 80% a 99% es aceptable con deuda; menos de 80% compromete reportes.',
+    qualityImpact: 'Sostiene trazabilidad, reportes confiables y generacion correcta de alertas.',
+    improvementProtocol: 'Completar placas, identificadores, telefonos, fechas y datos obligatorios pendientes.',
+    thresholds: {
+      verde: '100% de registros completos',
+      amarillo: '80% a 99% de registros completos',
+      rojo: 'Menos de 80% de registros completos',
+      neutral: 'No hay registros evaluables',
+    },
+  },
+  {
+    id: 'alert-criticality',
+    type: 'Metrica propia de dominio',
+    sonarEquivalent: 'No existe equivalente directo en SonarQube; Sonar no prioriza alertas operativas activas.',
+    whatItMeasures: 'Porcentaje de alertas criticas dentro del total de alertas activas.',
+    dataSource: 'Alertas publicadas por adaptadores de SOAT, RTM, licencias, vehiculos y reglas operativas.',
+    formula: 'alertas criticas / alertas activas * 100',
+    interpretationGuide: '0% es saludable; 1% a 29% requiere seguimiento; 30% o mas exige atencion inmediata.',
+    qualityImpact: 'Permite priorizar riesgos que afectan cumplimiento, continuidad y seguridad operativa.',
+    improvementProtocol: 'Resolver primero alertas rojas, documentar causa raiz y prevenir recurrencia.',
+    thresholds: {
+      verde: '0% de alertas criticas',
+      amarillo: '1% a 29% de alertas criticas',
+      rojo: '30% o mas de alertas criticas',
+      neutral: 'No hay alertas activas',
+    },
+  },
+];
+
+const QUALITY_METRIC_DEFINITION_BY_ID = Object.fromEntries(
+  QUALITY_METRIC_DEFINITIONS.map((definition) => [definition.id, definition])
+);
+
 const asArray = (items) => (Array.isArray(items) ? items : []);
 
 const hasValue = (value) => {
@@ -286,6 +344,18 @@ const getAlertCriticalityMessages = (total, critical) => {
   };
 };
 
+const enrichMetric = (metric) => ({
+  ...metric,
+  definition: QUALITY_METRIC_DEFINITION_BY_ID[metric.id],
+});
+
+export function getQualityMetricDefinitions() {
+  return QUALITY_METRIC_DEFINITIONS.map((definition) => ({
+    ...definition,
+    thresholds: { ...definition.thresholds },
+  }));
+}
+
 export function calculateDocumentRiskMetric(data = {}, options = {}) {
   const states = buildDocumentRecords(data)
     .map((document) => resolveDocumentState(document, options))
@@ -296,7 +366,7 @@ export function calculateDocumentRiskMetric(data = {}, options = {}) {
   const status = resolveRiskStatus(percentage, total);
   const messages = getDocumentRiskMessages(total, affected);
 
-  return {
+  return enrichMetric({
     id: 'document-risk',
     name: 'Indice de riesgo documental',
     value: percentage,
@@ -307,7 +377,7 @@ export function calculateDocumentRiskMetric(data = {}, options = {}) {
     interpretation: messages.interpretation,
     impact: messages.impact,
     improvementAction: messages.improvementAction,
-  };
+  });
 }
 
 export function calculateOperationalCompletenessMetric(data = {}) {
@@ -319,7 +389,7 @@ export function calculateOperationalCompletenessMetric(data = {}) {
   const status = resolveCompletenessStatus(percentage, total);
   const messages = getCompletenessMessages(total, incomplete);
 
-  return {
+  return enrichMetric({
     id: 'operational-completeness',
     name: 'Completitud de datos operativos',
     value: percentage,
@@ -331,7 +401,7 @@ export function calculateOperationalCompletenessMetric(data = {}) {
     interpretation: messages.interpretation,
     impact: messages.impact,
     improvementAction: messages.improvementAction,
-  };
+  });
 }
 
 export function calculateAlertCriticalityMetric(alerts = []) {
@@ -346,7 +416,7 @@ export function calculateAlertCriticalityMetric(alerts = []) {
   const status = resolveCriticalityStatus(percentage, total);
   const messages = getAlertCriticalityMessages(total, critical);
 
-  return {
+  return enrichMetric({
     id: 'alert-criticality',
     name: 'Indice de criticidad de alertas',
     value: percentage,
@@ -358,7 +428,7 @@ export function calculateAlertCriticalityMetric(alerts = []) {
     interpretation: messages.interpretation,
     impact: messages.impact,
     improvementAction: messages.improvementAction,
-  };
+  });
 }
 
 export function buildQualityMetricsSummary(data = {}, options = {}) {

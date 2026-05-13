@@ -220,6 +220,17 @@ Para detener y limpiar los contenedores, red y volumen local:
 docker compose down -v
 ```
 
+Para validar el despliegue desde imagenes publicadas en DockerHub se usa el override de produccion:
+
+```bash
+export BACKEND_IMAGE=usuario/drivectrl-backend
+export FRONTEND_IMAGE=usuario/drivectrl-frontend
+export IMAGE_TAG=tag-publicado
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-build
+```
+
+El workflow `.github/workflows/docker_ci_cd.yml` publica tags por SHA, corrida y rama, y luego despliega ese tag con Docker Compose.
+
 ---
 
 # 🔗 Wiki y enlaces

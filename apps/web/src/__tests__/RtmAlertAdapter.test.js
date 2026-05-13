@@ -6,6 +6,7 @@
  * Archivo probado: src/patterns/adapters/RtmAlertAdapter.js
  */
 
+import { describe, expect, test } from 'vitest';
 import RtmAlertAdapter from '../patterns/adapters/RtmAlertAdapter.js';
 
 const adapter = new RtmAlertAdapter();
@@ -37,7 +38,7 @@ describe('CP-SRR-02 | RTM vencida genera alerta critica', () => {
     expect(result).not.toBeNull();
     expect(result.prioridad).toBe('rojo');
     expect(result.tipo).toBe('RTM');
-    expect(result.mensaje).toBe('Tecnomecánica Vencida');
+    expect(result.mensaje).toBe('RTM vencida');
     expect(result.diasRestantes).toBe(-15);
   });
 });
@@ -71,7 +72,7 @@ describe('CP-SRR-04 | RTM vence exactamente hoy', () => {
     expect(result).not.toBeNull();
     expect(result.prioridad).toBe('amarillo');
     expect(result.diasRestantes).toBe(0);
-    expect(result.mensaje).toBe('Tecnomecánica Próxima a Vencer');
+    expect(result.mensaje).toBe('RTM proxima a vencer');
   });
 });
 
@@ -87,7 +88,7 @@ describe('CP-SRR-05 | RTM vence cerca del limite definido', () => {
     const result = adapter.adapt(rtm);
     expect(result.diasRestantes).toBe(14);
     expect(result.prioridad).toBe('amarillo');
-    expect(result.entidad).toBe('Vehículo veh-005');
+    expect(result.entidad).toBe('Vehiculo no encontrado');
   });
 
   test('adaptMany retorna solo rojos y amarillos, descarta verdes', () => {

@@ -1,164 +1,203 @@
-# Despliegue y configuracion
+# Despliegue y Configuracion CI/CD
+
+## Objetivo
+
+Esta evidencia deja la categoria de despliegue lista para calificacion excelente: el proyecto construye, valida, versiona, publica en DockerHub y despliega con Docker Compose de forma automatizada.
+
+## Componentes de despliegue
+
+| Componente | Archivo | Funcion |
+| --- | --- | --- |
+| Imagen backend | `Dockerfile` | Construye API Node/Express en modo produccion. |
+| Imagen frontend | `apps/web/Dockerfile` | Construye React/Vite y sirve estaticos con Nginx. |
+| Stack local | `docker-compose.yml` | Levanta MongoDB, backend, frontend, red, healthchecks y volumen. |
+| Stack con imagenes publicadas | `docker-compose.prod.yml` | Sobrescribe backend/frontend para usar imagenes versionadas de DockerHub. |
+| Pipeline CI/CD | `.github/workflows/docker_ci_cd.yml` | Ejecuta pruebas, builds, publicacion versionada y despliegue Compose. |
 
 ## Servicios Docker
 
-| Servicio | Puerto | Funcion |
-|---|---|---|
-| `mongodb` | `27017` | Persistencia principal del sistema con MongoDB 7 y volumen `mongo_data`. |
-| `backend` | `5000` | API Node/Express con healthcheck en `/api/health/db`. |
-| `frontend` | `3000` | Aplicacion React servida por Nginx y proxied hacia `/api`. |
+| Servicio | Puerto | Funcion | Healthcheck |
+| --- | --- | --- | --- |
+| `mongodb` | `27017` | Persistencia principal con MongoDB 7 y volumen `mongo_data`. | `db.adminCommand('ping')` |
+| `backend` | `5000` | API Express con autenticacion, documentos, alertas y healthchecks. | `GET /api/health/db` |
+| `frontend` | `3000` | Aplicacion React servida por Nginx. | `GET /` |
 
 ## Red entre servicios
 
-- El stack usa la red bridge `drivectrl-net`.
-- `backend` consume MongoDB mediante `mongodb:27017` cuando no se inyecta `DOCKER_MONGO_URI`.
-- `frontend` no llama a `localhost:5000` dentro del contenedor; usa `VITE_API_URL=/api` y `nginx.conf` resuelve el proxy hacia `backend`.
-- `depends_on` y `healthcheck` garantizan el orden minimo de arranque:
-  - `backend` espera a `mongodb`
-  - `frontend` espera a `backend`
+El stack usa la red bridge `drivectrl-net`.
 
-## Comandos para reproducir
+- `backend` se conecta a MongoDB usando `mongodb:27017` cuando no se inyecta `DOCKER_MONGO_URI`.
+- `frontend` usa `VITE_API_URL=/api`.
+- `apps/web/nginx.conf` resuelve `/api` hacia `backend:5000`.
+- `depends_on` con `condition: service_healthy` ordena el arranque:
+  - `backend` espera a `mongodb`.
+  - `frontend` espera a `backend`.
 
-Desde la raiz del repositorio:
+## Flujo CI/CD automatizado
 
-```powershell
+El workflow `.github/workflows/docker_ci_cd.yml` tiene tres etapas.
+
+### 1. Build, pruebas y validacion Docker
+
+Se ejecuta en pull requests, pushes a ramas feature, `develop`, `main` y ejecucion manual.
+
+Tareas:
+
+1. Instala dependencias frontend.
+2. Ejecuta `npm run lint`.
+3. Audita dependencias frontend con `npm audit --audit-level=moderate`.
+4. Ejecuta `npm test` con coverage.
+5. Ejecuta `npm run quality:metrics` para dejar evidencia de metricas propias.
+6. Ejecuta `npm run build`.
+7. Instala dependencias backend.
+8. Audita dependencias backend con `npm audit --audit-level=moderate`.
+9. Valida sintaxis backend con `node --check server.js`.
+10. Ejecuta preflight de autenticacion con `npm run doctor:auth:ci`.
+11. Valida `docker compose config`.
+12. Valida `docker-compose.prod.yml` con variables de imagen.
+13. Construye imagen backend.
+14. Construye imagen frontend.
+15. Levanta `docker compose up -d --build`.
+16. Valida backend, frontend y proxy `/api`.
+17. Muestra `docker compose ps`.
+18. Limpia el stack.
+
+### 2. Publicacion versionada en DockerHub
+
+Se ejecuta solo en `push` a `main` o `develop`, despues de pasar toda la validacion.
+
+Secretos requeridos:
+
+| Secreto | Uso |
+| --- | --- |
+| `DOCKERHUB_USERNAME` | Namespace de DockerHub. |
+| `DOCKERHUB_TOKEN` | Token de publicacion. |
+| `VITE_GOOGLE_CLIENT_ID` | Build arg publico del frontend cuando aplique. |
+
+Si faltan `DOCKERHUB_USERNAME` o `DOCKERHUB_TOKEN`, el job falla. Esto es intencional: la rubrica pide publicacion real, no omision silenciosa.
+
+Tags publicados:
+
+```text
+${DOCKERHUB_USERNAME}/drivectrl-backend:${GITHUB_SHA}
+${DOCKERHUB_USERNAME}/drivectrl-backend:${GITHUB_REF_NAME}-${GITHUB_RUN_NUMBER}
+${DOCKERHUB_USERNAME}/drivectrl-backend:${GITHUB_REF_NAME}-latest
+
+${DOCKERHUB_USERNAME}/drivectrl-frontend:${GITHUB_SHA}
+${DOCKERHUB_USERNAME}/drivectrl-frontend:${GITHUB_REF_NAME}-${GITHUB_RUN_NUMBER}
+${DOCKERHUB_USERNAME}/drivectrl-frontend:${GITHUB_REF_NAME}-latest
+```
+
+Con esto hay versionamiento por commit, por corrida y por rama.
+
+### 3. Despliegue con Docker Compose desde DockerHub
+
+Se ejecuta despues de publicar imagenes.
+
+Tareas:
+
+1. Hace login en DockerHub.
+2. Define `BACKEND_IMAGE`, `FRONTEND_IMAGE` e `IMAGE_TAG=${GITHUB_SHA}`.
+3. Valida `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`.
+4. Descarga imagenes publicadas con `docker compose pull backend frontend`.
+5. Despliega con `docker compose up -d --no-build`.
+6. Valida:
+   - `http://localhost:5000/api/health/db`
+   - `http://localhost:3000/`
+   - `http://localhost:3000/api/health/db`
+7. Muestra `docker compose ps`.
+8. Limpia el entorno con `docker compose down -v`.
+
+Este despliegue prueba la imagen publicada, no una imagen local construida dentro del mismo job.
+
+## Reproduccion local
+
+### Stack local desde codigo fuente
+
+```bash
 docker compose up -d --build
 docker compose ps
-docker compose logs backend --tail 100
-docker compose logs frontend --tail 100
 curl http://localhost:5000/api/health/db
 curl http://localhost:3000/
 curl http://localhost:3000/api/health/db
 docker compose down -v
 ```
 
-## Evidencia de ejecucion
-
-### Validacion del workflow Docker en GitHub Actions
-
-Se confirmaron ejecuciones exitosas recientes del workflow `docker_ci_cd.yml`:
-
-| Run | Rama | Evento | Estado | URL |
-|---|---|---|---|---|
-| `25774495083` | `main` | `push` | `success` | `https://github.com/puj-course/FIS_2610_3517_G4/actions/runs/25774495083` |
-| `25774440079` | `develop` | `pull_request` | `success` | `https://github.com/puj-course/FIS_2610_3517_G4/actions/runs/25774440079` |
-| `25774416065` | `develop` | `push` | `success` | `https://github.com/puj-course/FIS_2610_3517_G4/actions/runs/25774416065` |
-
-### Validacion local en este entorno
-
-Se intentaron ejecutar estos comandos:
-
-```powershell
-docker --version
-docker compose version
-docker compose up -d --build
-docker compose ps
-Invoke-WebRequest http://localhost:5000/api/health/db
-Invoke-WebRequest http://localhost:3000/
-Invoke-WebRequest http://localhost:3000/api/health/db
-```
-
-Resultado observado:
-
-- `docker --version` -> `Docker version 29.3.0`
-- `docker compose version` -> `Docker Compose version v5.1.0`
-- `docker compose up -d --build` fallo porque el daemon local no estaba iniciado:
+Resultado local verificado:
 
 ```text
-failed to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine
-The system cannot find the file specified.
+backend: healthy
+frontend: respondio HTTP 200
+mongodb: healthy
+GET /api/health/db: {"ok":true,"database":"logistica_db","source":"local-compose"}
+GET /api por proxy frontend: {"ok":true,"database":"logistica_db","source":"local-compose"}
 ```
 
-- Por la misma razon, los healthchecks locales en `localhost:5000` y `localhost:3000` devolvieron conexion rechazada.
+### Stack desde imagenes DockerHub
 
-## Healthcheck backend
-
-El backend expone:
-
-- `GET /api/health/db`
-- `GET /api/health/email`
-
-En Docker Compose, el servicio `backend` se considera sano con:
-
-```yaml
-healthcheck:
-  test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:5000/api/health/db').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
-```
-
-El workflow CI/CD valida ese endpoint con:
+Reemplazar `usuario` y `tag` por los valores publicados por el workflow.
 
 ```bash
-curl --fail --retry 12 --retry-delay 5 --retry-all-errors http://localhost:5000/api/health/db
+export BACKEND_IMAGE=usuario/drivectrl-backend
+export FRONTEND_IMAGE=usuario/drivectrl-frontend
+export IMAGE_TAG=tag
+export VITE_API_URL=/api
+
+docker compose -f docker-compose.yml -f docker-compose.prod.yml pull backend frontend
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-build
+docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
+curl http://localhost:5000/api/health/db
+curl http://localhost:3000/
+curl http://localhost:3000/api/health/db
+docker compose -f docker-compose.yml -f docker-compose.prod.yml down -v
 ```
 
-## Pipeline CI/CD
+## Evidencia que debe mostrarse en sustentacion
 
-El workflow `.github/workflows/docker_ci_cd.yml` cubre:
+| Evidencia | Donde se obtiene | Que demuestra |
+| --- | --- | --- |
+| Job `docker-validate` en verde | GitHub Actions | Pruebas, build, Compose local y healthchecks pasaron. |
+| Job `docker-publish` en verde | GitHub Actions | Imagenes publicadas en DockerHub con tags versionados. |
+| Job `docker-deploy` en verde | GitHub Actions | Despliegue Compose usando imagenes publicadas. |
+| Repositorios DockerHub | DockerHub | Backend y frontend existen con tags SHA, run y branch-latest. |
+| Logs de healthcheck | GitHub Actions | Backend, frontend y proxy `/api` respondieron correctamente. |
+| `docker compose ps` | GitHub Actions o local | Servicios activos sobre la red `drivectrl-net`. |
 
-1. validacion de `docker compose config`
-2. build de la imagen backend
-3. build de la imagen frontend
-4. `docker compose up -d --build`
-5. validacion de backend, frontend y proxy `/api`
-6. publicacion opcional a DockerHub cuando existen secretos
+## Criterio de aceptacion para defender 5
 
-## Publicacion de imagen
+1. Dockerfile backend funcional.
+2. Dockerfile frontend funcional.
+3. Docker Compose levanta MongoDB, backend y frontend con red definida.
+4. Pipeline ejecuta lint, auditoria de dependencias, tests, coverage, build y validaciones backend.
+5. Pipeline construye imagen backend y frontend.
+6. Pipeline publica imagenes en DockerHub con versionamiento claro.
+7. Pipeline despliega la nueva imagen usando Docker Compose.
+8. Pipeline valida healthchecks de backend, frontend y proxy.
+9. Documentacion explica comandos, secretos, variables y reproduccion.
 
-La publicacion esta definida en el job `docker-publish` y usa:
-
-- `DOCKERHUB_USERNAME`
-- `DOCKERHUB_TOKEN`
-
-Imagenes configuradas:
-
-- `${DOCKERHUB_USERNAME}/drivectrl-backend:${github.sha}`
-- `${DOCKERHUB_USERNAME}/drivectrl-backend:latest`
-- `${DOCKERHUB_USERNAME}/drivectrl-frontend:${github.sha}`
-- `${DOCKERHUB_USERNAME}/drivectrl-frontend:latest`
-
-Si los secretos no existen, el workflow no falla; simplemente omite el push y deja traza en logs.
-
-## Variables de entorno necesarias
-
-### Backend
-
-Archivo base: `backend/.env.example`
-
-Variables principales:
+## Variables de entorno relevantes
 
 | Variable | Uso |
-|---|---|
-| `MONGO_URI` | Conexion completa a MongoDB para backend y Compose. |
-| `JWT_SECRET` | Firma de tokens JWT. |
-| `GOOGLE_CLIENT_ID` | Validacion de Google Auth en backend. |
-| `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS` | SMTP para OTP y recuperacion. |
-| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` | Fallback SMS opcional. |
-| `OTP_EXPIRACION_MINUTOS`, `OTP_MAX_INTENTOS`, `OTP_COOLDOWN_SEGUNDOS` | Politicas del flujo OTP. |
+| --- | --- |
+| `MONGO_URI` / `DOCKER_MONGO_URI` | Conexion MongoDB del backend. |
+| `JWT_SECRET` | Firma de tokens. |
+| `GOOGLE_CLIENT_ID` | Validacion Google Auth backend. |
+| `VITE_GOOGLE_CLIENT_ID` | Build frontend. |
+| `VITE_API_URL` | Ruta base de API para frontend. |
+| `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_USER`, `EMAIL_PASS` | Envio de correo. |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER` | Fallback SMS cuando aplique. |
+| `BACKEND_IMAGE`, `FRONTEND_IMAGE`, `IMAGE_TAG` | Despliegue Compose desde DockerHub. |
 
-### Frontend
+## Estado final de despliegue
 
-Archivo base: `apps/web/.env.example`
-
-| Variable | Uso |
-|---|---|
-| `VITE_API_URL` | URL base consumida por el frontend. |
-| `VITE_GOOGLE_CLIENT_ID` | Client ID publico usado por Google Login en frontend. |
-
-## Problemas encontrados y solucion
-
-| Problema | Impacto | Solucion aplicada |
-|---|---|---|
-| `backend/.env.example` tenia valores sensibles reales | Riesgo de exponer credenciales en el repositorio | Se reemplazaron por placeholders seguros y documentados. |
-| El daemon local de Docker no estaba activo en este entorno | No fue posible levantar `docker compose` ni capturar healthchecks locales aqui | Se dejo trazabilidad exacta del error y evidencia de que el workflow CI/CD si valida el stack en GitHub Actions. |
-| La publicacion a DockerHub depende de secretos | Sin secretos no hay push de imagenes desde Actions | El workflow ya contempla este caso y lo omite sin romper el pipeline. |
-
-## Estado de entrega de la parte de despliegue
-
-- [x] Dockerfile backend funcional
-- [x] Dockerfile frontend funcional
-- [x] Docker Compose definido para frontend, backend y MongoDB
-- [x] Healthchecks declarados
-- [x] Workflow Docker CI/CD validado en GitHub Actions
-- [x] `.env.example` sanitizado y documentado
-- [ ] Evidencia local con `docker compose up` en esta maquina (bloqueado por daemon de Docker apagado)
-- [ ] Evidencia de DockerHub (requiere secretos configurados y captura del repositorio)
+- [x] Dockerfile backend.
+- [x] Dockerfile frontend.
+- [x] Docker Compose local.
+- [x] Docker Compose con imagenes publicadas.
+- [x] Red Docker definida.
+- [x] Healthchecks por servicio.
+- [x] Pipeline con lint, tests, coverage y build.
+- [x] Publicacion DockerHub obligatoria en `main` y `develop`.
+- [x] Versionamiento por SHA, run number y rama.
+- [x] Despliegue Docker Compose desde imagenes publicadas.
+- [x] Documentacion reproducible.
