@@ -42,3 +42,13 @@ jobs:
           # El artefacto resultante se publica para revisión o descarga manual posterior.
           path: dist/apps/web
           retention-days: 7
+
+  notify:
+    needs: [entrega]
+    if: always()
+    uses: ./.github/workflows/notify_discord.yml
+    with:
+      status: ${{ needs.entrega.result }}
+      workflow_name: "CD - Generación de Artefacto y Entrega Continua"
+    secrets:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
