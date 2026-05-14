@@ -1,86 +1,55 @@
-# Evidencia de Integracion SMS con Twilio
+# Evidencia de integracion SMS con Twilio
 
-## Objetivo
+Este documento resume la integracion SMS. La defensa completa esta en:
 
-Documentar la integracion SMS de DriveControl / AutoMinder Enterprise con Twilio para sustentar el envio de codigos OTP de verificacion y recuperacion de cuenta sin exponer credenciales.
+- [Integracion SMS Twilio](evidencias_finales/sms/05_integracion_sms_twilio.md)
+- [Gestion de secretos y variables](evidencias_finales/seguridad/06_gestion_secretos_variables_entorno.md)
 
-## Proveedor y alcance
+## Alcance implementado
 
-| Elemento | Descripcion |
-| --- | --- |
-| Proveedor | Twilio |
-| Tipo de integracion | API HTTP mediante `axios` |
-| Servicio principal | `backend/services/smsService.js` |
-| Flujos cubiertos | Verificacion de cuenta, reenvio de codigo y recuperacion de contrasena con respaldo SMS |
-| Prueba automatizada | `backend/test/smsService.test.js` con Twilio mockeado |
+| Elemento | Ruta | Estado |
+|---|---|---|
+| Servicio SMS | `backend/services/smsService.js` | Implementado |
+| Pruebas SMS | `backend/test/smsService.test.js` | Mockeadas |
+| Integracion backend | `backend/server.js` | OTP verificacion/recuperacion |
+| UI registro | `apps/web/src/components/RegisterModal.jsx` | Canal SMS |
+| UI recuperacion | `apps/web/src/components/LoginModal.jsx` | Canal SMS |
 
-## Archivos involucrados
+## Variables necesarias
 
-| Archivo | Responsabilidad |
-| --- | --- |
-| `backend/services/smsService.js` | Construye el request a Twilio y valida que la respuesta incluya `sid`. |
-| `backend/server.js` | Conecta SMS con reenvio de OTP y recuperacion de contrasena. |
-| `apps/web/src/components/RegisterModal.jsx` | Permite elegir SMS como canal de verificacion cuando aplica. |
-| `apps/web/src/components/LoginModal.jsx` | Muestra flujo de recuperacion y canal de entrega. |
-| `apps/web/src/services/api.js` | Expone llamadas frontend hacia endpoints de autenticacion. |
-
-## Variables requeridas
-
-No se deben documentar valores reales. La sustentacion solo debe mencionar nombres:
-
-- `TWILIO_ACCOUNT_SID`
-- `TWILIO_AUTH_TOKEN`
-- `TWILIO_PHONE_NUMBER`
-- `OTP_EXPIRACION_MINUTOS`
-- `OTP_MAX_INTENTOS`
-- `OTP_COOLDOWN_SEGUNDOS`
-
-## Flujo funcional
-
-1. El usuario solicita verificacion o recuperacion.
-2. El backend genera un codigo OTP y lo guarda como hash.
-3. Si el canal elegido o de respaldo es SMS, `server.js` normaliza el telefono.
-4. `smsService.js` envia el mensaje a Twilio.
-5. Twilio debe responder con un `sid`.
-6. El backend registra un log operativo sin tokens.
-
-## Pruebas automatizadas
-
-Ejecutar:
+No incluir valores reales en el repositorio.
 
 ```bash
+TWILIO_ACCOUNT_SID=<twilio-account-sid>
+TWILIO_AUTH_TOKEN=<twilio-auth-token>
+TWILIO_PHONE_NUMBER=<twilio-phone-number>
+OTP_EXPIRACION_MINUTOS=10
+OTP_MAX_INTENTOS=5
+OTP_COOLDOWN_SEGUNDOS=60
+```
+
+Si el profesor requiere credenciales por contexto academico, se entregan por canal privado.
+
+## Comando de prueba automatizada
+
+```bash
+npm --prefix backend ci
 npm --prefix backend test
 ```
 
-Las pruebas usan mocks y validan:
+Estas pruebas usan mocks. No prueban recepcion real de SMS ni consumo del proveedor.
 
-- envio exitoso de verificacion;
-- envio exitoso de recuperacion;
-- error cuando falta cada variable Twilio requerida;
-- error cuando Twilio no devuelve `sid`;
-- propagacion de error si Twilio falla;
-- ausencia de credenciales en logs.
+## Evidencia real requerida para excelente
 
-Estas pruebas no envian SMS reales y no consumen saldo de Twilio.
+| Evidencia | Archivo esperado |
+|---|---|
+| Formulario seleccionando SMS | `Docs/QA/evidencias_finales/sms/img/sms-formulario.png` |
+| SMS recibido con datos ocultos | `Docs/QA/evidencias_finales/sms/img/sms-recibido-redacted.png` |
+| Dashboard Twilio con estado del mensaje | `Docs/QA/evidencias_finales/sms/img/twilio-message-status-redacted.png` |
+| Log backend sin tokens | `Docs/QA/evidencias_finales/sms/img/backend-sms-log-redacted.png` |
+| Tests backend | `Docs/QA/evidencias_finales/sms/img/backend-sms-tests.png` |
 
-## Prueba manual para sustentacion
+## Regla de sustentacion
 
-1. Confirmar que las variables Twilio estan configuradas localmente o en el entorno de despliegue.
-2. Iniciar frontend y backend.
-3. Registrar o recuperar una cuenta con telefono valido.
-4. Solicitar codigo por SMS.
-5. Verificar que el mensaje llegue al telefono autorizado.
-6. Tomar captura del formulario, del SMS recibido y del dashboard de Twilio.
-7. Ocultar numeros completos, tokens y datos sensibles en las capturas.
+No afirmar "se recibio SMS" si no existe captura del mensaje o registro verificable de Twilio. Sin evidencia real, la integracion debe presentarse como implementada y probada con mocks, pero con evidencia funcional externa pendiente.
 
-## Evidencia externa pendiente
-
-El repositorio deja lista la integracion y las pruebas mockeadas. Para defender nivel excelente, el equipo debe anexar evidencia real:
-
-- captura del formulario que solicita SMS;
-- captura del SMS recibido;
-- captura del dashboard de Twilio con mensaje entregado;
-- log de envio exitoso sin tokens;
-- resultado de `npm --prefix backend test`.
-
-No se debe afirmar que un SMS fue recibido si no existe captura o registro externo verificable.

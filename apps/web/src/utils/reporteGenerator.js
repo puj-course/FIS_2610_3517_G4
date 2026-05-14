@@ -125,9 +125,11 @@ export const reporteGenerator = {
             border-bottom: 1px solid #e0e0e0;
           }
           .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
             gap: 15px;
+          }
+          .grid > * {
+            flex: 1;
           }
         </style>
       </head>
