@@ -24,9 +24,9 @@ services:
     restart: unless-stopped
     environment:
       PORT: 5000
-      JWT_SECRET: syntix_super_secret_key_dev
+      JWT_SECRET: ${JWT_SECRET:-local-compose-jwt-secret}
       MONGO_URI: ${DOCKER_MONGO_URI:-${MONGO_URI:-mongodb://mongodb:27017/logistica_db}}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-${VITE_GOOGLE_CLIENT_ID:-}}
       EMAIL_HOST: ${EMAIL_HOST:-smtp.gmail.com}
       EMAIL_PORT: ${EMAIL_PORT:-587}
       EMAIL_USER: ${EMAIL_USER:-}
@@ -34,6 +34,9 @@ services:
       OTP_EXPIRACION_MINUTOS: ${OTP_EXPIRACION_MINUTOS:-10}
       OTP_MAX_INTENTOS: ${OTP_MAX_INTENTOS:-5}
       OTP_COOLDOWN_SEGUNDOS: ${OTP_COOLDOWN_SEGUNDOS:-60}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_PHONE_NUMBER: ${TWILIO_PHONE_NUMBER:-}
     ports:
       - "5000:5000"
     depends_on:
@@ -54,7 +57,7 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-/api}
-        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID:-}}
     container_name: drivectrl-frontend
     restart: unless-stopped
     ports:

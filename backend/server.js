@@ -34,7 +34,7 @@ const {
   enviarCodigoRecuperacion,
   verificarServicioCorreo,
 } = require('./services/emailService');
-const { enviarCodigoRecuperacionSms } = require('./services/smsService');
+const { enviarCodigoVerificacionSms, enviarCodigoRecuperacionSms } = require('./services/smsService');
 
 const DB_UNAVAILABLE_MESSAGE =
   'Base de datos no disponible. Verifica la IP permitida en MongoDB Atlas y la variable MONGO_URI.';
@@ -716,11 +716,28 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres' });
     }
 
-    // Se evita registrar dos veces el mismo correo.
+    // Se evita registrar dos veces el mismo correo, salvo que la cuenta exista pero no esté verificada.
     const existe = await Usuario.findOne({ email: emailNormalizado });
 
-    if (existe) {
+    if (existe && existe.isVerified) {
       return res.status(400).json({ message: DUPLICATE_EMAIL_MESSAGE });
+    }
+
+    // Si existe pero no está verificada, se sobreescriben los datos con los nuevos.
+    if (existe && !existe.isVerified) {
+      existe.password = password;
+      existe.empresa = empresaNormalizada;
+      existe.telefono = telefonoNormalizado;
+      if (nombreNormalizado) existe.nombre = nombreNormalizado;
+      await existe.save();
+      // También se limpia cualquier OTP anterior para que no haya conflictos.
+      await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
+
+      return res.status(201).json({
+        success: true,
+        message: 'Registro exitoso. Elige como quieres recibir tu codigo de verificacion.',
+        data: { email: emailNormalizado, needsVerification: true },
+      });
     }
 
     // El usuario nace sin verificar hasta completar el OTP.
@@ -735,35 +752,9 @@ app.post('/api/auth/register', async (req, res) => {
 
     await nuevoUsuario.save();
 
-    // Se crea un OTP de 6 dígitos, se hashea y se persiste con expiración.
-    const codigo = String(secureRandomInt(100000, 999999));
-    const codigoHash = await bcrypt.hash(codigo, 10);
-    const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
-
-    // Solo puede existir un OTP activo por correo.
-    await VerificacionOTP.findOneAndDelete({ email: emailNormalizado });
-
-    await new VerificacionOTP({
-      email: emailNormalizado,
-      codigoHash,
-      expiresAt,
-    }).save();
-
-    try {
-      // El envío se hace después de guardar el OTP para que el código ya exista en BD.
-      await enviarCodigoVerificacion(emailNormalizado, nombreNormalizado || empresaNormalizada, codigo);
-    } catch (emailErr) {
-      console.error('Error al enviar correo:', emailErr.message);
-
-      // Si el correo falla, el frontend no debe avanzar al paso OTP.
-      return res.status(500).json({
-        message: `No se pudo enviar el correo de verificacion: ${emailErr.message}`,
-      });
-    }
-
     return res.status(201).json({
       success: true,
-      message: 'Registro exitoso. Revisa tu correo para verificar tu cuenta.',
+      message: 'Registro exitoso. Elige como quieres recibir tu codigo de verificacion.',
       data: {
         email: emailNormalizado,
         needsVerification: true,
@@ -868,14 +859,16 @@ app.post('/api/auth/verificar-codigo', async (req, res) => {
 
 app.post('/api/auth/reenviar-codigo', async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, channel } = req.body;
     const emailNormalizado = normalizeEmail(email);
+    // Canal elegido por el usuario: 'email' (por defecto) o 'sms'.
+    const canal = channel === 'sms' ? 'sms' : 'email';
 
     if (!emailNormalizado) {
       return res.status(400).json({ message: 'Email es requerido' });
     }
 
-    // Solo se puede reenviar a usuarios existentes.
+    // Solo se puede enviar a usuarios existentes.
     const usuario = await Usuario.findOne({ email: emailNormalizado });
 
     if (!usuario) {
@@ -886,10 +879,10 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
       return res.status(400).json({ message: 'Esta cuenta ya esta verificada' });
     }
 
-    // El cooldown evita abuso del correo transaccional.
+    // El cooldown solo aplica si ya existe un OTP previo (reenvíos reales, no el primer envío).
     const verificacionExistente = await VerificacionOTP.findOne({ email: emailNormalizado });
 
-    if (verificacionExistente) {
+    if (verificacionExistente?.ultimoEnvio) {
       const segundosDesdeUltimoEnvio =
         (Date.now() - new Date(verificacionExistente.ultimoEnvio).getTime()) / 1000;
 
@@ -902,7 +895,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
       }
     }
 
-    // El reenvío invalida el OTP anterior y crea uno completamente nuevo.
+    // Se invalida el OTP anterior y se crea uno nuevo.
     const codigo = String(secureRandomInt(100000, 999999));
     const codigoHash = await bcrypt.hash(codigo, 10);
     const expiresAt = new Date(Date.now() + OTP_EXPIRACION_MINUTOS * 60 * 1000);
@@ -917,18 +910,29 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
     }).save();
 
     try {
-      // Se intenta enviar usando nombre y, si falta, empresa como identificador visual.
-      await enviarCodigoVerificacion(emailNormalizado, usuario.nombre || usuario.empresa, codigo);
-    } catch (emailErr) {
-      console.error('Error al enviar correo:', emailErr.message);
-
+      if (canal === 'sms') {
+        // Envío por SMS al teléfono guardado en el perfil del usuario.
+        const smsDestination = buildSmsDestination(usuario.telefono);
+        if (!smsDestination) {
+          return res.status(400).json({ message: 'El usuario no tiene un telefono valido para SMS.' });
+        }
+        await enviarCodigoVerificacionSms(smsDestination, usuario.nombre || usuario.empresa, codigo);
+      } else {
+        // Envío por correo electrónico.
+        await enviarCodigoVerificacion(emailNormalizado, usuario.nombre || usuario.empresa, codigo);
+      }
+    } catch (envioErr) {
+      console.error('Error al enviar codigo:', envioErr.message);
       return res.status(500).json({
-        message: `Error al enviar el correo: ${emailErr.message}`,
+        message: `Error al enviar el codigo: ${envioErr.message}`,
       });
     }
 
     return res.json({
-      message: 'Codigo reenviado exitosamente. Revisa tu correo.',
+      success: true,
+      message: canal === 'sms'
+        ? 'Codigo enviado por SMS.'
+        : 'Codigo enviado al correo.',
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });

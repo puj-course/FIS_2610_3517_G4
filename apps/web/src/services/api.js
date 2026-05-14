@@ -205,10 +205,10 @@ export const authService = {
     }
   },
 
-  // Reenvía OTP sin obligar a recrear el registro desde cero.
-  async reenviarCodigo(email) {
+  // Reenvía OTP sin obligar a recrear el registro desde cero. Acepta el canal elegido por el usuario.
+  async reenviarCodigo(identifier, channel = 'email') {
     try {
-      const response = await api.post('/auth/reenviar-codigo', { email });
+      const response = await api.post('/auth/reenviar-codigo', { email: identifier, channel });
       return { success: true, data: response.data };
     } catch (error) {
       if (shouldUseLocalStorage(error)) {
@@ -225,6 +225,22 @@ export const authService = {
     try {
       // Inicia el flujo de recuperación por correo o por SMS según disponibilidad.
       const response = await api.post('/auth/recuperar-cuenta', { identifier });
+      return { success: true, data: response.data.data || response.data, message: response.data.message };
+    } catch (error) {
+      if (shouldUseLocalStorage(error)) {
+        return { success: false, useLocalStorage: true };
+      }
+      return {
+        success: false,
+        message: normalizeApiErrorMessage(error, 'Error al solicitar recuperacion'),
+      };
+    }
+  },
+
+  // Solicita el OTP de recuperación forzando el canal elegido por el usuario (email | sms).
+  async solicitarRecuperacionConCanal(identifier, channel) {
+    try {
+      const response = await api.post('/auth/recuperar-cuenta', { identifier, channel });
       return { success: true, data: response.data.data || response.data, message: response.data.message };
     } catch (error) {
       if (shouldUseLocalStorage(error)) {
