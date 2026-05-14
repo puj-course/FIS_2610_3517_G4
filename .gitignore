@@ -5,6 +5,8 @@ apps/**/node_modules/
 # builds
 dist/
 apps/**/dist/
+coverage/
+apps/**/coverage/
 
 # vite cache
 .vite/
@@ -12,15 +14,24 @@ apps/**/dist/
 apps/**/.vite/
 apps/**/.vite-temp/
 
-# env / logs
+# env / secrets
+.env
+.env.*
 **/.env
 **/.env.*
-!.env
-!backend/.env
+!.env.example
 !**/.env.example
-*.log
+ANEXO_CREDENCIALES_PRIVADO.md
+Docs/**/ANEXO_CREDENCIALES_PRIVADO.md
 
-# OS
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editors
 .DS_Store
-.env
-backend/.env
+Thumbs.db
+.idea/
+.vscode/

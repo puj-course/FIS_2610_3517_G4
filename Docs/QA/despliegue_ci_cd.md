@@ -51,16 +51,17 @@ Tareas:
 6. Ejecuta `npm run build`.
 7. Instala dependencias backend.
 8. Audita dependencias backend con `npm audit --audit-level=moderate`.
-9. Valida sintaxis backend con `node --check server.js`.
-10. Ejecuta preflight de autenticacion con `npm run doctor:auth:ci`.
-11. Valida `docker compose config`.
-12. Valida `docker-compose.prod.yml` con variables de imagen.
-13. Construye imagen backend.
-14. Construye imagen frontend.
-15. Levanta `docker compose up -d --build`.
-16. Valida backend, frontend y proxy `/api`.
-17. Muestra `docker compose ps`.
-18. Limpia el stack.
+9. Ejecuta pruebas backend con `npm test`.
+10. Valida sintaxis backend con `node --check server.js`.
+11. Ejecuta preflight de autenticacion con `npm run doctor:auth:ci`.
+12. Valida `docker compose config`.
+13. Valida `docker-compose.prod.yml` con variables de imagen.
+14. Construye imagen backend.
+15. Construye imagen frontend.
+16. Levanta `docker compose up -d --build`.
+17. Valida backend, frontend y proxy `/api`.
+18. Muestra `docker compose ps`.
+19. Limpia el stack.
 
 ### 2. Publicacion versionada en DockerHub
 
@@ -201,3 +202,25 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml down -v
 - [x] Versionamiento por SHA, run number y rama.
 - [x] Despliegue Docker Compose desde imagenes publicadas.
 - [x] Documentacion reproducible.
+
+## Troubleshooting de sustentacion
+
+| Situacion | Revision recomendada | Accion segura |
+| --- | --- | --- |
+| `docker-compose.prod.yml` falla por variables requeridas | Confirmar `BACKEND_IMAGE`, `FRONTEND_IMAGE` e `IMAGE_TAG`. | Exportar variables sin incluir credenciales y repetir `docker compose -f docker-compose.yml -f docker-compose.prod.yml config`. |
+| Backend no queda healthy | Revisar `MONGO_URI` o `DOCKER_MONGO_URI`, healthcheck `/api/health/db` y logs del contenedor. | Validar conectividad a MongoDB y reiniciar el stack con `docker compose down -v && docker compose up -d --build`. |
+| Frontend no responde | Revisar build de Vite, `apps/web/nginx.conf` y puerto `3000`. | Ejecutar `npm --prefix apps/web run build` y reconstruir la imagen frontend. |
+| Proxy `/api` falla desde frontend | Confirmar que `frontend` y `backend` estan en `drivectrl-net`. | Revisar `docker compose ps`, `docker network inspect drivectrl-net` y health del backend. |
+| Publicacion DockerHub no ocurre | Confirmar secretos `DOCKERHUB_USERNAME` y `DOCKERHUB_TOKEN` en GitHub Actions. | Reejecutar workflow despues de configurar secretos protegidos. |
+
+## Evidencias manuales pendientes
+
+Antes de sustentar, el equipo debe anexar capturas o enlaces verificables de:
+
+- GitHub Actions con `docker-validate`, `docker-publish` y `docker-deploy` en verde.
+- Repositorios DockerHub `drivectrl-backend` y `drivectrl-frontend` con tags por SHA, numero de corrida y rama.
+- `docker compose ps` mostrando `mongodb`, `backend` y `frontend`.
+- `docker network ls` o `docker network inspect drivectrl-net`.
+- Frontend respondiendo en `http://localhost:3000/`.
+- Backend respondiendo en `http://localhost:5000/api/health/db`.
+- Proxy del frontend respondiendo en `http://localhost:3000/api/health/db`.
