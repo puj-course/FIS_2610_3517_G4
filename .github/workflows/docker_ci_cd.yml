@@ -130,7 +130,7 @@ jobs:
     if: always()
     uses: ./.github/workflows/notify_discord.yml
     with:
-      status: ${{ needs.docker-validate.result == 'success' && (needs.docker-publish.result == 'success' || needs.docker-publish.result == 'skipped') && 'success' || 'failure' }}
+      status: ${{ needs.docker-validate.result }}
       workflow_name: "Docker CI/CD"
     secrets:
       DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
