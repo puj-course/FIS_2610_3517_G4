@@ -1,19 +1,23 @@
+WEB_ENV_FILE ?= apps/web/.env
+COMPOSE_ENV_ARGS := $(if $(wildcard $(WEB_ENV_FILE)),--env-file $(WEB_ENV_FILE),)
+COMPOSE := docker compose $(COMPOSE_ENV_ARGS)
+
 .PHONY: build clean up down logs ps
 
 build:
-	docker compose build
+	$(COMPOSE) build
 
 clean:
-	docker compose down --rmi local --volumes --remove-orphans
+	$(COMPOSE) down --rmi local --volumes --remove-orphans
 
 up:
-	docker compose up -d --build
+	$(COMPOSE) up -d --build
 
 down:
-	docker compose down
+	$(COMPOSE) down
 
 logs:
-	docker compose logs -f
+	$(COMPOSE) logs -f
 
 ps:
-	docker compose ps
+	$(COMPOSE) ps

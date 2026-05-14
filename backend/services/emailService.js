@@ -64,7 +64,7 @@ async function enviarCodigoVerificacion(email, nombre, codigo) {
     throw new Error('Servicio de correo no configurado: faltan EMAIL_USER y/o EMAIL_PASS en backend/.env');
   }
 
-  // Plantilla de bienvenida con OTP temporal para activacion de cuenta.
+  // Mensaje de bienvenida con OTP temporal para activacion de cuenta.
   const mailOptions = {
     from: `"Drive Control" <${EMAIL_USER}>`,
     to: email,
@@ -97,7 +97,7 @@ async function enviarCodigoVerificacion(email, nombre, codigo) {
 }
 
 async function enviarCodigoRecuperacion(email, nombre, codigo) {
-  // Reutiliza el mismo canal SMTP, pero con una plantilla y asunto distintos.
+  // Reutiliza el mismo canal SMTP, pero con contenido y asunto distintos.
   if (!EMAIL_ENABLED) {
     throw new Error('Servicio de correo no configurado: faltan EMAIL_USER y/o EMAIL_PASS en backend/.env');
   }

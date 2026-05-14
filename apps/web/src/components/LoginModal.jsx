@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { X, Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { X, Mail, Lock, Loader2, Eye, EyeOff, ArrowLeft, ShieldCheck, Smartphone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { authService } from '@/services/api.js';
 import GoogleAuthButton from '@/components/GoogleAuthButton.jsx';
@@ -19,7 +19,7 @@ const isValidRecoveryIdentifier = (value) => {
 
 // Modal ligero para autenticación desde la landing sin abandonar el flujo público.
 export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
-  // `mode` controla las tres pantallas internas del mismo modal: login, recover y reset.
+  // `mode` controla las cuatro pantallas internas del mismo modal: login, recover, chooseChannel y reset.
   const [mode, setMode] = useState('login');
   // Credenciales del acceso tradicional.
   const [email, setEmail] = useState('');
@@ -34,6 +34,8 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
   // Estos dos valores permiten decirle al usuario por dónde fue enviado el código.
   const [resetChannel, setResetChannel] = useState('');
   const [resetDestinationHint, setResetDestinationHint] = useState('');
+  // `pendingIdentifier` guarda el identificador validado en el paso recover para usarlo en chooseChannel.
+  const [pendingIdentifier, setPendingIdentifier] = useState('');
   // Los toggles separan la visibilidad de la contraseña actual y la nueva.
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -58,6 +60,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     setRecoveryToken('');
     setResetChannel('');
     setResetDestinationHint('');
+    setPendingIdentifier('');
     setMode('login');
   };
 
@@ -71,6 +74,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     setRecoveryToken('');
     setResetChannel('');
     setResetDestinationHint('');
+    setPendingIdentifier('');
     setMode('recover');
   };
 
@@ -129,22 +133,30 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
       return;
     }
 
+    // Con el identificador validado, se pasa a elegir el canal antes de llamar al backend.
+    setPendingIdentifier(normalizedIdentifier);
+    clearMessages();
+    setMode('chooseChannel');
+  };
+
+  const handleChannelSelect = async (channel) => {
+    clearMessages();
     setIsSubmitting(true);
 
     try {
-      // El backend decide si responde mensaje genérico o habilita el paso de reset con token.
-      const res = await authService.solicitarRecuperacion(normalizedIdentifier);
+      // El backend recibe el identificador y el canal elegido por el usuario.
+      const res = await authService.solicitarRecuperacionConCanal(pendingIdentifier, channel);
 
       if (res.success) {
         if (res.data?.recoveryToken) {
-          // Si hay token, el backend ya emitió el OTP y podemos pasar al paso 2.
+          // Si hay token, el backend ya emitió el OTP y podemos pasar al paso de reset.
           setRecoveryToken(res.data.recoveryToken);
-          setResetChannel(res.data.channel || '');
+          setResetChannel(res.data.channel || channel);
           setResetDestinationHint(res.data.destinationHint || '');
           setResetCode('');
           setNewPassword('');
           setConfirmPassword('');
-          setNotice(res.message || 'Codigo enviado al contacto registrado.');
+          setNotice(res.message || 'Codigo enviado.');
           setMode('reset');
         } else {
           // Respuesta genérica para no filtrar si la cuenta realmente existe.
@@ -221,6 +233,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
     // El título cambia con el paso para evitar renderizar modales distintos.
     login: 'Iniciar Sesion',
     recover: 'Recuperar Cuenta',
+    chooseChannel: 'Enviar Codigo',
     reset: 'Nueva Contrasena',
   };
 
@@ -338,9 +351,66 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister }) {
               </p>
             </div>
             <button type="submit" disabled={isSubmitting} className="w-full bg-syntix-green text-white py-2.5 rounded-lg font-medium hover:bg-syntix-green/90 transition-colors mt-6 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-              {isSubmitting ? (<><Loader2 className="w-5 h-5 animate-spin" />Enviando...</>) : 'Enviar codigo'}
+              {isSubmitting ? (<><Loader2 className="w-5 h-5 animate-spin" />Enviando...</>) : 'Continuar'}
             </button>
           </form>
+        )}
+
+        {mode === 'chooseChannel' && (
+          <div className="p-6 space-y-5">
+            {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}
+            {notice && <div className="p-3 bg-green-50 text-syntix-green text-sm rounded-lg border border-green-100">{notice}</div>}
+
+            <p className="text-sm text-gray-600 text-center">
+              ¿Por donde quieres recibir tu codigo de verificacion?
+            </p>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* Opcion correo electronico */}
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => handleChannelSelect('email')}
+                className="flex flex-col items-center gap-3 p-5 border-2 border-gray-200 rounded-xl hover:border-syntix-green hover:bg-syntix-green/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+              >
+                <div className="w-12 h-12 rounded-full bg-syntix-navy/10 group-hover:bg-syntix-green/15 flex items-center justify-center transition-colors">
+                  {isSubmitting ? (
+                    <Loader2 className="w-6 h-6 text-syntix-navy animate-spin" />
+                  ) : (
+                    <Mail className="w-6 h-6 text-syntix-navy group-hover:text-syntix-green transition-colors" />
+                  )}
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-sm text-gray-800 group-hover:text-syntix-green transition-colors">Correo</p>
+                  <p className="text-xs text-gray-500 mt-0.5">electronico</p>
+                </div>
+              </button>
+
+              {/* Opcion SMS */}
+              <button
+                type="button"
+                disabled={isSubmitting}
+                onClick={() => handleChannelSelect('sms')}
+                className="flex flex-col items-center gap-3 p-5 border-2 border-gray-200 rounded-xl hover:border-syntix-green hover:bg-syntix-green/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+              >
+                <div className="w-12 h-12 rounded-full bg-syntix-navy/10 group-hover:bg-syntix-green/15 flex items-center justify-center transition-colors">
+                  {isSubmitting ? (
+                    <Loader2 className="w-6 h-6 text-syntix-navy animate-spin" />
+                  ) : (
+                    <Smartphone className="w-6 h-6 text-syntix-navy group-hover:text-syntix-green transition-colors" />
+                  )}
+                </div>
+                <div className="text-center">
+                  <p className="font-semibold text-sm text-gray-800 group-hover:text-syntix-green transition-colors">SMS</p>
+                  <p className="text-xs text-gray-500 mt-0.5">mensaje de texto</p>
+                </div>
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-400 text-center">
+              El codigo expira en 10 minutos.
+            </p>
+          </div>
         )}
 
         {mode === 'reset' && (

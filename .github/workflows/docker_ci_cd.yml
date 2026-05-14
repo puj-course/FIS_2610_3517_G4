@@ -76,6 +76,10 @@ jobs:
         working-directory: backend
         run: npm audit --audit-level=moderate
 
+      - name: Pruebas backend
+        working-directory: backend
+        run: npm test
+
       - name: Validar sintaxis backend
         working-directory: backend
         run: node --check server.js
@@ -136,10 +140,10 @@ jobs:
     steps:
       - name: Checkout repositorio
         uses: actions/checkout@v4
- 
+
       - name: Configurar Buildx
         uses: docker/setup-buildx-action@v3
- 
+
       - name: Exigir secretos DockerHub
         run: |
           if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ] || [ -z "${{ secrets.DOCKERHUB_TOKEN }}" ]; then

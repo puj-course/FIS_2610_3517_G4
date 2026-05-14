@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { X, Mail, Lock, Building, Phone, Loader2, ShieldCheck, RefreshCw, Eye, EyeOff, Smartphone } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext.jsx';
 import { queueOnboardingForUser } from '@/contexts/OnboardingContext.jsx';
 import { authService } from '@/services/api.js';
@@ -18,10 +18,14 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  // `step` define si estamos rellenando datos o confirmando el OTP.
-  const [step, setStep] = useState('register'); // 'register' | 'verify'
+  // `step` define si estamos rellenando datos, eligiendo canal de OTP, o confirmando el OTP.
+  const [step, setStep] = useState('register'); // 'register' | 'chooseChannel' | 'verify'
   // `pendingEmail` conserva el correo que debe verificarse en el segundo paso.
   const [pendingEmail, setPendingEmail] = useState('');
+  // `pendingTelefono` conserva el teléfono para poder enviar OTP por SMS si el usuario lo elige.
+  const [pendingTelefono, setPendingTelefono] = useState('');
+  // `otpChannel` guarda el canal elegido por el usuario ('email' | 'sms').
+  const [otpChannel, setOtpChannel] = useState('email');
   // El OTP se separa en 6 casillas para mejorar legibilidad y foco.
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   // Cooldown visual para limitar reenvíos desde el cliente.
@@ -70,12 +74,13 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     // Se inicia la llamada al contexto solo después de pasar todas las validaciones locales.
     setIsSubmitting(true);
     try {
+      // Primero se registra el usuario sin disparar OTP todavía; el canal se elige a continuación.
       const res = await register(email, formData.password, empresa, telefono);
       if (res.needsVerification) {
-        // El backend ya guardó el usuario pendiente y disparó el correo OTP.
+        // El backend creó la cuenta pendiente; ahora el usuario elige por dónde recibir el código.
         setPendingEmail(res.email || email);
-        setStep('verify');
-        startCooldown();
+        setPendingTelefono(telefono);
+        setStep('chooseChannel');
       } else if (res.success) {
         // Fallback reservado para registros que no requieran OTP en otros escenarios.
         queueOnboardingForUser(res.user?.email || email);
@@ -148,6 +153,30 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     }, 1000);
   };
 
+  // El usuario eligió el canal; se solicita el OTP y se avanza a la pantalla de verificación.
+  const handleChannelSelect = async (channel) => {
+    setError('');
+    setOtpChannel(channel);
+    setIsSubmitting(true);
+    try {
+      // Siempre se identifica la cuenta por correo; el canal le dice al backend si envía email o SMS.
+      const res = await authService.reenviarCodigo(pendingEmail, channel);
+      if (res.success) {
+        setOtp(['', '', '', '', '', '']);
+        setStep('verify');
+        startCooldown();
+        setTimeout(() => inputRefs.current[0]?.focus(), 100);
+      } else {
+        setError(res.message || 'No se pudo enviar el codigo. Intenta de nuevo.');
+      }
+    } catch (err) {
+      setError('Error al enviar el codigo.');
+      console.error('Error enviando OTP de registro:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Permite solo digitos y avanza automaticamente entre inputs.
   const handleOtpChange = (index, value) => {
     // Se rechaza cualquier carácter que no sea numérico.
@@ -196,13 +225,12 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
 
   // Solicita un OTP nuevo respetando el cooldown configurado.
   const handleResend = async () => {
-    // El cliente no deja reenviar si el contador aún no llegó a cero.
     if (resendCooldown > 0) return;
     setError('');
     try {
-      const res = await authService.reenviarCodigo(pendingEmail);
+      // Siempre se identifica la cuenta por correo; el canal determina cómo llega el código.
+      const res = await authService.reenviarCodigo(pendingEmail, otpChannel);
       if (res.success) {
-        // Al reenviar, se limpia el OTP anterior y se devuelve el foco al primer cuadro.
         setOtp(['', '', '', '', '', '']);
         startCooldown();
         inputRefs.current[0]?.focus();
@@ -298,6 +326,71 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
           </>
         )}
 
+        {step === 'chooseChannel' && (
+          <>
+            <div className="flex justify-between items-center p-6 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-6 h-6 text-syntix-green" />
+                <h2 className="text-2xl font-bold text-syntix-navy">Verificar Cuenta</h2>
+              </div>
+              <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors"><X className="w-6 h-6" /></button>
+            </div>
+            <div className="p-6 space-y-5">
+              {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}
+
+              <p className="text-sm text-gray-600 text-center">
+                ¿Por donde quieres recibir tu codigo de verificacion?
+              </p>
+
+              <div className="grid grid-cols-2 gap-3">
+                {/* Opcion correo electronico */}
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={() => handleChannelSelect('email')}
+                  className="flex flex-col items-center gap-3 p-5 border-2 border-gray-200 rounded-xl hover:border-syntix-green hover:bg-syntix-green/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                >
+                  <div className="w-12 h-12 rounded-full bg-syntix-navy/10 group-hover:bg-syntix-green/15 flex items-center justify-center transition-colors">
+                    {isSubmitting ? (
+                      <Loader2 className="w-6 h-6 text-syntix-navy animate-spin" />
+                    ) : (
+                      <Mail className="w-6 h-6 text-syntix-navy group-hover:text-syntix-green transition-colors" />
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <p className="font-semibold text-sm text-gray-800 group-hover:text-syntix-green transition-colors">Correo</p>
+                    <p className="text-xs text-gray-500 mt-0.5 truncate max-w-[100px]">{pendingEmail}</p>
+                  </div>
+                </button>
+
+                {/* Opcion SMS */}
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={() => handleChannelSelect('sms')}
+                  className="flex flex-col items-center gap-3 p-5 border-2 border-gray-200 rounded-xl hover:border-syntix-green hover:bg-syntix-green/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+                >
+                  <div className="w-12 h-12 rounded-full bg-syntix-navy/10 group-hover:bg-syntix-green/15 flex items-center justify-center transition-colors">
+                    {isSubmitting ? (
+                      <Loader2 className="w-6 h-6 text-syntix-navy animate-spin" />
+                    ) : (
+                      <Smartphone className="w-6 h-6 text-syntix-navy group-hover:text-syntix-green transition-colors" />
+                    )}
+                  </div>
+                  <div className="text-center">
+                    <p className="font-semibold text-sm text-gray-800 group-hover:text-syntix-green transition-colors">SMS</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{pendingTelefono}</p>
+                  </div>
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-400 text-center">
+                El codigo expira en 10 minutos.
+              </p>
+            </div>
+          </>
+        )}
+
         {step === 'verify' && (
           <>
             <div className="flex justify-between items-center p-6 border-b border-gray-100">
@@ -309,10 +402,19 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
             </div>
             <form onSubmit={handleVerify} className="p-6 space-y-6">
               <div className="text-center">
-                <p className="text-gray-600 text-sm">Enviamos un código de 6 dígitos a</p>
-                <p className="font-semibold text-syntix-navy mt-1">{pendingEmail}</p>
-                {/* Se avisa spam porque varios profesores/equipos suelen probar con Gmail. */}
-                <p className="text-gray-500 text-xs mt-2">Revisa tu bandeja de entrada y carpeta de spam.</p>
+                {otpChannel === 'sms' ? (
+                  <>
+                    <p className="text-gray-600 text-sm">Enviamos un codigo de 6 digitos por SMS a</p>
+                    <p className="font-semibold text-syntix-navy mt-1">{pendingTelefono}</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-gray-600 text-sm">Enviamos un código de 6 dígitos a</p>
+                    <p className="font-semibold text-syntix-navy mt-1">{pendingEmail}</p>
+                    {/* Se avisa spam porque varios profesores/equipos suelen probar con Gmail. */}
+                    <p className="text-gray-500 text-xs mt-2">Revisa tu bandeja de entrada y carpeta de spam.</p>
+                  </>
+                )}
               </div>
 
               {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}

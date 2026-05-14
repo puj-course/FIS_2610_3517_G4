@@ -11,7 +11,7 @@ export default function PlanesPage() {
 
   const planes = [
     {
-      name: "Starter",
+      name: "Inicial",
       price: "$0",
       desc: "Para probar el MVP con funciones básicas.",
       features: ["1 flota demo", "Alertas básicas", "Gestión SOAT (demo)"],

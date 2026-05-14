@@ -5,6 +5,8 @@ apps/**/node_modules/
 # builds
 dist/
 apps/**/dist/
+coverage/
+apps/**/coverage/
 
 # vite cache
 .vite/
@@ -12,13 +14,15 @@ apps/**/dist/
 apps/**/.vite/
 apps/**/.vite-temp/
 
-# env / logs
-**/.env
-**/.env.*
-!.env
-!backend/.env
-!**/.env.example
-*.log
 
-# OS
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editors
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
