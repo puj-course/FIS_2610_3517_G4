@@ -12,8 +12,40 @@
 | **M4** | Dashboard Pro, Dockerización, CI/CD y QA Final. | 100% | ✅ Finalizado |
 
 ---
+## 2. Identificación de Causas Raíz (Análisis RCA)
 
-## 2. Métricas de Productividad Sprint a Sprint
+Siguiendo la metodología de ingeniería de software, se analizaron los incidentes críticos del proyecto para identificar su origen sistémico y establecer medidas que eviten su recurrencia.
+
+### 1. Análisis de Causa Raíz: Exposición de Secretos (Seguridad)
+* **Problema:** Se detectaron claves de API y URIs de base de datos en el historial de Git.
+* **Análisis de los 5 Porqués:**
+    1.  *¿Por qué estaban las claves en el repositorio?* Porque se subió el archivo `.env` al hacer el primer commit.
+    2.  *¿Por qué se subió el archivo `.env`?* Porque no estaba incluido en el archivo `.gitignore`.
+    3.  *¿Por qué no estaba en el `.gitignore`?* Porque se utilizó un template genérico que no se revisó detalladamente al inicio del Milestone 1.
+    4.  *¿Por qué no se revisó detalladamente?* Por la presión de iniciar el desarrollo sin una política de seguridad de configuración definida.
+    5.  *¿Por qué no había una política definida?* (Causa Raíz) **Ausencia de un protocolo de "Secure Bootstrapping" en el plan de administración de configuración.**
+* **Acción Correctiva:** Implementación de `dotenv-safe`, rotación de llaves y uso de **Husky** para ejecutar un script de escaneo de secretos antes de cada commit.
+
+### 2. Análisis de Causa Raíz: Inconsistencia en Cálculos de Alertas (Lógica)
+* **Problema:** El sistema de semaforización mostraba alertas erróneas para el SOAT/RTM en ciertos navegadores.
+* **Análisis de los 5 Porqués:**
+    1.  *¿Por qué las alertas eran erróneas?* Porque el cálculo de días restantes devolvía valores negativos o NaN.
+    2.  *¿Por qué devolvía valores erróneos?* Porque la librería de fechas interpretaba el formato de entrada de manera distinta según el motor del navegador.
+    3.  *¿Por qué dependía del navegador?* Porque se utilizó el objeto `Date` nativo de JavaScript sin normalizar el formato ISO.
+    4.  *¿Por qué no se normalizó el formato?* Porque no se definieron estándares de manejo de tiempo en la capa de servicios.
+    5.  *¿Por qué no se definieron estándares?* (Causa Raíz) **Falta de pruebas de compatibilidad cross-browser y unitarias en la lógica del motor de vigilancia.**
+* **Acción Correctiva:** Migración a `date-fns` para estandarizar el manejo de zonas horarias y creación de un suite de pruebas en **Jest** que valide 15 casos de borde (fechas pasadas, bisiestos, fin de mes).
+
+### 3. Análisis de Causa Raíz: Retraso en el Despliegue (Proceso/DevOps)
+* **Problema:** La configuración del entorno de producción tomó 3 días adicionales a lo planeado.
+* **Análisis de los 5 Porqués:**
+    1.  *¿Por qué hubo retraso?* Porque el backend no conectaba con la base de datos en el servidor de despliegue.
+    2.  *¿Por qué no conectaba?* Porque las versiones de Node.js y las dependencias de red diferían entre la máquina de desarrollo y el servidor.
+    3.  *¿Por qué diferían las versiones?* Porque cada integrante configuró su entorno de manera manual.
+    4.  *¿Por qué se configuró manualmente?* Porque no se priorizó la virtualización del entorno desde el Sprint 1.
+    5.  *¿Por qué no se priorizó?* (Causa Raíz) **Subestimación de la complejidad de integración y falta de una estrategia de "Infraestructura como Código".**
+* **Acción Correctiva:** Adopción total de **Docker y Docker Compose** para garantizar la paridad entre los entornos de desarrollo, QA y producción.
+## 3. Métricas de Productividad Sprint a Sprint
 
 | Sprint | Periodo | HU Cerradas | Issues | Commits | Hito / Detalle Técnico |
 |--------|---------|-------------|--------|---------|------------------------|
@@ -34,7 +66,7 @@
 
 ---
 
-## 3. Dinámica Estrella de Mar por Milestones (Postmortem)
+## 4. Dinámica Estrella de Mar por Milestones (Postmortem)
 
 ### Milestone 1: Infraestructura y Autenticación
 | Eje | Acción (Verbo + Frase) | Ejemplo / Justificación |
