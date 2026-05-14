@@ -6,10 +6,10 @@
 
 | Milestone | Descripción Técnica | Progreso | Estado |
 |-----------|---------------------|----------|--------|
-| **M1** | Setup MERN, GitFlow, JWT Auth y Layout Base. | 100% | ✅ Finalizado |
-| **M2** | CRUD Vehículos, Esquemas Mongo y Capa de Servicios. | 100% | ✅ Finalizado |
-| **M3** | Motor de Vigilancia, Cron Jobs y Alertas Documentales. | 100% | ✅ Finalizado |
-| **M4** | Dashboard Pro, Dockerización, CI/CD y QA Final. | 100% | ✅ Finalizado |
+| **M1** | Base funcional del sistema. | 100% | ✅ Finalizado |
+| **M2** | Gestión básica de flotas. | 100% | ✅ Finalizado |
+| **M3** |  Gestión documental y monitoreo. | 100% | ✅ Finalizado |
+| **M4** | Dashboard, alertas y cierre del sistema. | 100% | ✅ Finalizado |
 
 ---
 ## 2. Identificación de Causas Raíz (Análisis RCA)
@@ -68,40 +68,42 @@ Siguiendo la metodología de ingeniería de software, se analizaron los incident
 
 ## 4. Dinámica Estrella de Mar por Milestones (Postmortem)
 
-### Milestone 1: Infraestructura y Autenticación
+### Milestone 1:  Base funcional del sistema
+
 | Eje | Acción (Verbo + Frase) | Ejemplo / Justificación |
 |-----|-------------------------|-------------------------|
-| **Seguir haciendo** | 1. Utilizar GitFlow estricto.<br>2. Realizar Dailies de 10 min.<br>3. Documentar el SRS. | Evitó conflictos en `main`.<br>Sincronizó al equipo frontend.<br>Claridad en los requisitos iniciales. |
-| **Empezar a hacer** | 1. Estandarizar con Tailwind.<br>2. Configurar `.env.example`.<br>3. Implementar Husky para hooks. | Mejorar la consistencia visual.<br>Evitar falta de variables en despliegue.<br>Validar linting antes del commit. |
-| **Dejar de hacer** | 1. Realizar commits sin mensaje.<br>2. Ignorar el linter de código.<br>3. Trabajar sobre la rama `main`. | Dificultó el rastreo de cambios.<br>Generó errores de sintaxis básicos.<br>Riesgo de romper la versión estable. |
-| **Más de** | 1. Investigación de librerías.<br>2. Sesiones de Pair Programming.<br>3. Revisión de la arquitectura. | Aceleró la elección de JWT.<br>Resolvió bloqueos en la conexión DB.<br>Aseguró escalabilidad del backend. |
-| **Menos de** | 1. Uso de librerías obsoletas.<br>2. Reuniones largas sin agenda.<br>3. Documentación en papel. | Evitamos problemas de compatibilidad.<br>Optimizamos el tiempo de desarrollo.<br>Migramos todo a Markdown en el repo. |
+| **Seguir haciendo** | 1. Consolidar el núcleo técnico.<br>2. Dividir historias de usuario.<br>3. Fomentar la autonomía individual. | El éxito del Login y Dashboard dio valor inmediato al proyecto.<br>El uso de sub-issues facilitó la trazabilidad y el orden.<br>Se cumplieron tareas sin necesidad de micro-gestión constante. |
+| **Empezar a hacer** | 1. Implementar checklists de pre-commit.<br>2. Adoptar política "1 issue = 1 cambio".<br>3. Planificar según capacidad real. | Evitar errores de compilación al integrar código de diferentes miembros.<br>Mejorar el orden y la granularidad de los commits en GitHub.<br>Considerar la carga de parciales y externa en la estimación de tiempos. |
+| **Dejar de hacer** | 1. Desarrollar sin validar compilación.<br>2. Ignorar metodología por estrés.<br>3. Subir código con estados incompletos. | Se integró código que rompió rutas en las primeras semanas.<br>El desorden metodológico acumuló trabajo innecesario al final del ciclo.<br>Generó inconsistencias visuales y bugs básicos en el frontend. |
+| **Más de** | 1. Rigor en procesos Scrum.<br>2. Trazabilidad intuitiva de sprints.<br>3. Aterrizar la planificación inicial. | Evitar que las tareas se aplacen o se pierda la agilidad ganada.<br>No perder tiempo del equipo buscando entregables en el repositorio.<br>Asegurar que las metas del sprint sean realistas para todos los integrantes. |
+| **Menos de** | 1. Aplazamiento de tareas pendientes.<br>2. Dependencia de reuniones sincrónicas.<br>3. Búsqueda dispersa de información. | Se debieron pasar tareas importantes del Sprint 3 al Sprint 4.<br>Se demostró que la autonomía y el trabajo asíncrono son más eficientes.<br>La desorganización inicial dificultó encontrar el trabajo ya realizado. |
 
-### Milestone 2: Lógica de Negocio y Flota
+### Milestone 2: Gestión básica de flota
+
 | Eje | Acción (Verbo + Frase) | Ejemplo / Justificación |
 |-----|-------------------------|-------------------------|
-| **Seguir haciendo** | 1. Validar esquemas con Mongoose.<br>2. Usar Pull Requests (PRs).<br>3. Mantener el backlog al día. | Aseguró integridad de datos de placas.<br>Permitió revisión por pares del código.<br>Facilitó la asignación de HU. |
-| **Empezar a hacer** | 1. Crear documentación JSDoc.<br>2. Implementar Logs de errores.<br>3. Usar Postman para pruebas. | Facilitó la rotación de tareas.<br>Ayudó a debuguear fallos en producción.<br>Agilizó el testeo de la API de vehículos. |
-| **Dejar de hacer** | 1. Subir secretos al repositorio.<br>2. Crear rutas sin protección.<br>3. Duplicar lógica de validación. | Se expuso la URI de Mongo (corregido).<br>Cualquier usuario podía borrar vehículos.<br>Se centralizó en un middleware. |
-| **Más de** | 1. Modularización de servicios.<br>2. Refactorización de controladores.<br>3. Consultas en la documentación. | Reutilización de código en reportes.<br>Código más limpio y legible.<br>Mejor uso de operadores de MongoDB. |
-| **Menos de** | 1. Hardcoding de variables.<br>2. Pruebas manuales repetitivas.<br>3. Consultas pesadas a la DB. | Se movió todo a variables globales.<br>Se empezó a planear Jest.<br>Se implementó paginación. |
+| **Seguir haciendo** | 1. Aplicar patrones GoF (Factory/Facade).<br>2. Mantener la división en sub-issues técnicas.<br>3. Utilizar simuladores para pruebas de borde. | Limpió el "código espagueti" y mejoró la mantenibilidad real.<br>Permitió un avance progresivo y trazable de la vista AlertasPage.<br>El simulador de fechas detectó bugs críticos en condiciones normales. |
+| **Empezar a hacer** | 1. Estandarizar convenciones de nombres.<br>2. Definir alcance de rutas y menús inicialmente.<br>3. Involucrar al QA desde el inicio del sprint. | Evitar confusiones entre archivos similares como useAlert y useAlerts.<br>Asegurar que las vistas nuevas sean accesibles desde el Sidebar.<br>Definir casos de prueba en paralelo al desarrollo para ganar tiempo. |
+| **Dejar de hacer** | 1. Probar flujos sin infraestructura base.<br>2. Mezclar responsabilidades en implementaciones.<br>3. Ignorar errores de arquitectura como visuales. | Se intentó probar Toasts antes de montar el ToasterLayout base.<br>El hito logró separar el análisis, la construcción y la documentación.<br>Evitar retrabajos al confundir fallos de estado con simples fallos de UI. |
+| **Más de** | 1. Recolección de evidencias en tiempo real.<br>2. Commits y Merges frecuentes a `main`.<br>3. Checklist de integración para el Dashboard. | No dejar las capturas de commits y UML para el final de la entrega.<br>Mitigar la complejidad de resolver conflictos al cierre del sprint.<br>Confirmar que cada acción nueva actualice la vista relacionada de inmediato. |
+| **Menos de** | 1. Ambigüedad en la estructura de archivos.<br>2. Descubrimiento de feedback visual tardío.<br>3. Retrabajo por desalineación de entornos. | Se requiere interoperabilidad total entre Windows y otros entornos.<br>Definir qué acciones necesitan Toasts antes de empezar a codificar.<br>Evitar conflictos con alias de rutas y duplicados en la carpeta layouts. |
 
-### Milestone 3: Gestión Documental y Alertas
+### Milestone 3: Gestión documental y monitoreo
+
 | Eje | Acción (Verbo + Frase) | Ejemplo / Justificación |
 |-----|-------------------------|-------------------------|
-| **Seguir haciendo** | 1. Aplicar el Patrón Facade.<br>2. Diseñar UI intuitiva.<br>3. Monitorear el progreso diario. | Centralizó la lógica de vencimientos.<br>Semaforización visual clara (SOAT/RTM).<br>Garantizó entregas en la fecha límite. |
-| **Empezar a hacer** | 1. Integrar SonarCloud.<br>2. Realizar Unit Testing.<br>3. Automatizar backups de DB. | Identificar deuda técnica acumulada.<br>Validar cálculos de fechas de alerta.<br>Prevenir pérdida de datos en pruebas. |
-| **Dejar de hacer** | 1. Aprobar PRs propios.<br>2. Ignorar los warnings de React.<br>3. Postponer la deuda técnica. | El QA debe ser independiente.<br>Causa de fugas de memoria detectadas.<br>Se priorizó la refactorización inmediata. |
-| **Más de** | 1. Comunicación vía Slack/Discord.<br>2. Revisión de logs en consola.<br>3. Uso de librerías de fechas. | Resolución de dudas en tiempo real.<br>Eliminación de rastro de debugging.<br>Migración a `date-fns` para precisión. |
-| **Menos de** | 1. Cambios directos en `develop`.<br>2. Desorden en carpetas de assets.<br>3. Suposiciones sobre el usuario. | Evitó inestabilidad en la rama base.<br>Se organizaron iconos y estilos.<br>Se consultó el flujo real con el PO. |
+| **Seguir haciendo** | 1. Refactorizar modelos antes que rutas.<br>2. Realizar Peer Reviews rigurosos.<br>3. Ejecutar pruebas en diversos dispositivos. | Ahorró tiempo de depuración en la lógica de autenticación.<br>Garantizó el cumplimiento del Definition of Done (DoD).<br>Aseguró que la flota sea gestionable desde móviles. |
+| **Empezar a hacer** | 1. Configurar `.env` desde el día uno.<br>2. Fortalecer la validación de relaciones.<br>3. Usar middlewares globales de seguridad. | Evitar deudas técnicas y bloqueos por SonarCloud.<br>Detectar inconsistencias en la asignación conductor-vehículo.<br>Simplificar el cumplimiento de criterios de seguridad. |
+| **Dejar de hacer** | 1. Utilizar credenciales "hardcoded".<br>2. Depender de datos simulados/pruebas.<br>3. Posponer ajustes de variables en staging. | SonarCloud detectó riesgos de seguridad al inicio del ciclo.<br>Las alertas deben reflejar información real y trazable.<br>Evitar cambios de última hora en interceptores del frontend. |
+| **Más de** | 1. Comunicación asertiva y división efectiva.<br>2. Uso de Scrum Poker para estimación.<br>3. Coherencia entre entidades y alertas. | Se redujeron los percances y mejoró el ambiente de equipo.<br>Permitió un cumplimiento fluido de los criterios INVEST.<br>Asegurar que cada alerta tenga una referencia verificable. |
+| **Menos de** | 1. Inconsistencias en StatusBadge/Buscadores.<br>2. Fallos de diseño en tablas responsivas.<br>3. Retrasos por gestión de credenciales. | QA detectó y reportó hallazgos antes de la integración final.<br>Se corrigieron para hacer la plataforma realmente usable.<br>La trazabilidad por sub-issues mitigó cuellos de botella. |
 
-### Milestone 4: Calidad, Docker y Cierre
+### Milestone 4: Dashboard, alertas y cierre del sistema
+
 | Eje | Acción (Verbo + Frase) | Ejemplo / Justificación |
 |-----|-------------------------|-------------------------|
-| **Seguir haciendo** | 1. Contenerizar con Docker.<br>2. Sincronizar el README.<br>3. Ejecutar el Quality Gate. | Aseguró despliegue en cualquier PC.<br>Documentación alineada al código real.<br>SonarCloud validó el 0% de bugs. |
-| **Empezar a hacer** | 1. Mockear servicios externos.<br>2. Auditar la seguridad final.<br>3. Practicar el Storytelling. | No gastar créditos de Twilio/SMS.<br>Cerrar puertos innecesarios en Compose.<br>Asegurar fluidez en la sustentación. |
-| **Dejar de hacer** | 1. Incluir nuevas features.<br>2. Realizar cambios de última hora.<br>3. Trabajar de forma aislada. | Riesgo de comprometer la estabilidad.<br>Peligro de romper el Dockerfile final.<br>Garantizar que todos conocen el sistema. |
-| **Más de** | 1. Pulir detalles visuales.<br>2. Optimizar el tiempo de build.<br>3. Revisar la trazabilidad de HU. | Acabado profesional del Dashboard.<br>Uso de imágenes `alpine` en Docker.<br>Asegurar que cada issue tiene evidencia. |
-| **Menos de** | 1. Logs innecesarios en prod.<br>2. Dependencias sin utilizar.<br>3. Código muerto o comentado. | Mejora el rendimiento de la aplicación.<br>Reducción del tamaño de la imagen final.<br>Limpieza total para entrega de código. |
-
-
+| **Seguir haciendo** | 1. Implementar pruebas con datos reales.<br>2. Mantener trazabilidad técnica total.<br>3. Utilizar publicación condicional en CI/CD. | Se validó el flujo completo con MongoDB Atlas.<br>Vinculación exitosa entre issues, PRs y cambios.<br>Evitó fallos en el pipeline ante falta de credenciales. |
+| **Empezar a hacer** | 1. Estandarizar `docker compose down -v`.<br>2. Ampliar cobertura de pruebas unitarias.<br>3. Validar formatos mientras el usuario escribe. | Mantener la higiene en los entornos de prueba técnicos.<br>Superar el estado "Failed" actual del Quality Gate.<br>Evitar errores posteriores de validación en la base de datos. |
+| **Dejar de hacer** | 1. Enviar código sin revisión funcional.<br>2. Usar datos demo sin `OWNER_EMAIL`.<br>3. Ignorar hotspots de SonarCloud. | La integración continua no sustituye la validación manual.<br>Causó desajustes entre el usuario y su información demo.<br>Riesgo de comprometer la seguridad y confiabilidad final. |
+| **Más de** | 1. Colaboración ante problemas emergentes.<br>2. Uso de navegación por componentes (`Link`).<br>3. Coherencia entre fuentes de información. | El equipo estuvo unido para resolver bloqueos de último minuto.<br>Hizo que la plataforma se sienta como una app nativa.<br>Asegurar que alertas y reportes muestren los mismos datos. |
+| **Menos de** | 1. Tiempo de uso del botón 'atrás'.<br>2. Dependencia de datos técnicos en alertas.<br>3. Retrabajos por fallos de integración. | La mejora en la navegación redujo la fricción del usuario.<br>Se logró mostrar información realmente útil y no técnica.<br>La falta de pruebas previas al commit generó carga extra. |
