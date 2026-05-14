@@ -90,18 +90,6 @@ No marcar `docker-publish` o `docker-deploy` como ejecutados si no existe run ve
 ## Interpretacion tecnica
 
 Docker Compose demuestra reproducibilidad porque todos los servicios se levantan desde definiciones versionadas. La red Docker demuestra comunicacion entre servicios sin depender de `localhost` dentro de contenedores. El pipeline demuestra integracion continua cuando valida pruebas/builds y entrega continua cuando publica y despliega imagenes versionadas.
-
-## Acciones para defender 5.0
-
-- [ ] Adjuntar evidencia de `docker compose ps` con servicios healthy.
-- [ ] Adjuntar evidencia de red Docker.
-- [ ] Adjuntar healthchecks backend/frontend/proxy.
-- [ ] Confirmar que DockerHub tiene imagenes versionadas.
-- [ ] Confirmar que `docker-deploy` usa imagenes publicadas, no solo build local.
-- [ ] Cerrar issue de evidencia Docker si existe y vincular PR con `Closes #ID`.
-
-## Trazabilidad
-
 | Issue | Branch | Commit | PR | Evidencia |
 |---|---|---|---|---|
 | `#584` Completar evidencia Docker, Docker Compose y CI/CD | Abierta en GitHub | Ver PR | PR hacia `develop` | Capturas Docker, Actions y DockerHub |
