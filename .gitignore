@@ -22,3 +22,5 @@ apps/**/.vite-temp/
 
 # OS
 .DS_Store
+.env
+backend/.env
