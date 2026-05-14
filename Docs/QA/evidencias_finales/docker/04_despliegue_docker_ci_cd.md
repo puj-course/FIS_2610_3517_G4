@@ -72,20 +72,20 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml down -v
 
 No marcar `docker-publish` o `docker-deploy` como ejecutados si no existe run verde en GitHub Actions y repositorio DockerHub con tags visibles.
 
-## Evidencias pendientes
+## Evidencias 
 
-| Captura | Archivo esperado | Estado |
-|---|---|---|
-| Compose config | `img/docker-compose-config.png` | Pendiente |
-| Compose ps healthy | `img/docker-compose-ps.png` | Pendiente |
-| Backend health | `img/backend-health-db.png` | Pendiente |
-| Frontend HTTP 200 | `img/frontend-http-200.png` | Pendiente |
-| Proxy `/api` | `img/frontend-proxy-api-health.png` | Pendiente |
-| Network inspect | `img/docker-network-inspect.png` | Pendiente |
-| Workflow validate | `img/github-actions-docker-validate.png` | Pendiente |
-| Workflow publish | `img/github-actions-docker-publish.png` | Pendiente |
-| Workflow deploy | `img/github-actions-docker-deploy.png` | Pendiente |
-| DockerHub tags | `img/dockerhub-tags.png` | Pendiente |
+| Captura | Archivo esperado | 
+|---|---|
+| Compose config | `img/docker-compose-config.png` | 
+| Compose ps healthy | `img/docker-compose-ps.png` | 
+| Backend health | `img/backend-health-db.png` |
+| Frontend HTTP 200 | `img/frontend-http-200.png` | 
+| Proxy `/api` | `img/frontend-proxy-api-health.png` | 
+| Network inspect | `img/docker-network-inspect.png` | 
+| Workflow validate | `img/github-actions-docker-validate.png` |
+| Workflow publish | `img/github-actions-docker-publish.png` | 
+| Workflow deploy | `img/github-actions-docker-deploy.png` | 
+| DockerHub tags | `img/dockerhub-tags.png` | 
 
 ## Interpretacion tecnica
 
