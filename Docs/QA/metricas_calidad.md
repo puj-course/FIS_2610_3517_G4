@@ -96,3 +96,29 @@ Para defender calificacion excelente se debe mostrar:
 | Coverage bajo | Agregar tests a ramas no cubiertas y ejecutar `npm test` antes del merge. | Incrementa lineas cubiertas y evita regresiones silenciosas. |
 | Duplicacion alta | Extraer funciones comunes y consolidar adaptadores. | Reduce codigo repetido y costo de mantenimiento. |
 | Maintainability baja | Refactorizar funciones complejas y eliminar smells. | Baja deuda tecnica y mejora capacidad de evolucion. |
+
+## Matriz de defensa por metrica propia
+
+Esta tabla se usa para sustentar que las metricas propias son de dominio, estan implementadas en codigo y no duplican las metricas estaticas de SonarCloud.
+
+| Nombre | Tipo | Implementacion | Prueba asociada | Que mide | Logica de calculo | Rango de interpretacion | Resultado esperado | Impacto | Accion correctiva | Diferencia frente a SonarCloud |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Indice de riesgo documental | Metrica propia de dominio | `apps/web/src/utils/qualityMetrics.js` (`calculateDocumentRiskMetric`) | `apps/web/src/__tests__/qualityMetrics.test.js` | Riesgo operativo por documentos vencidos o proximos a vencer. | Cuenta documentos evaluables en estado rojo o amarillo y calcula el porcentaje sobre el total. | `0%` verde; `1%-49%` amarillo; `50%+` rojo; sin evaluables neutral. | Riesgo bajo cuando no hay vencidos ni proximos. | Renovar vencidos, planear proximos vencimientos y mantener alertas preventivas. | SonarCloud no interpreta fechas legales ni cumplimiento documental. |
+| Completitud de datos operativos | Metrica propia de dominio | `apps/web/src/utils/qualityMetrics.js` (`calculateOperationalCompletenessMetric`) | `apps/web/src/__tests__/qualityMetrics.test.js` | Calidad de datos de vehiculos, conductores, SOAT, RTM y documentos. | Evalua campos minimos por tipo de registro y calcula registros completos sobre evaluados. | `100%` verde; `80%-99%` amarillo; `<80%` rojo; sin registros neutral. | Reportes y alertas confiables con datos completos. | Completar placas, identificadores, telefonos, fechas y certificados faltantes. | SonarCloud no sabe si un dato de negocio es suficiente para operar. |
+| Indice de criticidad de alertas | Metrica propia de dominio | `apps/web/src/utils/qualityMetrics.js` (`calculateAlertCriticalityMetric`) | `apps/web/src/__tests__/qualityMetrics.test.js` | Proporcion de alertas criticas activas frente al total. | Normaliza prioridad, severidad, estado o tipo y calcula criticas sobre alertas activas. | `0%` verde; `1%-29%` amarillo; `30%+` rojo; sin alertas neutral. | Priorizacion clara de riesgos que afectan continuidad. | Atender alertas rojas, cerrar causa raiz y prevenir recurrencia. | SonarCloud no evalua eventos operativos ni prioridades de flota. |
+
+## Alcance de cobertura SonarCloud
+
+El analisis mantiene `sonar.sources=apps/web/src`, por lo que SonarCloud sigue revisando el frontend para mantenibilidad, confiabilidad y seguridad. La cobertura automatizada se enfoca en logica unitaria defendible: utilidades, adaptadores, validadores y hooks de dominio. Los componentes visuales, paginas, layouts y contextos se validan principalmente con lint, build, pruebas funcionales/manuales y revision de interfaz.
+
+Las exclusiones de coverage no eliminan archivos del analisis general: solo evitan mezclar cobertura unitaria de reglas de negocio con archivos de integracion visual. Si el coverage baja de `80%`, la accion correcta es agregar pruebas reales a ramas no cubiertas antes de modificar configuracion.
+
+## Interpretacion del Quality Gate
+
+| Concepto | Interpretacion para sustentacion | Accion si falla |
+| --- | --- | --- |
+| Quality Gate | Condicion de aceptacion automatica que combina coverage, duplicacion, reliability, security y maintainability. | Corregir issues y agregar pruebas antes de promover la rama. |
+| Coverage superior a 80% | Evidencia que las rutas criticas medidas por SonarCloud estan cubiertas por pruebas automatizadas. | Revisar `lcov.info`, ubicar lineas sin cubrir y crear pruebas deterministas. |
+| Duplications en 0.0% o bajo | Indica bajo riesgo de copy-paste en codigo nuevo medido por SonarCloud. | Extraer funciones compartidas y evitar repetir bloques visuales o de logica. |
+| Security Hotspots en 0 o revisados | Indica que no hay puntos sensibles abiertos sin revision. | Corregir validaciones, manejo de secretos, regex riesgosos y configuracion insegura. |
+| Maintainability A | Deuda tecnica baja en codigo nuevo. | Corregir code smells por tandas pequenas y verificables. |

@@ -76,6 +76,10 @@ jobs:
         working-directory: backend
         run: npm audit --audit-level=moderate
 
+      - name: Pruebas backend
+        working-directory: backend
+        run: npm test
+
       - name: Validar sintaxis backend
         working-directory: backend
         run: node --check server.js

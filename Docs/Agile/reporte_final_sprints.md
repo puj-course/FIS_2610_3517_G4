@@ -105,3 +105,47 @@ Siguiendo la instrucción de realizar el ejercicio por cada Milestone, a continu
 | **Dejar de hacer** | 1. Postergación de la trazabilidad.<br>2. Dejar HU abiertas.<br>3. Desatender el DoD. | Evitar pérdida de puntos en la rúbrica.<br>Tener el tablero de GitHub al 100%.<br>No entregar nada sin sus tests. |
 
 ---
+
+## Trazabilidad Sprint 13 y calidad final
+
+Esta tabla resume evidencia verificable observada en el repositorio y en PRs asociados. No reemplaza las capturas de GitHub que el equipo debe anexar durante la sustentacion.
+
+| Sprint | Milestone | HU / Issue | Estado | Branch | PR | Commits asociados | Responsable | Evidencia / archivo relacionado |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Sprint 13 | Milestone 4 | #556 Automatizar metricas propias de calidad | Cerrada | `feature-sarm-m` / `develop` | #569 | Ver historial de PR #569 | Sarm-m | `apps/web/src/utils/qualityMetrics.js`, `Docs/QA/metricas_calidad.md` |
+| Sprint 13 | Milestone 4 | #557 Implementar metricas propias e integrarlas en reportes | Cerrada | `feature-sarm-m` / `develop` | #569 | Ver historial de PR #569 | Sarm-m | `apps/web/src/pages/ReportesPage.jsx`, `qualityMetrics.js` |
+| Sprint 13 | Milestone 4 | #558 Validar y documentar metricas propias | Cerrada | `feature-sarm-m` / `develop` | #569, #572, #576, #578 | Ver historial de PRs | Sarm-m | `apps/web/src/__tests__/qualityMetrics.test.js`, `Docs/QA/metricas_calidad.md` |
+| Sprint 13 | Milestone 4 | Refuerzo SonarCloud y Quality Gate | Integrado en main segun PRs | `develop` | #578 | Ver historial de PR #578 | Equipo QA / DevOps | `sonar-project.properties`, `.github/workflows/sonarcloud.yml` |
+| Sprint 13 | Milestone 4 | Evidencia Docker y despliegue | Documentada; requiere capturas externas | `develop` / `main` | PRs de release y Docker | Ver historial de PRs | DevOps | `.github/workflows/docker_ci_cd.yml`, `Docs/QA/despliegue_ci_cd.md` |
+
+## Metricas agiles consolidadas
+
+| Indicador | Resultado documentado | Interpretacion |
+| --- | --- | --- |
+| HU completadas | 88 | Volumen funcional alto durante 13 sprints. |
+| Issues cerradas | 374 | Evidencia de seguimiento granular en GitHub Issues. |
+| Commits por sprint | 405 en tabla de sprints | Actividad constante con mayor intensidad en los sprints de cierre. |
+| Promedio HU por sprint | 6.77 | Promedio calculado sobre 88 HU / 13 sprints. |
+| Promedio commits por sprint | 31.15 | Promedio calculado sobre 405 commits / 13 sprints. |
+| Milestones finalizados | 3 finalizados y 1 en curso | Para defender excelencia completa se debe cerrar o evidenciar el estado real del Milestone 4. |
+
+## Postmortem de cierre
+
+| Problema detectado | Causa raiz tecnica | Causa raiz de proceso | Impacto | Accion correctiva | Responsable sugerido | Evidencia de cierre | Prevencion futura |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Quality Gate fallido por coverage en New Code | Codigo nuevo sin suficientes pruebas unitarias. | Integracion de metricas antes de completar cobertura. | Bloqueo temporal del PR hacia `main`. | Agregar pruebas deterministas para metricas, validadores y adaptadores. | QA Lead / Scrum Master | PRs #569, #572, #576, #578 y SonarCloud Passed. | Definition of Done con coverage local antes de PR. |
+| Hotspots y code smells de SonarCloud | Regex y componentes sin validacion de props. | Revision estatica tardia al cierre del sprint. | Deuda visible en rubrica de calidad. | Corregir hotspots, PropTypes, labels y reglas de mantenibilidad por tandas. | Frontend Lead / QA | PR #578 y check SonarCloud. | Revisar Sonar en cada PR, no solo al final. |
+| Riesgo por variables de entorno versionadas | Repositorio academico conserva `.env` para reproducibilidad. | Falta de separacion temprana entre entorno academico y productivo. | Riesgo de seguridad si se reutilizan credenciales fuera de la entrega. | Documentar excepcion academica, no exponer valores y rotar credenciales despues de la entrega. | Configuration Manager | `Docs/QA/gestion_variables_entorno.md`. | Usar GitHub Secrets y `.env.example` con placeholders en produccion. |
+| Evidencia SMS incompleta | El servicio existe, pero la prueba real depende de credenciales Twilio y telefono receptor. | La evidencia manual no quedo anexada al mismo ritmo que el codigo. | La rubrica puede calificar la integracion como parcial si no se muestra entrega real. | Agregar tests mockeados y documento de evidencia para anexar capturas reales. | Backend Lead / QA | `backend/test/smsService.test.js`, `Docs/QA/sms_twilio_evidencia.md`. | Mantener pruebas mockeadas y checklist de evidencia manual por release. |
+
+## Sustentacion individual sugerida
+
+| Integrante | Aporte principal | Como defender participacion |
+| --- | --- | --- |
+| Sarm-m | Scrum Master, metricas de calidad, SonarCloud, cobertura y documentacion de cierre. | Mostrar issues #556, #557, #558, PRs #569/#572/#576/#578, coverage y documentos QA. |
+| samuelfl680 | Configuration Manager, perfil, modo oscuro, configuracion y soporte de integracion. | Mostrar PRs de perfil/configuracion, commits y ajustes de experiencia autenticada. |
+| solonlosada2006 | DevOps, Docker, Compose, despliegue y soporte de pipeline. | Mostrar workflow Docker CI/CD, Compose, Dockerfiles y evidencias de contenedores. |
+| juanvargax | Product Owner, planeacion de sprints, validacion funcional y priorizacion. | Mostrar tablero, milestones, HU priorizadas y criterios de aceptacion. |
+| jSebastianRR / Juserora | QA Lead, pruebas, revision de evidencia y soporte de calidad. | Mostrar pruebas, validaciones, reportes QA y revision de resultados. |
+
+La participacion es desigual en commits, pero se justifica por roles complementarios: direccion de sprint, desarrollo frontend/backend, QA, DevOps, configuracion, documentacion y validacion funcional.

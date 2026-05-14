@@ -74,7 +74,7 @@ docker build -t drivectrl-backend:local -f Dockerfile .
 # Ejecucion de contenedor backend
 docker run --name drivectrl-backend -p 5000:5000 \
   -e MONGO_URI="mongodb://host.docker.internal:27017/logistica_db" \
-  -e JWT_SECRET="syntix_super_secret_key_dev" \
+  -e JWT_SECRET="<jwt-secret>" \
   drivectrl-backend:local
 ```
 
