@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+mport { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -9,7 +9,9 @@ const __dirname = path.dirname(__filename)
 
 export default defineConfig({
   plugins: [react()],
-  envDir: path.resolve(__dirname, '../..'),
+  // La app web mantiene sus variables VITE_* en apps/web/.env.
+  // Si Vite lee la raiz del repo, Google Auth queda sin client id y el boton se oculta.
+  envDir: __dirname,
   resolve: {
     alias: {
       // El alias @ evita imports relativos largos dentro de src.
