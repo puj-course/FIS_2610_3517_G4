@@ -1,0 +1,12 @@
+copilot/check-web-functionality-errors
+develop
+feature-Slosada
+feature-Vargas-J
+feature-juserora
+feature-samuelfl680
+feature-sarm-m
+feature/docker-deploy
+feature/pipelines
+main
+origin
+revert-422-feature-Slosada
