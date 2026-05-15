@@ -16,6 +16,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   // `formData` concentra el paso inicial del registro tradicional.
   const [formData, setFormData] = useState({ email: '', password: '', empresa: '', telefono: '' });
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   // `step` define si estamos rellenando datos, eligiendo canal de OTP, o confirmando el OTP.
@@ -40,6 +41,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setNotice('');
     const empresa = formData.empresa.trim();
     const telefono = formData.telefono.trim();
     const email = formData.email.trim().toLowerCase();
@@ -156,6 +158,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   // El usuario eligió el canal; se solicita el OTP y se avanza a la pantalla de verificación.
   const handleChannelSelect = async (channel) => {
     setError('');
+    setNotice('');
     setOtpChannel(channel);
     setIsSubmitting(true);
     try {
@@ -163,6 +166,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
       const res = await authService.reenviarCodigo(pendingEmail, channel);
       if (res.success) {
         setOtp(['', '', '', '', '', '']);
+        setNotice(res.data?.message || 'Codigo enviado.');
         setStep('verify');
         startCooldown();
         setTimeout(() => inputRefs.current[0]?.focus(), 100);
@@ -203,6 +207,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
     const codigo = otp.join('');
     if (codigo.length < 6) { setError('Ingresa el código completo de 6 dígitos'); return; }
     setError('');
+    setNotice('');
     setIsSubmitting(true);
     try {
       // El backend verifica hash, expiración e intentos restantes.
@@ -227,11 +232,13 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
   const handleResend = async () => {
     if (resendCooldown > 0) return;
     setError('');
+    setNotice('');
     try {
       // Siempre se identifica la cuenta por correo; el canal determina cómo llega el código.
       const res = await authService.reenviarCodigo(pendingEmail, otpChannel);
       if (res.success) {
         setOtp(['', '', '', '', '', '']);
+        setNotice(res.data?.message || 'Codigo reenviado.');
         startCooldown();
         inputRefs.current[0]?.focus();
       } else {
@@ -255,6 +262,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
             </div>
             <form onSubmit={handleSubmit} noValidate className="p-6 space-y-4">
               {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}
+              {notice && <div className="p-3 bg-green-50 text-syntix-green text-sm rounded-lg border border-green-100">{notice}</div>}
               <div>
                 <label htmlFor="register-company" className="block text-sm font-medium text-gray-700 mb-1">Nombre de Empresa</label>
                 <div className="relative">
@@ -337,6 +345,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }) {
             </div>
             <div className="p-6 space-y-5">
               {error && <div className="p-3 bg-red-50 text-syntix-red text-sm rounded-lg border border-red-100">{error}</div>}
+              {notice && <div className="p-3 bg-green-50 text-syntix-green text-sm rounded-lg border border-green-100">{notice}</div>}
 
               <p className="text-sm text-gray-600 text-center">
                 ¿Por donde quieres recibir tu codigo de verificacion?

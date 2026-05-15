@@ -6,12 +6,14 @@ const backendDir = path.resolve(__dirname, '..');
 const repoRootDir = path.resolve(backendDir, '..');
 const backendEnvPath = path.join(backendDir, '.env');
 const backendEnvExamplePath = path.join(backendDir, '.env.example');
+const appsWebEnvPath = path.join(repoRootDir, 'apps', 'web', '.env');
 const rootEnvPath = path.join(repoRootDir, '.env');
 
 const labelForPath = (filePath) => {
   // Se devuelven etiquetas legibles para logs de diagnóstico.
   if (filePath === backendEnvPath) return 'backend/.env';
   if (filePath === backendEnvExamplePath) return 'backend/.env.example';
+  if (filePath === appsWebEnvPath) return 'apps/web/.env';
   if (filePath === rootEnvPath) return '.env';
   return path.basename(filePath);
 };
@@ -43,6 +45,13 @@ const loadProjectEnv = ({ explicitEnvFile = null } = {}) => {
     loadedFrom.push(fallbackLabel);
   }
 
+  const appsWebLabel = loadEnvFile(appsWebEnvPath, { override: true });
+  if (appsWebLabel) {
+    // El proyecto academico conserva variables compartidas en apps/web/.env.
+    // Se carga sin imprimir valores para que backend local pueda leer Twilio/Mongo/SMTP.
+    loadedFrom.push(appsWebLabel);
+  }
+
   const backendLabel = loadEnvFile(backendEnvPath, { override: true });
   if (backendLabel) {
     // `backend/.env` tiene prioridad sobre el example.
@@ -60,6 +69,7 @@ const loadProjectEnv = ({ explicitEnvFile = null } = {}) => {
 
 module.exports = {
   backendDir,
+  appsWebEnvPath,
   backendEnvExamplePath,
   backendEnvPath,
   rootEnvPath,

@@ -909,6 +909,8 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
       ultimoEnvio: new Date(),
     }).save();
 
+    let smsResult = null;
+
     try {
       if (canal === 'sms') {
         // Envío por SMS al teléfono guardado en el perfil del usuario.
@@ -916,7 +918,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
         if (!smsDestination) {
           return res.status(400).json({ message: 'El usuario no tiene un telefono valido para SMS.' });
         }
-        await enviarCodigoVerificacionSms(smsDestination, usuario.nombre || usuario.empresa, codigo);
+        smsResult = await enviarCodigoVerificacionSms(smsDestination, usuario.nombre || usuario.empresa, codigo);
       } else {
         // Envío por correo electrónico.
         await enviarCodigoVerificacion(emailNormalizado, usuario.nombre || usuario.empresa, codigo);
@@ -931,7 +933,7 @@ app.post('/api/auth/reenviar-codigo', async (req, res) => {
     return res.json({
       success: true,
       message: canal === 'sms'
-        ? 'Codigo enviado por SMS.'
+        ? smsResult?.message || 'Codigo enviado por SMS.'
         : 'Codigo enviado al correo.',
     });
   } catch (err) {
@@ -1111,6 +1113,7 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
   try {
     // Se acepta un único identificador que puede ser correo o teléfono.
     const identifier = normalizeText(req.body?.identifier || req.body?.email || req.body?.telefono);
+    const canalSolicitado = req.body?.channel === 'sms' ? 'sms' : 'email';
 
     if (!identifier) {
       return res.status(400).json({ message: 'Ingresa el correo o telefono registrado.' });
@@ -1161,6 +1164,46 @@ app.post('/api/auth/recuperar-cuenta', async (req, res) => {
 
     // Se limpia cualquier recuperación anterior antes de crear la nueva.
     await PasswordResetOTP.findOneAndDelete({ email: emailRegistrado });
+
+    if (canalSolicitado === 'sms') {
+      try {
+        const smsDestination = buildSmsDestination(usuario.telefono);
+        if (!smsDestination) {
+          return res.status(500).json({
+            message: 'No hay un telefono valido registrado para SMS.',
+          });
+        }
+
+        const smsResult = await enviarCodigoRecuperacionSms(smsDestination, usuario.nombre || usuario.empresa, codigo);
+        canalEntrega = 'sms';
+        destinoEnmascarado = maskPhone(smsDestination);
+
+        await new PasswordResetOTP({
+          email: emailRegistrado,
+          recoveryTokenHash,
+          codigoHash,
+          expiresAt,
+          ultimoEnvio: new Date(),
+          canalEntrega,
+          destinoEnmascarado,
+        }).save();
+
+        return res.json({
+          success: true,
+          message: smsResult?.message || 'Codigo de recuperacion enviado por SMS.',
+          data: {
+            recoveryToken,
+            channel: canalEntrega,
+            destinationHint: destinoEnmascarado,
+          },
+        });
+      } catch (smsErr) {
+        console.error('Error al enviar SMS de recuperacion:', smsErr.message);
+        return res.status(500).json({
+          message: `Error al enviar SMS: ${smsErr.message}`,
+        });
+      }
+    }
 
     try {
       // Canal preferido: correo.
