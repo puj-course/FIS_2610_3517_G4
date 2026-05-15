@@ -21,7 +21,7 @@ const explicitEnvFile = envFileArg ? envFileArg.split('=')[1] : null;
 // Reutiliza el mismo cargador de variables del backend para evitar diferencias de entorno.
 const loadedEnvSources = loadProjectEnv({ explicitEnvFile });
 if (loadedEnvSources.length === 0) {
-  console.error('[AUTH-DOCTOR] No se encontro archivo de entorno (.env, backend/.env o backend/.env.example).');
+  console.error('[AUTH-DOCTOR] No se encontro archivo de entorno (.env, backend/.env, apps/web/.env o backend/.env.example).');
   process.exit(1);
 }
 
