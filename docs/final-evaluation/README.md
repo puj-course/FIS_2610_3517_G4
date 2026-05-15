@@ -53,10 +53,11 @@ scripts/generate_final_pdfs.sh
 
 ## Como probar SMS
 
-1. Configurar variables Twilio fuera del repo.
-2. Levantar backend o stack Docker.
-3. Probar registro/recuperacion seleccionando SMS.
-4. Capturar SMS recibido, dashboard Twilio y log backend sin secretos.
+1. Para modo mock: ejecutar `SMS_PROVIDER=mock SMS_MOCK_ENABLED=true npm --prefix backend start` y `npm --prefix apps/web run dev:frontend`.
+2. Para Twilio real: usar las variables `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` y `TWILIO_PHONE_NUMBER` ya configuradas por el equipo.
+3. En Docker directo, `docker-compose.yml` carga `apps/web/.env` para el backend mediante `env_file`.
+4. Probar registro/recuperacion seleccionando SMS.
+5. Capturar SMS recibido o mensaje mock exitoso, dashboard Twilio si aplica y log backend sin secretos.
 
 ## Capturas que debe tomar el equipo
 
@@ -84,6 +85,7 @@ scripts/generate_final_pdfs.sh
 ## Advertencias
 
 - `apps/web/.env` aparece trackeado por Git en este checkout. No mostrarlo en capturas. Rotar credenciales si contienen valores reales.
+- Por decision academica, este paquete no modifica ni reemplaza credenciales existentes en `.env`; solo documenta el riesgo.
 - No hay `gh` instalado en este entorno; los datos finales de issues/milestones deben exportarse en una maquina con GitHub CLI autenticado.
 - No se observaron tags remotos con `git ls-remote --tags origin`; crear release/tag final si se quiere defender control de versiones excelente.
 - El script de PDF esta listo, pero en este entorno no estan instalados `pandoc` ni `markdown-pdf`.

@@ -7,14 +7,15 @@ const {
   redactMongoUri,
 } = require('../config/mongo');
 const {
+  appsWebEnvPath,
   backendEnvPath,
   loadProjectEnv,
   rootEnvPath,
 } = require('../config/load-env');
 
 // El script falla temprano si no existe ningún archivo de entorno conocido.
-if (!fs.existsSync(backendEnvPath) && !fs.existsSync(rootEnvPath)) {
-  console.error('[ENV] Falta configuracion. Crea backend/.env o .env en la raiz con MONGO_URI o con MONGO_USER/MONGO_PASSWORD.');
+if (!fs.existsSync(backendEnvPath) && !fs.existsSync(rootEnvPath) && !fs.existsSync(appsWebEnvPath)) {
+  console.error('[ENV] Falta configuracion. Crea backend/.env, apps/web/.env o .env en la raiz con MONGO_URI o con MONGO_USER/MONGO_PASSWORD.');
   process.exit(1);
 }
 
