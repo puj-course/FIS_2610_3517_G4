@@ -37,7 +37,7 @@ El proyecto llego a una base funcional con frontend, backend, Docker, CI/CD, Son
 
 1. Crear una checklist por release con Sonar, Docker, SMS, Agile y seguridad.
 2. Rechazar PRs de cierre sin evidencia o justificacion.
-3. Mantener scripts de export y PDF como parte del repositorio.
+3. Mantener scripts de export y el informe Overleaf como parte del repositorio.
 4. Rotar secretos cuando se detecte exposicion.
 5. Preparar una ficha de sustentacion por integrante.
 
@@ -45,9 +45,9 @@ El proyecto llego a una base funcional con frontend, backend, Docker, CI/CD, Son
 
 | Evidencia | Ruta |
 |---|---|
-| Auditoria rubrica | `docs/final-evaluation/auditoria-rubrica.md` |
+| Auditoria rubrica | `docs/Entrega-Final/final-evaluation/auditoria-rubrica.md` |
 | Scripts Agile | `scripts/agile/` |
-| Scripts PDF | `scripts/generate_final_pdfs.sh` |
+| Informe final Overleaf | `docs/Entrega-Final/main.tex` |
 | CI/CD | `.github/workflows/` |
 | Docker | `docker-compose.yml`, `Dockerfile`, `apps/web/Dockerfile` |
 

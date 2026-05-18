@@ -39,8 +39,9 @@ docker compose down
 scripts/agile/export_github_data.sh puj-course/FIS_2610_3517_G4
 python3 scripts/agile/generate_agile_report.py
 
-# PDFs
-scripts/generate_final_pdfs.sh
+# Informe final Overleaf
+cd docs/Entrega-Final
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
 ## Como revisar CI/CD
@@ -88,4 +89,4 @@ scripts/generate_final_pdfs.sh
 - Por decision academica, este paquete no modifica ni reemplaza credenciales existentes en `.env`; solo documenta el riesgo.
 - No hay `gh` instalado en este entorno; los datos finales de issues/milestones deben exportarse en una maquina con GitHub CLI autenticado.
 - No se observaron tags remotos con `git ls-remote --tags origin`; crear release/tag final si se quiere defender control de versiones excelente.
-- El script de PDF esta listo, pero en este entorno no estan instalados `pandoc` ni `markdown-pdf`.
+- El informe final centralizado esta en `docs/Entrega-Final/main.tex`.

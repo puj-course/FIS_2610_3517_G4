@@ -9,11 +9,11 @@ python3 scripts/agile/generate_agile_report.py
 
 Salida esperada:
 
-- `docs/final-evaluation/agile/data/issues.json`
-- `docs/final-evaluation/agile/data/pull_requests.json`
-- `docs/final-evaluation/agile/data/milestones.json`
-- `docs/final-evaluation/agile/data/commits.tsv`
-- `docs/final-evaluation/agile/data/metricas_scrum_generadas.md`
+- `docs/Entrega-Final/final-evaluation/agile/data/issues.json`
+- `docs/Entrega-Final/final-evaluation/agile/data/pull_requests.json`
+- `docs/Entrega-Final/final-evaluation/agile/data/milestones.json`
+- `docs/Entrega-Final/final-evaluation/agile/data/commits.tsv`
+- `docs/Entrega-Final/final-evaluation/agile/data/metricas_scrum_generadas.md`
 
 ## Indicadores requeridos por rubrica
 

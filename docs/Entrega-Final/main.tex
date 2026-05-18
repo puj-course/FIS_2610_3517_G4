@@ -1,0 +1,638 @@
+\documentclass[11pt,a4paper]{article}
+
+% --------------------------------------------------
+% PAQUETES
+% --------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{ragged2e}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage{colortbl}
+\usepackage{lastpage}
+
+% --------------------------------------------------
+% CONFIGURACION GENERAL
+% --------------------------------------------------
+\geometry{
+  top=2.6cm,
+  bottom=2.6cm,
+  left=2.6cm,
+  right=2.6cm,
+  headheight=15pt,
+  footskip=1.2cm
+}
+
+\definecolor{azulprincipal}{HTML}{1F3C88}
+\definecolor{azulsuave}{HTML}{EAF0FB}
+\definecolor{grislinea}{HTML}{D9DEE8}
+\definecolor{gristexto}{HTML}{333333}
+\definecolor{rojopendiente}{HTML}{B00020}
+\definecolor{verdesuave}{HTML}{EAF7EA}
+\definecolor{amarillosuave}{HTML}{FFF7E0}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=azulprincipal,
+  urlcolor=azulprincipal,
+  citecolor=azulprincipal,
+  pdftitle={Informe Final de Entrega},
+  pdfauthor={SYNTIX TECH - Pontificia Universidad Javeriana}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\setstretch{1.12}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\emergencystretch}{2em}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+\renewcommand{\contentsname}{Tabla de contenido}
+
+% --------------------------------------------------
+% FORMATO DE TITULOS
+% --------------------------------------------------
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{azulprincipal}}
+  {\thesection.}{0.6em}{}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{azulprincipal}}
+  {\thesubsection.}{0.6em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{azulprincipal}}
+  {\thesubsubsection.}{0.6em}{}
+
+\titleformat{\paragraph}[block]
+  {\normalfont\normalsize\bfseries\color{azulprincipal}}
+  {\theparagraph.}{0.6em}{}
+
+\titlespacing*{\section}{0pt}{1.6em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+\titlespacing*{\paragraph}{0pt}{0.9em}{0.4em}
+
+% --------------------------------------------------
+% ENCABEZADO Y PIE DE PAGINA
+% --------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{azulprincipal}{Informe Final de Entrega}}
+\fancyhead[R]{\textcolor{azulprincipal}{DriveControl / AutoMinder Enterprise}}
+\fancyfoot[C]{\textcolor{gristexto}{Pagina \thepage\ de \pageref{LastPage}}}
+\renewcommand{\headrulewidth}{0.6pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\captionsetup{
+  font=small,
+  labelfont=bf
+}
+
+% --------------------------------------------------
+% COLUMNAS Y COMANDOS UTILES
+% --------------------------------------------------
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
+\newcommand{\insertplaceholderfigure}[2][0.88]{%
+\begin{figure}[H]
+    \centering
+    \IfFileExists{#2}{%
+        \includegraphics[width=#1\linewidth]{#2}%
+    }{%
+        \fbox{%
+            \begin{minipage}[c][6cm][c]{0.82\linewidth}
+                \centering
+                \vspace{0.5cm}
+                \textbf{\detokenize{#2}}\\[0.4em]
+                Espacio reservado para reemplazar la imagen
+                \vspace{0.5cm}
+            \end{minipage}%
+        }%
+    }%
+\end{figure}
+}
+
+\newcommand{\pendiente}[1]{%
+\begin{center}
+\colorbox{amarillosuave}{%
+\begin{minipage}{0.9\linewidth}
+\textcolor{rojopendiente}{\textbf{Pendiente:}} #1
+\end{minipage}}
+\end{center}
+}
+
+\newcommand{\estadoOk}{\cellcolor{verdesuave}Evidenciado}
+\newcommand{\estadoParcial}{\cellcolor{amarillosuave}Parcial}
+\newcommand{\estadoPendiente}{\cellcolor{amarillosuave}Pendiente}
+
+\begin{document}
+
+% --------------------------------------------------
+% PORTADA
+% --------------------------------------------------
+\begin{titlepage}
+\centering
+\vspace*{0.5cm}
+
+\IfFileExists{img/logo-javeriana.png}{%
+  \includegraphics[width=0.28\linewidth]{img/logo-javeriana.png}%
+}{%
+  \fbox{%
+    \begin{minipage}[c][3cm][c]{0.28\linewidth}
+      \centering
+      \textbf{img/logo-javeriana.png}\\[0.4em]
+      Logo pendiente
+    \end{minipage}%
+  }%
+}
+\vspace{0.2cm}
+
+{\Large \textbf{Pontificia Universidad Javeriana}}\\
+{\large Facultad de Ingenieria}\\
+{\large Fundamentos de Ingenieria de Software}\\[1.2cm]
+
+{\Huge \textbf{\textcolor{azulprincipal}{Informe Final de Entrega}}}\\[0.4cm]
+{\Large Rubrica, Scrum, QA, DevOps y evidencia tecnica}\\[1.1cm]
+
+{\LARGE \textbf{DriveControl / AutoMinder Enterprise}}\\[0.3cm]
+{\Large Equipo SYNTIX TECH}\\[1.1cm]
+
+\begin{tabularx}{0.86\linewidth}{P{4cm}Y}
+\toprule
+\textbf{Profesor} & Luis Gabriel Moreno Sandoval \\
+\textbf{Fecha} & 18 de mayo de 2026 \\
+\textbf{Repositorio} & \url{https://github.com/puj-course/FIS_2610_3517_G4} \\
+\bottomrule
+\end{tabularx}
+
+\vfill
+\textit{Documento construido con evidencias versionadas, capturas disponibles y trazabilidad verificable. No incluye valores reales de credenciales.}
+\end{titlepage}
+
+\section*{Integrantes}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{P{5.2cm}P{3.4cm}Y}
+\toprule
+\textbf{Nombre} & \textbf{GitHub} & \textbf{Rol Scrum / tecnico} \\
+\midrule
+Sebastian Ramirez Maldonado & \texttt{@Sarm-m} & Scrum Master \\
+Sebastian Vargas & \texttt{@juanvargax} & Product Owner / Sprint Planner \\
+Samuel Freile & \texttt{@samuelfl680} & Configuration Manager \\
+Solon Losada & \texttt{@solonlosada2006} & DevOps Engineer \\
+Sebastian Rodriguez Ramirez & \texttt{@juserora} & QA Lead \\
+\bottomrule
+\end{tabularx}
+\caption{Integrantes y roles del equipo SYNTIX TECH.}
+\end{table}
+
+\tableofcontents
+\newpage
+
+\section{Introduccion}
+
+DriveControl / AutoMinder Enterprise es un sistema academico para la gestion de flotas, documentos, alertas operativas y verificacion por mensajeria. La entrega final consolida el trabajo tecnico y metodologico desarrollado por SYNTIX TECH durante el curso Fundamentos de Ingenieria de Software.
+
+El objetivo de este informe es centralizar la evidencia requerida por la rubrica: metricas de calidad, pruebas unitarias, coverage, despliegue reproducible, CI/CD, integracion SMS, trazabilidad Scrum y postmortem. El documento usa evidencia disponible en el repositorio y marca como pendiente cualquier captura o validacion externa que no pueda verificarse desde los archivos versionados.
+
+El alcance de la entrega cubre el informe principal en \texttt{docs/Entrega-Final/main.tex}, las evidencias centralizadas en \texttt{docs/Entrega-Final/evidencias/} y los anexos documentales conservados en \texttt{docs/Entrega-Final/final-evaluation/}. No se modifican credenciales, archivos \texttt{.env}, codigo de aplicacion ni configuraciones funcionales del sistema.
+
+\section{Resumen ejecutivo de cumplimiento de rubrica}
+
+\begin{longtable}{P{3.1cm}P{1.5cm}P{5.2cm}P{2.2cm}P{3.2cm}}
+\toprule
+\textbf{Criterio} & \textbf{Peso} & \textbf{Evidencia principal} & \textbf{Estado} & \textbf{Riesgo} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Criterio} & \textbf{Peso} & \textbf{Evidencia principal} & \textbf{Estado} & \textbf{Riesgo} \\
+\midrule
+\endhead
+Metricas de calidad & 20\% & Tres metricas propias implementadas y capturas de SonarCloud en \texttt{main}. & \estadoOk & Mantener interpretacion sin inventar valores no visibles. \\
+Despliegue y configuracion & 20\% & Docker Compose, red \texttt{drivecontrol-net}, \texttt{make build}, \texttt{make up}, capturas Docker. & \estadoOk & DockerHub depende de evidencia de tags y secrets. \\
+Pruebas unitarias & 20\% & Tests frontend/backend y coverage local documentado; SonarCloud analiza oficialmente \texttt{main}. & \estadoOk & Backend no esta dentro de \texttt{sonar.sources}; se explica alcance. \\
+Integracion SMS & 10\% & Servicio Twilio, tests mockeados y capturas de envio real/app. & \estadoParcial & Capturas SMS/Twilio pueden requerir censura manual. \\
+Metodologias agiles y postmortem & 30\% & Reporte final de sprints, issues \#618-\#622, PRs \#623/\#625, postmortems. & \estadoOk & Capturas de milestones/contributors siguen como anexos recomendados. \\
+Trabajo en equipo & Transversal & Tabla de roles, commits normalizados y trazabilidad por issue/PR. & \estadoParcial & Requiere completar capturas de Insights si se evalua participacion individual. \\
+\bottomrule
+\end{longtable}
+
+\section{Metricas de calidad}
+
+\subsection{Metricas propias del sistema}
+
+Las metricas propias estan implementadas como reglas de dominio y no reemplazan a SonarCloud. Su funcion es medir calidad funcional y riesgo operativo del sistema.
+
+\begin{longtable}{P{3cm}P{3.2cm}P{4.1cm}P{4.5cm}}
+\toprule
+\textbf{Metrica} & \textbf{Que mide} & \textbf{Interpretacion} & \textbf{Accion de mejora} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Metrica} & \textbf{Que mide} & \textbf{Interpretacion} & \textbf{Accion de mejora} \\
+\midrule
+\endhead
+\texttt{document-risk} & Documentos evaluables vencidos o proximos a vencer. & 0\% verde; 1\%-49\% amarillo; 50\% o mas rojo. & Renovar documentos, agendar vencimientos y revisar alertas preventivas. \\
+\texttt{operational-completeness} & Registros de vehiculos, conductores y documentos con campos minimos completos. & 100\% verde; 80\%-99\% amarillo; menos de 80\% rojo. & Completar placas, identificadores, telefonos, fechas, certificados y datos obligatorios. \\
+\texttt{alert-criticality} & Alertas criticas frente al total de alertas activas. & 0\% verde; 1\%-29\% amarillo; 30\% o mas rojo. & Resolver alertas rojas, documentar causa raiz y prevenir recurrencias. \\
+\bottomrule
+\end{longtable}
+
+Evidencia en codigo: \texttt{apps/web/src/utils/qualityMetrics.js}, tests en \texttt{apps/web/src/\_\_tests\_\_/qualityMetrics.test.js} y generador en \texttt{apps/web/tools/generate-quality-evidence.mjs}. El comando asociado es:
+
+\begin{verbatim}
+npm --prefix apps/web run quality:metrics
+\end{verbatim}
+
+\subsection{Metricas SonarCloud}
+
+SonarCloud complementa las metricas de dominio con analisis estatico. La configuracion revisada usa \texttt{sonar.organization=puj-course}, \texttt{sonar.projectKey=puj-course\_FIS\_2610\_3517\_G4}, fuentes en \texttt{apps/web/src} y coverage importado desde \texttt{apps/web/coverage/lcov.info}.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{P{3cm}Y Y}
+\toprule
+\textbf{Metrica} & \textbf{Impacto en calidad} & \textbf{Accion de mejora} \\
+\midrule
+Coverage & Reduce regresiones en reglas criticas y valida que el pipeline ejecute pruebas medibles. & Agregar pruebas a ramas no cubiertas y revisar exclusiones. \\
+Duplications & Evita deuda por copia de logica y bugs repetidos. & Extraer helpers o consolidar adaptadores. \\
+Maintainability & Disminuye costo de cambio y lectura del sistema. & Resolver code smells y reducir complejidad. \\
+Reliability / Bugs & Reduce defectos detectables por analisis estatico. & Corregir bugs y cubrirlos con pruebas de regresion. \\
+Security / Hotspots & Obliga revision de puntos sensibles y manejo de secretos. & Sanitizar entradas, evitar logs sensibles y revisar autenticacion/configuracion. \\
+\bottomrule
+\end{tabularx}
+\caption{Metricas SonarCloud defendibles en la entrega.}
+\end{table}
+
+\insertplaceholderfigure[0.95]{evidencias/sprint-13/14_sonarcloud_main_coverage_actualizad.png}
+\begin{center}
+\textit{Figura 1. Evidencia de coverage actualizado en SonarCloud para la rama \texttt{main}.}
+\end{center}
+
+\insertplaceholderfigure[0.8]{evidencias/sprint-13/15_sonarcloud_main_metricas_generales_actualizadas.png}
+\begin{center}
+\textit{Figura 2. Evidencia de metricas generales de SonarCloud en \texttt{main}.}
+\end{center}
+
+\section{Pruebas unitarias y coverage}
+
+\subsection{Pruebas frontend}
+
+El frontend usa Vitest y cubre utilidades, formatos colombianos, validaciones de correo, adaptadores de alertas, reglas de fecha y simulacion RUNT. La validacion local documentada reporta 10 archivos de prueba, 126 tests exitosos y coverage local superior a 90\% en los indicadores principales.
+
+\begin{verbatim}
+npm --prefix apps/web ci
+npm --prefix apps/web run lint
+npm --prefix apps/web test
+npm --prefix apps/web run build
+\end{verbatim}
+
+\insertplaceholderfigure[0.88]{evidencias/sprint-13/16_terminal_frontend_tests_ok.png}
+\begin{center}
+\textit{Figura 3. Ejecucion exitosa de pruebas frontend.}
+\end{center}
+
+\insertplaceholderfigure[0.82]{evidencias/sprint-13/17_terminal_frontend_build_ok.png}
+\begin{center}
+\textit{Figura 4. Build frontend exitoso.}
+\end{center}
+
+\subsection{Pruebas backend}
+
+El backend incluye pruebas sobre \texttt{backend/services/smsService.js}. Estas validan contrato tecnico con Twilio, manejo de errores y logs sin imprimir credenciales reales.
+
+\begin{verbatim}
+npm --prefix backend ci
+npm --prefix backend test
+\end{verbatim}
+
+\insertplaceholderfigure[0.78]{evidencias/sprint-13/18_terminal_backend_tests_ok.png}
+\begin{center}
+\textit{Figura 5. Ejecucion exitosa de pruebas backend.}
+\end{center}
+
+\subsection{Coverage local y SonarCloud}
+
+El flujo esperado es: generar LCOV local con Vitest, subirlo en GitHub Actions y permitir que SonarCloud lo importe desde \texttt{apps/web/coverage/lcov.info}. Por limitacion del plan actual, SonarCloud analiza oficialmente la rama \texttt{main}; por eso el cierre se sustenta con el flujo \texttt{feature-sarm-m -> develop -> main} y con las capturas posteriores al merge.
+
+\insertplaceholderfigure[0.86]{evidencias/sprint-13/02_pr_s13_sonar_quality_gate_passed.png}
+\begin{center}
+\textit{Figura 6. Quality Gate aprobado en PR de Sprint 13.}
+\end{center}
+
+\section{Docker, despliegue y red}
+
+\subsection{Arquitectura de contenedores}
+
+El proyecto define tres servicios principales en Docker Compose:
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{P{2.4cm}P{2.6cm}P{2cm}Y}
+\toprule
+\textbf{Servicio} & \textbf{Imagen/build} & \textbf{Puerto} & \textbf{Responsabilidad} \\
+\midrule
+\texttt{frontend} & \texttt{apps/web/Dockerfile} & 3000 & Aplicacion React/Vite servida por Nginx y proxy \texttt{/api}. \\
+\texttt{backend} & \texttt{Dockerfile} raiz & 5000 & API Node/Express, MongoDB, OTP y SMS. \\
+\texttt{mongodb} & \texttt{mongo:7} & 27017 & Base de datos local para Compose. \\
+\bottomrule
+\end{tabularx}
+\caption{Servicios del despliegue local.}
+\end{table}
+
+El profesor puede clonar el repositorio y ejecutar:
+
+\begin{verbatim}
+make build
+make up
+make ps
+\end{verbatim}
+
+Por decision academica, \texttt{apps/web/.env} se conserva sin cambios para facilitar la validacion funcional del sistema. Este informe no muestra valores reales, no reemplaza credenciales y no elimina el archivo.
+
+\subsection{Red Docker}
+
+La red se define como \texttt{drivecontrol-net}, con driver \texttt{bridge} y subnet \texttt{172.28.0.0/16}. Los contenedores se comunican por nombre de servicio, no por \texttt{localhost} interno.
+
+\insertplaceholderfigure[0.75]{evidencias/sprint-13/19_terminal_docker_compose_config_ok.png}
+\begin{center}
+\textit{Figura 7. Validacion de configuracion Docker Compose.}
+\end{center}
+
+\insertplaceholderfigure[0.95]{evidencias/sprint-13/20_terminal_docker_compose_ps.png}
+\begin{center}
+\textit{Figura 8. Servicios levantados con Docker Compose.}
+\end{center}
+
+\insertplaceholderfigure[0.78]{evidencias/sprint-13/21_terminal_docker_network_inspect.png}
+\begin{center}
+\textit{Figura 9. Inspeccion de la red \texttt{drivecontrol-net}.}
+\end{center}
+
+Si existe conflicto con contenedores o redes previas, la accion documentada es apagar el stack con \texttt{docker compose down}; si se requiere limpieza completa, usar \texttt{docker compose down -v} y revisar que ninguna red externa use la subnet configurada antes de volver a levantar el proyecto.
+
+\section{CI/CD}
+
+\subsection{Workflows}
+
+La entrega identifica estos workflows principales:
+
+\begin{longtable}{P{4.4cm}P{4.6cm}P{5.6cm}}
+\toprule
+\textbf{Workflow} & \textbf{Evento} & \textbf{Funcion} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Workflow} & \textbf{Evento} & \textbf{Funcion} \\
+\midrule
+\endhead
+\texttt{ci\_verificacion.yml} & \texttt{push}, \texttt{pull\_request}, manual & Instala frontend, lint y pruebas. \\
+\texttt{sonarcloud.yml} & \texttt{push}, \texttt{pull\_request}, manual & Ejecuta lint, audit, coverage, metricas propias, build y scanner SonarCloud. \\
+\texttt{docker\_ci\_cd.yml} & Cambios Docker/app y manual & Valida frontend/backend, Compose, build de imagenes, healthchecks, publicacion DockerHub y despliegue condicionado. \\
+\texttt{cd\_entrega.yml} & \texttt{push} a \texttt{main}/\texttt{develop} & Build frontend y artefacto descargable. \\
+\texttt{pipeline\_hu454\_auth\_ci\_cd.yml} & \texttt{push}, \texttt{pull\_request}, manual & CI de autenticacion y hooks externos opcionales. \\
+\bottomrule
+\end{longtable}
+
+Los jobs marcados como omitidos en algunos runs se interpretan como ejecuciones condicionadas: por ejemplo, publicacion o despliegue cuando faltan secrets, cuando el evento es PR o cuando la rama no corresponde. No deben presentarse como despliegue real si el job de publicacion no corrio en verde.
+
+\insertplaceholderfigure[0.84]{evidencias/sprint-13/01_pr_s13_quality_gate_checks_aprobados.png}
+\begin{center}
+\textit{Figura 10. Checks aprobados en PR \#623.}
+\end{center}
+
+\insertplaceholderfigure[0.76]{evidencias/sprint-13/16_pr_develop_main_checks_aprobados.png}
+\begin{center}
+\textit{Figura 11. Checks del PR \#625 hacia \texttt{main}.}
+\end{center}
+
+\insertplaceholderfigure[0.84]{evidencias/docker/github-actions-docker-validate.png}
+\begin{center}
+\textit{Figura 12. Evidencia complementaria de validacion Docker en GitHub Actions.}
+\end{center}
+
+\insertplaceholderfigure[0.84]{evidencias/docker/dockerhub-tags1.png}
+\begin{center}
+\textit{Figura 13. Evidencia complementaria de tags DockerHub.}
+\end{center}
+
+\insertplaceholderfigure[0.84]{evidencias/docker/dockerhub-tags2.png}
+\begin{center}
+\textit{Figura 14. Evidencia complementaria de tags DockerHub.}
+\end{center}
+
+\section{Integracion SMS / Twilio}
+
+\subsection{Problema inicial y causa}
+
+El error documentado fue: \textit{Servicio SMS no configurado: faltan \texttt{TWILIO\_ACCOUNT\_SID}, \texttt{TWILIO\_AUTH\_TOKEN} o \texttt{TWILIO\_PHONE\_NUMBER}}. La causa fue que las variables necesarias se conservaban en \texttt{apps/web/.env}, mientras el backend no siempre las cargaba desde ese archivo en ejecucion local o Compose.
+
+\subsection{Solucion}
+
+El backend integra Twilio REST API en \texttt{backend/services/smsService.js}. El flujo permite OTP por SMS, maneja errores y registra informacion operativa enmascarada. Docker Compose carga \texttt{apps/web/.env} para el backend mediante \texttt{env\_file}, sin imprimir valores reales.
+
+Variables requeridas, sin valores reales:
+
+\begin{verbatim}
+TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN
+TWILIO_PHONE_NUMBER
+OTP_EXPIRACION_MINUTOS
+OTP_MAX_INTENTOS
+OTP_COOLDOWN_SEGUNDOS
+\end{verbatim}
+
+Para pruebas academicas seguras tambien existe modo mock:
+
+\begin{verbatim}
+SMS_PROVIDER=mock
+SMS_MOCK_ENABLED=true
+\end{verbatim}
+
+\insertplaceholderfigure[0.65]{evidencias/sprint-13/24_sms_evidencia_envio_exitoso_app.png}
+\begin{center}
+\textit{Figura 15. Evidencia de envio exitoso desde la aplicacion.}
+\end{center}
+
+\insertplaceholderfigure[0.45]{evidencias/sprint-13/25_sms_evidencia_envio_exitoso_twilio.png}
+\begin{center}
+\textit{Figura 16. Evidencia Twilio/SMS. Imagen pendiente de censura manual antes de presentacion publica.}
+\end{center}
+
+\section{Metodologia agil y Scrum}
+
+\subsection{Fuente principal}
+
+La fuente principal para Scrum es \texttt{docs/Agile/reporte\_final\_sprints.md}, porque contiene el cuadro completo de milestones, productividad por sprint y postmortem por milestone. La carpeta \texttt{docs/Entrega-Final/final-evaluation/agile/} se conserva como paquete auxiliar de auditoria y datos generados, pero no se usa como fuente primaria cuando contiene informacion incompleta o pendiente.
+
+\subsection{Milestones y productividad}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{P{2cm}Y P{2.5cm}P{2.2cm}}
+\toprule
+\textbf{Milestone} & \textbf{Descripcion tecnica} & \textbf{Progreso} & \textbf{Estado} \\
+\midrule
+M1 & Base funcional del sistema. & 100\% & Finalizado \\
+M2 & Gestion basica de flotas. & 100\% & Finalizado \\
+M3 & Gestion documental y monitoreo. & 100\% & Finalizado \\
+M4 & Dashboard, alertas y cierre del sistema. & 100\% & Finalizado \\
+\bottomrule
+\end{tabularx}
+\caption{Estado final de milestones segun la documentacion agil principal.}
+\end{table}
+
+El reporte final registra 13 sprints, 88 historias de usuario cerradas, 375 issues y 405 commits como lectura metodologica consolidada. El export local de \texttt{docs/Entrega-Final/final-evaluation/agile/data/metricas\_scrum\_generadas.md} contiene conteos de commits por sprint, pero no incluye issues ni PRs porque el entorno donde se genero no tenia \texttt{gh} autenticado.
+
+\subsection{Flujo Scrum/Kanban}
+
+\begin{enumerate}[leftmargin=*]
+\item Sprint planning: convertir historias en issues con criterios de aceptacion.
+\item Desarrollo: ramas \texttt{feature-*} o \texttt{feature/<tema>}.
+\item Integracion: commits con \texttt{Refs \#ID} o \texttt{Closes \#ID}.
+\item Pull Request: resumen, validaciones, evidencia e issues relacionadas.
+\item Review/CI: lint, tests, build, SonarCloud y Docker cuando aplica.
+\item Cierre: merge a \texttt{develop}/\texttt{main}, actualizacion de milestone y evidencias.
+\end{enumerate}
+
+\insertplaceholderfigure[0.85]{evidencias/sprint-13/05_issue_618_hu_entrega_tecnica.png}
+\begin{center}
+\textit{Figura 17. Historia de usuario padre \#618 para la entrega tecnica final.}
+\end{center}
+
+\section{Matriz de trazabilidad}
+
+\begin{longtable}{P{1.4cm}P{4.1cm}P{2.1cm}P{2cm}P{3.2cm}P{2cm}}
+\toprule
+\textbf{Issue} & \textbf{Descripcion} & \textbf{Commit} & \textbf{PR} & \textbf{Evidencia} & \textbf{Estado} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Issue} & \textbf{Descripcion} & \textbf{Commit} & \textbf{PR} & \textbf{Evidencia} & \textbf{Estado} \\
+\midrule
+\endhead
+\#618 & HU padre: consolidar entrega tecnica final segun rubrica. & PR merge & \#623, \#625 & Captura issue, PRs y paquete final. & Cerrada \\
+\#619 & Metricas de calidad, SonarCloud y coverage. & \texttt{24afa71} & \#623, \#625 & SonarCloud, tests frontend, coverage. & Cerrada \\
+\#620 & Docker Compose, red Docker y despliegue local. & \texttt{c1fd64b} & \#623, \#625 & Compose config, ps, network inspect. & Cerrada \\
+\#621 & CI/CD, DockerHub y workflows. & \texttt{f6a9062} & \#623, \#625 & Checks PR, Actions, tags DockerHub. & Cerrada \\
+\#622 & SMS, seguridad de entorno y paquete final de evidencia. & \texttt{f0e90b2}, \texttt{735c1fa} & \#623, \#625 & SMS app, Twilio, docs finales. & Cerrada \\
+\bottomrule
+\end{longtable}
+
+\insertplaceholderfigure[0.82]{evidencias/sprint-13/03_pr_s13_sin_conflictos_con_develop.png}
+\begin{center}
+\textit{Figura 18. PR \#623 sin conflictos con \texttt{develop}.}
+\end{center}
+
+\insertplaceholderfigure[0.82]{evidencias/sprint-13/04_pr_s13_issues_relacionadas.png}
+\begin{center}
+\textit{Figura 19. Issues relacionadas en PR \#623.}
+\end{center}
+
+\section{Postmortem}
+
+\subsection{Que salio bien}
+
+\begin{itemize}[leftmargin=*]
+\item La base funcional permitio cerrar el sistema con frontend, backend, MongoDB, Docker y CI/CD.
+\item Las metricas propias quedaron implementadas, testeadas y documentadas.
+\item Las pruebas frontend/backend validan reglas criticas y el servicio SMS sin exponer credenciales.
+\item La trazabilidad final conecta issues, commits, PRs y evidencias.
+\item Docker Compose facilita reproducibilidad para el evaluador mediante \texttt{make build} y \texttt{make up}.
+\end{itemize}
+
+\subsection{Que salio mal y causas raiz}
+
+\begin{longtable}{P{3.5cm}P{4.5cm}P{3.1cm}P{4cm}}
+\toprule
+\textbf{Problema} & \textbf{Causa raiz} & \textbf{Impacto} & \textbf{Accion correctiva/preventiva} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Problema} & \textbf{Causa raiz} & \textbf{Impacto} & \textbf{Accion correctiva/preventiva} \\
+\midrule
+\endhead
+Evidencia externa incompleta en fases previas. & Capturas y exports se dejaron para el cierre. & Riesgo en Sonar, DockerHub, SMS y Agile. & Checklist de evidencia por release y cierre de HU con anexos. \\
+Gestion tardia de variables de entorno. & Politica de secretos no se formalizo desde el primer sprint. & Riesgo de seguridad y retrasos por configuracion. & Mantener \texttt{.env.example}, GitHub Secrets y no proyectar \texttt{.env}. \\
+Datos GitHub incompletos en export local. & \texttt{gh} no estaba disponible/autenticado. & Metricas de issues/PRs incompletas en el export. & Ejecutar export en maquina autenticada y anexar capturas de Insights. \\
+Backend fuera del alcance Sonar actual. & Configuracion Sonar centrada en frontend. & Requiere explicar cobertura de backend por tests Node. & Documentar alcance y agregar coverage backend en futura iteracion. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Lecciones aprendidas}
+
+El cierre mostro que la calidad no se agrega al final: requiere pruebas, evidencia, configuracion reproducible, politicas de secretos y trazabilidad desde el sprint planning. Para futuros proyectos, cada historia debe cerrar con evidencia funcional, comandos reproducibles y riesgos documentados.
+
+\section{Conclusiones}
+
+La entrega final centraliza la evidencia principal de la rubrica y permite defender el sistema desde tres frentes: funcionamiento tecnico, calidad verificable y proceso agil. DriveControl / AutoMinder Enterprise cuenta con frontend, backend, Docker Compose, MongoDB, pruebas, SonarCloud, CI/CD y SMS/Twilio documentados.
+
+Las principales limitaciones no estan en la existencia del codigo, sino en la completitud de evidencia externa: capturas de milestones, contributors, release/tag y cualquier dato sensible que requiera censura manual. Este informe mantiene placeholders para no inventar resultados y para que el equipo pueda completar anexos sin romper la compilacion en Overleaf.
+
+\section{Referencias}
+
+\begin{thebibliography}{9}
+\bibitem{repo} Repositorio GitHub: \url{https://github.com/puj-course/FIS_2610_3517_G4}
+\bibitem{pr623} Pull Request \#623: \url{https://github.com/puj-course/FIS_2610_3517_G4/pull/623}
+\bibitem{pr625} Pull Request \#625: \url{https://github.com/puj-course/FIS_2610_3517_G4/pull/625}
+\bibitem{issue618} Issue \#618: \url{https://github.com/puj-course/FIS_2610_3517_G4/issues/618}
+\bibitem{docker} Docker Compose: \url{https://docs.docker.com/compose/}
+\bibitem{twilio} Twilio SMS API: \url{https://www.twilio.com/docs/sms}
+\bibitem{scrum} Scrum Guide: \url{https://scrumguides.org/}
+\bibitem{sonar} SonarCloud: \url{https://docs.sonarsource.com/sonarcloud/}
+\end{thebibliography}
+
+\section{Anexos}
+
+\subsection{Evidencias usadas}
+
+\begin{itemize}[leftmargin=*]
+\item SonarCloud: \texttt{14\_sonarcloud\_main\_coverage\_actualizad.png}, \texttt{15\_sonarcloud\_main\_metricas\_generales\_actualizadas.png}.
+\item PRs y CI: \texttt{01\_pr\_s13\_quality\_gate\_checks\_aprobados.png}, \texttt{02\_pr\_s13\_sonar\_quality\_gate\_passed.png}, \texttt{16\_pr\_develop\_main\_checks\_aprobados.png}.
+\item Pruebas: \texttt{16\_terminal\_frontend\_tests\_ok.png}, \texttt{17\_terminal\_frontend\_build\_ok.png}, \texttt{18\_terminal\_backend\_tests\_ok.png}.
+\item Docker: \texttt{19\_terminal\_docker\_compose\_config\_ok.png}, \texttt{20\_terminal\_docker\_compose\_ps.png}, \texttt{21\_terminal\_docker\_network\_inspect.png}.
+\item SMS/Twilio: \texttt{24\_sms\_evidencia\_envio\_exitoso\_app.png}, \texttt{25\_sms\_evidencia\_envio\_exitoso\_twilio.png}.
+\end{itemize}
+
+\subsection{Evidencias faltantes o recomendadas}
+
+\pendiente{Anexar logo oficial de la Javeriana en \texttt{img/logo-javeriana.png} si se cuenta con permiso de uso.}
+\pendiente{Anexar capturas finales de GitHub Milestones cerrados, GitHub Insights por integrante y release/tag final si se defiende control de versiones excelente.}
+\pendiente{Revisar manualmente capturas SMS/Twilio antes de presentarlas para ocultar telefono, SID, codigo OTP u otros datos sensibles.}
+
+\subsection{Comandos de validacion}
+
+\begin{verbatim}
+npm --prefix apps/web test
+npm --prefix backend test
+make build
+make up
+docker compose ps
+docker network inspect drivecontrol-net
+\end{verbatim}
+
+\subsection{Commit sugerido}
+
+\begin{verbatim}
+docs(report): centralizar informe final en latex para overleaf. Closes #618
+\end{verbatim}
+
+\end{document}
