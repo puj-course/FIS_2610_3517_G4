@@ -21,10 +21,16 @@ const statusLabels = {
   rojo: 'Vencido',
 };
 
-function getBadgeClasses(estado) {
-  if (estado === 'rojo') return 'bg-red-50 text-red-500 border border-red-200';
-  if (estado === 'amarillo') return 'bg-yellow-50 text-yellow-600 border border-yellow-200';
-  return 'bg-green-50 text-green-600 border border-green-200';
+function getBadgeClasses(estado, isDarkMode) {
+  if (estado === 'rojo') return isDarkMode
+    ? 'bg-red-500/10 text-red-300 border border-red-500/20'
+    : 'bg-red-50 text-red-500 border border-red-200';
+  if (estado === 'amarillo') return isDarkMode
+    ? 'bg-yellow-500/10 text-yellow-300 border border-yellow-500/20'
+    : 'bg-yellow-50 text-yellow-600 border border-yellow-200';
+  return isDarkMode
+    ? 'bg-green-500/10 text-green-300 border border-green-500/20'
+    : 'bg-green-50 text-green-600 border border-green-200';
 }
 
 const normalizeSearchText = (value) => String(value ?? '').toLowerCase().trim();
@@ -219,7 +225,7 @@ export default function DocumentosPage() {
                       <div className={`mt-1 text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{expirationText.primaryText}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getBadgeClasses(soat.estado)}`}>
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getBadgeClasses(soat.estado, isDarkMode)}`}>
                         {statusLabels[soat.estado] || soat.estado}
                       </span>
                     </td>
@@ -284,7 +290,7 @@ export default function DocumentosPage() {
                       <div className={`mt-1 text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{expirationText.primaryText}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getBadgeClasses(rtm.estado)}`}>
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getBadgeClasses(rtm.estado, isDarkMode)}`}>
                         {statusLabels[rtm.estado] || rtm.estado}
                       </span>
                     </td>
