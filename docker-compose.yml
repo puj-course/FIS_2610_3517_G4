@@ -22,15 +22,19 @@ services:
       dockerfile: Dockerfile
     container_name: drivectrl-backend
     restart: unless-stopped
+    env_file:
+      - apps/web/.env
     environment:
       PORT: 5000
-      JWT_SECRET: syntix_super_secret_key_dev
+      JWT_SECRET: ${JWT_SECRET:-local-compose-jwt-secret}
       MONGO_URI: ${DOCKER_MONGO_URI:-${MONGO_URI:-mongodb://mongodb:27017/logistica_db}}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-${VITE_GOOGLE_CLIENT_ID:-}}
       EMAIL_HOST: ${EMAIL_HOST:-smtp.gmail.com}
       EMAIL_PORT: ${EMAIL_PORT:-587}
       EMAIL_USER: ${EMAIL_USER:-}
       EMAIL_PASS: ${EMAIL_PASS:-}
+      SMS_PROVIDER: ${SMS_PROVIDER:-}
+      SMS_MOCK_ENABLED: ${SMS_MOCK_ENABLED:-}
       OTP_EXPIRACION_MINUTOS: ${OTP_EXPIRACION_MINUTOS:-10}
       OTP_MAX_INTENTOS: ${OTP_MAX_INTENTOS:-5}
       OTP_COOLDOWN_SEGUNDOS: ${OTP_COOLDOWN_SEGUNDOS:-60}
@@ -57,7 +61,7 @@ services:
       dockerfile: apps/web/Dockerfile
       args:
         VITE_API_URL: ${VITE_API_URL:-/api}
-        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID:-${GOOGLE_CLIENT_ID:-}}
     container_name: drivectrl-frontend
     restart: unless-stopped
     ports:
@@ -79,4 +83,8 @@ volumes:
 
 networks:
   drivectrl-net:
+    name: drivecontrol-net
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

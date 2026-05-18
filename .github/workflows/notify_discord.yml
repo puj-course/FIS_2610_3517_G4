@@ -1,0 +1,31 @@
+name: Notificar Discord
+
+on:
+  workflow_call:
+    inputs:
+      status:
+        required: true
+        type: string
+      workflow_name:
+        required: true
+        type: string
+    secrets:
+      DISCORD_WEBHOOK_URL:
+        required: true
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enviar notificacion a Discord
+        run: |
+          if [ "${{ inputs.status }}" = "success" ]; then
+            COLOR=3066993
+            MENSAJE="exitosa"
+          else
+            COLOR=15158332
+            MENSAJE="fallida"
+          fi
+          curl -s -H "Content-Type: application/json" \
+            -d "{\"embeds\":[{\"title\":\"$EMOJI Pipeline $MENSAJE\",\"description\":\"**Workflow:** ${{ inputs.workflow_name }}\n**Rama:** ${{ github.ref_name }}\n**Commit:** [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\n**Por:** ${{ github.actor }}\",\"color\":$COLOR}]}" \
+            "${{ secrets.DISCORD_WEBHOOK_URL }}"

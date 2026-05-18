@@ -120,3 +120,13 @@ jobs:
 
           curl -fsS -X POST "$FRONTEND_DEPLOY_HOOK_URL"
           echo "Deploy de frontend solicitado correctamente."
+
+  notify:
+    needs: [frontend_ci, backend_ci, deploy_backend, deploy_frontend]
+    if: always()
+    uses: ./.github/workflows/notify_discord.yml
+    with:
+      status: ${{ needs.frontend_ci.result == 'success' && needs.backend_ci.result == 'success' && 'success' || 'failure' }}
+      workflow_name: "HU-454 - Pipeline CI/CD Autenticacion"
+    secrets:
+      DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}

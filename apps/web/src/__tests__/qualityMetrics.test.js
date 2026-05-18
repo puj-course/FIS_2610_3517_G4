@@ -4,6 +4,7 @@ import {
   calculateAlertCriticalityMetric,
   calculateDocumentRiskMetric,
   calculateOperationalCompletenessMetric,
+  getQualityMetricDefinitions,
 } from '../utils/qualityMetrics.js';
 
 const BASE_DATE = '2026-05-12';
@@ -54,6 +55,16 @@ const expectMetricRenderShape = (metric) => {
     interpretation: expect.any(String),
     impact: expect.any(String),
     improvementAction: expect.any(String),
+    definition: expect.objectContaining({
+      type: 'Metrica propia de dominio',
+      sonarEquivalent: expect.stringContaining('Sonar'),
+      whatItMeasures: expect.any(String),
+      formula: expect.any(String),
+      interpretationGuide: expect.any(String),
+      qualityImpact: expect.any(String),
+      improvementProtocol: expect.any(String),
+      thresholds: expect.any(Object),
+    }),
   }));
 };
 
@@ -320,6 +331,44 @@ describe('calculateDocumentRiskMetric', () => {
       percentage: 25,
       status: 'amarillo',
     });
+  });
+});
+
+describe('getQualityMetricDefinitions', () => {
+  it('documenta tres metricas propias sin equivalente directo en SonarQube', () => {
+    const definitions = getQualityMetricDefinitions();
+
+    expect(definitions).toHaveLength(3);
+    expect(definitions.map((definition) => definition.id)).toEqual([
+      'document-risk',
+      'operational-completeness',
+      'alert-criticality',
+    ]);
+
+    definitions.forEach((definition) => {
+      expect(definition.type).toBe('Metrica propia de dominio');
+      expect(definition.sonarEquivalent).toContain('Sonar');
+      expect(definition.whatItMeasures).toBeTruthy();
+      expect(definition.formula).toContain('* 100');
+      expect(definition.interpretationGuide).toBeTruthy();
+      expect(definition.qualityImpact).toBeTruthy();
+      expect(definition.improvementProtocol).toBeTruthy();
+      expect(definition.thresholds).toEqual(expect.objectContaining({
+        verde: expect.any(String),
+        amarillo: expect.any(String),
+        rojo: expect.any(String),
+        neutral: expect.any(String),
+      }));
+    });
+  });
+
+  it('retorna copias defensivas de los umbrales', () => {
+    const [firstDefinition] = getQualityMetricDefinitions();
+    firstDefinition.thresholds.verde = 'mutado';
+
+    const [freshDefinition] = getQualityMetricDefinitions();
+
+    expect(freshDefinition.thresholds.verde).not.toBe('mutado');
   });
 });
 

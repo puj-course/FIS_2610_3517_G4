@@ -1,0 +1,6 @@
+services:
+  backend:
+    image: ${BACKEND_IMAGE:?BACKEND_IMAGE is required}:${IMAGE_TAG:?IMAGE_TAG is required}
+
+  frontend:
+    image: ${FRONTEND_IMAGE:?FRONTEND_IMAGE is required}:${IMAGE_TAG:?IMAGE_TAG is required}

@@ -2,9 +2,22 @@
 node_modules/
 apps/**/node_modules/
 
+# local secrets
+.env
+.env.*
+!.env.example
+apps/**/.env
+apps/**/.env.*
+!apps/**/.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+
 # builds
 dist/
 apps/**/dist/
+coverage/
+apps/**/coverage/
 
 # vite cache
 .vite/
@@ -12,13 +25,34 @@ apps/**/dist/
 apps/**/.vite/
 apps/**/.vite-temp/
 
-# env / logs
-**/.env
-**/.env.*
-!.env
-!backend/.env
-!**/.env.example
-*.log
 
-# OS
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editors
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# LaTeX build artifacts
+*.aux
+*.lof
+*.lot
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.bbl
+*.blg
+*.run.xml
+*.bcf
+*.xdv
+docs/Entrega-Final/*.pdf
