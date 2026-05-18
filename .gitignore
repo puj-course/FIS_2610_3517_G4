@@ -37,3 +37,22 @@ yarn-error.log*
 Thumbs.db
 .idea/
 .vscode/
+
+# LaTeX build artifacts
+*.aux
+*.lof
+*.lot
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.vrb
+*.bbl
+*.blg
+*.run.xml
+*.bcf
+*.xdv
+docs/Entrega-Final/*.pdf

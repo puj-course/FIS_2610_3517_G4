@@ -9,7 +9,7 @@ from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-DATA_DIR = Path("docs/final-evaluation/agile/data")
+DATA_DIR = Path("docs/Entrega-Final/final-evaluation/agile/data")
 OUTPUT = DATA_DIR / "metricas_scrum_generadas.md"
 SPRINT_START = date(2026, 2, 16)
 SPRINT_LENGTH_DAYS = 7

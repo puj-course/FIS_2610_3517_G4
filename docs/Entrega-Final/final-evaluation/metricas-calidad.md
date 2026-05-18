@@ -44,10 +44,10 @@ npm --prefix apps/web run build
 
 | Evidencia | Archivo sugerido | Observacion |
 |---|---|---|
-| JSON de metricas propias | `docs/final-evaluation/img/quality-metrics-report.png` | No contiene secretos. |
-| UI de reportes | `docs/final-evaluation/img/metricas-ui.png` | Mostrar interpretacion y accion de mejora. |
-| Sonar coverage | `docs/final-evaluation/img/sonar-coverage.png` | Debe ser del analisis actual. |
-| Sonar duplicidad/mantenibilidad/seguridad | `docs/final-evaluation/img/sonar-quality.png` | Ocultar datos privados si aplica. |
+| JSON de metricas propias | `docs/Entrega-Final/final-evaluation/img/quality-metrics-report.png` | No contiene secretos. |
+| UI de reportes | `docs/Entrega-Final/final-evaluation/img/metricas-ui.png` | Mostrar interpretacion y accion de mejora. |
+| Sonar coverage | `docs/Entrega-Final/final-evaluation/img/sonar-coverage.png` | Debe ser del analisis actual. |
+| Sonar duplicidad/mantenibilidad/seguridad | `docs/Entrega-Final/final-evaluation/img/sonar-quality.png` | Ocultar datos privados si aplica. |
 
 ## Validacion local realizada el 2026-05-15
 
