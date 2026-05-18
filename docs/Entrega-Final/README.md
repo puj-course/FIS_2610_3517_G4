@@ -8,7 +8,8 @@ Esta carpeta centraliza el informe final academico de SYNTIX TECH para la entreg
 |---|---|
 | `main.tex` | Informe principal listo para compilar en Overleaf. |
 | `evidencias/` | Capturas usadas por el informe final. |
-| `img/` | Imagenes generales del informe, incluido el logo si se anexa. |
+| `img/` | Imagenes generales del informe, incluido `javeriana.png`. |
+| `agile/` | Capturas de milestones e Insights de GitHub usadas en Scrum/trabajo en equipo. |
 | `anexos/` | Espacio para anexos adicionales no sensibles. |
 | `final-evaluation/` | Documentacion fuente y paquete de auditoria conservado como respaldo. |
 
@@ -30,16 +31,14 @@ Las evidencias principales estan en `evidencias/sprint-13/` y cubren:
 - Docker Compose, `docker compose ps` y `docker network inspect drivecontrol-net`.
 - SMS/Twilio.
 - Issue padre `#618` y trazabilidad de PRs.
+- Milestones cerrados e Insights/contributors en `agile/`.
 
 Tambien se copiaron evidencias complementarias de DockerHub y GitHub Actions a `evidencias/docker/`.
 
 ## Evidencias faltantes o recomendadas
 
-- Logo oficial de la Javeriana en `img/logo-javeriana.png`, si el equipo cuenta con permiso de uso.
-- Capturas finales de GitHub Milestones cerrados.
-- Capturas de GitHub Insights/contributors por integrante.
-- Captura de release/tag final si se quiere defender control de versiones excelente.
 - Revision manual de capturas SMS/Twilio para ocultar telefono, SID, codigo OTP u otros datos sensibles.
+- No se creo release/tag final. El informe sustenta control de versiones con PR `#623`, PR `#625`, issues cerradas y commits trazables.
 
 ## No tocar
 
@@ -75,5 +74,5 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ## Commit sugerido
 
 ```bash
-docs(report): centralizar informe final en latex para overleaf. Closes #618
+docs(report): completar informe final con evidencias de rubrica. Closes #618
 ```
