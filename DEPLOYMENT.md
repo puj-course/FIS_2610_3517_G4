@@ -128,6 +128,9 @@ npm --prefix apps/web run dev -- --host
 | `OTP_EXPIRACION_MINUTOS` | ❌ | Tiempo de vida del OTP (default: `10`) |
 | `OTP_MAX_INTENTOS` | ❌ | Intentos máximos antes de bloqueo (default: `5`) |
 | `OTP_COOLDOWN_SEGUNDOS` | ❌ | Espera entre reenvíos (default: `60`) |
+| `TWILIO_ACCOUNT_SID` | ❌ | SID de cuenta Twilio — obtener en console.twilio.com |
+| `TWILIO_AUTH_TOKEN` | ❌ | Auth Token de Twilio (visible en el dashboard de la cuenta) |
+| `TWILIO_PHONE_NUMBER` | ❌ | Número de origen Twilio en formato E.164 (ej: `+15551234567`) |
 
 ### Frontend (`apps/web/.env.local`)
 
@@ -215,6 +218,8 @@ Ver instrucciones completas en [Docs/QA/datos_mongo_seed/README_importacion.md](
 
 ## Ejecución de pruebas
 
+### Frontend
+
 ```bash
 # Pruebas unitarias con cobertura
 npm --prefix apps/web run test -- --coverage
@@ -228,6 +233,41 @@ npm --prefix apps/web run build
 
 Cobertura actual en New Code: **83.7%** (PR #564, SonarCloud Quality Gate aprobado).  
 Informe HTML generado en: `apps/web/coverage/index.html`.
+
+### Backend
+
+```bash
+# Instalar dependencias (incluye jest como devDependency)
+npm --prefix backend install
+
+# Pruebas unitarias
+npm --prefix backend test
+
+# Pruebas con reporte de cobertura
+npm --prefix backend run test:coverage
+```
+
+Los tests del backend cubren `emailService.js` y `smsService.js`. No requieren conexión a red ni credenciales reales — todas las dependencias externas (nodemailer, axios) están mockeadas con Jest.
+
+El plan de pruebas manuales para flujos críticos (autenticación, CRUD, documentos y alertas) está en [`Docs/QA/plan_pruebas_manuales.md`](Docs/QA/plan_pruebas_manuales.md).
+
+### Activar el servicio SMS (Twilio)
+
+Para habilitar el fallback de recuperación de contraseña por SMS:
+
+1. Crear una cuenta en [console.twilio.com](https://console.twilio.com) (la cuenta trial es suficiente para pruebas).
+2. Obtener: **Account SID**, **Auth Token** y un **número de teléfono Twilio**.
+3. Agregar al `backend/.env`:
+
+```bash
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_PHONE_NUMBER=+15551234567
+```
+
+4. En despliegue Docker, las mismas variables se pasan al contenedor `backend` desde el `.env` del host gracias a la configuración de `docker-compose.yml`.
+
+Con las tres variables presentes, `SMS_ENABLED` se activa automáticamente y el backend intentará enviar el OTP por SMS como fallback del correo.
 
 ---
 
