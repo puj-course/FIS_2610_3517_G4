@@ -2,7 +2,7 @@
 set -euo pipefail
 
 REPO="${1:-puj-course/FIS_2610_3517_G4}"
-OUT_DIR="${2:-docs/final-evaluation/agile/data}"
+OUT_DIR="${2:-docs/Entrega-Final/final-evaluation/agile/data}"
 
 mkdir -p "$OUT_DIR"
 

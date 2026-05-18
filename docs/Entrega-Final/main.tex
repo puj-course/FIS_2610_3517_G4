@@ -1,0 +1,1055 @@
+\documentclass[11pt,a4paper]{article}
+
+% --------------------------------------------------
+% PAQUETES
+% --------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{lmodern}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{ragged2e}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage{colortbl}
+\usepackage{lastpage}
+\usepackage{pdflscape}
+
+% --------------------------------------------------
+% CONFIGURACION GENERAL
+% --------------------------------------------------
+\geometry{
+  top=2.6cm,
+  bottom=2.6cm,
+  left=2.6cm,
+  right=2.6cm,
+  headheight=15pt,
+  footskip=1.2cm
+}
+
+\definecolor{azulprincipal}{HTML}{1F3C88}
+\definecolor{azulsuave}{HTML}{EAF0FB}
+\definecolor{grislinea}{HTML}{D9DEE8}
+\definecolor{gristexto}{HTML}{333333}
+\definecolor{rojopendiente}{HTML}{B00020}
+\definecolor{verdesuave}{HTML}{EAF7EA}
+\definecolor{amarillosuave}{HTML}{FFF7E0}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=azulprincipal,
+  urlcolor=azulprincipal,
+  citecolor=azulprincipal,
+  pdftitle={Informe Final de Entrega},
+  pdfauthor={SYNTIX TECH - Pontificia Universidad Javeriana}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\setstretch{1.12}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\emergencystretch}{2em}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+\renewcommand{\contentsname}{Tabla de contenido}
+
+% --------------------------------------------------
+% FORMATO DE TITULOS
+% --------------------------------------------------
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{azulprincipal}}
+  {\thesection.}{0.6em}{}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{azulprincipal}}
+  {\thesubsection.}{0.6em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{azulprincipal}}
+  {\thesubsubsection.}{0.6em}{}
+
+\titleformat{\paragraph}[block]
+  {\normalfont\normalsize\bfseries\color{azulprincipal}}
+  {\theparagraph.}{0.6em}{}
+
+\titlespacing*{\section}{0pt}{1.6em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+\titlespacing*{\paragraph}{0pt}{0.9em}{0.4em}
+
+% --------------------------------------------------
+% ENCABEZADO Y PIE DE PAGINA
+% --------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{azulprincipal}{Informe Final de Entrega}}
+\fancyhead[R]{\textcolor{azulprincipal}{DriveControl / AutoMinder Enterprise}}
+\fancyfoot[C]{\textcolor{gristexto}{Pagina \thepage\ de \pageref{LastPage}}}
+\renewcommand{\headrulewidth}{0.6pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\captionsetup{
+  font=small,
+  labelfont=bf
+}
+
+% --------------------------------------------------
+% COLUMNAS Y COMANDOS UTILES
+% --------------------------------------------------
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
+\newcommand{\insertplaceholderfigure}[2][0.88]{%
+\begin{figure}[H]
+    \centering
+    \IfFileExists{#2}{%
+        \includegraphics[width=#1\linewidth]{#2}%
+    }{%
+        \fbox{%
+            \begin{minipage}[c][6cm][c]{0.82\linewidth}
+                \centering
+                \vspace{0.5cm}
+                \textbf{\detokenize{#2}}\\[0.4em]
+                Espacio reservado para reemplazar la imagen
+                \vspace{0.5cm}
+            \end{minipage}%
+        }%
+    }%
+\end{figure}
+}
+
+\newcommand{\insertfitfigure}[2][0.78]{%
+\begin{figure}[H]
+    \centering
+    \IfFileExists{#2}{%
+        \includegraphics[width=\linewidth,height=#1\textheight,keepaspectratio]{#2}%
+    }{%
+        \fbox{%
+            \begin{minipage}[c][6cm][c]{0.82\linewidth}
+                \centering
+                \vspace{0.5cm}
+                \textbf{\detokenize{#2}}\\[0.4em]
+                Espacio reservado para reemplazar la imagen
+                \vspace{0.5cm}
+            \end{minipage}%
+        }%
+    }%
+\end{figure}
+}
+
+\newcommand{\pendiente}[1]{%
+\begin{center}
+\colorbox{amarillosuave}{%
+\begin{minipage}{0.9\linewidth}
+\textcolor{rojopendiente}{\textbf{Pendiente:}} #1
+\end{minipage}}
+\end{center}
+}
+
+\newcommand{\estadoOk}{\cellcolor{verdesuave}Evidenciado}
+\newcommand{\estadoParcial}{\cellcolor{amarillosuave}Parcial}
+\newcommand{\estadoPendiente}{\cellcolor{amarillosuave}Pendiente}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+
+\begin{document}
+
+% --------------------------------------------------
+% PORTADA
+% --------------------------------------------------
+\begin{titlepage}
+\centering
+\vspace*{0.5cm}
+
+\IfFileExists{img/javeriana.png}{%
+  \includegraphics[width=0.24\linewidth]{img/javeriana.png}%
+}{%
+  \fbox{%
+    \begin{minipage}[c][3cm][c]{0.28\linewidth}
+      \centering
+      \textbf{img/javeriana.png}\\[0.4em]
+      Logo pendiente
+    \end{minipage}%
+  }%
+}
+\vspace{0.2cm}
+
+{\Large \textbf{Pontificia Universidad Javeriana}}\\
+{\large Facultad de Ingenieria}\\
+{\large Fundamentos de Ingenieria de Software}\\[1.2cm]
+
+{\Huge \textbf{\textcolor{azulprincipal}{Informe Final de Entrega}}}\\[0.4cm]
+{\Large Rubrica, Scrum, QA, DevOps y evidencia tecnica}\\[1.1cm]
+
+{\LARGE \textbf{DriveControl / AutoMinder Enterprise}}\\[0.3cm]
+{\Large Equipo SYNTIX TECH}\\[1.1cm]
+
+\begin{tabularx}{0.86\linewidth}{P{4cm}Y}
+\toprule
+\textbf{Profesor} & Luis Gabriel Moreno Sandoval \\
+\textbf{Monitor} & Juan Pablo Arias Buitrago \\
+\textbf{Fecha} & 19 de mayo de 2026 \\
+\textbf{Repositorio} & \url{https://github.com/puj-course/FIS_2610_3517_G4} \\
+\bottomrule
+\end{tabularx}
+
+\vfill
+\textit{Documento construido con evidencias versionadas, capturas disponibles y trazabilidad verificable. No incluye valores reales de credenciales.}
+\end{titlepage}
+
+\section*{Integrantes}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{P{5.2cm}P{3.4cm}Y}
+\toprule
+\textbf{Nombre} & \textbf{GitHub} & \textbf{Rol Scrum / tecnico} \\
+\midrule
+Sebastian Ramirez Maldonado & \texttt{@Sarm-m} & Scrum Master \\
+Sebastian Vargas & \texttt{@juanvargax} & Product Owner / Sprint Planner \\
+Samuel Freile & \texttt{@samuelfl680} & Configuration Manager \\
+Solon Losada & \texttt{@solonlosada2006} & DevOps Engineer \\
+Sebastian Rodriguez Ramirez & \texttt{@juserora} & QA Lead \\
+\bottomrule
+\end{tabularx}
+\caption{Integrantes y roles del equipo SYNTIX TECH.}
+\end{table}
+
+\tableofcontents
+\newpage
+
+\section{Introduccion}
+
+DriveControl / AutoMinder Enterprise es un sistema academico para la gestion de flotas, documentos, alertas operativas y verificacion por mensajeria. La entrega final consolida el trabajo tecnico y metodologico desarrollado por SYNTIX TECH durante el curso Fundamentos de Ingenieria de Software.
+
+El objetivo de este informe es centralizar la evidencia requerida por la rubrica: metricas de calidad, pruebas unitarias, coverage, despliegue reproducible, CI/CD, integracion SMS, trazabilidad Scrum y postmortem. El documento usa evidencia disponible en el repositorio y marca como pendiente cualquier captura o validacion externa que no pueda verificarse desde los archivos versionados.
+
+El alcance de la entrega cubre el informe principal en \texttt{docs/Entrega-Final/main.tex}, las evidencias centralizadas en \texttt{docs/Entrega-Final/evidencias/} y los anexos de apoyo conservados en \texttt{docs/Entrega-Final/anexos/}. 
+\section{Resumen ejecutivo de cumplimiento de rubrica}
+
+La siguiente matriz traduce la rubrica oficial a evidencia verificable del repositorio. El estado ``Evidenciado'' no significa ausencia total de riesgo: significa que existe base tecnica/documental para defender el criterio y que cualquier brecha restante queda declarada con accion concreta.
+
+\begin{landscape}
+\begingroup
+\tiny
+\setlength{\tabcolsep}{2pt}
+\begin{longtable}{P{1.7cm}P{0.7cm}P{3.0cm}P{3.2cm}P{2.6cm}P{1.35cm}P{2.2cm}P{2.8cm}P{2.6cm}}
+\toprule
+\textbf{Criterio} & \textbf{Peso} & \textbf{Exigencia Excelente} & \textbf{Evidencia disponible} & \textbf{Imagen/captura asociada} & \textbf{Estado actual} & \textbf{Riesgo restante} & \textbf{Accion tomada/recomendada} & \textbf{Captura pendiente si aplica} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Criterio} & \textbf{Peso} & \textbf{Exigencia Excelente} & \textbf{Evidencia disponible} & \textbf{Imagen/captura asociada} & \textbf{Estado actual} & \textbf{Riesgo restante} & \textbf{Accion tomada/recomendada} & \textbf{Captura pendiente si aplica} \\
+\midrule
+\endhead
+Implementacion de metricas de calidad & 20\% & 3 metricas propias en codigo, distintas de SonarQube, mas 2 o mas metricas SonarCloud con interpretacion, impacto y acciones. & \texttt{document-risk}, \texttt{operational-completeness} y \texttt{alert-criticality} en \path{apps/web/src/utils/qualityMetrics.js}; pruebas en \path{qualityMetrics.test.js}; SonarCloud en \texttt{main}. & \path{evidencias/17_metricas_calidad_app.png}; \path{evidencias/03_sonarcloud_coverage_main.png}. & \estadoOk & Las metricas dependen de los datos de la cuenta activa; una cuenta vacia puede mostrar 0\% o sin datos evaluables. & Se documentan formula, fuente, resultado, interpretacion, impacto y correccion por metrica propia; se separan de Coverage, Duplicidad y Seguridad. & No aplica; captura centralizada. \\
+Despliegue y configuracion & 20\% & Dockerfile, Docker Compose, build, pruebas, publicacion versionada, despliegue Compose, red Docker y reproduccion documentada. & \texttt{Dockerfile}, \path{apps/web/Dockerfile}, \path{docker-compose.yml}, \path{docker-compose.prod.yml}, \texttt{make build}, \texttt{make up}, healthchecks y red \texttt{drivecontrol-net}. & \path{evidencias/08_make_build.png}; \path{evidencias/09_make_up.png}; \path{evidencias/11_docker_compose_ps.png}; \path{evidencias/12_docker_network_inspect.png}. & \estadoOk & DockerHub depende de secrets y de ejecuciones condicionadas; si no se muestra run verde, se debe explicar el alcance. & Se deja procedimiento reproducible, variables solo por nombre, red y limpieza con \texttt{docker compose down}. & Captura actualizada de DockerHub/run si cambia la publicacion. \\
+Pruebas unitarias & 20\% & Coverage mayor a 80\% evidenciado en SonarQube, pruebas criticas y ejecucion automatica en push/PR. & Vitest frontend con LCOV, backend con \texttt{node --test}, workflow \path{sonarcloud.yml}; captura SonarCloud de \texttt{main} con 93.1\% coverage. & \path{evidencias/03_sonarcloud_coverage_main.png}; \path{evidencias/05_frontend_tests_ok.png}; \path{evidencias/07_backend_tests_ok.png}. & \estadoOk & Backend se valida con tests Node, pero no esta dentro de \texttt{sonar.sources}; se explica el alcance frontend de SonarCloud. & Se conectan pruebas locales, LCOV, pipeline y SonarCloud; si coverage baja, se priorizan ramas criticas y adaptadores. & Captura de Measures si se requiere desglose por archivo. \\
+Integracion servicio SMS & 10\% & Integracion funcional y comprobable con proveedor SMS, con evidencia de envio o recepcion exitosa. & Servicio Twilio en \path{backend/services/smsService.js}, OTP en backend, variables por nombre, pruebas mockeadas y capturas academicas controladas. & \path{evidencias/18_sms_app_verificacion.png}; \path{evidencias/19_sms_twilio_recibido.png}. & \estadoOk & Las capturas pueden contener datos sensibles; no se transcriben valores en texto ni se muestra \texttt{.env}. & Se documenta proveedor, flujo OTP, pruebas, manejo de credenciales y conservacion academica de \path{apps/web/.env}. & Version censurada solo si el PDF se publica fuera del contexto academico. \\
+Metodologias agiles y postmortem & 30\% & Milestones finalizados, HU trazables, HU por sprint, promedio HU/sprint, commits por sprint, participacion, PRs, ramas y postmortem profundo. & \path{docs/Agile/reporte_final_sprints.md}: 13 sprints, 88 HU, 375 issues, 405 commits, promedio 6.7 HU/sprint; M1-M4 cerrados; PR \#623 y \#625 mergeados. Git local: 698 commits en todas las ramas. & Milestones cerrados, tablero Project, contributors, issues \#618--\#622 y PRs finales. & \estadoOk & Issues/PRs/reviews por integrante requieren export completo con GitHub CLI; aliases de Git se normalizan. & Se enfoca el semestre completo y PRs finales quedan como cierre tecnico, no como unico eje agil. & Reviews por integrante si el profesor exige desglose adicional. \\
+\bottomrule
+\end{longtable}
+\endgroup
+\end{landscape}
+
+\section{Metodologia agil del semestre}
+
+La gestion agil se documenta como un proceso de semestre, no como una lista de actividades del Sprint 13. La fuente principal es \path{docs/Agile/reporte_final_sprints.md}, complementada con los postmortems de \path{docs/Agile/evidencias_finales/} y con las capturas de milestones e Insights incluidas en este informe.
+
+\subsection{Scrum academico, roles y Definition of Done}
+
+El equipo trabajo con Scrum academico apoyado por GitHub Issues, milestones, ramas de trabajo, Pull Requests y evidencias por entrega. El flujo defendible fue: planeacion de sprint, division de HU en issues, desarrollo en rama, validacion local, PR, checks automatizados, merge y postmortem.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{4cm}P{3.2cm}Y}
+\toprule
+\textbf{Integrante} & \textbf{Rol} & \textbf{Responsabilidad defendible} \\
+\midrule
+Sebastian Ramirez Maldonado & Scrum Master & Seguimiento de sprints, cierre de evidencia, trazabilidad final y coordinacion de bloqueos. \\
+Sebastian Vargas & Product Owner / Sprint Planner & Priorizacion, planeacion de historias y consolidacion del backlog. \\
+Samuel Freile & Configuration Manager & Configuracion, variables de entorno, consistencia de entorno y soporte de integracion. \\
+Solon Losada & DevOps Engineer & Docker, red, pipelines, publicacion de imagenes y automatizacion de despliegue. \\
+Sebastian Rodriguez Ramirez & QA Lead & Pruebas, coverage, SonarCloud, revision de calidad y evidencias de QA. \\
+\bottomrule
+\end{tabularx}
+\caption{Roles Scrum y responsabilidades principales del semestre.}
+\end{table}
+
+El Definition of Done usado para defender la entrega exige que una HU cierre con codigo integrado, validacion local o pipeline, evidencia funcional cuando aplique, actualizacion documental y trazabilidad issue--commit--PR. Esta regla explica por que las metricas, Docker, SMS y SonarCloud aparecen vinculados a issues y PRs, no solo a capturas aisladas.
+
+\subsection{Planificacion por sprints y milestones}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{2cm}Y P{2.4cm}P{2.2cm}}
+\toprule
+\textbf{Milestone} & \textbf{Enfoque} & \textbf{Progreso} & \textbf{Estado} \\
+\midrule
+M1 & Base funcional: repositorio, autenticacion inicial, frontend/backend y convenciones de trabajo. & 100\% & Finalizado \\
+M2 & Gestion basica de flota, CRUD, rutas, datos y primeros patrones de arquitectura. & 100\% & Finalizado \\
+M3 & Gestion documental, monitoreo, validaciones, reportes y madurez de QA. & 100\% & Finalizado \\
+M4 & Dashboard, alertas, SonarCloud, Docker, SMS, CI/CD y cierre de evidencia. & 100\% & Finalizado \\
+\bottomrule
+\end{tabularx}
+\caption{Milestones del semestre segun la documentacion agil principal.}
+\end{table}
+
+El reporte final registra 13 sprints, 88 historias de usuario cerradas, 375 issues y 405 commits, con promedio de 6.7 HU por sprint. Estas cifras permiten evidenciar continuidad de trabajo, capacidad incremental y cierre metodologico; no sustituyen las capturas de GitHub, por lo que se anexan o reservan espacios visuales para tablero, issues y PRs.
+
+\insertfitfigure[0.68]{evidencias/25_agile_milestones_semestre.png}
+\begin{center}
+\textit{Evidencia de milestones cerrados en GitHub.}
+\end{center}
+
+\insertfitfigure[0.70]{evidencias/26_agile_project_board.png}
+\begin{center}
+\textit{Tablero GitHub Projects del semestre: columnas de flujo, issues por estado y distribucion por integrantes. Soporta metodologia agil y trazabilidad de trabajo continuo.}
+\end{center}
+
+\subsection{Metricas agiles del semestre}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{3.4cm}P{3cm}Y}
+\toprule
+\textbf{Indicador} & \textbf{Resultado documentado} & \textbf{Interpretacion} \\
+\midrule
+Sprints ejecutados & 13 & Muestra seguimiento regular durante el semestre y no solo cierre final. \\
+HU cerradas & 88 & Evidencia division del alcance en unidades verificables. \\
+Issues registradas & 375 & Refuerza trazabilidad fina entre backlog, tareas tecnicas y evidencia. \\
+Commits registrados & 405 & Indica continuidad tecnica; para participacion individual deben normalizarse aliases de Git. \\
+Promedio HU/sprint & 6.7 & Permite interpretar capacidad historica y balance de carga por iteracion. \\
+\bottomrule
+\end{tabularx}
+\caption{Metricas agiles consolidadas desde el reporte final de sprints.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabularx}{\linewidth}{P{1.8cm}P{1.6cm}P{1.7cm}P{1.9cm}Y}
+\toprule
+\textbf{Sprint} & \textbf{HU cerradas} & \textbf{Issues} & \textbf{Commits} & \textbf{Lectura para la rubrica} \\
+\midrule
+Sprint 1 & 5 & 44 & 20 & Inicio de base funcional y convenciones del equipo. \\
+Sprint 2 & 2 & 12 & 7 & Ajuste de alcance y estabilizacion temprana. \\
+Sprint 3 & 12 & 31 & 20 & Incremento de funcionalidades y tareas tecnicas. \\
+Sprint 4 & 18 & 57 & 38 & Mayor volumen de HU cerradas del semestre. \\
+Sprint 5 & 6 & 33 & 22 & Continuidad de desarrollo con backlog acotado. \\
+Sprint 6 & 6 & 30 & 17 & Avance incremental estable. \\
+Sprint 7 & 4 & 28 & 10 & Sprint de menor carga funcional documentada. \\
+Sprint 8 & 5 & 42 & 55 & Aumento fuerte de commits por integracion tecnica. \\
+Sprint 9 & 7 & 31 & 54 & Consolidacion de modulos y QA. \\
+Sprint 10 & 5 & 26 & 15 & Cierre de tareas puntuales y ajustes. \\
+Sprint 11 & 5 & 23 & 41 & Fortalecimiento tecnico previo al cierre. \\
+Sprint 12 & 6 & 10 & 47 & Preparacion de entrega final. \\
+Sprint 13 & 7 & 8 & 59 & Cierre tecnico, evidencia, Docker, SonarCloud, SMS y PRs finales. \\
+\bottomrule
+\end{tabularx}
+\caption{HU, issues y commits por sprint segun el reporte final de sprints.}
+\end{table}
+
+El conteo oficial del reporte agil registra 405 commits asociados al seguimiento del semestre. Como contraste tecnico, git local sobre todas las ramas muestra 698 commits; esta diferencia se explica por merges, ramas remotas, commits de integracion y criterios distintos de corte. Para no inflar artificialmente la metodologia, el informe usa 405 como cifra agil y 698 solo como referencia de auditoria tecnica.
+
+\insertfitfigure[0.70]{evidencias/27_github_contributors_semestre.png}
+\begin{center}
+\textit{Evidencia de contribucion del equipo en GitHub Insights.}
+\end{center}
+
+La participacion del equipo debe explicarse con commits, issues, PRs, revisiones, QA, documentacion y responsabilidades de rol. Los conteos por autor requieren cuidado porque Git puede mostrar alias, correos institucionales y correos personales para la misma persona.
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabularx}{\linewidth}{P{3cm}P{2cm}P{2.3cm}P{2.3cm}Y}
+\toprule
+\textbf{Integrante normalizado} & \textbf{Commits} & \textbf{Lineas agregadas} & \textbf{Lineas eliminadas} & \textbf{Interpretacion de participacion} \\
+\midrule
+Sarm-m & 237 & 51667 & 15287 & Alta participacion en cierre, documentacion tecnica, integracion y evidencia. \\
+samuelfl680 & 162 & 9269 & 2351 & Participacion fuerte en configuracion, backend y soporte tecnico. \\
+juanvargax / juansebastianvd & 114 & 15472 & 1607 & Participacion en producto, funcionalidades y planeacion; se agrupan aliases asociados al mismo frente de trabajo. \\
+solonlosada2006 & 109 & 10850 & 1567 & Participacion visible en DevOps, Docker, pipelines y despliegue. \\
+juserora & 51 & 3393 & 341 & Participacion en QA, pruebas, reportes y validacion. \\
+\bottomrule
+\end{tabularx}
+\caption{Distribucion tecnica por integrante desde git local con aliases normalizados.}
+\end{table}
+
+\insertfitfigure[0.62]{evidencias/28_github_commits_por_integrante.png}
+\begin{center}
+\textit{Evidencia visual de commits por integrante. Complementa la lectura Scrum porque muestra participacion tecnica y necesidad de normalizar aliases de Git antes de interpretar contribucion individual.}
+\end{center}
+
+\subsection{Metricas agiles detalladas pendientes de exportacion}
+
+El conector de GitHub permite validar el acceso al repositorio, pero el entorno local no tiene GitHub CLI disponible para exportar todos los listados paginados. Por eso no se inventan conteos de issues, PRs o reviews por integrante. Los datos limpios que si se calcularon desde git local quedan en \path{anexos/commits_por_autor.txt} y \path{anexos/lineas_por_autor_resumen.tsv}. Los archivos \path{anexos/issues.json}, \path{anexos/pull_requests.json} y \path{anexos/milestones.json} deben regenerarse con \texttt{gh} autenticado si el profesor solicita el desglose fino.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{3.6cm}P{3cm}Y}
+\toprule
+\textbf{Metrica fina} & \textbf{Estado} & \textbf{Como se completaria sin inventar} \\
+\midrule
+Issues por integrante & Pendiente de export completo & Exportar \path{anexos/issues.json} con GitHub CLI y agrupar por \texttt{assignees}. \\
+Issues cerradas por integrante & Pendiente de export completo & Filtrar issues con \texttt{state=closed} y agrupar por responsable normalizado. \\
+PRs por integrante & Pendiente de export completo & Exportar \path{anexos/pull_requests.json} y agrupar por \texttt{author.login}. \\
+PRs mergeadas & Parcial por conector GitHub & Confirmar lista completa con \texttt{gh pr list --state all --limit 1000}. \\
+Reviews por integrante & Pendiente GraphQL o GitHub CLI & Exportar reviews por PR y agrupar por autor de revision. \\
+Lineas por integrante & Calculado desde git local & Usar \path{anexos/lineas_por_autor_resumen.tsv} y normalizar aliases. \\
+\bottomrule
+\end{tabularx}
+\caption{Matriz de metricas agiles finas: datos calculables y pendientes declarados.}
+\end{table}
+
+\pendiente{Agregar captura \path{evidencias/33_github_issues_por_integrante.png} cuando se exporten issues por responsable desde GitHub.}
+\insertplaceholderfigure[0.82]{evidencias/33_github_issues_por_integrante.png}
+
+\pendiente{Agregar captura \path{evidencias/34_github_commits_por_integrante.png} si se genera una vista actualizada desde GitHub Insights o desde el anexo de commits.}
+\insertplaceholderfigure[0.82]{evidencias/34_github_commits_por_integrante.png}
+
+\pendiente{Agregar captura \path{evidencias/35_github_lineas_codigo_por_integrante.png} con el resumen de lineas agregadas/eliminadas por alias normalizado.}
+\insertplaceholderfigure[0.82]{evidencias/35_github_lineas_codigo_por_integrante.png}
+
+\pendiente{Agregar captura \path{evidencias/36_github_prs_por_integrante.png} al exportar PRs por autor y estado.}
+\insertplaceholderfigure[0.82]{evidencias/36_github_prs_por_integrante.png}
+
+\pendiente{Agregar captura \path{evidencias/37_github_reviews_por_integrante.png} solo si se exportan reviews reales; no se debe completar manualmente sin fuente.}
+\insertplaceholderfigure[0.82]{evidencias/37_github_reviews_por_integrante.png}
+
+\subsection{Trazabilidad agil y cierre tecnico}
+
+Los PRs \#623 y \#625 corresponden al cierre tecnico final: \#623 integro \texttt{feature-sarm-m} hacia \texttt{develop}, y \#625 integro \texttt{develop} hacia \texttt{main}. En metodologia agil se usan como evidencia de integracion y cierre, pero no reemplazan la evidencia del semestre completo.
+
+\insertplaceholderfigure[0.84]{evidencias/21_github_issues_sprint13.png}
+\begin{center}
+\textit{Issues \#618 a \#622 cerradas y trazables en el cierre tecnico.}
+\end{center}
+
+\insertplaceholderfigure[0.84]{evidencias/22_github_prs_finales.png}
+\begin{center}
+\textit{PR \#623 y PR \#625 como flujo \texttt{feature-sarm-m -> develop -> main}.}
+\end{center}
+
+\section{Metricas de calidad implementadas en el sistema}
+
+Las metricas propias estan implementadas como reglas de dominio en \path{apps/web/src/utils/qualityMetrics.js}. Son distintas de SonarCloud porque miden calidad funcional y riesgo operativo de la flota: documentos vencidos, completitud de registros y criticidad de alertas. SonarCloud analiza codigo fuente; no conoce si un SOAT esta vencido, si un conductor carece de telefono o si una alerta roja esta bloqueando la operacion.
+
+\insertplaceholderfigure[0.90]{evidencias/17_metricas_calidad_app.png}
+\begin{center}
+\textit{Figura: Metricas de calidad del sistema en la app: indice de riesgo documental, completitud de datos operativos e indice de criticidad de alertas.}
+\end{center}
+
+La captura muestra los resultados observados de las tres metricas propias en la cuenta usada para la validacion. Estas metricas son dinamicas: se calculan con los vehiculos, documentos, conductores y alertas registrados por el usuario activo. Por tanto, si se crea una cuenta nueva sin informacion operativa, los indicadores pueden aparecer en 0\% o como ``sin datos evaluables''. Eso no invalida la metrica; confirma que el calculo responde al estado real de la flota registrada. Para reproducir la evidencia se debe usar una cuenta con datos de prueba cargados o registrar vehiculos, documentos, conductores y alertas antes de validar.
+
+\subsection{Indice de riesgo documental}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{4cm}Y}
+\toprule
+\textbf{Campo} & \textbf{Detalle tecnico} \\
+\midrule
+Tipo & Metrica propia del sistema, no SonarCloud. \\
+Que mide & Proporcion de documentos evaluables vencidos o proximos a vencer. \\
+Fuente de datos & SOAT, RTM, licencias, documentos genericos y conductores con estado, fecha de vencimiento o dias restantes. \\
+Formula/logica & \texttt{(documentos vencidos + documentos proximos) / documentos evaluables * 100}. En codigo, estados rojo y amarillo cuentan como afectados. \\
+Resultado observado & 62\%; 23 de 37 documentos evaluables estan vencidos o proximos a vencer; estado critico. \\
+Interpretacion tecnica & Un valor superior al umbral rojo de 50\% indica concentracion alta de riesgo documental y requiere priorizacion inmediata. \\
+Impacto en DriveControl & Afecta cumplimiento legal, continuidad operativa, disponibilidad de vehiculos y confiabilidad de alertas preventivas. \\
+Impacto operativo en flota & La flota puede quedar inmovilizada, recibir sanciones o perder disponibilidad si se opera con documentos vencidos. \\
+Por que SonarCloud no la mide & SonarCloud no evalua vigencia legal ni datos de negocio; solo inspecciona codigo, duplicidad, seguridad, bugs y coverage. \\
+Accion de mejora & Renovar primero documentos vencidos, programar renovaciones proximas y crear seguimiento preventivo por fecha. \\
+Correccion si es critico & Bloquear o marcar vehiculos con documentos rojos, asignar responsable de renovacion y reejecutar la metrica hasta reducir el porcentaje bajo 50\%. \\
+\bottomrule
+\end{tabularx}
+\caption{Interpretacion del indice de riesgo documental.}
+\end{table}
+
+\subsection{Completitud de datos operativos}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{4cm}Y}
+\toprule
+\textbf{Campo} & \textbf{Detalle tecnico} \\
+\midrule
+Tipo & Metrica propia del sistema, no SonarCloud. \\
+Que mide & Porcentaje de registros de vehiculos, conductores y documentos que cumplen campos minimos obligatorios. \\
+Fuente de datos & Vehiculos, conductores, SOAT, RTM y documentos genericos capturados por el usuario. \\
+Formula/logica & \texttt{registros completos / registros evaluados * 100}. El codigo evalua grupos de campos requeridos por tipo de registro. \\
+Resultado observado & 56\%; 24 de 54 registros operativos tienen campos minimos pendientes; estado critico. \\
+Interpretacion tecnica & Un valor menor a 80\% esta en rojo porque reduce confiabilidad de reportes, alertas y decisiones. \\
+Impacto en DriveControl & Deteriora la trazabilidad y puede generar alertas incompletas o reportes con datos faltantes. \\
+Impacto operativo en flota & Un registro sin placa, identificador, telefono o fecha puede impedir contactar conductores, validar documentos o priorizar mantenimientos. \\
+Por que SonarCloud no la mide & SonarCloud no valida completitud semantica de registros de negocio ni calidad de datos operativos. \\
+Accion de mejora & Completar placas, identificadores, telefonos, fechas, polizas, certificados y campos obligatorios pendientes. \\
+Correccion si es critico & Agregar validaciones de formulario y tareas de depuracion de datos hasta subir la completitud al menos a 80\%, idealmente 100\%. \\
+\bottomrule
+\end{tabularx}
+\caption{Interpretacion de la completitud de datos operativos.}
+\end{table}
+
+\subsection{Indice de criticidad de alertas}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{4cm}Y}
+\toprule
+\textbf{Campo} & \textbf{Detalle tecnico} \\
+\midrule
+Tipo & Metrica propia del sistema, no SonarCloud. \\
+Que mide & Porcentaje de alertas criticas dentro del total de alertas activas. \\
+Fuente de datos & Alertas generadas por adaptadores de SOAT, RTM, licencias, vehiculos y reglas operativas. \\
+Formula/logica & \texttt{alertas criticas / alertas activas * 100}. El codigo normaliza estados como rojo, critico, vencido o danger. \\
+Resultado observado & 73\%; 27 de 37 alertas activas son criticas; estado critico. \\
+Interpretacion tecnica & Un valor de 30\% o mas es rojo; 73\% significa que la mayoria de alertas requiere accion inmediata. \\
+Impacto en DriveControl & Obliga a priorizar alertas rojas para proteger continuidad, cumplimiento y seguridad operativa. \\
+Impacto operativo en flota & Una alta concentracion de alertas criticas puede indicar documentos vencidos, fallas de mantenimiento o datos incompletos que afectan disponibilidad. \\
+Por que SonarCloud no la mide & SonarCloud no interpreta severidad operacional ni prioriza eventos activos de negocio. \\
+Accion de mejora & Atender primero alertas rojas, cerrar causas documentales u operativas y registrar causa raiz. \\
+Correccion si es critico & Crear cola de atencion por severidad, resolver alertas bloqueantes y medir nuevamente hasta bajar de 30\%. \\
+\bottomrule
+\end{tabularx}
+\caption{Interpretacion del indice de criticidad de alertas.}
+\end{table}
+
+Evidencia de implementacion:
+
+\begin{itemize}[leftmargin=*]
+\item Codigo: \path{apps/web/src/utils/qualityMetrics.js}
+\item Tests: \path{apps/web/src/__tests__/qualityMetrics.test.js}
+\item Generador reproducible: \path{apps/web/tools/generate-quality-evidence.mjs}
+\item Comando: \texttt{npm --prefix apps/web run quality:metrics}
+\end{itemize}
+
+\section{SonarCloud}
+
+SonarCloud complementa las metricas de dominio con analisis estatico. La configuracion revisada usa \texttt{sonar.organization=puj-course}, \texttt{sonar.projectKey=puj-course\_FIS\_2610\_3517\_G4}, fuentes en \texttt{apps/web/src} y coverage importado desde \texttt{apps/web/coverage/lcov.info}.
+
+El plan actual de SonarCloud analiza oficialmente la rama \texttt{main}. Por eso, \texttt{develop} y \texttt{feature-sarm-m} pueden aparecer como ramas no analizadas o con visibilidad limitada, mientras que la evidencia oficial se toma desde \texttt{main}. El flujo usado fue \texttt{feature-sarm-m -> develop -> main}. No se completan valores que no aparecen visibles en una captura.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{3cm}P{3.4cm}P{2.5cm}Y}
+\toprule
+\textbf{Metrica} & \textbf{Que mide} & \textbf{Resultado observado} & \textbf{Interpretacion y accion de mejora} \\
+\midrule
+Quality Gate & Cumplimiento global de condiciones de calidad. & Passed. & Todas las condiciones configuradas pasan; si falla, no se debe integrar hasta corregir la condicion bloqueante. \\
+Coverage & Porcentaje de codigo medido ejecutado por pruebas. & 93.1\%. & Supera el umbral de excelencia de 80\%; si baja, agregar pruebas en ramas no cubiertas y revisar \path{lcov.info}. \\
+Duplications & Bloques duplicados detectados por analisis CPD. & 0.0\%. & Duplicidad nula o muy baja reduce deuda y bugs repetidos; si sube, extraer helpers o componentes compartidos. \\
+Security Rating & Riesgo de vulnerabilidades detectadas por reglas de seguridad. & A. & Rating A indica estado saludable visible; si baja, corregir vulnerabilidades antes de merge. \\
+Security Issues & Issues de seguridad abiertos. & 0. & Cero issues abiertos reduce exposicion; si aparecen, revisar sanitizacion, autenticacion y dependencias. \\
+Open Issues & Issues abiertos del analisis estatico general. & 52. & No invalida por si solo el Quality Gate, pero permite priorizar deuda tecnica; se deben revisar por severidad y costo. \\
+Security Hotspots & Puntos que requieren revision manual de seguridad. & Pendiente de captura completa. & Si aparecen hotspots sin revisar, evaluarlos y registrar decision antes de la entrega. \\
+Maintainability & Code smells y deuda tecnica estimada. & Pendiente si no aparece en captura. & Si la calificacion baja de A, refactorizar funciones complejas y code smells priorizados. \\
+Reliability & Bugs potenciales detectados por analisis estatico. & Pendiente si no aparece en captura. & Si aparecen bugs, corregirlos y agregar prueba de regresion. \\
+\bottomrule
+\end{tabularx}
+\caption{Metricas SonarCloud interpretadas con resultados visibles y pendientes declarados.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{3.3cm}Y P{4.6cm}}
+\toprule
+\textbf{Elemento Sonar} & \textbf{Uso en la defensa} & \textbf{Evidencia} \\
+\midrule
+Quality Gate & Demuestra que el analisis no quedo solo configurado, sino aprobado en el flujo de PR. & Captura de Quality Gate y checks del PR final. \\
+Coverage en \texttt{main} & Sustenta el criterio de pruebas y la importacion del reporte LCOV del frontend. & Captura de coverage en \texttt{main}. \\
+Duplicidad y seguridad & Sustentan dos metricas Sonar adicionales a coverage: duplicidad 0.0\%, Security Rating A y Security Issues 0. & Captura general de SonarCloud en \texttt{main}. \\
+Mantenibilidad y reliability & Deben explicarse si aparecen en el panel; si no aparecen, quedan como captura pendiente, no como valor inventado. & Placeholder o captura actualizada de Measures/Summary. \\
+\bottomrule
+\end{tabularx}
+\caption{Lectura de evidencia SonarCloud tomada de la rama \texttt{main}.}
+\end{table}
+
+\insertfitfigure[0.70]{evidencias/03_sonarcloud_coverage_main.png}
+\begin{center}
+\textit{Evidencia de coverage actualizado en SonarCloud para la rama \texttt{main}.}
+\end{center}
+
+\insertfitfigure[0.66]{evidencias/04_sonarcloud_metricas_generales.png}
+\begin{center}
+\textit{Evidencia de metricas generales de SonarCloud en \texttt{main}.}
+\end{center}
+
+\subsection{Evidencia complementaria pendiente de SonarCloud}
+
+Para una defensa 10/10, la captura principal de SonarCloud se puede complementar con una vista de \textit{Measures} o \textit{Summary} en la rama \texttt{main}. Esa vista debe mostrar, idealmente, Maintainability, Reliability, Security Hotspots, Code Smells, Bugs, Vulnerabilities, Coverage y Duplications. Si alguno de esos valores no aparece visible en la captura actual, queda como evidencia pendiente y no se presenta como resultado inventado.
+
+La lectura tecnica esperada es la siguiente: SonarCloud analiza oficialmente \texttt{main}; \texttt{develop} y \texttt{feature-sarm-m} pueden aparecer como no analizadas o con datos incompletos por limitacion del plan. Coverage superior a 80\% cumple el criterio Excelente de pruebas; duplicidad 0.0\% reduce riesgo de deuda repetida; Security Rating A y Security Issues 0 fortalecen el criterio de seguridad. Si aparece \textit{Open Issues}, se interpreta como backlog de analisis estatico a priorizar por severidad, no automaticamente como fallo critico si el Quality Gate esta aprobado.
+
+\pendiente{Guardar una captura complementaria en \path{evidencias/38_sonarcloud_measures_main.png} con las medidas detalladas de SonarCloud en \texttt{main}: Maintainability, Reliability, Security, Coverage y Duplications.}
+\insertplaceholderfigure[0.85]{evidencias/38_sonarcloud_measures_main.png}
+\begin{center}
+\textit{Pendiente: medidas detalladas de SonarCloud en \texttt{main}: Maintainability, Reliability, Security Hotspots, Code Smells, Bugs, Vulnerabilities, Coverage y Duplications.}
+\end{center}
+
+\section{Pruebas unitarias y coverage}
+
+\subsection{Alcance de pruebas}
+
+La rubrica exige coverage superior a 80\% evidenciado en SonarCloud y pruebas unitarias sobre componentes criticos. El proyecto cubre dos frentes: frontend con Vitest y reporte LCOV, y backend con \texttt{node --test} para el servicio SMS/Twilio. SonarCloud importa el LCOV del frontend desde \path{apps/web/coverage/lcov.info}; el backend se defiende con tests Node y evidencia de pipeline, porque no esta incluido en \texttt{sonar.sources}.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{4cm}Y P{3.2cm}}
+\toprule
+\textbf{Componente critico} & \textbf{Riesgo cubierto} & \textbf{Prueba/fuente} \\
+\midrule
+Metricas propias & Calculo incorrecto de riesgo, completitud o criticidad. & \path{qualityMetrics.test.js} \\
+Fechas y vencimientos & Clasificacion equivocada de documentos vencidos o proximos. & \path{dateUtils.test.js} \\
+Formatos colombianos & Placas, telefonos o documentos con formato invalido. & \path{colombiaFormats.test.js} \\
+Adaptadores de alertas & Alertas SOAT, RTM, licencia y vehiculo mal priorizadas. & \path{*AlertAdapter.test.js} \\
+Simulador RUNT & Flujo de consulta o respuesta simulada inconsistente. & \path{useRUNTSimulator.test.js} \\
+SMS/Twilio backend & Payload, errores, modo mock y logs con datos sensibles. & \path{backend/test/smsService.test.js} \\
+\bottomrule
+\end{tabularx}
+\caption{Componentes criticos cubiertos por pruebas unitarias.}
+\end{table}
+
+\subsection{Pruebas frontend}
+
+El frontend usa Vitest y cubre utilidades, formatos colombianos, validaciones de correo, adaptadores de alertas, reglas de fecha, metricas de calidad y simulacion RUNT. La validacion local documentada reporta 10 archivos de prueba, 126 tests exitosos y coverage local superior a 90\% en los indicadores principales.
+
+\begin{verbatim}
+npm --prefix apps/web ci
+npm --prefix apps/web run lint
+npm --prefix apps/web test
+npm --prefix apps/web run build
+\end{verbatim}
+
+\insertfitfigure[0.72]{evidencias/05_frontend_tests_ok.png}
+\begin{center}
+\textit{Ejecucion exitosa de pruebas frontend.}
+\end{center}
+
+\insertplaceholderfigure[0.82]{evidencias/06_frontend_build_ok.png}
+\begin{center}
+\textit{Build frontend exitoso.}
+\end{center}
+
+\subsection{Pruebas backend}
+
+El backend incluye pruebas sobre \path{backend/services/smsService.js}. Estas validan contrato tecnico con Twilio, envio de OTP, errores por variables faltantes, modo mock y logs sin imprimir credenciales reales. La evidencia versionada indica 10 pruebas SMS exitosas.
+
+\begin{verbatim}
+npm --prefix backend ci
+npm --prefix backend test
+\end{verbatim}
+
+\insertfitfigure[0.62]{evidencias/07_backend_tests_ok.png}
+\begin{center}
+\textit{Ejecucion exitosa de pruebas backend.}
+\end{center}
+
+\subsection{Coverage local y SonarCloud}
+
+El flujo esperado es: generar LCOV local con Vitest, subirlo en GitHub Actions y permitir que SonarCloud lo importe desde \path{apps/web/coverage/lcov.info}. Coverage superior a 80\% significa que la mayor parte del codigo medido fue ejecutada por pruebas automatizadas; no garantiza ausencia de defectos, pero reduce el riesgo de regresiones silenciosas en reglas criticas. Si el coverage baja, la accion tecnica es abrir el reporte HTML, priorizar archivos con menor cobertura, agregar pruebas con aserciones reales y repetir el analisis antes del merge.
+
+Por limitacion del plan actual, SonarCloud analiza oficialmente la rama \texttt{main}. Por eso el cierre se sustenta con el flujo \texttt{feature-sarm-m -> develop -> main} y con capturas posteriores al merge. Las ramas secundarias pueden tener visibilidad limitada en SonarCloud y no deben presentarse como evidencia oficial del criterio.
+
+\insertplaceholderfigure[0.86]{evidencias/02_pr_sonar_quality_gate.png}
+\begin{center}
+\textit{Quality Gate aprobado en PR de Sprint 13.}
+\end{center}
+
+\section{Docker, despliegue y red}
+
+\subsection{Arquitectura de contenedores}
+
+El proyecto define tres servicios principales en Docker Compose:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{2.7cm}P{3.4cm}Y}
+\toprule
+\textbf{Servicio} & \textbf{Acceso local} & \textbf{Responsabilidad y build} \\
+\midrule
+\texttt{frontend} & \texttt{localhost:3000} & Aplicacion React/Vite servida por Nginx y proxy \texttt{/api}; build desde \code{apps/web/Dockerfile}. \\
+\texttt{backend} & \texttt{localhost:5000} & API Node/Express, MongoDB, OTP y SMS; build desde el \texttt{Dockerfile} raiz. \\
+\texttt{mongodb} & \texttt{localhost:27017} & Base de datos local para Compose mediante imagen \texttt{mongo:7}. \\
+\bottomrule
+\end{tabularx}
+\caption{Servicios del despliegue local.}
+\end{table}
+
+El profesor puede clonar el repositorio y ejecutar:
+
+\begin{verbatim}
+make build
+make up
+make ps
+\end{verbatim}
+
+Por decision academica, \path{apps/web/.env} se conserva sin cambios para facilitar la validacion funcional del sistema. Este informe no muestra valores reales, no reemplaza credenciales y no elimina el archivo.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{P{4cm}Y}
+\toprule
+\textbf{Comando} & \textbf{Proposito en la entrega} \\
+\midrule
+\texttt{make build} & Construye las imagenes de frontend y backend usando la configuracion Compose. \\
+\texttt{make up} & Levanta MongoDB, backend y frontend en segundo plano, usando el archivo de entorno academico conservado. \\
+\texttt{docker compose ps} & Verifica que los servicios esperados esten arriba y saludables. \\
+\texttt{docker network inspect drivecontrol-net} & Comprueba que la red explicita exista y use la subnet \texttt{172.28.0.0/16}. \\
+\bottomrule
+\end{tabularx}
+\caption{Comandos de despliegue y validacion local.}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{4cm}Y}
+\toprule
+\textbf{Variable} & \textbf{Uso documentado, sin valores reales} \\
+\midrule
+\texttt{MONGO\_URI} / \texttt{DOCKER\_MONGO\_URI} & Conexion del backend a MongoDB; en Compose se usa el servicio \texttt{mongodb}. \\
+\texttt{JWT\_SECRET} & Firma de tokens del backend. \\
+\texttt{GOOGLE\_CLIENT\_ID} / \texttt{VITE\_GOOGLE\_CLIENT\_ID} & Autenticacion Google en backend/frontend. \\
+\texttt{EMAIL\_*} & Configuracion de correo para OTP cuando aplica. \\
+\texttt{TWILIO\_ACCOUNT\_SID}, \texttt{TWILIO\_AUTH\_TOKEN}, \texttt{TWILIO\_PHONE\_NUMBER} & Integracion SMS con Twilio. \\
+\texttt{VITE\_API\_URL} & URL o proxy de API del frontend; en Docker se usa \texttt{/api}. \\
+\bottomrule
+\end{tabularx}
+\caption{Variables de entorno documentadas solo por nombre.}
+\end{table}
+
+\subsection{Red Docker}
+
+La red visible se define como \texttt{drivecontrol-net}, con driver \texttt{bridge} y subnet \texttt{172.28.0.0/16}. En \path{docker-compose.yml} la clave interna es \texttt{drivectrl-net}, pero el nombre inspeccionable por Docker es \texttt{drivecontrol-net}. Los contenedores se comunican por nombre de servicio, no por \texttt{localhost} interno.
+
+\insertplaceholderfigure[0.82]{evidencias/08_make_build.png}
+\begin{center}
+\textit{Salida exitosa de \texttt{make build}.}
+\end{center}
+
+\insertplaceholderfigure[0.82]{evidencias/09_make_up.png}
+\begin{center}
+\textit{Salida exitosa de \texttt{make up}.}
+\end{center}
+
+\insertfitfigure[0.72]{evidencias/10_docker_compose_config.png}
+\begin{center}
+\textit{Validacion de configuracion Docker Compose.}
+\end{center}
+
+\insertplaceholderfigure[0.95]{evidencias/11_docker_compose_ps.png}
+\begin{center}
+\textit{Servicios levantados con Docker Compose.}
+\end{center}
+
+\insertfitfigure[0.72]{evidencias/12_docker_network_inspect.png}
+\begin{center}
+\textit{Inspeccion de la red \texttt{drivecontrol-net}.}
+\end{center}
+
+\insertfitfigure[0.62]{evidencias/29_backend_health_db.png}
+\begin{center}
+\textit{Healthcheck del backend con base de datos disponible. Refuerza despliegue y configuracion porque evidencia que el servicio API no solo arranca, sino que se conecta correctamente con MongoDB dentro del entorno Docker.}
+\end{center}
+
+\insertfitfigure[0.58]{evidencias/30_frontend_http_200.png}
+\begin{center}
+\textit{Respuesta HTTP 200 del frontend. Soporta la defensa del despliegue al mostrar que la interfaz queda servida y accesible despues de levantar el stack.}
+\end{center}
+
+\insertfitfigure[0.58]{evidencias/31_frontend_proxy_api_health.png}
+\begin{center}
+\textit{Validacion del proxy del frontend hacia el endpoint de salud de la API. Demuestra networking entre servicios y configuracion correcta del proxy \texttt{/api}.}
+\end{center}
+
+Si existe conflicto con contenedores o redes previas, la accion documentada es apagar el stack con \texttt{docker compose down}. Si persiste un conflicto de volumen, puerto o red, usar \texttt{docker compose down -v}, liberar los puertos 3000, 5000 y 27017, y revisar que ninguna red externa use \texttt{172.28.0.0/16} antes de volver a levantar el proyecto.
+
+\section{CI/CD}
+
+\subsection{Workflows}
+
+La entrega identifica estos workflows principales:
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\linewidth}{P{3.2cm}P{3.2cm}Y}
+\toprule
+\textbf{Workflow} & \textbf{Activacion} & \textbf{Funcion principal} \\
+\midrule
+\texttt{ci\_verificacion.yml} & \texttt{push}, PR, manual & Instala frontend, ejecuta lint y pruebas. \\
+\texttt{sonarcloud.yml} & \texttt{push}, PR, manual & Genera coverage, metricas propias, build y analisis SonarCloud. \\
+\texttt{docker\_ci\_cd.yml} & Cambios Docker/app, manual & Valida frontend/backend, Compose, imagenes, healthchecks y publicacion condicionada. \\
+\texttt{cd\_entrega.yml} & \texttt{main}/\texttt{develop} & Construye frontend y deja artefacto descargable. \\
+HU454 auth CI/CD & \texttt{push}, PR, manual & Valida autenticacion y hooks externos opcionales. Archivo: \path{pipeline_hu454_auth_ci_cd.yml}. \\
+\bottomrule
+\end{tabularx}
+\caption{Workflows principales de CI/CD.}
+\end{table}
+
+Los jobs marcados como omitidos en algunos runs se interpretan como ejecuciones condicionadas: por ejemplo, publicacion o despliegue cuando faltan secrets, cuando el evento es PR o cuando la rama no corresponde. No deben presentarse como despliegue real si el job de publicacion no corrio en verde.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{3.5cm}Y P{4.2cm}}
+\toprule
+\textbf{Etapa CI/CD} & \textbf{Que valida} & \textbf{Evidencia esperada} \\
+\midrule
+Build y pruebas & Instala dependencias, ejecuta lint, audit, pruebas frontend/backend y build Vite. & Checks verdes en PR o GitHub Actions. \\
+SonarCloud & Genera LCOV, ejecuta metricas propias, build y scanner. & Quality Gate Passed y coverage en \texttt{main}. \\
+Docker build & Construye imagen backend desde \texttt{Dockerfile} e imagen frontend desde \path{apps/web/Dockerfile}. & Job \texttt{docker-validate} y logs de build. \\
+Publicacion DockerHub & Publica imagenes con tags por SHA, rama-run y rama-latest. & Capturas DockerHub tags o run \texttt{docker-publish}. \\
+Despliegue Compose & Descarga imagenes publicadas y levanta stack con \path{docker-compose.prod.yml}. & Job \texttt{docker-deploy}, healthchecks y \texttt{docker compose ps}. \\
+\bottomrule
+\end{tabularx}
+\caption{Secuencia defendible del pipeline CI/CD.}
+\end{table}
+
+\insertplaceholderfigure[0.84]{evidencias/01_pr_checks_aprobados.png}
+\begin{center}
+\textit{Checks aprobados en PR \#623.}
+\end{center}
+
+\insertplaceholderfigure[0.76]{evidencias/13_pr_develop_main_checks.png}
+\begin{center}
+\textit{Checks del PR \#625 hacia \texttt{main}.}
+\end{center}
+
+\insertfitfigure[0.74]{evidencias/14_github_actions_docker_validate.png}
+\begin{center}
+\textit{Evidencia complementaria de validacion Docker en GitHub Actions.}
+\end{center}
+
+\insertplaceholderfigure[0.84]{evidencias/15_dockerhub_tags_1.png}
+\begin{center}
+\textit{Evidencia complementaria de tags DockerHub.}
+\end{center}
+
+\insertplaceholderfigure[0.84]{evidencias/16_dockerhub_tags_2.png}
+\begin{center}
+\textit{Evidencia complementaria de tags DockerHub.}
+\end{center}
+
+\section{Integracion SMS / Twilio}
+
+\subsection{Problema inicial y causa}
+
+El error documentado fue: \textit{Servicio SMS no configurado: faltan \texttt{TWILIO\_ACCOUNT\_SID}, \texttt{TWILIO\_AUTH\_TOKEN} o \texttt{TWILIO\_PHONE\_NUMBER}}. La causa fue que las variables necesarias se conservaban en \texttt{apps/web/.env}, mientras el backend no siempre las cargaba desde ese archivo en ejecucion local o Compose.
+
+\subsection{Solucion}
+
+El backend integra Twilio REST API en \path{backend/services/smsService.js}. El flujo permite OTP por SMS, maneja errores y registra informacion operativa enmascarada. Docker Compose carga \path{apps/web/.env} para el backend mediante \texttt{env\_file}, sin imprimir valores reales.
+
+Flujo funcional defendible:
+
+\begin{enumerate}[leftmargin=*]
+\item El usuario solicita registro o recuperacion y selecciona verificacion por SMS.
+\item El backend genera un codigo OTP con expiracion y limite de intentos.
+\item El servicio SMS construye la solicitud a Twilio con autenticacion segura desde variables de entorno.
+\item Twilio responde con estado de envio o error controlado.
+\item El backend registra informacion operativa sin imprimir token, SID completo, telefono completo ni codigo OTP en logs publicos.
+\end{enumerate}
+
+Variables requeridas, sin valores reales:
+
+\begin{verbatim}
+TWILIO_ACCOUNT_SID
+TWILIO_AUTH_TOKEN
+TWILIO_PHONE_NUMBER
+OTP_EXPIRACION_MINUTOS
+OTP_MAX_INTENTOS
+OTP_COOLDOWN_SEGUNDOS
+\end{verbatim}
+
+Para pruebas academicas seguras tambien existe modo mock:
+
+\begin{verbatim}
+SMS_PROVIDER=mock
+SMS_MOCK_ENABLED=true
+\end{verbatim}
+
+\insertplaceholderfigure[0.72]{evidencias/18_sms_app_verificacion.png}
+\begin{center}
+\textit{Evidencia academica controlada: verificacion SMS desde la aplicacion.}
+\end{center}
+
+\insertfitfigure[0.58]{evidencias/19_sms_twilio_recibido.png}
+\begin{center}
+\textit{Evidencia academica controlada: recepcion o registro exitoso en Twilio.}
+\end{center}
+
+Estas capturas se usan como evidencia academica controlada. El informe no transcribe telefonos, codigos OTP, SID, tokens, correos ni valores de credenciales; tampoco muestra el contenido de \path{apps/web/.env}. Si el PDF se publica fuera del contexto de evaluacion, se recomienda generar una copia censurada de las mismas capturas. El archivo \path{apps/web/.env} se conserva por decision academica para validacion del profesor; en produccion real estos valores se cargarian desde GitHub Secrets, secretos del entorno o un gestor de secretos.
+
+\section{Trazabilidad tecnica}
+
+La trazabilidad tecnica conecta la HU padre, sub-issues, commits, PRs y evidencias capturadas. Los PRs \#623 y \#625 se usan aqui como evidencia de cierre e integracion final, no como resumen completo de la metodologia agil del semestre.
+
+\insertfitfigure[0.70]{evidencias/20_issue_618_hu_entrega_tecnica.png}
+\begin{center}
+\textit{Historia de usuario padre \#618 para la entrega tecnica final.}
+\end{center}
+
+\begin{landscape}
+\begingroup
+\footnotesize
+\setlength{\tabcolsep}{2pt}
+\begin{longtable}{P{1.3cm}P{4.1cm}P{7.1cm}P{2.2cm}P{4.8cm}P{1.7cm}}
+\toprule
+\textbf{Issue} & \textbf{Descripcion} & \textbf{Commit} & \textbf{PR} & \textbf{Evidencia} & \textbf{Estado} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Issue} & \textbf{Descripcion} & \textbf{Commit} & \textbf{PR} & \textbf{Evidencia} & \textbf{Estado} \\
+\midrule
+\endhead
+\#618 & HU padre de entrega tecnica final. & Cierre por PR mergeado y sub-issues trazadas. & \#623, \#625 & Issue padre, PRs finales y paquete de entrega. & Cerrada \\
+\#619 & Metricas, SonarCloud y coverage. & \texttt{24afa71} test(coverage): consolidar pruebas y metricas de calidad. Closes \#619. & \#623, \#625 & Capturas SonarCloud, pruebas frontend y coverage. & Cerrada \\
+\#620 & Docker Compose, red Docker y despliegue local. & \texttt{c1fd64b} chore(docker): configurar red explicita para despliegue local. Closes \#620. & \#623, \#625 & Compose config, ps y network inspect. & Cerrada \\
+\#621 & CI/CD, DockerHub y workflows. & \texttt{f6a9062} docs(cicd): documentar flujo de integracion y despliegue continuo. Closes \#621. & \#623, \#625 & Checks PR, Actions y tags DockerHub. & Cerrada \\
+\#622 & SMS, seguridad y paquete final de evidencia. & \texttt{f0e90b2} docs(evaluation): consolidar paquete final de evidencia tecnica. Closes \#622. \newline \texttt{735c1fa} fix(sms): corregir configuracion de verificacion por mensajeria. Closes \#622. & \#623, \#625 & SMS app, Twilio y documentacion final. & Cerrada \\
+\bottomrule
+\end{longtable}
+\endgroup
+\end{landscape}
+
+El flujo final de integracion fue \texttt{feature-sarm-m -> develop -> main}: PR \#623 integro la rama de cierre hacia \texttt{develop}, y PR \#625 llevo \texttt{develop} a \texttt{main}.
+
+\insertplaceholderfigure[0.82]{evidencias/23_pr_sin_conflictos_develop.png}
+\begin{center}
+\textit{PR \#623 sin conflictos con \texttt{develop}.}
+\end{center}
+
+\insertplaceholderfigure[0.82]{evidencias/24_pr_issues_relacionadas.png}
+\begin{center}
+\textit{Issues relacionadas en PR \#623.}
+\end{center}
+
+\section{Postmortem}
+
+\subsection{Que salio bien}
+
+\begin{itemize}[leftmargin=*]
+\item La base funcional permitio cerrar el sistema con frontend, backend, MongoDB, Docker y CI/CD.
+\item Las metricas propias quedaron implementadas, testeadas y documentadas.
+\item Las pruebas frontend/backend validan reglas criticas y el servicio SMS sin exponer credenciales.
+\item La trazabilidad final conecta issues, commits, PRs y evidencias.
+\item Docker Compose facilita reproducibilidad para el evaluador mediante \texttt{make build} y \texttt{make up}.
+\end{itemize}
+
+\subsection{Que salio mal y causas raiz}
+
+\begin{landscape}
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabularx}{\linewidth}{P{2.8cm}P{3.3cm}P{3.2cm}P{2.5cm}P{3.4cm}P{3.4cm}P{2.5cm}}
+\toprule
+\textbf{Problema} & \textbf{Causa raiz tecnica} & \textbf{Causa raiz de proceso} & \textbf{Impacto} & \textbf{Accion correctiva} & \textbf{Accion preventiva} & \textbf{Rol responsable} \\
+\midrule
+Evidencia externa incompleta en fases previas. & Capturas de SonarCloud, DockerHub, Twilio y tablero no siempre quedaron versionadas al momento del cierre. & La recoleccion de evidencia se dejo parcialmente para el final de sprint. & Riesgo de defensa parcial aunque el sistema funcione. & Normalizar nombres, rutas y placeholders en el informe final. & Checklist de evidencia por HU antes de cerrar issue. & Scrum Master / QA Lead \\
+Gestion tardia de variables de entorno. & Backend no siempre cargaba variables Twilio desde el archivo usado por Compose. & La politica de secretos y archivos de entorno no se formalizo desde el primer sprint. & Riesgo de configuracion, seguridad y retrasos de validacion. & Documentar variables solo por nombre y conservar \path{apps/web/.env} para validacion academica. & Usar secrets de CI/CD y gestor de secretos en despliegues reales. & Configuration Manager \\
+Coverage y Quality Gate bajo presion. & Codigo nuevo podia entrar sin pruebas suficientes en ramas criticas. & El DoD no exigia evidencia de coverage local desde el inicio. & Riesgo de regresiones y bloqueo por SonarCloud. & Ejecutar pruebas con coverage y corregir fallos antes del merge. & Hacer coverage parte obligatoria de cada PR. & QA Lead \\
+Datos GitHub con aliases. & Git registra autores con correos y nombres diferentes. & No se normalizo identidad de autores durante el semestre. & Conteos individuales pueden ser injustos o confusos. & Presentar tabla normalizada y declarar pendientes no exportados. & Acordar identidad Git desde el Sprint 1. & Scrum Master \\
+Backend fuera del alcance Sonar actual. & \texttt{sonar.sources} esta centrado en \path{apps/web/src}. & Se priorizo coverage frontend por tiempo y configuracion. & Requiere explicar que backend se valida con \texttt{node --test}. & Defender backend con pruebas Node y captura terminal. & Agregar coverage backend y configuracion Sonar ampliada. & QA Lead / DevOps \\
+Metricas operativas criticas. & La app reporta 62\% riesgo documental, 56\% completitud y 73\% criticidad de alertas. & La calidad de datos y documentos no se resolvio completamente antes del cierre. & Riesgo operativo en cumplimiento, continuidad y priorizacion de flota. & Priorizar renovaciones, completar registros y cerrar alertas rojas. & Crear tablero semanal de saneamiento de datos y alertas. & Product Owner / QA Lead \\
+\bottomrule
+\end{tabularx}
+\caption{Postmortem consolidado: causas raiz, impacto, acciones y responsables.}
+\end{table}
+\end{landscape}
+
+
+
+\section{Conclusiones}
+
+La entrega final centraliza la evidencia principal de la rubrica y permite defender el sistema desde tres frentes: funcionamiento tecnico, calidad verificable y proceso agil. DriveControl / AutoMinder Enterprise cuenta con frontend, backend, Docker Compose, MongoDB, pruebas, SonarCloud, CI/CD y SMS/Twilio documentados.
+
+Las principales limitaciones no estan en la existencia del codigo, sino en la completitud y manejo responsable de evidencia externa. Las metricas propias atacan calidad de negocio que SonarCloud no mide; SonarCloud complementa con coverage, duplicidad y seguridad; Docker/CI/CD permiten reproducibilidad; y Scrum se sustenta con datos de todo el semestre. El equipo decidio no presentar tag o release final; el control de versiones se sustenta con PRs, issues, commits y merges trazables. Las capturas SMS/Twilio se usan como evidencia academica controlada y no se transcriben valores sensibles.
+
+\section{Referencias}
+
+\begin{thebibliography}{9}
+\bibitem{repo} Repositorio GitHub: \url{https://github.com/puj-course/FIS_2610_3517_G4}
+\bibitem{pr623} Pull Request \#623: \url{https://github.com/puj-course/FIS_2610_3517_G4/pull/623}
+\bibitem{pr625} Pull Request \#625: \url{https://github.com/puj-course/FIS_2610_3517_G4/pull/625}
+\bibitem{issue618} Issue \#618: \url{https://github.com/puj-course/FIS_2610_3517_G4/issues/618}
+\bibitem{docker} Docker Compose: \url{https://docs.docker.com/compose/}
+\bibitem{twilio} Twilio SMS API: \url{https://www.twilio.com/docs/sms}
+\bibitem{scrum} Scrum Guide: \url{https://scrumguides.org/}
+\bibitem{sonar} SonarCloud: \url{https://docs.sonarsource.com/sonarcloud/}
+\end{thebibliography}
+
+\section{Anexos}
+
+\subsection{Evidencias usadas}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\linewidth}{P{3.2cm}Y}
+\toprule
+\textbf{Categoria} & \textbf{Archivos usados} \\
+\midrule
+SonarCloud & Capturas centralizadas de coverage y metricas generales en \path{evidencias/03_sonarcloud_coverage_main.png} y \path{evidencias/04_sonarcloud_metricas_generales.png}. \\
+PRs y CI & Capturas de Quality Gate, checks de PR y validacion de GitHub Actions. \\
+Pruebas & Capturas de tests frontend, build frontend y tests backend. \\
+Docker & Capturas de Compose config, \texttt{make build}, \texttt{make up}, Compose ps, network inspect, DockerHub y Actions. \\
+SMS/Twilio & Capturas academicas controladas en \path{evidencias/18_sms_app_verificacion.png} y \path{evidencias/19_sms_twilio_recibido.png}; no transcribir telefono, OTP, SID, token o correo. \\
+Agile/Scrum & Capturas \path{evidencias/25_agile_milestones_semestre.png} y \path{evidencias/27_github_contributors_semestre.png}. \\
+Arquitectura & Diagrama de base de datos centralizado en \path{evidencias/32_diagrama_base_datos.png}. \\
+Metricas agiles finas & Placeholders \path{evidencias/33_github_issues_por_integrante.png} a \path{evidencias/37_github_reviews_por_integrante.png}; se completan solo con export real. \\
+SonarCloud complementario & Placeholder \path{evidencias/38_sonarcloud_measures_main.png} para vista Measures/Summary de \texttt{main}. \\
+\bottomrule
+\end{tabularx}
+\caption{Resumen de evidencias anexadas al informe.}
+\end{table}
+
+\subsection{Evidencia complementaria de arquitectura}
+
+\insertfitfigure[0.72]{evidencias/32_diagrama_base_datos.png}
+\begin{center}
+\textit{Diagrama de base de datos del sistema. No reemplaza los criterios de la rubrica, pero ayuda a explicar la estructura de datos que alimenta vehiculos, conductores, documentos, alertas y metricas propias.}
+\end{center}
+
+\subsection{Comandos de validacion}
+
+\begin{verbatim}
+npm --prefix apps/web test
+npm --prefix backend test
+make build
+make up
+docker compose ps
+docker network inspect drivecontrol-net
+\end{verbatim}
+
+\subsection{Commit sugerido}
+
+\begin{verbatim}
+docs(report): limpiar entrega final y reforzar evidencia de rubrica.
+Closes #618.
+\end{verbatim}
+
+\end{document}
