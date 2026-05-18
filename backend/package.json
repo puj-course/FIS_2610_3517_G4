@@ -7,7 +7,8 @@
     "prestart": "node scripts/ensure-env.js",
     "doctor:auth": "node scripts/auth-doctor.js",
     "doctor:auth:ci": "node scripts/auth-doctor.js --ci --no-connect --env-file=.env.example",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
     "start:checked": "node scripts/auth-doctor.js && node server.js",
     "start": "node server.js"
   },
@@ -31,6 +32,7 @@
     "nodemailer": "^7.0.13"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^3.1.14"
   }
 }
