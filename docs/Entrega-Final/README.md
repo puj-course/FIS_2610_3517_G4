@@ -71,8 +71,31 @@ cd docs/Entrega-Final
 latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
+## Compilacion con Docker
+
+Esta opcion solo compila el informe LaTeX. No se mezcla con Docker Compose de la aplicacion.
+
+Desde la raiz del repositorio:
+
+```bash
+docker run --rm -it \
+  -v "$PWD/docs/Entrega-Final:/work" \
+  -w /work \
+  texlive/texlive:latest \
+  sh -lc "pdflatex -interaction=nonstopmode -halt-on-error main.tex && pdflatex -interaction=nonstopmode -halt-on-error main.tex"
+```
+
+Se ejecuta dos veces para actualizar correctamente la tabla de contenido.
+
+Docker Compose del sistema sigue siendo:
+
+```bash
+make build
+make up
+```
+
 ## Commit sugerido
 
 ```bash
-docs(report): completar informe final con evidencias de rubrica. Closes #618
+docs(report): mejorar legibilidad y estructura del informe final. Closes #618
 ```
