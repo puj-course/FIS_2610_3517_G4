@@ -43,9 +43,9 @@ DriveControl / AutoMinder Enterprise es una aplicacion academica de SYNTIX TECH 
 ```text
 apps/web/                   Frontend React + Vite.
 backend/                    API Node.js + Express.
-Docs/                       Documentacion academica, QA, Agile y arquitectura.
-Docs/QA/evidencias_finales/ Paquete final de sustentacion 5.0.
-Docs/Agile/evidencias_finales/ Evidencia agil y postmortem.
+docs/                       Documentacion academica, QA, Agile y arquitectura.
+docs/QA/evidencias_finales/ Paquete final de sustentacion 5.0.
+docs/Agile/evidencias_finales/ Evidencia agil y postmortem.
 Dockerfile                  Imagen backend.
 apps/web/Dockerfile         Imagen frontend con build Vite + Nginx.
 docker-compose.yml          Stack local: MongoDB, backend, frontend.
@@ -71,15 +71,14 @@ npm --prefix apps/web ci
 npm --prefix backend ci
 ```
 
-Configurar variables desde los archivos de ejemplo:
+Configurar variables desde los archivos de ejemplo cuando se trabaje en un entorno propio:
 
 ```bash
 cp .env.example .env
 cp backend/.env.example backend/.env
-cp apps/web/.env.example apps/web/.env
 ```
 
-Por requerimiento academico, el profesor puede recibir credenciales reales para reproducir la demo. Esas credenciales se entregan por anexo privado o se cargan como GitHub Secrets; no deben quedar publicadas en commits, issues, README ni capturas.
+No sobrescribir `apps/web/.env` durante la validacion academica: ese archivo se conserva en el repositorio por decision del equipo para que el profesor pueda ejecutar la entrega con `make build` y `make up`. Los README y el informe no muestran valores reales; en produccion real se usarian GitHub Secrets o variables protegidas.
 
 ## Ejecucion en desarrollo
 
@@ -120,6 +119,47 @@ Detener y limpiar:
 ```bash
 docker compose down -v
 ```
+
+## Entrega final — Evidencia de rubrica
+
+La entrega final del informe academico esta en:
+
+- `docs/Entrega-Final/main.tex`
+- `docs/Entrega-Final/README.md`
+- `docs/Entrega-Final/evidencias/`
+
+El informe cubre:
+
+- Metricas de calidad propias del sistema.
+- SonarCloud.
+- Pruebas unitarias y coverage.
+- Docker y despliegue reproducible.
+- CI/CD.
+- SMS/Twilio.
+- Metodologia agil y postmortem.
+- Trazabilidad issues -> commits -> PRs.
+
+Comandos principales de validacion:
+
+```bash
+npm --prefix apps/web test
+npm --prefix backend test
+make build
+make up
+docker compose ps
+docker network inspect drivecontrol-net
+```
+
+Ejecucion principal para el profesor:
+
+```bash
+make build
+make up
+```
+
+`apps/web/.env` se conserva por decision academica para validacion del profesor. No se deben publicar valores reales en documentacion ni capturas; en un entorno productivo real se usarian GitHub Secrets o variables protegidas.
+
+La guia completa para Overleaf, evidencias, capturas pendientes y metricas agiles esta en `docs/Entrega-Final/README.md`.
 
 ## Validacion desde imagenes publicadas
 
@@ -162,15 +202,15 @@ SonarCloud usa:
 
 ## Sustentacion final
 
-La evidencia final esta organizada en:
+La evidencia historica del proyecto tambien incluye:
 
-- [Indice de sustentacion 5.0](Docs/QA/evidencias_finales/00_indice_sustentacion_5.md)
-- [Metricas propias](Docs/QA/evidencias_finales/metricas/01_metricas_propias.md)
-- [SonarCloud](Docs/QA/evidencias_finales/sonar/02_sonarcloud.md)
-- [Pruebas y coverage](Docs/QA/evidencias_finales/pruebas/03_pruebas_unitarias_coverage.md)
-- [Docker y CI/CD](Docs/QA/evidencias_finales/docker/04_despliegue_docker_ci_cd.md)
-- [SMS Twilio](Docs/QA/evidencias_finales/sms/05_integracion_sms_twilio.md)
-- [Agil y postmortem](Docs/Agile/evidencias_finales/07_agil_postmortem_trazabilidad.md)
+- [Indice de sustentacion 5.0](docs/QA/evidencias_finales/00_indice_sustentacion_5.md)
+- [Metricas propias](docs/QA/evidencias_finales/metricas/01_metricas_propias.md)
+- [SonarCloud](docs/QA/evidencias_finales/sonar/02_sonarcloud.md)
+- [Pruebas y coverage](docs/QA/evidencias_finales/pruebas/03_pruebas_unitarias_coverage.md)
+- [Docker y CI/CD](docs/QA/evidencias_finales/docker/04_despliegue_docker_ci_cd.md)
+- [SMS Twilio](docs/QA/evidencias_finales/sms/05_integracion_sms_twilio.md)
+- [Agil y postmortem](docs/Agile/evidencias_finales/07_agil_postmortem_trazabilidad.md)
 
 Las carpetas `img/` estan reservadas para capturas verificables. No se deben inventar resultados ni reutilizar capturas desactualizadas.
 
