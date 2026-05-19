@@ -1,0 +1,2808 @@
+Sarm
+Sarm-m
+
+1	1	.gitignore
+54	14	README.md
+152	74	docs/Entrega-Final/README.md
+0	0	docs/Entrega-Final/{final-evaluation/agile/data => anexos}/README-gh-cli-required.md
+0	0	docs/Entrega-Final/{final-evaluation/agile/data => anexos}/authors.tsv
+0	0	docs/Entrega-Final/{final-evaluation/agile/data => anexos}/branches.txt
+24	0	docs/Entrega-Final/anexos/commits_por_autor.txt
+0	0	docs/Entrega-Final/{final-evaluation/agile/data => anexos}/github-export-status.json
+0	0	docs/Entrega-Final/{final-evaluation/agile/data => anexos}/issues.json
+10	0	docs/Entrega-Final/anexos/lineas_por_autor_resumen.tsv
+0	0	docs/Entrega-Final/{final-evaluation/agile/data => anexos}/metricas_scrum_generadas.md
+0	0	docs/Entrega-Final/{final-evaluation/agile/data => anexos}/milestones.json
+0	0	docs/Entrega-Final/{final-evaluation/agile/data => anexos}/pull_requests.json
+-	-	docs/Entrega-Final/evidencias/{sprint-13/01_pr_s13_quality_gate_checks_aprobados.png => 01_pr_checks_aprobados.png}
+-	-	docs/Entrega-Final/evidencias/{sprint-13/02_pr_s13_sonar_quality_gate_passed.png => 02_pr_sonar_quality_gate.png}
+-	-	docs/Entrega-Final/evidencias/{sonarcloud_main_coverage.png => 03_sonarcloud_coverage_main.png}
+-	-	docs/Entrega-Final/evidencias/{sprint-13/15_sonarcloud_main_metricas_generales_actualizadas.png => 04_sonarcloud_metricas_generales.png}
+-	-	docs/Entrega-Final/evidencias/{sprint-13/16_terminal_frontend_tests_ok.png => 05_frontend_tests_ok.png}
+-	-	docs/Entrega-Final/evidencias/{sprint-13/17_terminal_frontend_build_ok.png => 06_frontend_build_ok.png}
+-	-	docs/Entrega-Final/evidencias/{sprint-13/18_terminal_backend_tests_ok.png => 07_backend_tests_ok.png}
+-	-	docs/Entrega-Final/evidencias/08_make_build.png
+-	-	docs/Entrega-Final/evidencias/09_make_up.png
+-	-	docs/Entrega-Final/evidencias/{sprint-13/19_terminal_docker_compose_config_ok.png => 10_docker_compose_config.png}
+-	-	docs/Entrega-Final/evidencias/{docker_compose_ps.png => 11_docker_compose_ps.png}
+-	-	docs/Entrega-Final/evidencias/{docker_network_inspect.png => 12_docker_network_inspect.png}
+-	-	docs/Entrega-Final/evidencias/{sprint-13/16_pr_develop_main_checks_aprobados.png => 13_pr_develop_main_checks.png}
+-	-	docs/Entrega-Final/evidencias/{docker/github-actions-docker-validate.png => 14_github_actions_docker_validate.png}
+-	-	docs/Entrega-Final/evidencias/{docker/dockerhub-tags1.png => 15_dockerhub_tags_1.png}
+-	-	docs/Entrega-Final/evidencias/{docker/dockerhub-tags2.png => 16_dockerhub_tags_2.png}
+-	-	docs/Entrega-Final/evidencias/17_metricas_calidad_app.png
+-	-	docs/Entrega-Final/evidencias/{sprint-13/24_sms_evidencia_envio_exitoso_app.png => 18_sms_app_verificacion.png}
+-	-	docs/Entrega-Final/evidencias/{sprint-13/25_sms_evidencia_envio_exitoso_twilio.png => 19_sms_twilio_recibido.png}
+-	-	docs/Entrega-Final/evidencias/{sprint-13/05_issue_618_hu_entrega_tecnica.png => 20_issue_618_hu_entrega_tecnica.png}
+-	-	docs/Entrega-Final/evidencias/21_github_issues_sprint13.png
+-	-	docs/Entrega-Final/evidencias/22_github_prs_finales.png
+-	-	docs/Entrega-Final/evidencias/{sprint-13/03_pr_s13_sin_conflictos_con_develop.png => 23_pr_sin_conflictos_develop.png}
+-	-	docs/Entrega-Final/evidencias/{sprint-13/04_pr_s13_issues_relacionadas.png => 24_pr_issues_relacionadas.png}
+-	-	docs/Entrega-Final/{agile/milestones-cerrados.png => evidencias/25_agile_milestones_semestre.png}
+-	-	docs/Entrega-Final/evidencias/26_agile_project_board.png
+-	-	docs/Entrega-Final/{agile/github-insights-contributors.png => evidencias/27_github_contributors_semestre.png}
+-	-	docs/Entrega-Final/evidencias/28_github_commits_por_integrante.png
+-	-	docs/Entrega-Final/evidencias/29_backend_health_db.png
+-	-	docs/Entrega-Final/evidencias/30_frontend_http_200.png
+-	-	docs/Entrega-Final/evidencias/31_frontend_proxy_api_health.png
+-	-	docs/Entrega-Final/evidencias/32_diagrama_base_datos.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/14_sonarcloud_main_coverage_actualizad.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/20_terminal_docker_compose_ps.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/21_terminal_docker_network_inspect.png
+0	92	docs/Entrega-Final/final-evaluation/README.md
+0	681	docs/Entrega-Final/final-evaluation/agile/data/commits.tsv
+0	77	docs/Entrega-Final/final-evaluation/agile/informe-general-agil.md
+0	47	docs/Entrega-Final/final-evaluation/agile/metricas-scrum.md
+0	46	docs/Entrega-Final/final-evaluation/agile/milestone-1.md
+0	40	docs/Entrega-Final/final-evaluation/agile/milestone-2.md
+0	41	docs/Entrega-Final/final-evaluation/agile/milestone-3.md
+0	43	docs/Entrega-Final/final-evaluation/agile/milestone-4.md
+0	56	docs/Entrega-Final/final-evaluation/agile/postmortem.md
+0	23	docs/Entrega-Final/final-evaluation/auditoria-rubrica.md
+0	61	docs/Entrega-Final/final-evaluation/cicd.md
+0	92	docs/Entrega-Final/final-evaluation/docker-despliegue.md
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/01_pr_s13_quality_gate_checks_aprobados.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/02_pr_s13_sonar_quality_gate_passed.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/03_pr_s13_sin_conflictos_con_develop.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/04_pr_s13_issues_relacionadas.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/05_issue_618_hu_entrega_tecnica.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/14_sonarcloud_main_coverage_actualizad.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/15_sonarcloud_main_metricas_generales_actualizadas.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/16_pr_develop_main_checks_aprobados.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/16_terminal_frontend_tests_ok.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/17_terminal_frontend_build_ok.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/18_terminal_backend_tests_ok.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/19_terminal_docker_compose_config_ok.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/20_terminal_docker_compose_ps.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/21_terminal_docker_network_inspect.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/24_sms_evidencia_envio_exitoso_app.png
+-	-	docs/Entrega-Final/final-evaluation/evidencias/sprint-13/25_sms_evidencia_envio_exitoso_twilio.png
+0	132	docs/Entrega-Final/final-evaluation/integracion-sms.md
+0	61	docs/Entrega-Final/final-evaluation/metricas-calidad.md
+0	71	docs/Entrega-Final/final-evaluation/pruebas-unitarias-coverage.md
+0	52	docs/Entrega-Final/final-evaluation/sonarqube-interpretacion.md
+-	-	docs/Entrega-Final/main.pdf
+195	82	docs/Entrega-Final/main.tex
+Sarm
+Sarm-m
+
+0	1	CHANGELOG.md
+0	0	CONTRIBUTING.md
+18	2	docs/Entrega-Final/README.md
+-	-	docs/Entrega-Final/evidencias/docker_compose_ps.png
+-	-	docs/Entrega-Final/evidencias/docker_network_inspect.png
+-	-	docs/Entrega-Final/evidencias/sonarcloud_main_coverage.png
+274	131	docs/Entrega-Final/main.tex
+0	0	jupyter/datasets/data1.csv
+0	0	jupyter/datasets/data2.csv
+0	0	jupyter/notebooks/analysis.ipynb
+0	0	jupyter/notebooks/exploration.ipynb
+Sarm-m
+
+19	0	.gitignore
+Sarm-m
+
+24	1	docs/Entrega-Final/README.md
+274	175	docs/Entrega-Final/main.tex
+Sarm-m
+
+5	6	docs/Entrega-Final/README.md
+-	-	docs/Entrega-Final/agile/github-insights-contributors.png
+-	-	docs/Entrega-Final/agile/milestones-cerrados.png
+0	1	docs/Entrega-Final/img/.gitkeep
+-	-	docs/Entrega-Final/img/javeriana.png
+91	29	docs/Entrega-Final/main.tex
+Sarm-m
+
+79	0	docs/Entrega-Final/README.md
+1	0	docs/Entrega-Final/anexos/.gitkeep
+-	-	docs/Entrega-Final/evidencias/docker/dockerhub-tags1.png
+-	-	docs/Entrega-Final/evidencias/docker/dockerhub-tags2.png
+-	-	docs/Entrega-Final/evidencias/docker/github-actions-docker-validate.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/01_pr_s13_quality_gate_checks_aprobados.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/02_pr_s13_sonar_quality_gate_passed.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/03_pr_s13_sin_conflictos_con_develop.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/04_pr_s13_issues_relacionadas.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/05_issue_618_hu_entrega_tecnica.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/14_sonarcloud_main_coverage_actualizad.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/15_sonarcloud_main_metricas_generales_actualizadas.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/16_pr_develop_main_checks_aprobados.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/16_terminal_frontend_tests_ok.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/17_terminal_frontend_build_ok.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/18_terminal_backend_tests_ok.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/19_terminal_docker_compose_config_ok.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/20_terminal_docker_compose_ps.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/21_terminal_docker_network_inspect.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/24_sms_evidencia_envio_exitoso_app.png
+-	-	docs/Entrega-Final/evidencias/sprint-13/25_sms_evidencia_envio_exitoso_twilio.png
+4	3	docs/Entrega-Final/final-evaluation/README.md
+5	5	docs/Entrega-Final/final-evaluation/agile/metricas-scrum.md
+3	3	docs/Entrega-Final/final-evaluation/agile/postmortem.md
+6	6	docs/Entrega-Final/final-evaluation/auditoria-rubrica.md
+4	4	docs/Entrega-Final/final-evaluation/metricas-calidad.md
+0	9	docs/Entrega-Final/final-evaluation/pdf/README.md
+1	0	docs/Entrega-Final/img/.gitkeep
+638	0	docs/Entrega-Final/main.tex
+1	1	scripts/agile/export_github_data.sh
+1	1	scripts/agile/generate_agile_report.py
+0	57	scripts/generate_final_pdfs.sh
+Sarm
+Sarm-m
+Sarm-m
+
+0	1	Docs/Taller
+0	0	{Docs => docs}/Agile/evidencias_finales/07_agil_postmortem_trazabilidad.md
+0	0	{Docs => docs}/Agile/evidencias_finales/img/.gitkeep
+0	0	{Docs => docs}/Agile/reporte_final_sprints.md
+0	0	{Docs => docs}/Arquitectura/README.md
+-	-	{Docs => docs}/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Diagrama UML PATRONES FECADE.png
+0	0	{Docs => docs}/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Facade_Alertas_Analisis.md
+0	0	{Docs => docs}/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Facade_Alertas_Documentacion.md
+-	-	{Docs => docs}/Arquitectura/UML/DiagramaDeClases.pdf
+-	-	{Docs => docs}/Arquitectura/UML/Diagrama_de_secuencia.png
+-	-	{Docs => docs}/Arquitectura/UML/Diagrama_registro_de_uml_clases.png
+0	0	{Docs => docs}/Arquitectura/UML/README.MD
+-	-	"Docs/Arquitectura/UML/UML-Patr\303\263n_Strategy.png" => "docs/Arquitectura/UML/UML-Patr\303\263n_Strategy.png"
+0	0	{Docs => docs}/Arquitectura/patrones/Modelo de dominio general.md
+0	0	{Docs => docs}/Arquitectura/patrones/comportamentales/observer_alert_hub.md
+0	0	{Docs => docs}/Arquitectura/patrones/comportamentales/strategy_orden_alertas.md
+0	0	{Docs => docs}/Arquitectura/patrones/creacionales/factory_method_modales.md
+0	0	{Docs => docs}/Arquitectura/patrones/creacionales/singleton_alert_hub.md
+0	0	{Docs => docs}/Arquitectura/patrones/estructurales/adapter_alertas.md
+0	0	{Docs => docs}/Arquitectura/patrones/estructurales/facade_alertas.md
+0	0	{Docs => docs}/Arquitectura/patrones/matriz_patrones_gof.md
+-	-	{Docs => docs}/DiagramaDB/DIAGRAMA DB.png
+0	0	{Docs => docs}/DiagramaDB/syntix_tech_db_descripcion.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/README.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/data/README-gh-cli-required.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/data/authors.tsv
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/data/branches.txt
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/data/commits.tsv
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/data/github-export-status.json
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/data/issues.json
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/data/metricas_scrum_generadas.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/data/milestones.json
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/data/pull_requests.json
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/informe-general-agil.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/metricas-scrum.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/milestone-1.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/milestone-2.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/milestone-3.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/milestone-4.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/agile/postmortem.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/auditoria-rubrica.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/cicd.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/docker-despliegue.md
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/01_pr_s13_quality_gate_checks_aprobados.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/02_pr_s13_sonar_quality_gate_passed.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/03_pr_s13_sin_conflictos_con_develop.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/04_pr_s13_issues_relacionadas.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/05_issue_618_hu_entrega_tecnica.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/14_sonarcloud_main_coverage_actualizad.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/15_sonarcloud_main_metricas_generales_actualizadas.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/16_pr_develop_main_checks_aprobados.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/16_terminal_frontend_tests_ok.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/17_terminal_frontend_build_ok.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/18_terminal_backend_tests_ok.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/19_terminal_docker_compose_config_ok.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/20_terminal_docker_compose_ps.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/21_terminal_docker_network_inspect.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/24_sms_evidencia_envio_exitoso_app.png
+-	-	docs/{ => Entrega-Final}/final-evaluation/evidencias/sprint-13/25_sms_evidencia_envio_exitoso_twilio.png
+0	0	docs/{ => Entrega-Final}/final-evaluation/integracion-sms.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/metricas-calidad.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/pdf/README.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/pruebas-unitarias-coverage.md
+0	0	docs/{ => Entrega-Final}/final-evaluation/sonarqube-interpretacion.md
+-	-	{Docs => docs}/Presentaciones/Presentacion grupo 4.pdf
+-	-	{Docs => docs}/Presentaciones/Proyecto propuesta grupo 4..pdf
+0	0	{Docs => docs}/QA/QA_Reporte_DriveControl.pdf
+-	-	{Docs => docs}/QA/Taller_Docker_Entrega/Informe_Taller_Docker_SYNTIX_2026.docx
+0	0	{Docs => docs}/QA/Taller_Docker_Entrega/evidencias/README.md
+-	-	{Docs => docs}/QA/datos_mongo_seed.zip
+0	0	{Docs => docs}/QA/datos_mongo_seed/README_importacion.md
+0	0	{Docs => docs}/QA/datos_mongo_seed/seed_drivecontrol_demo.mongosh.js
+-	-	{Docs => docs}/QA/despliegue_ci_cd.docx
+0	0	{Docs => docs}/QA/despliegue_ci_cd.md
+-	-	{Docs => docs}/QA/despliegue_ci_cd.pdf
+0	0	{Docs => docs}/QA/evidencias_finales/00_indice_sustentacion_5.md
+0	0	{Docs => docs}/QA/evidencias_finales/docker/04_despliegue_docker_ci_cd.md
+0	0	{Docs => docs}/QA/evidencias_finales/docker/img/.gitkeep
+-	-	{Docs => docs}/QA/evidencias_finales/docker/img/Screenshot 2026-05-14 101358.png
+-	-	{Docs => docs}/QA/evidencias_finales/docker/img/backend-health-db.png.png
+-	-	{Docs => docs}/QA/evidencias_finales/docker/img/docker-compose-config1.png
+-	-	{Docs => docs}/QA/evidencias_finales/docker/img/docker-compose-config2.png
+-	-	{Docs => docs}/QA/evidencias_finales/docker/img/docker-network-inspect.png
+-	-	{Docs => docs}/QA/evidencias_finales/docker/img/dockerhub-tags1.png
+-	-	{Docs => docs}/QA/evidencias_finales/docker/img/dockerhub-tags2.png
+-	-	{Docs => docs}/QA/evidencias_finales/docker/img/frontend-http-200.png
+-	-	{Docs => docs}/QA/evidencias_finales/docker/img/frontend-proxy-api-health.png
+-	-	{Docs => docs}/QA/evidencias_finales/docker/img/github-actions-docker-validate.png
+0	0	{Docs => docs}/QA/evidencias_finales/metricas/01_metricas_propias.md
+0	0	{Docs => docs}/QA/evidencias_finales/metricas/img/.gitkeep
+0	0	{Docs => docs}/QA/evidencias_finales/pruebas/03_pruebas_unitarias_coverage.md
+0	0	{Docs => docs}/QA/evidencias_finales/pruebas/img/.gitkeep
+0	0	{Docs => docs}/QA/evidencias_finales/release/08_release_final.md
+0	0	{Docs => docs}/QA/evidencias_finales/release/img/.gitkeep
+0	0	{Docs => docs}/QA/evidencias_finales/seguridad/06_gestion_secretos_variables_entorno.md
+0	0	{Docs => docs}/QA/evidencias_finales/seguridad/img/.gitkeep
+0	0	{Docs => docs}/QA/evidencias_finales/sms/05_integracion_sms_twilio.md
+0	0	{Docs => docs}/QA/evidencias_finales/sms/img/.gitkeep
+0	0	{Docs => docs}/QA/evidencias_finales/sonar/02_sonarcloud.md
+0	0	{Docs => docs}/QA/evidencias_finales/sonar/img/.gitkeep
+-	-	{Docs => docs}/QA/evidencias_finales/sonar/img/WhatsApp Image 2026-05-14 at 11.14.48.jpeg
+0	0	{Docs => docs}/QA/evidencias_finales/sustentacion/10_guion_sustentacion.md
+0	0	{Docs => docs}/QA/evidencias_finales/sustentacion/img/.gitkeep
+0	0	{Docs => docs}/QA/evidencias_finales/trabajo_equipo/09_trabajo_equipo.md
+0	0	{Docs => docs}/QA/evidencias_finales/trabajo_equipo/img/.gitkeep
+0	0	{Docs => docs}/QA/gestion_variables_entorno.md
+0	0	{Docs => docs}/QA/indice_sustentacion_rubrica.md
+0	0	{Docs => docs}/QA/issue_auth_registro_mongo_atlas.md
+0	0	{Docs => docs}/QA/metricas_calidad.md
+0	0	{Docs => docs}/QA/sms_twilio_evidencia.md
+0	0	{Docs => docs}/Reuniones/README.md
+-	-	"Docs/Reuniones/Reuni\303\263n_1_ en _3517_G4_ .docx" => "docs/Reuniones/Reuni\303\263n_1_ en _3517_G4_ .docx"
+-	-	{Docs => docs}/Taller_de_diagramas/HU-01/Diagramas Historia de usuario 1.docx
+0	0	{Docs => docs}/Taller_de_diagramas/HU-01/read.me
+-	-	{Docs => docs}/Taller_de_diagramas/HU-02/1.png
+-	-	{Docs => docs}/Taller_de_diagramas/HU-02/HU-2-2.png
+-	-	{Docs => docs}/Taller_de_diagramas/HU-02/HU-2-3.jpeg
+0	0	{Docs => docs}/Taller_de_diagramas/HU-02/read.me
+-	-	{Docs => docs}/Taller_de_diagramas/HU-03/Diagrama de clases_ HU3.drawio.png
+-	-	{Docs => docs}/Taller_de_diagramas/HU-03/DiagramaEBC_HU_3.drawio.png
+-	-	{Docs => docs}/Taller_de_diagramas/HU-03/HU3_Diagrama_componentes.jpeg
+0	0	{Docs => docs}/Taller_de_diagramas/HU-03/read.me
+0	0	{Docs => docs}/Taller_de_diagramas/read.me
+Juan Sebastian Vargas Dicelys
+
+155	0	Docs/Agile/evidencias_finales/postmortem_milestone1.md
+156	0	Docs/Agile/evidencias_finales/postmortem_milestone2.md
+157	0	Docs/Agile/evidencias_finales/postmortem_milestone3.md
+175	0	Docs/Agile/evidencias_finales/postmortem_milestone4.md
+Juan Sebastian Vargas Dicelys
+
+0	81	Docs/Agile/evidencias_finales/07_agil_postmortem_trazabilidad.md
+Sarm-m
+
+-	-	docs/final-evaluation/evidencias/sprint-13/01_pr_s13_quality_gate_checks_aprobados.png
+-	-	docs/final-evaluation/evidencias/sprint-13/02_pr_s13_sonar_quality_gate_passed.png
+-	-	docs/final-evaluation/evidencias/sprint-13/03_pr_s13_sin_conflictos_con_develop.png
+-	-	docs/final-evaluation/evidencias/sprint-13/04_pr_s13_issues_relacionadas.png
+-	-	docs/final-evaluation/evidencias/sprint-13/05_issue_618_hu_entrega_tecnica.png
+-	-	docs/final-evaluation/evidencias/sprint-13/14_sonarcloud_main_coverage_actualizad.png
+-	-	docs/final-evaluation/evidencias/sprint-13/15_sonarcloud_main_metricas_generales_actualizadas.png
+-	-	docs/final-evaluation/evidencias/sprint-13/16_pr_develop_main_checks_aprobados.png
+-	-	docs/final-evaluation/evidencias/sprint-13/16_terminal_frontend_tests_ok.png
+-	-	docs/final-evaluation/evidencias/sprint-13/17_terminal_frontend_build_ok.png
+-	-	docs/final-evaluation/evidencias/sprint-13/18_terminal_backend_tests_ok.png
+-	-	docs/final-evaluation/evidencias/sprint-13/19_terminal_docker_compose_config_ok.png
+-	-	docs/final-evaluation/evidencias/sprint-13/20_terminal_docker_compose_ps.png
+-	-	docs/final-evaluation/evidencias/sprint-13/21_terminal_docker_network_inspect.png
+-	-	docs/final-evaluation/evidencias/sprint-13/24_sms_evidencia_envio_exitoso_app.png
+-	-	docs/final-evaluation/evidencias/sprint-13/25_sms_evidencia_envio_exitoso_twilio.png
+Sarm
+Sarm
+Sarm-m
+
+9	0	apps/web/src/components/RegisterModal.jsx
+30	20	backend/config/load-env.js
+4	4	backend/scripts/auth-doctor.js
+12	11	backend/scripts/ensure-env.js
+71	28	backend/server.js
+83	37	backend/services/smsService.js
+69	2	backend/test/smsService.test.js
+4	3	docker-compose.yml
+6	4	docs/final-evaluation/README.md
+82	8	docs/final-evaluation/integracion-sms.md
+Sarm-m
+
+11	0	.gitignore
+89	0	docs/final-evaluation/README.md
+11	0	docs/final-evaluation/agile/data/README-gh-cli-required.md
+24	0	docs/final-evaluation/agile/data/authors.tsv
+12	0	docs/final-evaluation/agile/data/branches.txt
+681	0	docs/final-evaluation/agile/data/commits.tsv
+6	0	docs/final-evaluation/agile/data/github-export-status.json
+1	0	docs/final-evaluation/agile/data/issues.json
+59	0	docs/final-evaluation/agile/data/metricas_scrum_generadas.md
+1	0	docs/final-evaluation/agile/data/milestones.json
+1	0	docs/final-evaluation/agile/data/pull_requests.json
+77	0	docs/final-evaluation/agile/informe-general-agil.md
+47	0	docs/final-evaluation/agile/metricas-scrum.md
+46	0	docs/final-evaluation/agile/milestone-1.md
+40	0	docs/final-evaluation/agile/milestone-2.md
+41	0	docs/final-evaluation/agile/milestone-3.md
+43	0	docs/final-evaluation/agile/milestone-4.md
+56	0	docs/final-evaluation/agile/postmortem.md
+23	0	docs/final-evaluation/auditoria-rubrica.md
+58	0	docs/final-evaluation/integracion-sms.md
+9	0	docs/final-evaluation/pdf/README.md
+66	0	scripts/agile/export_github_data.sh
+195	0	scripts/agile/generate_agile_report.py
+57	0	scripts/generate_final_pdfs.sh
+Sarm-m
+
+61	0	docs/final-evaluation/cicd.md
+Sarm-m
+
+4	0	docker-compose.yml
+92	0	docs/final-evaluation/docker-despliegue.md
+Sarm-m
+
+74	0	apps/web/src/__tests__/rtmAlertAdapter.test.js
+101	0	apps/web/src/__tests__/vehicleAlertAdapter.test.js
+61	0	docs/final-evaluation/metricas-calidad.md
+71	0	docs/final-evaluation/pruebas-unitarias-coverage.md
+52	0	docs/final-evaluation/sonarqube-interpretacion.md
+Juan Sebastian Vargas Dicelys
+
+2	35	Docs/Agile/reporte_final_sprints.md
+Juan Sebastian Vargas Dicelys
+
+23	23	Docs/Agile/reporte_final_sprints.md
+Juan Sebastian Vargas Dicelys
+
+32	30	Docs/Agile/reporte_final_sprints.md
+Juan Sebastian Vargas Dicelys
+
+34	2	Docs/Agile/reporte_final_sprints.md
+Juan Sebastian Vargas Dicelys
+
+73	72	Docs/Agile/reporte_final_sprints.md
+Sarm
+Sarm
+Sarm
+
+-	-	Docs/QA/evidencias_finales/sonar/img/WhatsApp Image 2026-05-14 at 11.14.48.jpeg
+Juan Sebastian Vargas Dicelys
+
+0	12	Docs/QA/evidencias_finales/docker/04_despliegue_docker_ci_cd.md
+Juan Sebastian Vargas Dicelys
+
+14	14	Docs/QA/evidencias_finales/docker/04_despliegue_docker_ci_cd.md
+Juan Sebastian Vargas Dicelys
+
+-	-	Docs/QA/evidencias_finales/docker/img/Screenshot 2026-05-14 101358.png
+-	-	Docs/QA/evidencias_finales/docker/img/backend-health-db.png.png
+-	-	Docs/QA/evidencias_finales/docker/img/docker-compose-config1.png
+-	-	Docs/QA/evidencias_finales/docker/img/docker-compose-config2.png
+-	-	Docs/QA/evidencias_finales/docker/img/docker-network-inspect.png
+-	-	Docs/QA/evidencias_finales/docker/img/dockerhub-tags1.png
+-	-	Docs/QA/evidencias_finales/docker/img/dockerhub-tags2.png
+-	-	Docs/QA/evidencias_finales/docker/img/frontend-http-200.png
+-	-	Docs/QA/evidencias_finales/docker/img/frontend-proxy-api-health.png
+-	-	Docs/QA/evidencias_finales/docker/img/github-actions-docker-validate.png
+samuelfl680
+Sarm-m
+
+1	1	apps/web/vite.config.js
+Sarm-m
+
+10	6	Makefile
+4	2	apps/web/vite.config.js
+2	2	docker-compose.yml
+Sarm
+
+8	12	apps/web/.env
+Sarm-m
+
+0	9	.gitignore
+82	0	ANEXO_CREDENCIALES_PRIVADO.md
+0	105	apps/web/src/__tests__/RtmAlertAdapter.test.js
+0	59	apps/web/src/__tests__/rtmAlertAdapter.test.js
+66	66	apps/web/src/index.css
+117	117	backend/config/mongo.js
+133	133	backend/services/emailService.js
+Sarm
+unknown
+
+28	0	.env.example
+17	6	.gitignore
+0	118	BOILERPLATE.md
+81	0	Docs/Agile/evidencias_finales/07_agil_postmortem_trazabilidad.md
+1	0	Docs/Agile/evidencias_finales/img/.gitkeep
+64	141	Docs/Agile/reporte_final_sprints.md
+0	262	Docs/QA/Taller_Docker_Entrega/Plantilla_Informe_Taller_Docker.md
+-	-	Docs/QA/Taller_Docker_Entrega/Plantilla_Informe_Taller_Docker.pdf
+86	0	Docs/QA/evidencias_finales/00_indice_sustentacion_5.md
+107	0	Docs/QA/evidencias_finales/docker/04_despliegue_docker_ci_cd.md
+1	0	Docs/QA/evidencias_finales/docker/img/.gitkeep
+94	0	Docs/QA/evidencias_finales/metricas/01_metricas_propias.md
+1	0	Docs/QA/evidencias_finales/metricas/img/.gitkeep
+105	0	Docs/QA/evidencias_finales/pruebas/03_pruebas_unitarias_coverage.md
+1	0	Docs/QA/evidencias_finales/pruebas/img/.gitkeep
+86	0	Docs/QA/evidencias_finales/release/08_release_final.md
+1	0	Docs/QA/evidencias_finales/release/img/.gitkeep
+118	0	Docs/QA/evidencias_finales/seguridad/06_gestion_secretos_variables_entorno.md
+1	0	Docs/QA/evidencias_finales/seguridad/img/.gitkeep
+108	0	Docs/QA/evidencias_finales/sms/05_integracion_sms_twilio.md
+1	0	Docs/QA/evidencias_finales/sms/img/.gitkeep
+67	0	Docs/QA/evidencias_finales/sonar/02_sonarcloud.md
+1	0	Docs/QA/evidencias_finales/sonar/img/.gitkeep
+56	0	Docs/QA/evidencias_finales/sustentacion/10_guion_sustentacion.md
+1	0	Docs/QA/evidencias_finales/sustentacion/img/.gitkeep
+72	0	Docs/QA/evidencias_finales/trabajo_equipo/09_trabajo_equipo.md
+1	0	Docs/QA/evidencias_finales/trabajo_equipo/img/.gitkeep
+39	101	Docs/QA/metricas_calidad.md
+36	67	Docs/QA/sms_twilio_evidencia.md
+129	210	README.md
+12	8	apps/web/.env
+19	0	apps/web/.env.example
+1	1	apps/web/src/pages/PlanesPage.jsx
+4	2	apps/web/src/utils/reporteGenerator.js
+18	22	backend/.env.example
+2	2	backend/services/emailService.js
+Sarm-m
+
+4	0	.github/workflows/docker_ci_cd.yml
+44	0	Docs/Agile/reporte_final_sprints.md
+1	1	Docs/QA/Taller_Docker_Entrega/Plantilla_Informe_Taller_Docker.md
+33	10	Docs/QA/despliegue_ci_cd.md
+66	0	Docs/QA/gestion_variables_entorno.md
+54	0	Docs/QA/indice_sustentacion_rubrica.md
+26	0	Docs/QA/metricas_calidad.md
+86	0	Docs/QA/sms_twilio_evidencia.md
+3	3	backend/.env.example
+1	1	backend/package.json
+154	0	backend/test/smsService.test.js
+1	1	docker-compose.yml
+solonlosada2006
+
+3	0	apps/web/.env
+solonlosada2006
+
+4	3	backend/.env.example
+samuelfl680
+
+10	0	apps/web/.env
+0	3	apps/web/.env.example
+samuelfl680
+solonlosada2006
+
+1	1	.github/workflows/docker_ci_cd.yml
+solonlosada2006
+
+13	14	.github/workflows/pipeline_hu454_auth_ci_cd.yml
+solonlosada2006
+
+0	10	.env
+2	0	.gitignore
+78	8	apps/web/src/components/LoginModal.jsx
+115	13	apps/web/src/components/RegisterModal.jsx
+19	3	apps/web/src/services/api.js
+0	16	backend/.env
+46	42	backend/server.js
+23	11	backend/services/smsService.js
+3	0	docker-compose.yml
+solonlosada2006
+
+2	2	.github/workflows/{main.yml => notify_discord.yml}
+solonlosada2006
+
+10	0	.github/workflows/cd_entrega.yml
+solonlosada2006
+
+30	137	.github/workflows/docker_ci_cd.yml
+solonlosada2006
+
+31	0	.github/workflows/main.yml
+juansebastianvd
+
+16	16	Docs/Agile/reporte_final_sprints.md
+91	45	apps/web/src/__tests__/rtmAlertAdapter.test.js
+Juan Sebastian Vargas Dicelys
+
+34	211	Docs/Agile/reporte_final_sprints.md
+Sarm
+Sarm-m
+
+46	53	apps/web/src/utils/qualityMetrics.js
+Sarm-m
+
+5	8	.github/workflows/sonarcloud.yml
+2	2	Docs/QA/metricas_calidad.md
+Sarm-m
+Sarm-m
+
+5	1	.github/ISSUE_TEMPLATE/pipeline_smoke_test.md
+133	24	.github/workflows/docker_ci_cd.yml
+30	3	.github/workflows/sonarcloud.yml
+8	3	Docs/QA/Taller_Docker_Entrega/Plantilla_Informe_Taller_Docker.md
+159	120	Docs/QA/despliegue_ci_cd.md
+72	42	Docs/QA/metricas_calidad.md
+11	0	README.md
+3	12	apps/web/package-lock.json
+1	0	apps/web/package.json
+4	3	apps/web/src/__tests__/RtmAlertAdapter.test.js
+49	0	apps/web/src/__tests__/qualityMetrics.test.js
+76	6	apps/web/src/utils/qualityMetrics.js
+115	0	apps/web/tools/generate-quality-evidence.mjs
+11	11	backend/package-lock.json
+1	1	backend/package.json
+6	0	docker-compose.prod.yml
+Sarm
+Sarm
+juserora
+
+151	0	CAMBIOS_EVALUACION.md
+241	0	DEPLOYMENT.md
+185	0	Docs/Agile/postmortem_final.md
+72	0	Docs/Agile/reporte_final_sprints.md
+60	0	Docs/QA/metricas_calidad.md
+232	0	Docs/QA/plan_pruebas.md
+52	16	README.md
+juserora
+
+90	45	apps/web/src/__tests__/rtmAlertAdapter.test.js
+Juserora
+samuelfl680
+
+2	1	.github/workflows/docker_ci_cd.yml
+4	2	.github/workflows/pipeline_hu454_auth_ci_cd.yml
+juserora
+samuelfl680
+
+9	3	.github/workflows/docker_ci_cd.yml
+samuelfl680
+
+12	3	.github/workflows/pipeline_hu454_auth_ci_cd.yml
+3	1	.github/workflows/sonarcloud.yml
+samuelfl680
+
+3	2	.github/workflows/ci_verificacion.yml
+2	1	.github/workflows/docker_ci_cd.yml
+samuelfl680
+
+-	-	Docs/QA/despliegue_ci_cd.docx
+164	0	Docs/QA/despliegue_ci_cd.md
+-	-	Docs/QA/despliegue_ci_cd.pdf
+2	1	apps/web/.env.example
+7	5	backend/.env.example
+Juan Sebastian Vargas Dicelys
+
+16	16	Docs/Agile/reporte_final_sprints.md
+Juan Sebastian Vargas Dicelys
+
+5	5	Docs/Agile/reporte_final_sprints.md
+Juan Sebastian Vargas Dicelys
+
+7	17	Docs/Agile/reporte_final_sprints.md
+Juan Sebastian Vargas Dicelys
+juansebastianvd
+
+16	16	Docs/Agile/reporte_final_sprints.md
+Juan Sebastian Vargas Dicelys
+juansebastianvd
+
+128	8	Docs/Agile/reporte_final_sprints.md
+Sarm
+Sarm
+Sarm-m
+
+9	0	.github/workflows/sonarcloud.yml
+Sarm-m
+
+5	4	.github/workflows/sonarcloud.yml
+38	19	apps/web/src/components/AddVehicleModal.jsx
+12	4	apps/web/src/components/AlertCard.jsx
+34	8	apps/web/src/components/DetallesValidacionModal.jsx
+33	7	apps/web/src/components/EditRtmModal.jsx
+33	7	apps/web/src/components/EditSoatModal.jsx
+8	0	apps/web/src/components/GoogleAuthButton.jsx
+9	4	apps/web/src/components/Header.jsx
+14	12	apps/web/src/components/LoginModal.jsx
+5	0	apps/web/src/components/ModalFactory.jsx
+9	9	apps/web/src/components/OnboardingTour.jsx
+6	0	apps/web/src/components/PublicHeader.jsx
+12	9	apps/web/src/components/RegisterModal.jsx
+6	0	apps/web/src/components/StatusBadge.jsx
+6	1	apps/web/src/components/ThemeToggle.jsx
+5	0	apps/web/src/components/UserProfileDropdown.jsx
+52	9	apps/web/src/components/ValidacionResultadoCard.jsx
+1	0	apps/web/src/contexts/AuthContext.jsx
+18	13	apps/web/src/contexts/DocumentsContext.jsx
+56	44	apps/web/src/contexts/OnboardingContext.jsx
+18	13	apps/web/src/contexts/RtmContext.jsx
+5	0	apps/web/src/contexts/ThemeContext.jsx
+7	7	apps/web/src/hooks/useConductors.js
+12	8	apps/web/src/hooks/useLocalStorage.js
+5	5	apps/web/src/hooks/useVehicles.js
+126	48	apps/web/src/pages/AlertasPage.jsx
+70	59	apps/web/src/pages/ConfiguracionPage.jsx
+18	6	apps/web/src/pages/DashboardPage.jsx
+31	5	apps/web/src/pages/DocumentosPage.jsx
+49	0	apps/web/src/pages/ReportesPage.jsx
+19	0	apps/web/src/pages/UserProfilePage.jsx
+8	6	apps/web/src/pages/ValidacionRUNTPage.jsx
+Sarm
+Sarm-m
+
+102	94	apps/web/src/components/Sidebar.jsx
+7	1	apps/web/src/components/ThemeToggle.jsx
+Sarm
+Sarm
+Sarm-m
+
+1	1	apps/web/src/__tests__/qualityMetrics.test.js
+28	6	apps/web/src/components/AddConductorModal.jsx
+20	7	apps/web/src/components/AddDocumentModal.jsx
+20	7	apps/web/src/components/AddRtmModal.jsx
+Sarm-m
+
+49	0	apps/web/src/__tests__/emailValidation.test.js
+402	390	apps/web/src/components/LoginModal.jsx
+356	347	apps/web/src/components/RegisterModal.jsx
+289	286	apps/web/src/contexts/AuthContext.jsx
+272	262	apps/web/src/services/api.js
+24	0	apps/web/src/utils/emailValidation.js
+Sarm-m
+
+14	0	Docs/QA/metricas_calidad.md
+1	0	apps/web/package-lock.json
+2	1	apps/web/package.json
+31	0	sonar-project.properties
+Sarm
+Sarm
+Sarm-m
+
+6	6	apps/web/src/utils/colombiaFormats.js
+Sarm
+Sarm-m
+
+73	0	apps/web/src/__tests__/baseAlertAdapter.test.js
+175	0	apps/web/src/__tests__/colombiaFormats.test.js
+96	8	apps/web/src/test/useRUNTSimulator.test.js
+4	2	apps/web/src/utils/colombiaFormats.js
+Sarm
+
+3	1	Docs/QA/metricas_calidad.md
+Juan Sebastian Vargas Dicelys
+Sarm
+juansebastianvd
+
+174	0	Docs/Agile/reporte_final_sprints.md
+Sarm
+Sarm-m
+
+0	19	.github/workflows/SONAR.yml
+Sarm-m
+
+230	0	apps/web/src/__tests__/qualityMetrics.test.js
+5	2	apps/web/src/utils/qualityMetrics.js
+Sarm-m
+
+7	2	Docs/QA/metricas_calidad.md
+Sarm-m
+
+1	1	apps/web/src/hooks/useValidationHistory.js
+22	22	apps/web/src/pages/ReportesPage.jsx
+2	3	apps/web/src/pages/ValidacionRUNTPage.jsx
+Sarm-m
+
+328	60	apps/web/src/__tests__/qualityMetrics.test.js
+118	69	apps/web/src/utils/qualityMetrics.js
+Sarm-m
+Juan Pablo Arias Buitrago
+
+19	0	.github/workflows/SONAR.yml
+Sarm
+Sarm-m
+Sarm-m
+
+41	0	apps/web/src/contexts/ThemeContext.jsx
+27	20	apps/web/src/main.jsx
+Sarm-m
+
+87	54	apps/web/src/pages/ReportesPage.jsx
+Sarm-m
+
+47	0	Docs/QA/metricas_calidad.md
+1	1	apps/web/package.json
+237	0	apps/web/src/__tests__/qualityMetrics.test.js
+Sarm-m
+
+75	0	apps/web/src/pages/ReportesPage.jsx
+320	0	apps/web/src/utils/qualityMetrics.js
+samuelfl680
+solonlosada2006
+
+28	17	apps/web/src/pages/ValidacionRUNTPage.jsx
+solonlosada2006
+
+83	54	apps/web/src/hooks/useValidationHistory.js
+solonlosada2006
+
+79	0	backend/server.js
+samuelfl680
+samuelfl680
+samuelfl680
+
+27	24	apps/web/src/App.jsx
+4	0	apps/web/src/components/GoogleAuthButton.jsx
+4	0	apps/web/src/components/Header.jsx
+28	0	apps/web/src/components/LoginModal.jsx
+27	0	apps/web/src/components/RegisterModal.jsx
+4	0	apps/web/src/components/Sidebar.jsx
+2	0	apps/web/src/components/ThemeToggle.jsx
+4	0	apps/web/src/components/UserProfileDropdown.jsx
+4	0	apps/web/src/components/ValidacionResultadoCard.jsx
+51	10	apps/web/src/contexts/AuthContext.jsx
+4	0	apps/web/src/contexts/ThemeContext.jsx
+3	0	apps/web/src/layouts/DashboardLayout.jsx
+3	1	apps/web/src/main.jsx
+4	0	apps/web/src/pages/AlertasPage.jsx
+4	0	apps/web/src/pages/ConductoresPage.jsx
+8	0	apps/web/src/pages/ConfiguracionPage.jsx
+6	0	apps/web/src/pages/DashboardPage.jsx
+6	0	apps/web/src/pages/DocumentosPage.jsx
+6	2	apps/web/src/pages/LoginPage.jsx
+4	0	apps/web/src/pages/ReportesPage.jsx
+6	0	apps/web/src/pages/UserProfilePage.jsx
+5	1	apps/web/src/pages/ValidacionRUNTPage.jsx
+4	0	apps/web/src/pages/VehiculosPage.jsx
+13	0	apps/web/src/services/api.js
+7	0	backend/config/load-env.js
+8	0	backend/config/mongo.js
+14	0	backend/scripts/auth-doctor.js
+3	0	backend/scripts/ensure-env.js
+68	0	backend/server.js
+8	0	backend/services/emailService.js
+4	0	backend/services/smsService.js
+samuelfl680
+Sarm
+Sarm-m
+
+22	3	apps/web/src/pages/ConfiguracionPage.jsx
+samuelfl680
+samuelfl680
+
+0	4	apps/web/src/components/Header.jsx
+2	2	apps/web/src/pages/ConfiguracionPage.jsx
+5	5	apps/web/src/pages/UserProfilePage.jsx
+samuelfl680
+
+2	0	apps/web/src/App.jsx
+27	21	apps/web/src/components/Header.jsx
+2	2	apps/web/src/components/PublicHeader.jsx
+38	31	apps/web/src/components/Sidebar.jsx
+52	0	apps/web/src/components/ThemeToggle.jsx
+40	15	apps/web/src/components/UserProfileDropdown.jsx
+46	45	apps/web/src/components/ValidacionResultadoCard.jsx
+37	0	apps/web/src/contexts/ThemeContext.jsx
+34	1	apps/web/src/index.css
+4	2	apps/web/src/layouts/DashboardLayout.jsx
+7	2	apps/web/src/main.jsx
+63	29	apps/web/src/pages/AlertasPage.jsx
+138	118	apps/web/src/pages/ConductoresPage.jsx
+54	18	apps/web/src/pages/ConfiguracionPage.jsx
+68	62	apps/web/src/pages/DashboardPage.jsx
+85	54	apps/web/src/pages/DocumentosPage.jsx
+66	42	apps/web/src/pages/ReportesPage.jsx
+222	0	apps/web/src/pages/UserProfilePage.jsx
+40	19	apps/web/src/pages/ValidacionRUNTPage.jsx
+48	24	apps/web/src/pages/VehiculosPage.jsx
+samuelfl680
+Sarm-m
+
+7	1	apps/web/src/hooks/useAlertsFacade.js
+11	9	apps/web/src/pages/ReportesPage.jsx
+54	35	apps/web/src/patterns/adapters/VehicleAlertAdapter.js
+Sarm
+Sarm-m
+
+64	64	apps/web/src/App.jsx
+272	272	apps/web/src/components/AddVehicleModal.jsx
+77	77	apps/web/src/components/Header.jsx
+362	362	apps/web/src/components/LoginModal.jsx
+281	281	apps/web/src/components/OnboardingTour.jsx
+320	320	apps/web/src/components/RegisterModal.jsx
+83	83	apps/web/src/components/Sidebar.jsx
+245	245	apps/web/src/contexts/AuthContext.jsx
+387	387	apps/web/src/contexts/OnboardingContext.jsx
+42	42	apps/web/src/layouts/DashboardLayout.jsx
+168	113	apps/web/src/pages/ConductoresPage.jsx
+266	266	apps/web/src/pages/DashboardPage.jsx
+389	389	apps/web/src/pages/DocumentosPage.jsx
+299	299	apps/web/src/pages/HistorialValidacionesPage.jsx
+196	196	apps/web/src/pages/ValidacionRUNTPage.jsx
+215	215	apps/web/src/pages/VehiculosPage.jsx
+249	249	apps/web/src/services/api.js
+1	1	apps/web/src/utils/colombiaFormats.js
+28	28	apps/web/vite.config.js
+22	22	backend/.env.example
+60	60	backend/config/load-env.js
+189	189	backend/scripts/auth-doctor.js
+30	30	backend/scripts/ensure-env.js
+1867	1867	backend/server.js
+43	43	backend/services/smsService.js
+Sarm
+unknown
+Sarm-m
+
+19	13	Makefile
+1	1	apps/web/Dockerfile
+2	2	apps/web/src/pages/DashboardPage.jsx
+15	7	apps/web/src/pages/ReportesPage.jsx
+11	10	docker-compose.yml
+Sarm-m
+
+13	0	Makefile
+6	0	docker-compose.yml
+Juan Sebastian Vargas Dicelys
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+
+5	4	apps/web/src/App.jsx
+8	5	apps/web/src/components/AddVehicleModal.jsx
+12	1	apps/web/src/components/Header.jsx
+281	0	apps/web/src/components/OnboardingTour.jsx
+6	0	apps/web/src/components/RegisterModal.jsx
+2	1	apps/web/src/components/Sidebar.jsx
+10	9	apps/web/src/contexts/AuthContext.jsx
+387	0	apps/web/src/contexts/OnboardingContext.jsx
+18	5	apps/web/src/layouts/DashboardLayout.jsx
+10	4	apps/web/src/pages/AlertasPage.jsx
+4	3	apps/web/src/pages/ConductoresPage.jsx
+7	7	apps/web/src/pages/ConfiguracionPage.jsx
+25	16	apps/web/src/pages/DashboardPage.jsx
+5	3	apps/web/src/pages/DocumentosPage.jsx
+5	4	apps/web/src/pages/HistorialValidacionesPage.jsx
+11	4	apps/web/src/pages/ReportesPage.jsx
+7	6	apps/web/src/pages/ValidacionRUNTPage.jsx
+39	4	apps/web/src/pages/VehiculosPage.jsx
+Sarm-m
+
+9	5	apps/web/src/components/AddConductorModal.jsx
+3	3	apps/web/src/components/AddVehicleModal.jsx
+63	0	apps/web/src/utils/colombiaFormats.js
+42	0	backend/server.js
+samuelfl680
+
+52	18	apps/web/src/components/LoginModal.jsx
+5	5	apps/web/src/services/api.js
+5	0	backend/.env.example
+157	31	backend/server.js
+43	0	backend/services/smsService.js
+Sarm-m
+
+38	37	Docs/QA/datos_mongo_seed/README_importacion.md
+81	46	Docs/QA/datos_mongo_seed/seed_drivecontrol_demo.mongosh.js
+2	2	apps/web/src/__tests__/rtmAlertAdapter.test.js
+6	5	apps/web/src/__tests__/soatAlertAdapter.test.js
+6	5	apps/web/src/components/AddConductorModal.jsx
+254	186	apps/web/src/components/AddDocumentModal.jsx
+252	146	apps/web/src/components/AddRtmModal.jsx
+35	11	apps/web/src/components/AddVehicleModal.jsx
+239	134	apps/web/src/components/EditRtmModal.jsx
+240	136	apps/web/src/components/EditSoatModal.jsx
+11	1	apps/web/src/components/RegisterModal.jsx
+42	19	apps/web/src/contexts/DocumentsContext.jsx
+42	19	apps/web/src/contexts/RtmContext.jsx
+4	1	apps/web/src/hooks/useAlertsFacade.js
+7	2	apps/web/src/hooks/useVehicles.js
+291	168	apps/web/src/pages/DocumentosPage.jsx
+32	5	apps/web/src/pages/ReportesPage.jsx
+1	1	apps/web/src/pages/VehiculosPage.jsx
+5	5	apps/web/src/patterns/adapters/RtmAlertAdapter.js
+9	6	apps/web/src/patterns/adapters/SoatAlertAdapter.js
+45	0	apps/web/src/utils/colombiaFormats.js
+285	87	backend/server.js
+samuelfl680
+
+5	23	backend/scripts/auth-doctor.js
+samuelfl680
+
+1	0	apps/web/vite.config.js
+60	0	backend/config/load-env.js
+11	11	backend/scripts/ensure-env.js
+7	24	backend/server.js
+Sarm-m
+
+2	0	apps/web/src/__tests__/conductorAlertAdapter.test.js
+26	2	apps/web/src/__tests__/dateUtils.test.js
+2	0	apps/web/src/__tests__/rtmAlertAdapter.test.js
+2	0	apps/web/src/__tests__/soatAlertAdapter.test.js
+113	46	apps/web/src/pages/AlertasPage.jsx
+255	117	apps/web/src/pages/ReportesPage.jsx
+1	0	apps/web/src/patterns/adapters/ConductorAlertAdapter.js
+1	0	apps/web/src/patterns/adapters/RtmAlertAdapter.js
+1	0	apps/web/src/patterns/adapters/SoatAlertAdapter.js
+96	6	apps/web/src/utils/dateUtils.js
+Sarm-m
+
+102	102	Docs/QA/datos_mongo_seed/README_importacion.md
+399	399	Docs/QA/datos_mongo_seed/seed_drivecontrol_demo.mongosh.js
+70	0	apps/web/src/__tests__/conductorAlertAdapter.test.js
+57	0	apps/web/src/__tests__/rtmAlertAdapter.test.js
+17	10	apps/web/src/__tests__/soatAlertAdapter.test.js
+7	16	apps/web/src/contexts/DocumentsContext.jsx
+7	16	apps/web/src/contexts/RtmContext.jsx
+109	14	apps/web/src/hooks/useAlertsFacade.js
+5	4	apps/web/src/hooks/useConductors.js
+3	3	apps/web/src/hooks/useVehicles.js
+170	86	apps/web/src/pages/AlertasPage.jsx
+29	23	apps/web/src/patterns/adapters/ConductorAlertAdapter.js
+31	23	apps/web/src/patterns/adapters/RtmAlertAdapter.js
+31	23	apps/web/src/patterns/adapters/SoatAlertAdapter.js
+Sarm
+Sarm-m
+
+102	102	Docs/QA/datos_mongo_seed/README_importacion.md
+399	399	Docs/QA/datos_mongo_seed/seed_drivecontrol_demo.mongosh.js
+juansebastianvd
+juansebastianvd
+juansebastianvd
+
+44	44	apps/web/src/components/Sidebar.jsx
+Sarm-m
+
+-	-	Docs/QA/datos_mongo_seed.zip
+102	0	Docs/QA/datos_mongo_seed/README_importacion.md
+399	0	Docs/QA/datos_mongo_seed/seed_drivecontrol_demo.mongosh.js
+juserora
+juserora
+juserora
+Sarm-m
+
+1	0	.env
+2	0	README.md
+37	3	backend/server.js
+1	1	docker-compose.yml
+Sarm-m
+
+9	0	.env
+1	0	.gitignore
+Sarm-m
+
+-	-	Docs/QA/Taller_Docker_Entrega/Informe_Taller_Docker_SYNTIX_2026.docx
+Sarm-m
+
+5	2	.github/workflows/docker_ci_cd.yml
+32	0	README.md
+1	1	apps/web/.env.example
+1	1	apps/web/Dockerfile
+9	0	apps/web/nginx.conf
+1	1	docker-compose.yml
+juserora
+Sarm-m
+
+8	0	.dockerignore
+24	15	.github/workflows/docker_ci_cd.yml
+2	2	apps/web/Dockerfile
+1	1	apps/web/nginx.conf
+1	1	apps/web/package.json
+3	0	apps/web/tools/generate-llms.js
+2	2	docker-compose.yml
+samuelfl680
+solonlosada2006
+
+2	2	.github/workflows/cd_entrega.yml
+samuelfl680
+samuelfl680
+samuelfl680
+
+1	1	.github/workflows/cd_entrega.yml
+samuelfl680
+samuelfl680
+samuelfl680
+
+1	1	apps/web/Dockerfile
+samuelfl680
+
+114	0	.github/workflows/docker_ci_cd.yml
+21	0	Dockerfile
+257	0	Docs/QA/Taller_Docker_Entrega/Plantilla_Informe_Taller_Docker.md
+-	-	Docs/QA/Taller_Docker_Entrega/Plantilla_Informe_Taller_Docker.pdf
+15	0	Docs/QA/Taller_Docker_Entrega/evidencias/README.md
+24	0	apps/web/Dockerfile
+17	0	apps/web/nginx.conf
+72	0	docker-compose.yml
+samuelfl680
+solonlosada2006
+solonlosada2006
+
+110	0	backend/server.js
+samuelfl680
+
+3	5	backend/.env.example
+samuelfl680
+samuelfl680
+
+36	1	backend/scripts/auth-doctor.js
+10	0	backend/server.js
+samuelfl680
+
+1	1	apps/web/.env.example
+4	9	backend/.env.example
+samuelfl680
+
+12	4	apps/web/src/contexts/AuthContext.jsx
+7	2	apps/web/src/services/api.js
+samuelfl680
+
+8	1	backend/.env.example
+109	0	backend/config/mongo.js
+31	9	backend/scripts/auth-doctor.js
+14	30	backend/scripts/ensure-env.js
+17	6	backend/server.js
+samuelfl680
+
+2	0	apps/web/.env.example
+11	0	apps/web/package-lock.json
+1	0	apps/web/package.json
+23	0	apps/web/src/components/GoogleAuthButton.jsx
+41	1	apps/web/src/components/LoginModal.jsx
+58	1	apps/web/src/components/RegisterModal.jsx
+37	1	apps/web/src/contexts/AuthContext.jsx
+10	1	apps/web/src/main.jsx
+19	0	apps/web/src/services/api.js
+samuelfl680
+
+1	0	backend/.env.example
+212	0	backend/package-lock.json
+1	0	backend/package.json
+145	0	backend/server.js
+samuelfl680
+
+3	3	backend/.env.example
+samuelfl680
+samuelfl680
+samuelfl680
+
+12	4	apps/web/src/utils/dateUtils.js
+samuelfl680
+
+2	0	".github/workflows/Est\303\241ndares_de_calidad.yml"
+3	0	".github/workflows/Flujo y asignaci\303\263n din\303\241mica.yml"
+3	0	.github/workflows/cd_entrega.yml
+3	0	.github/workflows/ci_verificacion.yml
+6	4	.github/workflows/pipeline_hu454_auth_ci_cd.yml
+3	1	apps/web/.eslintrc.cjs
+1	0	apps/web/postcss.config.js
+3	0	apps/web/tailwind.config.js
+4	1	apps/web/vite.config.js
+3	0	scripts/setup.ps1
+3	0	scripts/setup.sh
+samuelfl680
+
+4	0	apps/web/src/hooks/useRUNTSimulator.js
+2	1	apps/web/src/patterns/adapters/BaseAlertAdapter.js
+2	1	apps/web/src/patterns/adapters/ConductorAlertAdapter.js
+1	0	apps/web/src/patterns/adapters/RtmAlertAdapter.js
+2	1	apps/web/src/patterns/adapters/SoatAlertAdapter.js
+2	1	apps/web/src/patterns/adapters/VehicleAlertAdapter.js
+2	1	apps/web/src/patterns/adapters/publishAdaptedAlerts.js
+3	1	apps/web/src/patterns/singleton/AlertHubSingleton.js
+2	1	apps/web/src/patterns/strategy/AlertSortStrategy.js
+2	1	apps/web/src/patterns/strategy/PriorityAlertSortStrategy.js
+2	1	apps/web/src/patterns/strategy/UrgencyAlertSortStrategy.js
+4	1	apps/web/src/utils/dateUtils.js
+5	2	apps/web/src/utils/reporteGenerator.js
+samuelfl680
+
+2	2	apps/web/src/Routes/routesConfig.js
+10	12	apps/web/src/services/api.js
+samuelfl680
+
+3	1	apps/web/src/components/UI/use-toast.js
+5	3	apps/web/src/contexts/AuthContext.jsx
+43	38	apps/web/src/contexts/DocumentsContext.jsx
+42	37	apps/web/src/contexts/RtmContext.jsx
+3	1	apps/web/src/hooks/useAlertHub.js
+2	1	apps/web/src/hooks/useAlerts.js
+3	1	apps/web/src/hooks/useAlertsFacade.js
+4	0	apps/web/src/hooks/useConductors.js
+2	1	apps/web/src/hooks/useDocumentStatus.js
+2	1	apps/web/src/hooks/useDocuments.js
+4	1	apps/web/src/hooks/useLocalStorage.js
+1	0	apps/web/src/hooks/useModalManager.js
+2	1	apps/web/src/hooks/useSimulatedDate.js
+2	0	apps/web/src/hooks/useValidationHistory.js
+5	0	apps/web/src/hooks/useVehicles.js
+samuelfl680
+
+5	3	apps/web/src/App.jsx
+5	0	apps/web/src/components/AddConductorModal.jsx
+29	25	apps/web/src/components/AddDocumentModal.jsx
+26	23	apps/web/src/components/AddRtmModal.jsx
+5	0	apps/web/src/components/AddVehicleModal.jsx
+2	2	apps/web/src/components/AlertCard.jsx
+4	2	apps/web/src/components/DataPanel.jsx
+2	0	apps/web/src/components/DetallesValidacionModal.jsx
+4	1	apps/web/src/components/Header.jsx
+2	1	apps/web/src/components/LoginModal.jsx
+2	1	apps/web/src/components/ModalFactory.jsx
+2	1	apps/web/src/components/ProtectedRoute.jsx
+2	1	apps/web/src/components/PublicHeader.jsx
+1	0	apps/web/src/components/RegisterModal.jsx
+2	1	apps/web/src/components/Sidebar.jsx
+2	1	apps/web/src/components/StatusBadge.jsx
+3	3	apps/web/src/components/UI/button.jsx
+1	0	apps/web/src/components/UI/toast.jsx
+2	1	apps/web/src/components/UI/toaster.jsx
+3	1	apps/web/src/components/UserProfileDropdown.jsx
+2	1	apps/web/src/components/ValidacionResultadoCard.jsx
+3	1	apps/web/src/layouts/DashboardLayout.jsx
+2	1	apps/web/src/main.jsx
+2	1	apps/web/src/pages/AlertasPage.jsx
+1	0	apps/web/src/pages/ConductoresPage.jsx
+4	2	apps/web/src/pages/ConfiguracionPage.jsx
+3	1	apps/web/src/pages/DashboardPage.jsx
+1	0	apps/web/src/pages/DocumentosPage.jsx
+3	2	apps/web/src/pages/HistorialValidacionesPage.jsx
+2	1	apps/web/src/pages/HomePage.jsx
+3	2	apps/web/src/pages/LoginPage.jsx
+2	1	apps/web/src/pages/PlanesPage.jsx
+3	1	apps/web/src/pages/ReportesPage.jsx
+2	1	apps/web/src/pages/TeamPage.jsx
+4	1	apps/web/src/pages/UserSettingsPage.jsx
+5	4	apps/web/src/pages/ValidacionRUNTPage.jsx
+2	0	apps/web/src/pages/VehiculosPage.jsx
+samuelfl680
+Sarm-m
+
+9	3	backend/.env.example
+samuelfl680
+Sarm-m
+
+1	0	.gitignore
+16	0	backend/.env
+1	1	backend/scripts/ensure-env.js
+1	1	backend/server.js
+Sarm-m
+
+4	7	apps/web/scripts/prepare-dev.mjs
+samuelfl680
+Sarm-m
+
+0	18	apps/web/package-lock.json
+samuelfl680
+Sarm-m
+
+3	3	.gitignore
+246	39	apps/web/src/components/LoginModal.jsx
+12	2	apps/web/src/components/RegisterModal.jsx
+30	0	apps/web/src/services/api.js
+5	10	backend/.env.example
+35	8	backend/scripts/ensure-env.js
+507	209	backend/server.js
+36	1	backend/services/emailService.js
+Aulas Ingenieria
+
+18	0	apps/web/package-lock.json
+solonlosada2006
+
+112	18	apps/web/src/pages/DocumentosPage.jsx
+solonlosada2006
+
+134	0	apps/web/src/components/EditRtmModal.jsx
+136	0	apps/web/src/components/EditSoatModal.jsx
+35	39	apps/web/src/contexts/DocumentsContext.jsx
+34	38	apps/web/src/contexts/RtmContext.jsx
+solonlosada2006
+
+79	512	backend/server.js
+solonlosada2006
+solonlosada2006
+
+4	4	backend/package-lock.json
+1	1	backend/package.json
+samuelfl680
+
+531	1	apps/web/package-lock.json
+6	2	apps/web/package.json
+samuelfl680
+
+84	0	apps/web/src/__tests__/soatAlertAdapter.test.js
+juserora
+
+0	1	apps/web/src/__tests__/RtmAlertAdapter.test.js
+juserora
+juserora
+
+105	0	apps/web/src/__tests__/RtmAlertAdapter.test.js
+4	0	apps/web/vite.config.js
+juserora
+
+383	1	apps/web/package-lock.json
+2	1	apps/web/package.json
+36	20	apps/web/src/pages/ConductoresPage.jsx
+40	31	apps/web/src/pages/VehiculosPage.jsx
+solonlosada2006
+
+383	1	apps/web/package-lock.json
+4	2	apps/web/package.json
+77	0	apps/web/src/test/useRUNTSimulator.test.js
+Sarm
+Sarm
+Sarm-m
+
+2	2	.github/workflows/sonarcloud.yml
+Sarm
+Sarm-m
+
+1	2	.github/workflows/sonarcloud.yml
+Sarm-m
+
+45	0	.github/workflows/sonarcloud.yml
+1	1	apps/web/package.json
+0	0	feature-samuelfl680
+10	0	sonar-project.properties
+samuelfl680
+samuelfl680
+Sarm-m
+
+1	0	apps/web/.gitignore
+Sarm-m
+
+531	1	apps/web/package-lock.json
+6	2	apps/web/package.json
+57	0	apps/web/src/__tests__/dateUtils.test.js
+16	5	apps/web/src/utils/dateUtils.js
+juserora
+samuelfl680
+samuelfl680
+
+101	4	backend/server.js
+copilot-swe-agent[bot]
+samuelfl680
+
+8	0	apps/web/vite.config.js
+samuelfl680
+
+1	1	backend/.env.example
+samuelfl680
+
+4	4	backend/.env.example
+Sarm-m
+
+25	24	apps/web/src/components/AddDocumentModal.jsx
+23	22	apps/web/src/components/AddRtmModal.jsx
+28	1	apps/web/src/components/AddVehicleModal.jsx
+38	29	apps/web/src/contexts/DocumentsContext.jsx
+37	28	apps/web/src/contexts/RtmContext.jsx
+5	7	apps/web/src/hooks/useConductors.js
+12	9	apps/web/src/hooks/useVehicles.js
+24	5	apps/web/src/services/api.js
+0	15	backend/.env.example
+11	1	backend/package-lock.json
+2	1	backend/package.json
+74	13	backend/server.js
+samuelfl680
+
+15	8	apps/web/src/contexts/AuthContext.jsx
+2	3	apps/web/src/services/api.js
+Sarm-m
+
+30	6	apps/web/src/components/RegisterModal.jsx
+123	43	apps/web/src/contexts/AuthContext.jsx
+28	10	apps/web/src/services/api.js
+81	45	backend/server.js
+samuelfl680
+
+3	2	apps/web/package.json
+57	0	apps/web/scripts/prepare-dev.mjs
+11	1	backend/package-lock.json
+2	1	backend/package.json
+samuelfl680
+
+50	6	backend/server.js
+samuelfl680
+
+20	2	backend/server.js
+juansebastianvd
+juansebastianvd
+juansebastianvd
+
+21	26	apps/web/src/services/api.js
+juansebastianvd
+
+16	76	apps/web/src/contexts/AuthContext.jsx
+juansebastianvd
+juansebastianvd
+
+70	11	backend/server.js
+juansebastianvd
+
+693	8	backend/package-lock.json
+juansebastianvd
+
+11	1	backend/package.json
+samuelfl680
+
+3	0	.github/workflows/pipeline_hu454_auth_ci_cd.yml
+34	0	Docs/QA/issue_auth_registro_mongo_atlas.md
+33	5	apps/web/src/services/api.js
+3	3	backend/.env.example
+3	0	backend/package.json
+150	0	backend/scripts/auth-doctor.js
+35	1	backend/server.js
+samuelfl680
+Juan Sebastian
+
+3	3	backend/.env.example
+1	0	backend/package.json
+19	0	backend/scripts/ensure-env.js
+39	4	backend/server.js
+62	8	backend/services/emailService.js
+samuelfl680
+samuelfl680
+
+1	0	.gitignore
+15	0	backend/.env.example
+samuelfl680
+
+24	0	scripts/setup.ps1
+27	0	scripts/setup.sh
+samuelfl680
+
+29	0	.github/ISSUE_TEMPLATE/pipeline_smoke_test.md
+117	0	.github/workflows/pipeline_hu454_auth_ci_cd.yml
+samuelfl680
+
+6	0	apps/web/src/components/RegisterModal.jsx
+2	1	apps/web/src/contexts/AuthContext.jsx
+4	0	backend/server.js
+2	0	backend/services/emailService.js
+samuelfl680
+samuelfl680
+
+3	6	backend/server.js
+samuelfl680
+
+6	3	backend/server.js
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+samuelfl680
+
+2	1	backend/server.js
+samuelfl680
+
+203	20	apps/web/package-lock.json
+5	2	apps/web/package.json
+samuelfl680
+
+5	7	apps/web/src/contexts/AuthContext.jsx
+1	1	backend/server.js
+samuelfl680
+
+165	63	apps/web/src/components/RegisterModal.jsx
+8	4	apps/web/src/contexts/AuthContext.jsx
+36	0	apps/web/src/services/api.js
+samuelfl680
+
+46	1	backend/package-lock.json
+3	1	backend/package.json
+158	7	backend/server.js
+36	0	backend/services/emailService.js
+samuelfl680
+samuelfl680
+
+13	3	apps/web/src/components/Header.jsx
+juansebastianvd
+juansebastianvd
+samuelfl680
+solonlosada2006
+
+8	1	apps/web/src/pages/DashboardPage.jsx
+1	1	apps/web/src/pages/DocumentosPage.jsx
+solonlosada2006
+
+89	35	apps/web/src/pages/DocumentosPage.jsx
+solonlosada2006
+
+3	0	apps/web/src/App.jsx
+142	0	apps/web/src/components/AddRtmModal.jsx
+79	0	apps/web/src/contexts/RtmContext.jsx
+22	0	apps/web/src/patterns/adapters/RtmAlertAdapter.js
+7	1	apps/web/src/patterns/factory/FleetModalFactory.jsx
+solonlosada2006
+
+64	1	backend/server.js
+juserora
+Sarm
+
+18	27	apps/web/src/components/AddDocumentModal.jsx
+35	40	apps/web/src/contexts/DocumentsContext.jsx
+5	28	apps/web/src/pages/DocumentosPage.jsx
+1	64	backend/server.js
+samuelfl680
+copilot-swe-agent[bot]
+samuelfl680
+solonlosada2006
+
+27	18	apps/web/src/components/AddDocumentModal.jsx
+40	35	apps/web/src/contexts/DocumentsContext.jsx
+28	5	apps/web/src/pages/DocumentosPage.jsx
+64	1	backend/server.js
+Juserora
+juserora
+
+225	0	Docs/QA/QA_Reporte_DriveControl.pdf
+Sarm
+
+18	17	Docs/Arquitectura/patrones/Modelo de dominio general.md
+Sarm
+
+0	0	Docs/Arquitectura/patrones/{Modelo de dominio general => Modelo de dominio general.md}
+Sarm
+
+18	2	Docs/Arquitectura/patrones/Modelo de dominio general
+Sarm
+
+89	0	Docs/Arquitectura/patrones/Modelo de dominio general
+Sarm
+
+16	4	Docs/Arquitectura/patrones/creacionales/factory_method_modales.md
+Juserora
+
+236	0	Docs/DiagramaDB/syntix_tech_db_descripcion.md
+juansebastianvd
+
+0	79	Docs/DiagramaDB/DiagramaBaseDatos
+juansebastianvd
+
+79	0	Docs/DiagramaDB/DiagramaBaseDatos
+Juserora
+
+0	1	Docs/DiagramaDB/ex
+Juserora
+
+-	-	Docs/DiagramaDB/DIAGRAMA DB.png
+Juserora
+
+1	0	Docs/DiagramaDB/ex
+samuelfl680
+samuelfl680
+
+-	-	Docs/Arquitectura/UML/DiagramaDeClases.pdf
+Sarm
+Sarm-m
+
+287	225	apps/web/src/components/AddConductorModal.jsx
+69	36	apps/web/src/components/AddVehicleModal.jsx
+22	0	apps/web/src/hooks/useConductors.js
+14	0	apps/web/src/hooks/useVehicles.js
+129	99	apps/web/src/pages/ConductoresPage.jsx
+178	143	apps/web/src/pages/VehiculosPage.jsx
+154	19	backend/server.js
+Samuel Freile
+
+121	12	apps/web/package-lock.json
+2	1	apps/web/package.json
+30	9	apps/web/src/components/LoginModal.jsx
+32	9	apps/web/src/components/RegisterModal.jsx
+136	20	apps/web/src/contexts/AuthContext.jsx
+101	0	apps/web/src/services/api.js
+Sarm-m
+
+0	16	apps/web/package-lock.json
+Sarm
+Sarm-m
+
+5	5	apps/web/src/components/AddConductorModal.jsx
+180	128	apps/web/src/components/AddVehicleModal.jsx
+58	14	apps/web/src/hooks/useConductors.js
+82	14	apps/web/src/hooks/useVehicles.js
+151	51	backend/server.js
+Sarm-m
+
+32	6	apps/web/src/components/AddConductorModal.jsx
+29	2	backend/server.js
+Sarm-m
+
+44	6	apps/web/src/components/AddConductorModal.jsx
+22	8	apps/web/src/hooks/useConductors.js
+20	5	apps/web/src/hooks/useVehicles.js
+18	0	backend/server.js
+Sarm-m
+
+79	39	apps/web/src/components/AddConductorModal.jsx
+Sarm-m
+
+22	7	apps/web/src/pages/ConductoresPage.jsx
+Sarm-m
+
+0	64	Docs/Arquitectura/UML/Patrones_GOF_Actuales.md
+0	29	Docs/Arquitectura/UML/UML_Adapter_Alertas.md
+0	41	Docs/Arquitectura/UML/UML_Facade_Alertas.md
+0	19	Docs/Arquitectura/UML/UML_FactoryMethod_Modales.md
+0	27	Docs/Arquitectura/UML/UML_Observer_AlertHub.md
+0	18	Docs/Arquitectura/UML/UML_Singleton_AlertHub.md
+0	30	Docs/Arquitectura/UML/UML_Strategy_Alertas.md
+72	0	Docs/Arquitectura/patrones/comportamentales/observer_alert_hub.md
+79	0	Docs/Arquitectura/patrones/comportamentales/strategy_orden_alertas.md
+69	0	Docs/Arquitectura/patrones/creacionales/factory_method_modales.md
+71	0	Docs/Arquitectura/patrones/creacionales/singleton_alert_hub.md
+91	0	Docs/Arquitectura/patrones/estructurales/adapter_alertas.md
+90	0	Docs/Arquitectura/patrones/estructurales/facade_alertas.md
+122	0	Docs/Arquitectura/patrones/matriz_patrones_gof.md
+solonlosada2006
+
+1	0	README.md
+solonlosada2006
+
+13	24	".github/workflows/Flujo y asignaci\303\263n din\303\241mica.yml"
+solonlosada2006
+
+1	1	".github/workflows/Flujo y asignaci\303\263n din\303\241mica.yml"
+juansebastianvd
+solonlosada2006
+
+20	1	".github/workflows/Flujo y asignaci\303\263n din\303\241mica.yml"
+solonlosada2006
+solonlosada2006
+
+0	34	.github/ISSUE_TEMPLATE/invest.md
+solonlosada2006
+
+0	22	.github/ISSUE_TEMPLATE/definition-of-done.md
+solonlosada2006
+
+0	28	.github/ISSUE_TEMPLATE/criterios-de-aceptacion.md
+juansebastianvd
+juansebastianvd
+
+16	0	apps/web/package-lock.json
+2	1	backend/package.json
+solonlosada2006
+
+1	1	.github/workflows/ci_verificacion.yml
+juansebastianvd
+juserora
+
+2	0	apps/web/src/App.jsx
+39	10	apps/web/src/pages/HomePage.jsx
+solonlosada2006
+
+1	1	.github/workflows/cd_entrega.yml
+juansebastianvd
+solonlosada2006
+
+30	0	".github/workflows/Est\303\241ndares_de_calidad.yml"
+0	95	.github/workflows/pipeline-gestion.yml
+solonlosada2006
+
+26	0	".github/workflows/Flujo y asignaci\303\263n din\303\241mica.yml"
+0	52	.github/workflows/pipeline-empaquetado.yml
+juansebastianvd
+juansebastianvd
+juserora
+solonlosada2006
+
+0	37	.github/workflows/cd.yml
+41	0	.github/workflows/cd_entrega.yml
+solonlosada2006
+
+1	1	.github/workflows/{ci.yml => ci_verificacion.yml}
+juansebastianvd
+juansebastianvd
+
+105	12	apps/web/package-lock.json
+2	1	apps/web/package.json
+286	1	package-lock.json
+4	1	package.json
+juansebastianvd
+
+0	22	apps/web/src/App.jsx
+26	51	apps/web/src/hooks/useConductors.js
+25	141	apps/web/src/hooks/useVehicles.js
+juansebastianvd
+
+31	16	apps/web/src/pages/LoginPage.jsx
+juansebastianvd
+
+52	36	apps/web/src/contexts/AuthContext.jsx
+juansebastianvd
+
+11	0	backend/models/Conductor.js
+1072	0	backend/package-lock.json
+19	0	backend/package.json
+133	0	backend/server.js
+samuelfl680
+copilot-swe-agent[bot]
+copilot-swe-agent[bot]
+
+6	2	apps/web/src/pages/DocumentosPage.jsx
+3	2	apps/web/src/pages/LoginPage.jsx
+Sarm
+Sarm-m
+
+3	1	Docs/Arquitectura/UML/Patrones_GOF_Actuales.md
+2	1	Docs/Arquitectura/UML/UML_Adapter_Alertas.md
+3	1	Docs/Arquitectura/UML/UML_Facade_Alertas.md
+2	1	Docs/Arquitectura/UML/UML_FactoryMethod_Modales.md
+2	1	Docs/Arquitectura/UML/UML_Observer_AlertHub.md
+3	1	Docs/Arquitectura/UML/UML_Singleton_AlertHub.md
+2	1	Docs/Arquitectura/UML/UML_Strategy_Alertas.md
+Sarm
+Sarm-m
+
+1	1	Docs/Arquitectura/UML/UML_Strategy_Alertas.md
+Sarm-m
+
+62	0	Docs/Arquitectura/UML/Patrones_GOF_Actuales.md
+28	0	Docs/Arquitectura/UML/UML_Adapter_Alertas.md
+39	0	Docs/Arquitectura/UML/UML_Facade_Alertas.md
+18	0	Docs/Arquitectura/UML/UML_FactoryMethod_Modales.md
+26	0	Docs/Arquitectura/UML/UML_Observer_AlertHub.md
+16	0	Docs/Arquitectura/UML/UML_Singleton_AlertHub.md
+29	0	Docs/Arquitectura/UML/UML_Strategy_Alertas.md
+samuelfl680
+Sarm-m
+
+1	1	apps/web/src/patterns/strategy/AlertSortStrategy.js
+Sarm-m
+Sarm-m
+
+12	22	apps/web/src/components/ModalFactory.jsx
+3	3	apps/web/src/contexts/DocumentsContext.jsx
+3	3	apps/web/src/hooks/useConductors.js
+3	3	apps/web/src/hooks/useVehicles.js
+15	0	apps/web/src/patterns/adapters/BaseAlertAdapter.js
+3	5	apps/web/src/patterns/adapters/ConductorAlertAdapter.js
+6	8	apps/web/src/patterns/adapters/SoatAlertAdapter.js
+3	5	apps/web/src/patterns/adapters/VehicleAlertAdapter.js
+12	0	apps/web/src/patterns/adapters/publishAdaptedAlerts.js
+22	0	apps/web/src/patterns/factory/AuthModalFactory.jsx
+11	0	apps/web/src/patterns/factory/BaseModalFactory.jsx
+31	0	apps/web/src/patterns/factory/FleetModalFactory.jsx
+Sarm-m
+
+11	68	apps/web/src/hooks/useAlertHub.js
+16	10	apps/web/src/hooks/useAlertsFacade.js
+73	0	apps/web/src/patterns/singleton/AlertHubSingleton.js
+5	0	apps/web/src/patterns/strategy/AlertSortStrategy.js
+11	0	apps/web/src/patterns/strategy/PriorityAlertSortStrategy.js
+7	0	apps/web/src/patterns/strategy/UrgencyAlertSortStrategy.js
+Sarm-m
+
+5	14	apps/web/src/contexts/DocumentsContext.jsx
+7	17	apps/web/src/hooks/useConductors.js
+4	29	apps/web/src/hooks/useVehicles.js
+24	0	apps/web/src/patterns/adapters/ConductorAlertAdapter.js
+24	0	apps/web/src/patterns/adapters/SoatAlertAdapter.js
+36	0	apps/web/src/patterns/adapters/VehicleAlertAdapter.js
+Sarm-m
+
+23	34	apps/web/src/contexts/DocumentsContext.jsx
+61	34	apps/web/src/hooks/useAlertHub.js
+7	99	apps/web/src/hooks/useAlertsFacade.js
+Sarm-m
+
+22	3	apps/web/src/contexts/DocumentsContext.jsx
+34	58	apps/web/src/hooks/useAlertHub.js
+samuelfl680
+Sarm-m
+
+17	7	apps/web/src/components/Sidebar.jsx
+2	4	apps/web/src/hooks/useAlerts.js
+28	10	apps/web/src/hooks/useAlertsFacade.js
+juansebastianvd
+copilot-swe-agent[bot]
+
+1	1	apps/web/src/components/UI/toast.jsx
+copilot-swe-agent[bot]
+
+92	0	apps/web/src/components/UI/toast.jsx
+2	2	apps/web/src/components/UI/toaster.jsx
+samuelfl680
+
+3	3	apps/web/src/contexts/DocumentsContext.jsx
+juserora
+
+101	0	apps/web/src/components/UI/toast.jsx
+34	0	apps/web/src/components/UI/toaster.jsx
+103	0	apps/web/src/components/UI/use-toast.js
+samuelfl680
+samuelfl680
+juansebastianvd
+juansebastianvd
+juansebastianvd
+juansebastianvd
+juansebastianvd
+juansebastianvd
+juansebastianvd
+juansebastianvd
+juansebastianvd
+
+2	0	apps/web/src/App.jsx
+243	0	apps/web/src/components/DetallesValidacionModal.jsx
+217	0	apps/web/src/components/ValidacionResultadoCard.jsx
+339	0	apps/web/src/hooks/useRUNTSimulator.js
+136	0	apps/web/src/hooks/useValidationHistory.js
+297	0	apps/web/src/pages/HistorialValidacionesPage.jsx
+155	76	apps/web/src/pages/ValidacionRUNTPage.jsx
+347	0	apps/web/src/utils/reporteGenerator.js
+8	2	package-lock.json
+Sarm-m
+
+24	21	apps/web/src/App.jsx
+172	0	apps/web/src/components/AddDocumentModal.jsx
+4	1	apps/web/src/components/ModalFactory.jsx
+75	0	apps/web/src/contexts/DocumentsContext.jsx
+1	63	apps/web/src/hooks/useDocuments.js
+8	4	apps/web/src/pages/DashboardPage.jsx
+62	37	apps/web/src/pages/DocumentosPage.jsx
+Sarm-m
+
+7682	0	apps/web/package-lock.json
+1	1	apps/web/package.json
+13	81	apps/web/src/App.jsx
+5	5	apps/web/src/components/ProtectedRoute.jsx
+9	4	apps/web/src/layouts/DashboardLayout.jsx
+Sarm-m
+
+76	12	apps/web/src/App.jsx
+12	12	apps/web/src/components/ProtectedRoute.jsx
+3	3	apps/web/src/layouts/DashboardLayout.jsx
+Sarm-m
+
+72	18	apps/web/src/hooks/useVehicles.js
+28	13	apps/web/src/pages/VehiculosPage.jsx
+Sarm-m
+
+31	2	apps/web/src/hooks/useLocalStorage.js
+Sarm-m
+
+36	12	apps/web/src/pages/VehiculosPage.jsx
+Sarm-m
+
+116	96	apps/web/src/pages/DashboardPage.jsx
+Sarm-m
+
+2	36	apps/web/src/App.jsx
+Sarm-m
+Sarm-m
+
+0	0	Docs/Arquitectura/README.md
+-	-	Docs/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Diagrama UML PATRONES FECADE.png
+109	0	Docs/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Facade_Alertas_Analisis.md
+94	0	Docs/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Facade_Alertas_Documentacion.md
+-	-	Docs/Arquitectura/UML/Diagrama_de_secuencia.png
+-	-	Docs/Arquitectura/UML/Diagrama_registro_de_uml_clases.png
+32	0	Docs/Arquitectura/UML/README.MD
+-	-	Docs/Presentaciones/Presentacion grupo 4.pdf
+-	-	Docs/Presentaciones/Proyecto propuesta grupo 4..pdf
+1	0	Docs/Reuniones/README.md
+-	-	"Docs/Reuniones/Reuni\303\263n_1_ en _3517_G4_ .docx"
+1	0	Docs/Taller
+-	-	Docs/Taller_de_diagramas/HU-01/Diagramas Historia de usuario 1.docx
+1	0	Docs/Taller_de_diagramas/HU-01/read.me
+-	-	Docs/Taller_de_diagramas/HU-02/1.png
+-	-	Docs/Taller_de_diagramas/HU-02/HU-2-2.png
+-	-	Docs/Taller_de_diagramas/HU-02/HU-2-3.jpeg
+1	0	Docs/Taller_de_diagramas/HU-02/read.me
+-	-	Docs/Taller_de_diagramas/HU-03/Diagrama de clases_ HU3.drawio.png
+-	-	Docs/Taller_de_diagramas/HU-03/DiagramaEBC_HU_3.drawio.png
+-	-	Docs/Taller_de_diagramas/HU-03/HU3_Diagrama_componentes.jpeg
+1	0	Docs/Taller_de_diagramas/HU-03/read.me
+1	0	Docs/Taller_de_diagramas/read.me
+Sarm-m
+Sarm-m
+
+0	0	Docs/Arquitectura/README.md
+-	-	Docs/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Diagrama UML PATRONES FECADE.png
+0	109	Docs/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Facade_Alertas_Analisis.md
+0	94	Docs/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Facade_Alertas_Documentacion.md
+-	-	Docs/Arquitectura/UML/Diagrama_de_secuencia.png
+-	-	Docs/Arquitectura/UML/Diagrama_registro_de_uml_clases.png
+0	32	Docs/Arquitectura/UML/README.MD
+-	-	Docs/Presentaciones/Presentacion grupo 4.pdf
+-	-	Docs/Presentaciones/Proyecto propuesta grupo 4..pdf
+0	1	Docs/Reuniones/README.md
+-	-	"Docs/Reuniones/Reuni\303\263n_1_ en _3517_G4_ .docx"
+0	1	Docs/Taller
+-	-	Docs/Taller_de_diagramas/HU-01/Diagramas Historia de usuario 1.docx
+0	1	Docs/Taller_de_diagramas/HU-01/read.me
+-	-	Docs/Taller_de_diagramas/HU-02/1.png
+-	-	Docs/Taller_de_diagramas/HU-02/HU-2-2.png
+-	-	Docs/Taller_de_diagramas/HU-02/HU-2-3.jpeg
+0	1	Docs/Taller_de_diagramas/HU-02/read.me
+-	-	Docs/Taller_de_diagramas/HU-03/Diagrama de clases_ HU3.drawio.png
+-	-	Docs/Taller_de_diagramas/HU-03/DiagramaEBC_HU_3.drawio.png
+-	-	Docs/Taller_de_diagramas/HU-03/HU3_Diagrama_componentes.jpeg
+0	1	Docs/Taller_de_diagramas/HU-03/read.me
+0	1	Docs/Taller_de_diagramas/read.me
+Sarm-m
+Sarm
+Sarm
+
+0	0	.github/workflows/{Pipeline2.yml => pipeline-gestion.yml}
+juansebastianvd
+juansebastianvd
+
+74	16	.github/workflows/Pipeline2.yml
+TuNombre
+
+29	0	apps/web/.eslintrc.cjs
+Sarm
+
+1	1	.github/workflows/pipeline-empaquetado.yml
+solonlosada2006
+solonlosada2006
+
+37	0	.github/workflows/Pipeline2.yml
+Sarm-m
+Sarm-m
+TuNombre
+
+20	6	.github/workflows/ci.yml
+1	1	.github/workflows/pipeline-empaquetado.yml
+Sarm-m
+
+0	30	.github/workflows
+0	0	.github/{ => workflows}/pipeline-empaquetado.yml
+solonlosada2006
+TuNombre
+
+10	10	.github/workflows/cd.yml
+7	7	.github/workflows/ci.yml
+solonlosada2006
+
+0	17	.github/workflows/Pipeline-ci.yaml
+Sarm-m
+TuNombre
+
+7	0	.github/workflows/cd.yml
+juansebastianvd
+TuNombre
+
+1	1	.github/workflows/cd.yml
+TuNombre
+
+0	0	.github/{Workflows => workflows}/cd.yml
+0	0	.github/{Workflows => workflows}/ci.yml
+0	0	.github/{Workflows => workflows}/pipeline-empaquetado.yml
+9	0	package.json
+Sarm
+
+0	27	.github/Workflows/build.yml
+0	27	.github/Workflows/cd.yml
+0	1	.github/Workflows/ci.yml
+juansebastianvd
+
+28	0	.github/ISSUE_TEMPLATE/criterios-de-aceptacion.md
+22	0	.github/ISSUE_TEMPLATE/definition-of-done.md
+34	0	.github/ISSUE_TEMPLATE/invest.md
+solonlosada2006
+
+12	13	.github/workflows/Pipeline-ci.yaml
+solonlosada2006
+
+0	0	.github/{Workflows => workflows}/Pipeline-ci.yaml
+samuelfl680
+solonlosada2006
+
+1	0	.github/workflows
+Sarm
+
+52	0	.github/Workflows/pipeline-empaquetado.yml
+solonlosada2006
+
+18	0	.github/Workflows/Pipeline-ci.yaml
+samuelfl680
+
+26	0	.github/Workflows/ci.yml
+samuelfl680
+
+29	0	.github/Workflows/cd.yml
+samuelfl680
+
+8	8	.github/Workflows/cd.yml
+samuelfl680
+
+26	0	.github/Workflows/cd.yml
+samuelfl680
+
+7	4	.github/Workflows/build.yml
+samuelfl680
+
+24	0	.github/Workflows/build.yml
+Juserora
+
+0	21	apps/web/src/hooks/useAlert.js
+Juserora
+
+2	2	apps/web/src/hooks/useAlerts.js
+Juserora
+
+2	2	apps/web/src/components/Sidebar.jsx
+Juserora
+
+22	1	apps/web/src/hooks/useDocuments.js
+Juserora
+
+38	1	apps/web/src/hooks/useVehicles.js
+Juserora
+
+22	1	apps/web/src/hooks/useConductors.js
+Juserora
+
+91	0	apps/web/src/hooks/useAlertHub.js
+solonlosada2006
+Aulas Ingenieria
+
+34	0	apps/web/src/components/UI/toaster.jsx
+Aulas Ingenieria
+
+22	0	apps/web/src/components/UI/use-toast.js
+Aulas Ingenieria
+
+16	0	apps/web/src/components/UI/use-toast.js
+Aulas Ingenieria
+
+32	0	apps/web/src/components/UI/use-toast.js
+Aulas Ingenieria
+
+5	0	apps/web/src/components/UI/use-toast.js
+Aulas Ingenieria
+
+7	0	apps/web/src/components/UI/use-toast.js
+Aulas Ingenieria
+
+9	0	apps/web/src/components/UI/use-toast.js
+solonlosada2006
+Aulas Ingenieria
+
+3	0	apps/web/src/components/UI/use-toast.js
+Aulas Ingenieria
+
+6	1	apps/web/src/components/UI/use-toast.js
+Aulas Ingenieria
+
+6	0	apps/web/src/components/UI/use-toast.js
+solonlosada2006
+
+12	2	apps/web/src/App.jsx
+solonlosada2006
+
+14	17	apps/web/src/App.jsx
+solonlosada2006
+
+15	0	apps/web/src/Routes/routesConfig.js
+solonlosada2006
+
+-	-	"Docs/Arquitectura/UML/UML-Patr\303\263n_Strategy.png"
+juansebastianvd
+Sarm-m
+
+-	-	Docs/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Diagrama UML PATRONES FECADE.png
+0	0	Docs/Arquitectura/{ => Taller_patrones/Sebastian_Ramirez_M}/Facade_Alertas_Analisis.md
+94	0	Docs/Arquitectura/Taller_patrones/Sebastian_Ramirez_M/Facade_Alertas_Documentacion.md
+Sarm-m
+
+5	2	apps/web/src/components/Header.jsx
+3	2	apps/web/src/components/Sidebar.jsx
+14	9	apps/web/src/pages/AlertasPage.jsx
+Sarm-m
+
+3	75	apps/web/src/hooks/useAlerts.js
+Sarm-m
+
+106	0	apps/web/src/hooks/useAlertsFacade.js
+Sarm-m
+
+109	0	Docs/Arquitectura/Facade_Alertas_Analisis.md
+Sarm-m
+
+7699	0	apps/web/package-lock.json
+solonlosada2006
+
+7699	0	apps/web/package-lock.json
+11	12	apps/web/src/App.jsx
+0	0	header_afuera.jsx => temp/header_afuera.jsx
+solonlosada2006
+
+1	3	apps/web/src/App.jsx
+solonlosada2006
+Sarm-m
+juanvargax
+juanvargax
+
+194	147	apps/web/src/pages/DashboardPage.jsx
+juanvargax
+
+11	9	apps/web/src/pages/TeamPage.jsx
+juanvargax
+
+12	9	apps/web/src/pages/HomePage.jsx
+juanvargax
+
+16	0	apps/web/src/hooks/useModalManager.js
+juanvargax
+
+27	0	apps/web/src/components/ModalFactory.jsx
+Sarm-m
+
+7679	0	apps/web/package-lock.json
+Sarm
+Sarm
+Sarm-m
+Sarm-m
+juansebastianvd
+juanvargax
+
+22	19	apps/web/src/App.jsx
+juanvargax
+
+60	0	apps/web/src/pages/DocumentosPage.jsx
+Sarm-m
+Sarm-m
+
+1	0	apps/web/src/pages/UserSettingsPage.jsx
+juansebastianvd
+juansebastianvd
+
+7	0	apps/web/src/App.jsx
+juansebastianvd
+solonlosada2006
+
+176	0	apps/web/src/pages/ConfiguracionPage.jsx
+115	0	apps/web/src/pages/ReportesPage.jsx
+solonlosada2006
+
+0	0	apps/web/src/pages/ConfiguracionPage.jsx
+solonlosada2006
+
+0	0	apps/web/src/pages/ReportesPage.jsx
+juanvargax
+juanvargax
+
+7679	0	apps/web/package-lock.json
+0	2	apps/web/src/App.jsx
+juanvargax
+
+115	0	apps/web/src/pages/ValidacionRUNTPage.jsx
+juansebastianvd
+Sarm
+juansebastianvd
+
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas}/HU-01/Diagramas Historia de usuario 1.docx
+0	0	Docs/{Taller de diagramas  => Taller_de_diagramas}/HU-01/read.me
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas}/HU-02/1.png
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas}/HU-02/HU-2-2.png
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas}/HU-02/HU-2-3.jpeg
+0	0	Docs/{Taller de diagramas  => Taller_de_diagramas}/HU-02/read.me
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas}/HU-03/Diagrama de clases_ HU3.drawio.png
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas}/HU-03/DiagramaEBC_HU_3.drawio.png
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas}/HU-03/HU3_Diagrama_componentes.jpeg
+0	0	Docs/{Taller de diagramas  => Taller_de_diagramas}/HU-03/read.me
+0	0	Docs/{Taller de diagramas  => Taller_de_diagramas}/read.me
+juansebastianvd
+
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-01/Diagramas Historia de usuario 1.docx
+0	0	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-01/read.me
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-02/1.png
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-02/HU-2-2.png
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-02/HU-2-3.jpeg
+0	0	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-02/read.me
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-03/Diagrama de clases_ HU3.drawio.png
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-03/DiagramaEBC_HU_3.drawio.png
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-03/HU3_Diagrama_componentes.jpeg
+0	0	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-03/read.me
+0	0	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/read.me
+Sarm-m
+
+2	0	apps/web/src/App.jsx
+Sarm-m
+
+15	20	apps/web/src/pages/AlertasPage.jsx
+juansebastianvd
+
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-01/Diagramas Historia de usuario 1.docx
+0	0	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-01/read.me
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-02/1.png
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-02/HU-2-2.png
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-02/HU-2-3.jpeg
+0	0	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-02/read.me
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-03/Diagrama de clases_ HU3.drawio.png
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-03/DiagramaEBC_HU_3.drawio.png
+-	-	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-03/HU3_Diagrama_componentes.jpeg
+0	0	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/HU-03/read.me
+0	0	Docs/{Taller_de_diagramas  => Taller_de_diagramas}/read.me
+Sarm-m
+
+42	1	apps/web/src/pages/AlertasPage.jsx
+Sarm-m
+
+30	5	apps/web/src/pages/AlertasPage.jsx
+Sarm-m
+
+19	0	apps/web/src/pages/AlertasPage.jsx
+juansebastianvd
+juansebastianvd
+juanvargax
+
+2	0	apps/web/src/App.jsx
+Sarm-m
+juansebastianvd
+
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas }/HU-01/Diagramas Historia de usuario 1.docx
+0	0	Docs/{Taller de diagramas  => Taller_de_diagramas }/HU-01/read.me
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas }/HU-02/1.png
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas }/HU-02/HU-2-2.png
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas }/HU-02/HU-2-3.jpeg
+0	0	Docs/{Taller de diagramas  => Taller_de_diagramas }/HU-02/read.me
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas }/HU-03/Diagrama de clases_ HU3.drawio.png
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas }/HU-03/DiagramaEBC_HU_3.drawio.png
+-	-	Docs/{Taller de diagramas  => Taller_de_diagramas }/HU-03/HU3_Diagrama_componentes.jpeg
+0	0	Docs/{Taller de diagramas  => Taller_de_diagramas }/HU-03/read.me
+0	0	Docs/{Taller de diagramas  => Taller_de_diagramas }/read.me
+Juserora
+juserora
+
+84	0	apps/web/src/pages/ConductoresPage.jsx
+104	0	apps/web/src/pages/VehiculosPage.jsx
+samuelfl680
+
+-	-	Docs/Taller de diagramas /HU-01/Diagramas Historia de usuario 1.docx
+juansebastianvd
+
+-	-	Docs/Taller de diagramas /HU-02/HU-2-3.jpeg
+solonlosada2006
+
+-	-	Docs/Taller de diagramas /HU-03/HU3_Diagrama_componentes.jpeg
+solonlosada2006
+
+-	-	Docs/Taller de diagramas /HU-03/Diagrama de clases_ HU3.drawio.png
+-	-	Docs/Taller de diagramas /HU-03/DiagramaEBC_HU_3.drawio.png
+juansebastianvd
+
+-	-	Docs/Taller de diagramas /HU-02/HU-2-2.png
+Sarm
+
+-	-	Docs/Taller de diagramas /HU-02/1.png
+Sarm
+
+-	-	Docs/Taller de diagramas /HU-02/1.png
+Sarm
+
+-	-	Docs/Taller de diagramas /HU-02/1.png
+Sarm
+
+1	0	Docs/Taller de diagramas /HU-03/read.me
+Sarm
+
+0	1	Docs/Taller de diagramas /HU-03
+Sarm
+
+1	0	Docs/Taller de diagramas /HU-03
+Sarm
+
+1	0	Docs/Taller de diagramas /HU-02/read.me
+Sarm
+
+1	0	Docs/Taller de diagramas /HU-01/read.me
+Sarm
+
+1	0	Docs/Taller de diagramas /read.me
+Sarm
+
+1	0	Docs/Taller
+juanvargax
+juansebastianvd
+juanvargax
+
+14	3	apps/web/src/App.jsx
+juansebastianvd
+juansebastianvd
+juansebastianvd
+juansebastianvd
+juanvargax
+
+6	0	apps/web/postcss.config.js
+juanvargax
+
+67	0	apps/web/tailwind.config.js
+juansebastianvd
+juanvargax
+
+5	12	apps/web/src/App.jsx
+33	0	apps/web/src/index.css
+5	3	apps/web/src/main.jsx
+juanvargax
+
+8	14	apps/web/src/App.jsx
+0	130	apps/web/src/contexts/AuthContext.jsx
+1	20	apps/web/vite.config.js
+juanvargax
+
+18	0	apps/web/src/components/StatusBadge.jsx
+Samuel felipe
+
+18	0	apps/web/src/components/StatusBadge.jsx
+solonlosada2006
+
+14	0	apps/web/src/components/ProtectedRoute.jsx
+solonlosada2006
+
+14	0	apps/web/src/components/ProtectedRoute.jsx
+Juserora
+Juserora
+Juserora
+Juserora
+juserora
+
+1	0	apps/web/src/hooks/useConductors.js
+1	0	apps/web/src/hooks/useVehicles.js
+juserora
+
+145	187	apps/web/src/pages/DashboardPage.jsx
+juserora
+
+1	0	apps/web/src/components/AddConductorModal.jsx
+1	0	apps/web/src/components/AddVehicleModal.jsx
+Juserora
+juserora
+
+124	0	apps/web/src/components/AddConductorModal.jsx
+127	0	apps/web/src/components/AddVehicleModal.jsx
+Juserora
+juserora
+
+1	0	apps/web/src/components/AlertCard.jsx
+Sarm-m
+Sarm-m
+
+1	1	apps/web/src/components/DataPanel.jsx
+Sarm-m
+
+35	12	apps/web/src/components/DataPanel.jsx
+Sarm-m
+
+47	14	apps/web/src/components/DataPanel.jsx
+Sarm-m
+
+33	3	apps/web/src/components/DataPanel.jsx
+Sarm-m
+
+23	2	apps/web/src/components/DataPanel.jsx
+Sarm-m
+
+23	2	apps/web/src/components/DataPanel.jsx
+Sarm-m
+
+9	0	apps/web/src/components/DataPanel.jsx
+2	0	apps/web/src/pages/DashboardPage.jsx
+solonlosada2006
+juserora
+
+27	0	apps/web/src/components/AlertCard.jsx
+solonlosada2006
+juserora
+
+27	0	apps/web/src/components/AlertCard.jsx
+juansebastianvd
+Sarm
+samuelfl680
+samuelfl680
+Samuel felipe
+
+0	7	src/README.md
+0	1	src/main/README.md
+0	7	src/test/README.md
+Samuel felipe
+
+134	0	apps/web/src/contexts/AuthContext.jsx
+0	0	feature-samuelfl680
+Samuel felipe
+
+168	0	apps/web/src/layouts/toast.jsx
+Samuel felipe
+
+57	0	apps/web/package.json
+Samuel felipe
+
+0	57	apps/web/package.json
+101	0	apps/web/src/components/UI/button.jsx
+22	0	apps/web/src/layouts/DashboardLayout.jsx
+Samuel felipe
+
+57	0	apps/web/package.json
+Juserora
+juserora
+
+112	0	apps/web/src/pages/LoginPage.jsx
+juserora
+solonlosada2006
+
+69	0	wireframe_soat
+juansebastianvd
+juanvargax
+
+4	7	apps/web/src/App.jsx
+5	8	apps/web/src/pages/HomePage.jsx
+juanvargax
+
+34	0	apps/web/src/App.jsx
+81	0	apps/web/src/components/RegisterModal.jsx
+70	0	apps/web/src/components/Sidebar.jsx
+82	0	apps/web/src/components/UserProfileDropdown.jsx
+61	0	apps/web/src/contexts/AuthContext.jsx
+21	0	apps/web/src/hooks/useAlert.js
+79	0	apps/web/src/hooks/useAlerts.js
+45	0	apps/web/src/hooks/useConductors.js
+21	0	apps/web/src/hooks/useDocumentStatus.js
+42	0	apps/web/src/hooks/useDocuments.js
+23	0	apps/web/src/hooks/useLocalStorage.js
+11	0	apps/web/src/hooks/useSimulatedDate.js
+63	0	apps/web/src/hooks/useVehicles.js
+22	0	apps/web/src/layouts/DashboardLayout.jsx
+218	0	apps/web/src/pages/DashboardPage.jsx
+110	0	apps/web/src/pages/HomePage.jsx
+26	0	apps/web/src/utils/dateUtils.js
+juansebastianvd
+juanvargax
+
+57	0	apps/web/package.json
+16	0	apps/web/vite.config.js
+Sarm
+Sarm-m
+
+1	0	apps/web/src/components/PublicHeader.jsx
+Sarm-m
+
+6	0	apps/web/src/App.jsx
+1	2	apps/web/src/components/PublicHeader.jsx
+124	0	apps/web/src/pages/PlanesPage.jsx
+Sarm
+Sarm-m
+Sarm-m
+Sarm-m
+
+0	0	apps/web/src/{ => components}/LoginModal.jsx
+Sarm-m
+
+16	0	apps/web/vite.config.js
+Sarm
+Sarm-m
+
+28	27	apps/web/src/pages/TeamPage.jsx
+Sarm-m
+
+13	4	apps/web/src/pages/TeamPage.jsx
+Sarm-m
+
+47	0	apps/web/src/pages/TeamPage.jsx
+Sarm
+juserora
+
+59	0	apps/web/src/LoginModal.jsx
+juserora
+
+0	0	apps/web/src/LoginModal.jsx
+Sarm-m
+Sarm-m
+Sarm-m
+
+0	0	apps/web/package.json
+solonlosada2006
+solonlosada2006
+solonlosada2006
+
+39	0	header_afuera.jsx
+juansebastianvd
+juanvargax
+
+50	0	apps/web/src/components/Header.jsx
+80	0	apps/web/src/components/PublicHeader.jsx
+Sarm
+Sarm
+juserora
+
+8	0	apps/web/src/main.jsx
+Sarm-m
+
+14	0	apps/web/index.html
+Sarm-m
+
+0	0	apps/web/{.gitkeep => package.json}
+0	0	apps/web/src/.gitkeep
+0	0	apps/web/src/components/.gitkeep
+0	0	apps/web/src/contexts/.gitkeep
+0	0	apps/web/src/hooks/.gitkeep
+0	0	apps/web/src/layouts/.gitkeep
+0	0	apps/web/src/pages/.gitkeep
+0	0	apps/web/src/test/.gitkeep
+Sarm
+Sarm-m
+
+0	0	apps/web/{package-lock.json => .gitkeep}
+0	0	apps/web/{package.json => src/.gitkeep}
+0	0	apps/web/src/components/.gitkeep
+0	0	apps/web/src/contexts/.gitkeep
+0	0	apps/web/src/hooks/.gitkeep
+0	0	apps/web/src/layouts/.gitkeep
+0	0	apps/web/src/pages/.gitkeep
+0	0	apps/web/src/test/.gitkeep
+Sarm-m
+
+0	0	apps/web/index.html
+0	0	apps/web/package-lock.json
+0	0	apps/web/package.json
+0	0	apps/web/src/App.jsx
+7	0	apps/web/src/README.md
+0	0	apps/web/src/index.css
+0	0	apps/web/src/main.jsx
+7	0	apps/web/src/test/README.md
+0	0	apps/web/vite.config.js
+Sarm-m
+
+21	0	.gitignore
+samuelfl680
+Samuel felipe
+
+0	0	CONTRIBUTING.md
+0	0	Dockerfile
+0	0	Makefile
+0	0	conf/config.yaml
+0	0	conf/settings.json
+0	0	docker-compose.yml
+0	0	jupyter/datasets/data1.csv
+0	0	jupyter/datasets/data2.csv
+0	0	jupyter/notebooks/analysis.ipynb
+0	0	jupyter/notebooks/exploration.ipynb
+0	0	scripts/deploy.sh
+0	0	scripts/setup.sh
+0	0	scripts/test.sh
+0	0	temp/temp_data/temp1.tmp
+0	0	temp/temp_data/temp2.tmp
+0	0	temp/temp_file.txt
+Sarm
+Samuel felipe
+
+1	0	.github/ISSUE_TEMPLATE/bug_report.md
+1	0	.github/ISSUE_TEMPLATE/feature_request.md
+1	0	.github/PULL_REQUEST_TEMPLATE.md
+1	0	.github/Workflows/cd.yml
+1	0	.github/Workflows/ci.yml
+0	0	Docs/Arquitectura/README.md
+-	-	Docs/Arquitectura/UML/Diagrama_de_secuencia.png
+-	-	Docs/Arquitectura/UML/Diagrama_registro_de_uml_clases.png
+32	0	Docs/Arquitectura/UML/README.MD
+-	-	Docs/Presentaciones/Presentacion grupo 4.pdf
+-	-	Docs/Presentaciones/Proyecto propuesta grupo 4..pdf
+1	0	Docs/Reuniones/README.md
+-	-	"Docs/Reuniones/Reuni\303\263n_1_ en _3517_G4_ .docx"
+1	0	temp/README.dm
+Sarm
+
+185	36	README.md
+Sarm
+Samuel felipe
+Sarm
+
+27	29	README.md
+solonlosada2006
+Sarm-m
+
+186	35	README.md
+Samuel felipe
+solonlosada2006
+
+3	3	README.md
+Sarm
+Sarm-m
+Sarm-m
+
+0	5	README.md
+Samuel felipe
+
+0	1	.github/ISSUE_TEMPLATE/bug_report.md
+0	1	.github/ISSUE_TEMPLATE/feature_request.md
+0	1	.github/PULL_REQUEST_TEMPLATE.md
+0	1	.github/Workflows/cd.yml
+0	1	.github/Workflows/ci.yml
+0	0	Docs/Arquitectura/README.md
+-	-	Docs/Arquitectura/UML/Diagrama_de_secuencia.png
+-	-	Docs/Arquitectura/UML/Diagrama_registro_de_uml_clases.png
+0	32	Docs/Arquitectura/UML/README.MD
+-	-	Docs/Presentaciones/Presentacion grupo 4.pdf
+-	-	Docs/Presentaciones/Proyecto propuesta grupo 4..pdf
+0	1	Docs/Reuniones/README.md
+-	-	"Docs/Reuniones/Reuni\303\263n_1_ en _3517_G4_ .docx"
+0	1	temp/README.dm
+Sarm
+
+2	1	Docs/Arquitectura/UML/README.MD
+Sarm
+Sarm
+
+31	0	Docs/Arquitectura/UML/README.MD
+Sarm
+
+0	1	Docs/Arquitectura/README.md
+Sarm
+
+-	-	Docs/Arquitectura/UML/Diagrama_de_secuencia.png
+Sarm
+
+-	-	Docs/Arquitectura/UML/Diagrama_de_secuencia.png
+Sarm
+
+-	-	Docs/Arquitectura/UML/Diagrama_de_secuencia.png
+Sarm
+
+-	-	Docs/Arquitectura/UML/Diagrama_de_secuencia.png
+Sarm
+
+-	-	Docs/Arquitectura/UML/Diagrama de secuencia.png
+Sarm
+
+-	-	Docs/Arquitectura/UML/Diagrama de secuencia.png
+Sarm
+
+-	-	Docs/Arquitectura/UML/Diagrama de secuencia.png
+juansebastianvd
+juanvargax
+
+-	-	Docs/Arquitectura/UML/Diagrama_registro_de_uml_clases.png
+samuelfl680
+
+1	1	src/main/README.md
+samuelfl680
+
+-	-	Docs/Presentaciones/Presentacion grupo 4.pdf
+samuelfl680
+
+0	1	Docs/Presentaciones/presentacion grupo 4.pdf
+samuelfl680
+
+0	1	Docs/Presentaciones/p1
+samuelfl680
+
+1	0	Docs/Presentaciones/presentacion grupo 4.pdf
+-	-	Docs/presentacion grupo 4.pdf
+samuelfl680
+
+-	-	Docs/{ => Presentaciones}/Proyecto propuesta grupo 4..pdf
+Sarm
+
+1	0	Docs/Presentaciones/p1
+samuelfl680
+
+-	-	"Docs/Reuni\303\263n_1_ en _3517_G4_ .docx" => "Docs/Reuniones/Reuni\303\263n_1_ en _3517_G4_ .docx"
+samuelfl680
+
+1	0	Docs/Reuniones/README.md
+samuelfl680
+
+0	1	Reuniones/README.md
+samuelfl680
+
+1	0	Reuniones/README.md
+solonlosada2006
+
+-	-	"Docs/Reuni\303\263n_1_ en _3517_G4_ .docx"
+samuelfl680
+
+4	3	src/README.md
+samuelfl680
+
+6	0	src/test/README.md
+samuelfl680
+
+5	0	src/README.md
+samuelfl680
+
+1	0	CHANGELOG.md
+samuelfl680
+
+1	0	Docs/Arquitectura/README.md
+samuelfl680
+
+1	0	src/main/README.md
+samuelfl680
+
+1	0	src/test/README.md
+samuelfl680
+
+0	1	tests/README.md
+samuelfl680
+
+1	0	temp/README.dm
+samuelfl680
+
+1	0	tests/README.md
+samuelfl680
+
+1	0	src/README.md
+samuelfl680
+
+0	1	src
+samuelfl680
+
+1	0	src
+Sarm
+
+10	9	README.md
+Sarm
+
+1	1	README.md
+Sarm
+
+1	1	README.md
+Sarm
+
+1	1	README.md
+Sarm
+
+5	5	README.md
+solonlosada2006
+
+0	1	Docs/envio9 docs
+solonlosada2006
+
+-	-	Docs/presentacion grupo 4.pdf
+solonlosada2006
+
+-	-	Docs/Proyecto propuesta grupo 4..pdf
+solonlosada2006
+
+1	0	Docs/envio9 docs
+solonlosada2006
+
+1	0	.github/Workflows/cd.yml
+solonlosada2006
+
+1	0	.github/Workflows/ci.yml
+samuelfl680
+
+3	3	README.md
+solonlosada2006
+
+1	0	.github/PULL_REQUEST_TEMPLATE.md
+samuelfl680
+
+13	12	README.md
+juansebastianvd
+
+21	0	LICENSE
+solonlosada2006
+
+0	1	.github/ISSUE_TEMPLATE/.github/PULL_REQUEST_TEMPLATE.md
+solonlosada2006
+
+0	1	.github/.github/PULL_REQUEST_TEMPLATE.md
+solonlosada2006
+
+1	0	.github/.github/PULL_REQUEST_TEMPLATE.md
+solonlosada2006
+
+1	0	.github/ISSUE_TEMPLATE/.github/PULL_REQUEST_TEMPLATE.md
+solonlosada2006
+
+1	0	.github/ISSUE_TEMPLATE/feature_request.md
+solonlosada2006
+
+68	0	README.md
+solonlosada2006
+
+1	0	.github/ISSUE_TEMPLATE/bug_report.md
+solonlosada2006
+
+118	0	BOILERPLATE.md
+solonlosada2006
+
+0	1	test.sh
+solonlosada2006
+
+0	0	temp_file.txt
+samuelfl680
+
+0	1	DriveControal/nasduahdu
+solonlosada2006
+
+0	0	temp2.tmp
+solonlosada2006
+
+0	0	temp1.tmp
+solonlosada2006
+
+0	1	setup.sh
+solonlosada2006
+
+0	1	settings.json
+solonlosada2006
+
+0	1	exploration.ipynb
+solonlosada2006
+
+0	1	docker-compose.yml
+solonlosada2006
+
+0	1	deploy.sh
+solonlosada2006
+
+0	1	data2.csv
+solonlosada2006
+
+0	1	data1.csv
+solonlosada2006
+
+0	1	config.yaml
+solonlosada2006
+
+0	1	analysis.ipynb
+solonlosada2006
+
+0	1	README.md
+solonlosada2006
+
+0	2	Makefile
+solonlosada2006
+
+0	1	LICENSE
+solonlosada2006
+
+0	1	Dockerfile
+solonlosada2006
+
+0	0	CONTRIBUTING.md
+solonlosada2006
+
+0	0	CHANGELOG.md
+solonlosada2006
+
+1	0	DriveControal/nasduahdu
+solonlosada2006
+
+0	0	CHANGELOG.md
+0	0	CONTRIBUTING.md
+1	0	Dockerfile
+1	21	LICENSE
+2	0	Makefile
+1	118	README.md
+1	0	analysis.ipynb
+1	0	config.yaml
+1	0	data1.csv
+1	0	data2.csv
+1	0	deploy.sh
+1	0	docker-compose.yml
+1	0	exploration.ipynb
+1	0	settings.json
+1	0	setup.sh
+0	0	temp1.tmp
+0	0	temp2.tmp
+0	0	temp_file.txt
+1	0	test.sh
+Juan Pablo Arias Buitrago
+
+21	0	LICENSE
+118	0	README.md
+0	0	conf/.gitkeep
