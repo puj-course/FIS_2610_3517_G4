@@ -1,174 +1,679 @@
+
 \documentclass[11pt,a4paper]{article}
+
+% --------------------------------------------------
+% PAQUETES
+% --------------------------------------------------
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[spanish,es-tabla]{babel}
+\IfFileExists{spanish.ldf}{%
+  \usepackage[spanish,es-tabla]{babel}%
+}{%
+  \usepackage[english]{babel}%
+}
+\usepackage{lmodern}
 \usepackage{geometry}
 \usepackage{graphicx}
-\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage[nopatch=footnote]{microtype}
 \usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{array}
 \usepackage{tabularx}
 \usepackage{booktabs}
-\usepackage{array}
-\geometry{margin=2.5cm}
-\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\usepackage{longtable}
+\usepackage{ragged2e}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage{colortbl}
+\usepackage{lastpage}
+\usepackage{pdflscape}
+
+% --------------------------------------------------
+% CONFIGURACION GENERAL
+% --------------------------------------------------
+\geometry{
+  top=2.6cm,
+  bottom=2.6cm,
+  left=2.6cm,
+  right=2.6cm,
+  headheight=15pt,
+  footskip=1.2cm
+}
+
+\definecolor{azulprincipal}{HTML}{1F3C88}
+\definecolor{azulsuave}{HTML}{EAF0FB}
+\definecolor{grislinea}{HTML}{D9DEE8}
+\definecolor{gristexto}{HTML}{333333}
+\definecolor{rojopendiente}{HTML}{B00020}
+\definecolor{verdesuave}{HTML}{EAF7EA}
+\definecolor{amarillosuave}{HTML}{FFF7E0}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=azulprincipal,
+  urlcolor=azulprincipal,
+  citecolor=azulprincipal,
+  pdfauthor={SYNTIX TECH - Pontificia Universidad Javeriana}
+}
+
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0.55em}
-\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlength{\parskip}{0.6em}
+\setstretch{1.12}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\emergencystretch}{2em}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+\renewcommand{\contentsname}{Tabla de contenido}
+\AtBeginDocument{%
+  \renewcommand{\contentsname}{Tabla de contenido}%
+  \renewcommand{\tablename}{Tabla}%
+  \renewcommand{\figurename}{Figura}%
+}
+
+% --------------------------------------------------
+% FORMATO DE TITULOS
+% --------------------------------------------------
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{azulprincipal}}
+  {\thesection.}{0.6em}{}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{azulprincipal}}
+  {\thesubsection.}{0.6em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{azulprincipal}}
+  {\thesubsubsection.}{0.6em}{}
+
+\titleformat{\paragraph}[block]
+  {\normalfont\normalsize\bfseries\color{azulprincipal}}
+  {\theparagraph.}{0.6em}{}
+
+\titlespacing*{\section}{0pt}{1.6em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+\titlespacing*{\paragraph}{0pt}{0.9em}{0.4em}
+
+% --------------------------------------------------
+% ENCABEZADO Y PIE DE PAGINA
+% --------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{azulprincipal}{Informe de Postmortem}}
+\fancyhead[R]{\textcolor{azulprincipal}{DriveControl / AutoMinder Enterprise}}
+\fancyfoot[C]{\textcolor{gristexto}{Pagina \thepage\ de \pageref*{LastPage}}}
+\renewcommand{\headrulewidth}{0.6pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\captionsetup{
+  font=small,
+  labelfont=bf
+}
+
+% --------------------------------------------------
+% COLUMNAS Y COMANDOS UTILES
+% --------------------------------------------------
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
 \newcommand{\code}[1]{\texttt{\detokenize{#1}}}
-\newcommand{\evidencia}[2]{%
-\begin{figure}[H]\centering
-\IfFileExists{#1}{\includegraphics[width=0.88\linewidth]{#1}}{%
-\fbox{\begin{minipage}[c][3cm][c]{0.82\linewidth}\centering Pendiente de captura: \texttt{\detokenize{#1}}\end{minipage}}}
-\caption{#2}
-\end{figure}}
 
 \begin{document}
+\hypersetup{pageanchor=false,pdftitle={Informe de Postmortem - Milestone 2}}
 \begin{titlepage}
 \centering
-\vspace*{1cm}
-{\Large Pontificia Universidad Javeriana}\\
-{\large Fundamentos de Ingeniería de Software}\\[1.5cm]
-{\Huge \textbf{DriveControl / AutoMinder Enterprise}}\\[0.4cm]
-{\Large Equipo SYNTIX TECH}\\[1.2cm]
-{\LARGE \textbf{Milestone 2 - Gestión básica de flota}}\\[1.2cm]
-\begin{tabular}{ll}
-Profesor: & Luis Gabriel Moreno Sandoval\\
-Fecha: & 19 de mayo de 2026\\
-Repositorio: & \url{https://github.com/puj-course/FIS_2610_3517_G4}\\
-\end{tabular}
+\vspace*{0.5cm}
+
+\IfFileExists{img/javeriana.png}{%
+  \includegraphics[width=0.24\linewidth]{img/javeriana.png}%
+}{%
+  \fbox{%
+    \begin{minipage}[c][3cm][c]{0.28\linewidth}
+      \centering
+      \textbf{img/javeriana.png}\\[0.4em]
+      Logo pendiente
+    \end{minipage}%
+  }%
+}
+\vspace{0.2cm}
+
+{\Large \textbf{Pontificia Universidad Javeriana}}\\
+{\large Facultad de Ingenieria}\\
+{\large Fundamentos de Ingenieria de Software}\\[1.2cm]
+
+{\Huge \textbf{\textcolor{azulprincipal}{Informe de Postmortem}}}\\[0.4cm]
+{\Large Reporte del ciclo, retrospectiva Starfish y PIP}\\[1.1cm]
+
+{\LARGE \textbf{Milestone 2: Gestión Básica de Flota y Patrones de Diseño}}\\[0.3cm]
+{\Large Equipo SYNTIX TECH}\\[1.1cm]
+
+\begin{tabularx}{0.86\linewidth}{P{4cm}Y}
+\toprule
+\textbf{Profesor} & Luis Gabriel Moreno Sandoval \\
+\textbf{Monitor} & Juan Pablo Arias Buitrago \\
+\textbf{Fecha} & 19 de mayo de 2026 \\
+\textbf{Repositorio} & \url{https://github.com/puj-course/FIS_2610_3517_G4} \\
+\bottomrule
+\end{tabularx}
+
 \vfill
+\textit{Documento construido a partir del postmortem original del milestone, sin recortar informacion, adaptado al formato institucional de la plantilla suministrada.}
 \end{titlepage}
+\hypersetup{pageanchor=true}
+\pagenumbering{arabic}
 
+\clearpage
+\section*{Integrantes}
+\phantomsection
+\addcontentsline{toc}{section}{Integrantes}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{P{5.2cm}P{3.4cm}Y}
+\toprule
+\textbf{Nombre} & \textbf{GitHub} & \textbf{Rol Scrum / tecnico} \\
+\midrule
+Sebastian Ramirez Maldonado & \texttt{@Sarm-m} & Scrum Master \\
+Sebastian Vargas & \texttt{@juanvargax} & Product Owner / Sprint Planner \\
+Samuel Freile & \texttt{@samuelfl680} & Configuration Manager \\
+Solon Losada & \texttt{@solonlosada2006} & DevOps Engineer \\
+Sebastian Rodriguez Ramirez & \texttt{@juserora} & QA Lead \\
+\bottomrule
+\end{tabularx}
+\caption{Integrantes y roles del equipo SYNTIX TECH.}
+\end{table}
+
+\clearpage
+\phantomsection
 \tableofcontents
-\newpage
+\clearpage
 
-\section{Resumen ejecutivo del milestone}
-El Milestone 2 consolidó la gestión básica de flota con interfaces de conductores y vehículos, validación RUNT, patrones de diseño y pruebas de flujos críticos. GitHub live registra 37 issues cerradas, 14 HU cerradas estrictas y 1 PR asociado.
+\clearpage
+\section{Introduccion}
 
-\section{Objetivos del milestone}
-\begin{itemize}
-\item Implementar flujos de conductores y vehículos.
-\item Integrar validación RUNT simulada.
-\item Aplicar separación de responsabilidades y patrones.
-\item Fortalecer pruebas funcionales de flota.
-\end{itemize}
+Este informe presenta el postmortem del Milestone 2 del proyecto DriveControl / AutoMinder Enterprise, desarrollado por el equipo SYNTIX TECH en el marco de la asignatura Fundamentos de Ingenieria de Software. El documento conserva de forma integral la informacion del postmortem original y la reorganiza bajo el formato institucional suministrado, manteniendo el contenido de resumen ejecutivo, contexto, revision de calidad, evaluacion de roles, causa raiz, retrospectiva Starfish, plan de mejora y respuestas completas a las preguntas guia de la presentacion de postmortem.
 
-\section{Alcance funcional}
-El alcance cubre gestión básica de flota, validaciones, componentes visuales y soporte de pruebas. No incluye cierre CI/CD, SMS ni dashboard final.
+El proposito de este reporte es dejar una evidencia clara del ciclo: que producto se produjo, que esfuerzo se invirtio, que proceso se siguio, que problemas aparecieron, cuales fueron sus causas, que aprendizajes surgieron y que acciones de mejora deben incorporarse en el ciclo siguiente o en proyectos futuros. La estructura facilita la lectura academica y permite defender el trabajo con trazabilidad metodologica, tecnica y de calidad.
 
-\section{Evidencia ágil}
-\begin{tabularx}{\linewidth}{l r Y}
+\clearpage
+\section{Postmortem -- Milestone 2: Gestión Básica de Flota y Patrones de Diseño}
+\textbf{Proyecto:} Drive Control / Syntix Tech
+\textbf{Stack:} MERN (MongoDB, Express, React, Node.js)
+\textbf{Equipo:}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.22\linewidth}P{0.34\linewidth}}
 \toprule
-Elemento & Valor & Evidencia\\
+\textbf{Nombre} & \textbf{Usuario} & \textbf{Rol} \\
 \midrule
-HU cerradas & 14 & Issues con patrón estricto de HU.\\
-Issues cerradas & 37 & Milestone cerrado en GitHub.\\
-PRs & 1 & PR \#233 mergeado.\\
-Commits & 164 & Ventana S5-S8 en Git local.\\
-\bottomrule
-\end{tabularx}
-
-\evidencia{../../Entrega-Final/evidencias/01_agile_milestones_semestre.png}{Milestones del semestre.}
-\evidencia{../../Entrega-Final/evidencias/02_agile_project_board.png}{Tablero GitHub Project.}
-
-\section{Métricas del milestone}
-\begin{tabularx}{\linewidth}{Y r}
+\endfirsthead
 \toprule
-Métrica & Valor\\
+\textbf{Nombre} & \textbf{Usuario} & \textbf{Rol} \\
 \midrule
-HU cerradas & 14\\
-Issues cerradas & 37\\
-Issues abiertas & 0\\
-Commits por ventana de sprint & 164\\
-PRs asociados & 1\\
-PRs mergeadas & 1\\
+\endhead
 \bottomrule
-\end{tabularx}
+\endlastfoot
+Sebastián Ramírez Maldonado & @Sarm-m & Scrum Master \\
+Samuel Freile & @samuelfl680 & Configuration Manager \\
+Sebastián Rodríguez Ramírez & @Juserora & Quality Assurance Lead \\
+Solón Losada & @solonlosada2006 & DevOps Engineer \\
+Sebastián Vargas & @juanvargax & Product Owner / Sprint Planner \\
+\end{longtable}
+\endgroup
 
-Participación por issues asignadas: \code{solonlosada2006} 18, \code{Sarm-m} 9, \code{Juserora} 6, \code{juanvargax} 5 y \code{samuelfl680} 3.
+\vspace{0.6em}\hrule\vspace{0.8em}
 
-\section{Evaluación del producto}
-Se produjo gestión básica de flota, validación RUNT y pruebas de flujos críticos. El producto avanzó en mantenibilidad por separación de responsabilidades y reducción de código mezclado.
+\subsection{1. Resumen Ejecutivo}
 
-\section{Evaluación del proceso}
-Mejoró la división en sub-issues, pero faltó mapa de dependencias e interoperabilidad entre entornos. GitHub sostuvo la trazabilidad del avance.
+El Milestone 2 marcó la transición más significativa del proyecto en términos de arquitectura de software: el equipo dejó atrás un enfoque de "código espagueti" para adoptar una estructura limpia y desacoplada mediante la aplicación de patrones de diseño del catálogo GoF. Se implementaron el Factory Method para la creación dinámica de modales de gestión de flota y el patrón Facade para simplificar el subsistema de alertas documentales. Adicionalmente, se integró el módulo de Validación RUNT con un simulador de escenarios temporales controlados. Los principales retos técnicos de este hito estuvieron asociados a la interoperabilidad entre entornos de desarrollo (Windows vs. Linux) y a la ambigüedad en las convenciones de nombres de archivos.
 
-\section{Evaluación del esfuerzo}
-El esfuerzo fue sostenido con 164 commits en S5-S8. La participación fue visible por issues asignadas, con carga fuerte en DevOps/flota y coordinación Scrum.
+\vspace{0.6em}\hrule\vspace{0.8em}
 
-\section{Postmortem del milestone}
-\subsection{Qué salió bien}
-Se cerraron las issues, se fortaleció la arquitectura y se validaron flujos críticos.
+\subsection{2. Contexto de Ingeniería y Negocio}
 
-\subsection{Qué salió mal}
-Hubo problemas por nombres, alias, diferencias de entorno y componentes construidos antes de infraestructura base.
+Desde la perspectiva de negocio, el Milestone 2 habilitó la funcionalidad central del sistema: la gestión dinámica de la flota vehicular y la simulación de respuestas del RUNT colombiano para validar el estado documental de los vehículos. Esto permitió demostrar al stakeholder que la plataforma podía procesar escenarios reales de documentos vencidos, vigentes y próximos a vencer, aportando valor concreto más allá de la autenticación establecida en el M1.
 
-\subsection{Causas raíz}
-La falta de convenciones de nombres y de entorno homogéneo causó bugs de importación e integración.
+Desde la perspectiva de ingeniería, la decisión de introducir patrones GoF en este hito fue estratégica: el crecimiento funcional previsto para los milestones 3 y 4 requería una arquitectura capaz de extenderse sin generar deuda técnica acumulativa. El desacoplamiento logrado mediante Factory y Facade fue la inversión de calidad que soportó el desarrollo posterior.
 
-\subsection{Impacto}
-El impacto fue retrabajo, menor visibilidad de integración y validaciones tardías.
+\vspace{0.6em}\hrule\vspace{0.8em}
 
-\subsection{Acciones correctivas}
-Estandarizar nombres, mapear dependencias y validar flujos en más de un entorno.
+\subsection{3. Revisión de Datos del Proceso y Calidad}
 
-\subsection{Acciones preventivas y responsables sugeridos}
-Configuration Manager debe definir convenciones; DevOps debe guiar entorno; QA debe mapear dependencias; Scrum Master debe cuidar sub-issues.
+\subsubsection{Desempeño real vs. planeado}
 
-\section{Retrospectiva estrella de mar}
-\subsection{Comenzar a hacer}
-\begin{itemize}
-\item Estandarizar convenciones de nombres mediante reglas compartidas.
-\item Definir rutas y menús antes de construir componentes dependientes.
-\item Recolectar evidencia técnica durante el sprint.
+\begin{itemize}[leftmargin=1.2em]
+\item La comunicación sincrónica del equipo disminuyó respecto al M1, pero el rendimiento individual aumentó gracias a la división del trabajo en sub-issues técnicas atómicas en GitHub (un cambio puntual = una issue).
+\item Se registraron retrabajos considerables por incompatibilidades de rutas de archivos entre entornos Windows y Linux, especialmente en el uso del alias \texttt{@/} para rutas absolutas en el frontend.
+\item Los componentes de Toasts fueron desarrollados antes de que el ToasterLayout base estuviera disponible, generando una dependencia invertida que obligó a rehacer parte del trabajo.
+\item El módulo RUNT fue entregado con el simulador de escenarios temporales funcional, cubriendo los tres estados documentales requeridos.
 \end{itemize}
 
-\subsection{Más de}
-\begin{itemize}
-\item Comunicar cambios en esquemas y contratos.
-\item Revisar dependencias técnicas en kick-off.
-\item Realizar commits frecuentes para reducir conflictos.
+\subsubsection{Lecciones aprendidas}
+
+\begin{itemize}[leftmargin=1.2em]
+\item La estandarización de convenciones de nombres de archivos no es un detalle menor: conflictos como \texttt{useAlert.js} vs. \texttt{useAlerts.js} generaron confusión en las importaciones y bugs difíciles de rastrear.
+\item Construir sobre infraestructura que aún no existe (Toasts sin ToasterLayout) es una forma de deuda técnica anticipada que siempre genera retrabajo.
+\item La interoperabilidad entre entornos debe definirse como un requisito técnico del equipo, no como un problema individual de cada desarrollador.
 \end{itemize}
 
-\subsection{Seguir haciendo}
-\begin{itemize}
-\item Dividir el trabajo en sub-issues atómicas.
-\item Aplicar patrones de diseño cuando reduzcan deuda real.
-\item Usar pruebas de flujos críticos.
-\end{itemize}
+\vspace{0.6em}\hrule\vspace{0.8em}
 
-\subsection{Menos de}
-\begin{itemize}
-\item Asumir compatibilidad entre entornos sin verificación.
-\item Posponer feedback visual hasta el cierre.
-\item Depender de datos manuales no reproducibles.
-\end{itemize}
+\subsection{4. Reporte de Roles}
 
-\subsection{Dejar de hacer}
-\begin{itemize}
-\item Construir componentes sobre infraestructura inexistente.
-\item Duplicar archivos sin revisar componentes existentes.
-\item Ignorar conflictos de alias como problemas individuales.
-\end{itemize}
+\subsubsection{4.1 Reporte del Scrum Master -- Sebastián Ramírez Maldonado (@Sarm-m)}
 
-\section{Plan de mejora del siguiente ciclo}
-\begin{tabularx}{\linewidth}{Y Y Y Y}
+En este milestone, el Scrum Master implementó la práctica de dividir el trabajo en sub-issues atómicas en GitHub, lo cual tuvo un impacto positivo directo en la trazabilidad y en la capacidad de los integrantes para trabajar de forma más autónoma. Sin embargo, la disminución de la comunicación sincrónica, aunque mejoró la productividad individual, redujo la visibilidad colectiva del estado de la integración. Los problemas de interoperabilidad entre entornos no fueron detectados a tiempo porque no había un espacio de revisión conjunta donde estos impedimentos pudieran emerger. Para el M3, el Scrum Master debe establecer al menos una sesión de sincronización semanal enfocada específicamente en la revisión de impedimentos técnicos y de integración.
+
+\subsubsection{4.2 Reporte del Product Owner / Sprint Planner -- Sebastián Vargas (@juanvargax)}
+
+El Product Owner logró mantener el foco del sprint en las funcionalidades de mayor valor para el negocio: los módulos de flota y el simulador RUNT. Sin embargo, no se definió con suficiente anticipación el alcance de los menús de navegación y las rutas asociadas, lo que generó que diferentes integrantes construyeran componentes con supuestos distintos sobre la estructura de navegación. Para el M3, el Sprint Planner debe incluir en el backlog refinado la definición explícita del mapa de rutas y la estructura de menús como prerequisito de cualquier historia de usuario que involucre navegación.
+
+\subsubsection{4.3 Reporte del Configuration Manager -- Samuel Freile (@samuelfl680)}
+
+El Configuration Manager identificó durante este milestone el problema crítico de interoperabilidad entre entornos Windows y Linux. Las rutas de archivos absolutas y el uso del alias \texttt{@/} generaron comportamientos distintos en los entornos de cada desarrollador, causando que código que funcionaba localmente en un entorno fallara en otro. Adicionalmente, la ambigüedad en los nombres de archivos (\texttt{useAlert.js} vs. \texttt{useAlerts.js}) no fue capturada por ningún mecanismo automático, evidenciando la ausencia de linters estrictos. Para el M3, el Configuration Manager debe liderar la configuración de ESLint con reglas de naming conventions y la estandarización del alias \texttt{@/} en todos los entornos del equipo.
+
+\subsubsection{4.4 Reporte del Quality Assurance Lead -- Sebastián Rodríguez Ramírez (@Juserora)}
+
+El QA Lead identificó el patrón de fallo más recurrente del milestone: el intento de probar flujos completos (Toasts) antes de que la infraestructura base (ToasterLayout) estuviera disponible. Este antipatrón refleja la ausencia de una secuencia de construcción definida en el sprint. El QA Lead también detectó la duplicación de componentes en layouts como consecuencia de la falta de comunicación entre integrantes sobre qué ya estaba construido. Para el M3, se debe establecer una sesión de kick-off técnico al inicio del sprint donde se defina explícitamente el orden de construcción de los componentes y sus dependencias.
+
+\subsubsection{4.5 Reporte del DevOps Engineer -- Solón Losada (@solonlosada2006)}
+
+Durante este milestone, el DevOps Engineer no contó aún con un pipeline de CI/CD activo, lo que permitió que los problemas de interoperabilidad entre entornos llegaran tarde al conocimiento del equipo. La ausencia de un entorno homogeneizado (Docker) fue identificada como una deuda técnica de infraestructura que se pagó con retrabajo durante el sprint. Para el M3, el DevOps Engineer debe priorizar la configuración de un entorno Docker Compose básico que garantice que todos los integrantes ejecuten el proyecto en condiciones idénticas, eliminando la clase de errores "funciona en mi máquina".
+
+\vspace{0.6em}\hrule\vspace{0.8em}
+
+\subsection{5. Identificación de Causa Raíz}
+
+La causa raíz principal del Milestone 2 fue la \textbf{falta de estandarización en las convenciones de nombres de archivos y en la definición de interoperabilidad entre entornos de desarrollo}. Estas dos condiciones operaron de forma combinada: la ambigüedad en los nombres (\texttt{useAlert} vs. \texttt{useAlerts}) generó bugs de importación silenciosos, mientras que la ausencia de un entorno homogeneizado hizo que los problemas de alias de rutas (\texttt{@/}) se manifestaran de forma inconsistente según el sistema operativo de cada desarrollador.
+
+Como causa secundaria, la \textbf{construcción de componentes visuales sobre infraestructura base inexistente} (Toasts antes que ToasterLayout) evidenció la ausencia de una secuencia de construcción acordada, generando una dependencia invertida que obligó a rehacer trabajo ya completado.
+
+\vspace{0.6em}\hrule\vspace{0.8em}
+
+\subsection{6. Retrospectiva}
+
+El Milestone 2 fue el sprint de mayor densidad técnica del proyecto hasta ese momento. El equipo asumió la responsabilidad de refactorizar una base de código que, de haberse dejado crecer sin intervención, habría comprometido la mantenibilidad del sistema en los hitos siguientes. La decisión de aplicar patrones GoF no fue cosmética: representó una apuesta deliberada por la calidad arquitectónica sobre la velocidad de entrega a corto plazo, y sus beneficios se harían sentir en los milestones 3 y 4.
+
+Sin embargo, el sprint también reveló una brecha importante en la cultura técnica del equipo: la interoperabilidad entre entornos no estaba en el radar de nadie como un riesgo real. El problema de Windows vs. Linux apareció cuando ya estaba bloqueando la integración, no antes. Esto es una señal de que el equipo aún no tenía el hábito de mapear riesgos técnicos de infraestructura al inicio del sprint.
+
+La práctica de sub-issues atómicas en GitHub fue el hallazgo positivo más claro del milestone. Aunque redujo la comunicación sincrónica, mejoró notablemente la trazabilidad y la autonomía individual. El reto para el equipo es encontrar el equilibrio entre la autonomía que da la trazabilidad individual y la visibilidad colectiva que da la comunicación de integración.
+
+El equipo salió del M2 con una arquitectura más sólida, pero también con la certeza de que la calidad no se construye solo con buenos patrones de diseño: también requiere convenciones de equipo, entornos homogéneos y una secuencia de construcción explícita.
+
+\vspace{0.6em}\hrule\vspace{0.8em}
+
+\subsection{7. Retrospectiva Starfish}
+
+\begin{quote}\itshape
+\textbf{Reglas aplicadas:} cada frase inicia con un verbo en infinitivo; ninguna frase se repite entre ejes.\\
+\end{quote}
+
+\subsubsection{Seguir haciendo Seguir Haciendo}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.06\linewidth}P{0.34\linewidth}P{0.54\linewidth}}
 \toprule
-Acción & Responsable & Evidencia esperada & Criterio de éxito\\
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
 \midrule
-Definir convenciones & Configuration Manager & Regla o documento & Menos errores de importación\\
-Mapear dependencias & QA Lead & Checklist & Menos retrabajo\\
-Validar entornos & DevOps Engineer & Guía reproducible & Resultado consistente\\
-Mantener sub-issues & Scrum Master & Issues enlazadas & Trazabilidad clara\\
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endhead
 \bottomrule
-\end{tabularx}
+\endlastfoot
+1 & Aplicar patrones de diseño GoF para desacoplar componentes con responsabilidades diferenciadas. & El Factory Method y el Facade demostraron ser inversiones de calidad que simplificaron la extensión del sistema en este mismo sprint. \\
+2 & Dividir el trabajo en sub-issues técnicas atómicas vinculadas a commits específicos. & Mejoró la trazabilidad del desarrollo y permitió a los integrantes trabajar con mayor autonomía sin perder el hilo del progreso colectivo. \\
+3 & Usar simuladores para cubrir escenarios de borde que aún no tienen infraestructura real disponible. & El simulador RUNT permitió validar los tres estados documentales sin depender de una conexión real a la entidad de tránsito. \\
+4 & Documentar los diagramas UML de los patrones en tiempo real, a medida que se implementan. & Facilita la comprensión del diseño por parte de todos los integrantes y sirve como referencia para extensiones futuras. \\
+5 & Separar las iteraciones de construcción de las iteraciones de refactorización dentro del sprint. & Evita mezclar la deuda técnica con el desarrollo de nuevas funcionalidades, manteniendo el foco del equipo en cada fase. \\
+\end{longtable}
+\endgroup
 
-\section{Conclusión del milestone}
-M2 fue finalizado y fortaleció la flota. Su aprendizaje central fue que arquitectura y proceso necesitan convenciones y entornos homogéneos.
+\subsubsection{Comenzar a hacer Comenzar a Hacer}
 
-\section{Anexos o evidencias pendientes}
-\begin{itemize}
-\item Pendiente de captura: flujos RUNT por escenario.
-\item Pendiente de auditoría: relación exacta commit por HU.
-\end{itemize}
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.06\linewidth}P{0.34\linewidth}P{0.54\linewidth}}
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & Estandarizar las convenciones de nombres de archivos mediante reglas de ESLint configuradas en el repositorio. & Los conflictos entre \texttt{useAlert.js} y \texttt{useAlerts.js} generaron bugs de importación que consumieron tiempo de depuración innecesario. \\
+2 & Definir el mapa de rutas y la estructura de menús al inicio del sprint, antes de comenzar el desarrollo de componentes dependientes. & La ausencia de esta definición generó que distintos integrantes asumieran estructuras de navegación incompatibles. \\
+3 & Involucrar al QA Lead desde el inicio del sprint para mapear dependencias entre componentes y definir el orden de construcción. & El antipatrón de Toasts sin ToasterLayout se hubiera prevenido con una revisión temprana de dependencias. \\
+4 & Configurar linters estrictos con reglas de naming conventions y formato de importaciones en todos los entornos. & Un linter correctamente configurado convierte los errores de convención en fallos automáticos, no en bugs silenciosos. \\
+5 & Definir la interoperabilidad entre entornos de desarrollo como un requisito técnico del equipo desde el inicio de cada milestone. & La compatibilidad entre Windows y Linux no debe ser un problema individual: debe ser una decisión colectiva y documentada. \\
+6 & Recolectar evidencias técnicas del proceso en tiempo real durante el sprint, no solo al cierre. & Las evidencias recopiladas a posteriori pierden el contexto y la precisión necesarios para el análisis del postmortem. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{Dejar de hacer Dejar de Hacer}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.06\linewidth}P{0.34\linewidth}P{0.54\linewidth}}
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & Construir componentes visuales que dependen de infraestructura base que aún no ha sido implementada. & Los Toasts desarrollados sin ToasterLayout generaron una dependencia invertida que obligó a rehacer trabajo completado. \\
+2 & Mezclar responsabilidades de presentación y lógica de negocio en el mismo componente sin aplicar separación de concerns. & Dificulta la aplicación de patrones de diseño y aumenta el costo de mantenimiento del código. \\
+3 & Ignorar los conflictos de alias de rutas (\texttt{@/}) entre entornos como si fueran problemas individuales. & Son problemas de equipo que requieren una solución de equipo: un entorno homogeneizado. \\
+4 & Duplicar archivos en layouts diferentes sin verificar si ya existe un componente equivalente en el repositorio. & La duplicación introduce deuda técnica y genera inconsistencias visuales difíciles de rastrear. \\
+5 & Navegar directamente por URLs hardcodeadas en lugar de usar el sistema de enrutamiento definido. & Rompe la coherencia del sistema de navegación y genera dependencias ocultas que complican los cambios futuros. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{Mas de Más de}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.06\linewidth}P{0.34\linewidth}P{0.54\linewidth}}
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & Realizar commits y merges frecuentes hacia la rama de desarrollo para visibilizar el progreso real del sprint. & Los commits frecuentes reducen el tamaño de los conflictos de integración y permiten detectar incompatibilidades más rápido. \\
+2 & Comunicar explícitamente al equipo cualquier cambio en los esquemas de datos o contratos de API. & Un cambio silencioso en el esquema puede romper componentes desarrollados por otros integrantes en paralelo. \\
+3 & Aplicar peer-feedback técnico en las revisiones de código, más allá de verificar que el código compila. & La revisión funcional y arquitectónica de los PRs es tan importante como la verificación de compilación. \\
+4 & Realizar una checklist de integración del Dashboard antes de cerrar cualquier historia de usuario que afecte la interfaz principal. & El Dashboard es el punto de convergencia de múltiples módulos; cualquier regresión allí es visible para el stakeholder. \\
+5 & Usar herramientas de diseño responsivo desde el inicio del desarrollo de componentes visuales. & Las correcciones de responsividad tardías son más costosas que diseñar con responsividad desde el primer commit. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{Menos de Menos de}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.06\linewidth}P{0.34\linewidth}P{0.54\linewidth}}
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & Generar ambigüedad en los nombres de archivos mediante variaciones mínimas que inducen errores de importación. & Un carácter de diferencia en el nombre de un archivo puede generar horas de depuración innecesaria. \\
+2 & Posponer el feedback visual de los componentes hasta etapas avanzadas del sprint. & El feedback tardío sobre la interfaz genera retrabajo en código que ya pasó por revisión y fue marcado como completo. \\
+3 & Generar retrabajo por desalineación de entornos que podría haberse prevenido con una configuración compartida. & Docker Compose es la solución estructural a esta clase de problemas; su ausencia en este milestone fue costosa. \\
+4 & Depender de datos ingresados manualmente para probar flujos que deberían tener datos de prueba automatizados. & Los datos manuales son inconsistentes entre sesiones y generan falsos negativos en las pruebas. \\
+5 & Asumir que el código que funciona en un entorno funcionará en todos los entornos sin verificación explícita. & Esta suposición fue la fuente principal de los problemas de interoperabilidad Windows/Linux del milestone. \\
+\end{longtable}
+\endgroup
+
+\vspace{0.6em}\hrule\vspace{0.8em}
+
+\subsection{8. Plan de Mejora para el Milestone 3}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.27\linewidth}P{0.30\linewidth}P{0.37\linewidth}}
+\toprule
+\textbf{Acción} & \textbf{Responsable} & \textbf{Criterio de éxito} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Acción} & \textbf{Responsable} & \textbf{Criterio de éxito} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Configurar ESLint con naming conventions y reglas de importación en el repositorio. & Configuration Manager (@samuelfl680) & El pipeline rechaza automáticamente código que viola las convenciones. \\
+Implementar Docker Compose para homogeneizar el entorno de desarrollo. & DevOps Engineer (@solonlosada2006) & Todos los integrantes ejecutan el proyecto con \texttt{docker compose up} sin configuración adicional. \\
+Establecer sesión de kick-off técnico al inicio del sprint para mapear dependencias y orden de construcción. & Scrum Master (@Sarm-m) & Diagrama de dependencias de componentes generado antes del primer commit del M3. \\
+Definir el mapa de rutas completo del sistema como prerequisito del sprint planning. & Product Owner (@juanvargax) & Todas las historias de usuario del M3 referencian rutas definidas en el mapa. \\
+Implementar proceso formal de reporte de hallazgos de QA con pasos de reproducción. & QA Lead (@Juserora) & Todos los bugs del M3 registrados en GitHub Issues con template estandarizado. \\
+\end{longtable}
+\endgroup
+
+\vspace{0.6em}\hrule\vspace{0.8em}
+
+\subsection{9. Respuestas completas a las preguntas guía de la PPT de Postmortem}
+
+Esta sección se agrega como matriz de verificación para dejar respondidas de forma explícita todas las preguntas guía de la presentación de Postmortem y Retrospectiva Starfish. Las respuestas se formulan con hechos del milestone, evitando evaluar personas y concentrándose en el desempeño del trabajo, el producto, el proceso y las oportunidades de mejora.
+
+\subsubsection{9.1 Revisión del producto, esfuerzo y proceso}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.58\linewidth}}
+\toprule
+\textbf{Pregunta guía de la PPT} & \textbf{Respuesta aplicada al Milestone 2: Gestión Básica de Flota y Patrones de Diseño} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Pregunta guía de la PPT} & \textbf{Respuesta aplicada al Milestone 2: Gestión Básica de Flota y Patrones de Diseño} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+¿Qué producto se produjo? & Se produjo la gestión básica de flota, la incorporación de patrones GoF como Factory Method y Facade, el simulador de Validación RUNT y una arquitectura más desacoplada para soportar funcionalidades posteriores. \\
+¿Qué esfuerzo se invirtió para hacerlo? & El esfuerzo se orientó a refactorizar, dividir trabajo en sub-issues, implementar componentes de flota y resolver problemas de compatibilidad entre entornos Windows/Linux. \\
+¿Qué proceso se siguió para hacerlo? & El proceso mejoró frente al M1 por el uso de sub-issues atómicas y mayor trazabilidad, pero aún faltó una sincronización técnica suficiente para detectar dependencias e incompatibilidades antes de integrar. \\
+¿Cómo fue el desempeño real comparado con lo planeado? & El desempeño fue mejor que en M1 en arquitectura y trazabilidad, pero tuvo desviaciones por problemas de alias de rutas, nombres de archivos y construcción de componentes sobre infraestructura aún no disponible. \\
+¿Qué lecciones se aprendieron de esta experiencia? & El equipo aprendió que los patrones de diseño ayudan a mantener el sistema, pero que la arquitectura también depende de convenciones, entornos homogéneos y orden de construcción. \\
+¿Debería usarse un criterio diferente, a nivel individual o de equipo, para el futuro? & Sí. Se debe usar un criterio de cierre que incluya revisión de dependencias, estandarización de nombres, validación en entornos distintos y confirmación de que la infraestructura base existe antes de construir encima. \\
+¿Dónde hay oportunidades para mejorar y por qué? & La oportunidad principal está en estandarizar convenciones técnicas con ESLint, Docker Compose, mapa de rutas y revisión de contratos antes de implementar componentes dependientes. \\
+¿Dónde hubo problemas que deben corregirse para el próximo ciclo? & Se deben corregir conflictos de naming, incompatibilidad del alias \texttt{@/}, baja sincronización de integración y desarrollo de Toasts antes del ToasterLayout. \\
+¿Qué hizo bien el equipo y en qué falló? & Hizo bien: introducir patrones GoF, usar sub-issues atómicas y entregar el simulador RUNT. Falló en: subestimar riesgos de interoperabilidad, duplicar componentes y construir dependencias en orden incorrecto \\
+¿Sirvieron las mejoras propuestas previamente? & Sí. La mejora de M1 sobre trazabilidad empezó a servir porque las sub-issues hicieron más claro el avance; no obstante, la mejora sobre validación técnica todavía fue incompleta. \\
+¿Cómo ha sido el desempeño comparado con otros equipos? & No se cuenta con datos verificables de otros equipos, por lo que no se afirma una comparación externa. La comparación válida es interna: frente al M1 hubo avance en arquitectura, trazabilidad y autonomía, pero persistieron problemas de integración que exigían madurez de DevOps. \\
+¿Se deben modificar los objetivos y las metas? & Sí. Las metas deben incluir no solo funcionalidades, sino también objetivos técnicos medibles: linters, rutas estandarizadas y entorno homogéneo. \\
+¿Cómo se deben modificar los procesos? & Agregar kick-off técnico, mapa de rutas antes del desarrollo, checklist de dependencias y definición de convenciones de nombres. \\
+¿Cuáles son las áreas de más alta prioridad para analizar? & Interoperabilidad de entornos, naming conventions, orden de construcción de componentes, revisión de contratos de API y rutas. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.2 Evaluación objetiva de roles}
+
+\begin{landscape}
+\begingroup
+\tiny
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.17\linewidth}P{0.20\linewidth}P{0.22\linewidth}P{0.22\linewidth}P{0.14\linewidth}}
+\toprule
+\textbf{Rol} & \textbf{¿Qué funcionó?} & \textbf{¿Dónde estuvieron los problemas?} & \textbf{¿Dónde se puede mejorar?} & \textbf{Objetivo de mejoramiento para el Milestone 3} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Rol} & \textbf{¿Qué funcionó?} & \textbf{¿Dónde estuvieron los problemas?} & \textbf{¿Dónde se puede mejorar?} & \textbf{Objetivo de mejoramiento para el Milestone 3} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Scrum Master / Liderazgo & La división en sub-issues mejoró la trazabilidad y la autonomía. & La menor comunicación sincrónica redujo visibilidad sobre bloqueos técnicos. & Crear sincronización semanal de integración. & Detectar impedimentos de interoperabilidad antes de que bloqueen PRs. \\
+Product Owner / Planeación & Priorizó flota y simulador RUNT como funcionalidades de alto valor. & No quedó definido a tiempo el mapa de rutas y menús. & Refinar navegación como prerequisito de historias visuales. & Documentar rutas y menús antes de iniciar desarrollo. \\
+Configuration Manager / Soporte & Identificó la causa de conflictos entre entornos y archivos similares. & No había reglas automáticas para naming ni alias. & Configurar ESLint y convención de importaciones. & Eliminar errores por nombres y rutas inconsistentes. \\
+QA Lead / Calidad & Detectó dependencia invertida entre Toasts y ToasterLayout. & El QA llegó tarde a mapear dependencias. & Participar desde el inicio en el orden de construcción. & Definir mapa de dependencias técnicas en el kick-off. \\
+DevOps Engineer / Proceso de entrega & Identificó la necesidad de entorno homogéneo. & No existía Docker Compose ni CI suficientemente preventivo. & Normalizar entorno de ejecución. & Reducir errores de tipo "funciona en mi máquina". \\
+Ingenieros / Desarrollo & Implementaron patrones y módulos complejos. & Algunos componentes se crearon duplicados o dependientes de infraestructura inexistente. & Revisar catálogo de componentes y dependencias antes de codificar. & Construir componentes reutilizables y alineados con la arquitectura. \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+\subsubsection{9.3 Reporte del ciclo por responsabilidades}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.58\linewidth}}
+\toprule
+\textbf{Responsabilidad solicitada en la PPT} & \textbf{Respuesta del milestone} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Responsabilidad solicitada en la PPT} & \textbf{Respuesta del milestone} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Resumen del ciclo & Ciclo de maduración arquitectónica: el producto ganó estructura técnica, pero el proceso evidenció falta de estandarización entre entornos y convenciones. \\
+Liderazgo: motivación, compromisos, reuniones y apoyo requerido & La motivación aumentó por avances técnicos visibles; falló la visibilidad de integración y se requiere coordinación de riesgos técnicos. \\
+Desarrollo: contenido producido frente a requisitos & El producto cumplió con flota, patrones y RUNT, pero algunos enfoques de integración generaron retrabajo. \\
+Planeación: tareas, seguimiento y compromisos & La planeación fue más granular gracias a sub-issues, pero no contempló dependencias entre componentes. \\
+Proceso: disciplina de trabajo, medición y seguimiento & El proceso mejoró en trazabilidad, aunque todavía no medía riesgos técnicos de entorno. \\
+Calidad: estándares, inspecciones, defectos y PIP & La calidad arquitectónica mejoró por patrones, pero la calidad operativa se afectó por naming, rutas y orden de construcción. \\
+Soporte: logística, configuración, cambios y riesgos & La configuración no fue suficiente para garantizar consistencia entre Windows y Linux. \\
+Reporte de ingenieros: planeado vs. ejecutado y mejora personal & Los ingenieros ejecutaron tareas más técnicas que en M1, pero deben validar compatibilidad y dependencia antes de cerrar. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.4 Estrategia de desarrollo y atributos de calidad}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.58\linewidth}}
+\toprule
+\textbf{Pregunta guía} & \textbf{Respuesta} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Pregunta guía} & \textbf{Respuesta} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+¿La estrategia de desarrollo funcionó? & Funcionó en términos de arquitectura, porque refactorizar con patrones evitó mayor deuda técnica. Falló parcialmente en coordinación de dependencias. \\
+¿Qué otros enfoques hubieran sido más adecuados? & Hubiera sido más adecuado diseñar primero un mapa de componentes, rutas y dependencias, y luego asignar implementación. \\
+¿Cómo debería cambiarse la estrategia en el futuro? & Mantener patrones, pero preceder el desarrollo con convenciones, linters, entorno compartido y revisión de dependencias. \\
+¿Cómo se tuvo en cuenta la usabilidad? & Se avanzó en flujos de gestión, aunque la navegación y menús necesitaban definición más temprana. \\
+¿Cómo se tuvo en cuenta la mantenibilidad? & Mejoró con Factory y Facade, reduciendo acoplamiento y facilitando extensión posterior. \\
+¿Cómo se tuvo en cuenta la compatibilidad? & Fue el punto débil por diferencias Windows/Linux y alias de rutas. \\
+¿Cómo se tuvo en cuenta el desempeño? & No hubo foco fuerte en medición de desempeño; el objetivo fue estabilidad funcional. \\
+¿Cómo se tuvo en cuenta la seguridad? & El simulador RUNT y módulos de flota se enfocaron en lógica de negocio; la seguridad de configuración aún debía reforzarse en ciclos siguientes. \\
+¿Cómo mejorar estos tópicos en el futuro? & Incluir pruebas de navegación, linters, validación multi-entorno, criterios de responsividad y revisión de seguridad de configuración. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.5 Administración de configuración, riesgos y reutilización}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.58\linewidth}}
+\toprule
+\textbf{Pregunta guía} & \textbf{Respuesta} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Pregunta guía} & \textbf{Respuesta} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+¿Funcionó la administración de configuración? & Funcionó parcialmente: Git permitió seguimiento, pero la configuración del entorno no estaba homogeneizada. \\
+¿Funcionó el control de cambios? & Las sub-issues mejoraron el control, pero los cambios de nombres y rutas no tuvieron revisión automática. \\
+¿Cómo mejorarlos? & Crear reglas de naming, estandarizar alias, definir Docker Compose y checklist de cambios de contratos. \\
+¿Fue efectivo el manejo y seguimiento de riesgos? & El seguimiento de riesgos fue insuficiente porque la interoperabilidad no se identificó como riesgo al inicio. \\
+¿Fue buena la estrategia de reutilización? & Fue positiva en intención por los patrones, pero debe evitar duplicación de componentes y layouts. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.6 Reflexión del trabajo en grupo}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.58\linewidth}}
+\toprule
+\textbf{Aspecto de reflexión} & \textbf{Respuesta} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Aspecto de reflexión} & \textbf{Respuesta} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Comunicación del grupo & La comunicación asíncrona permitió autonomía, pero faltó sincronización técnica. \\
+Calidad del trabajo de los integrantes & La calidad del diseño mejoró, aunque no toda la calidad de integración. \\
+Planeación de tareas y seguimiento & Las sub-issues ayudaron, pero faltó mapear dependencias. \\
+Mitigación de riesgos & El riesgo de entorno apareció tarde y se volvió retrabajo. \\
+Relación con el cliente / stakeholder académico & El valor de negocio se fortaleció con flota y RUNT, mostrando utilidad más allá de autenticación. \\
+Relación con las tecnologías & El equipo empezó a usar patrones y aprendió que el stack requiere convenciones comunes. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.7 Verificación Starfish: respuestas por eje}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.20\linewidth}P{0.38\linewidth}P{0.36\linewidth}}
+\toprule
+\textbf{Eje de la estrella} & \textbf{Pregunta de la PPT que responde} & \textbf{Respuesta concreta del milestone} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Eje de la estrella} & \textbf{Pregunta de la PPT que responde} & \textbf{Respuesta concreta del milestone} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Comenzar a hacer & ¿Qué acciones deberíamos comenzar para lograr el éxito, resolver problemas, mitigar riesgos, mejorar calidad, aprender, usar herramientas, distribuir tiempo y comunicar mejor? & Estandarizar ESLint, mapa de rutas, orden de construcción y compatibilidad de entornos. \\
+Más de & ¿Qué acciones que ya hacemos deberíamos hacer más para mejorar productividad, comunicación, calidad y aprendizaje? & Hacer más commits visibles, comunicación de contratos, peer-feedback técnico y revisión de integración. \\
+Seguir haciendo & ¿Qué acciones que ya hacemos bien deberíamos continuar? & Mantener patrones GoF, sub-issues, simuladores y documentación UML vinculada al código. \\
+Menos de & ¿Qué acciones deberíamos hacer menos porque causan inconvenientes o reducen calidad, comunicación o planeación? & Reducir ambigüedad de nombres, feedback visual tardío y dependencia de datos manuales. \\
+Dejar de hacer & ¿Qué acciones deberíamos dejar de hacer porque no son productivas o ya no se necesitan? & Dejar de construir componentes sin infraestructura base, duplicar layouts e ignorar conflictos de alias. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.8 PIP - Plan de Mejora del Proceso}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.22\linewidth}P{0.24\linewidth}P{0.27\linewidth}P{0.21\linewidth}}
+\toprule
+\textbf{Mejora priorizada} & \textbf{Problema que ataca} & \textbf{Cambio concreto en el proceso} & \textbf{Evidencia esperada} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Mejora priorizada} & \textbf{Problema que ataca} & \textbf{Cambio concreto en el proceso} & \textbf{Evidencia esperada} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Estandarizar nombres e importaciones & Bugs por \texttt{useAlert} vs. \texttt{useAlerts} y alias & Configurar ESLint y convención única & Pipeline/linter detecta inconsistencias \\
+Kick-off técnico de dependencias & Toasts antes de ToasterLayout & Revisar orden de construcción antes de codificar & Mapa de dependencias aprobado \\
+Entorno homogéneo & Diferencias Windows/Linux & Configurar Docker Compose o guía única de entorno & Ejecución reproducible en todos los equipos \\
+Mapa de rutas & Supuestos distintos de navegación & Documentar rutas y menús por sprint & PRs alineados con rutas definidas \\
+\end{longtable}
+\endgroup
 \end{document}
