@@ -1,0 +1,197 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\geometry{margin=2.5cm}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\evidencia}[2]{%
+\begin{figure}[H]\centering
+\IfFileExists{#1}{\includegraphics[width=0.88\linewidth]{#1}}{%
+\fbox{\begin{minipage}[c][3cm][c]{0.82\linewidth}\centering Pendiente de captura: \texttt{\detokenize{#1}}\end{minipage}}}
+\caption{#2}
+\end{figure}}
+
+\begin{document}
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+{\Large Pontificia Universidad Javeriana}\\
+{\large Fundamentos de Ingeniería de Software}\\[1.4cm]
+{\Huge \textbf{DriveControl / AutoMinder Enterprise}}\\[0.4cm]
+{\Large Equipo SYNTIX TECH}\\[1.2cm]
+{\LARGE \textbf{Informe general de milestones y postmortem}}\\[1.2cm]
+\begin{tabular}{ll}
+Profesor: & Luis Gabriel Moreno Sandoval\\
+Fecha: & 19 de mayo de 2026\\
+Repositorio: & \url{https://github.com/puj-course/FIS_2610_3517_G4}\\
+\end{tabular}
+\vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Introducción}
+Este informe reúne los cuatro milestones funcionales del semestre y documenta la aplicación de Scrum académico, GitHub Issues, PRs, ramas, commits, métricas, trazabilidad y postmortem. Se construye con datos reales de GitHub live, Git local, anexos exportados y capturas disponibles. Si un dato no se puede verificar, se declara como pendiente.
+
+\section{Explicación metodológica}
+\subsection{Scrum académico}
+El equipo trabajó con planeación por sprint, división de HU en issues, seguimiento por tablero, revisión de avances y postmortem por ciclo. Los roles fueron Scrum Master, Product Owner / Sprint Planner, Configuration Manager, DevOps Engineer y QA Lead.
+
+\subsection{GitHub Issues y milestones}
+Las HU y tareas se gestionaron con issues y se agruparon en cuatro milestones válidos. Se ignora el milestone de taller porque no representa incremento funcional del producto.
+
+\subsection{Pull Requests, ramas y control de versiones}
+El flujo combinó ramas \code{main}, \code{develop} y ramas feature. Se verifican 161 PRs, 134 mergeadas, 1 abierta y 26 cerradas sin merge. No existen releases/tags verificables.
+
+\subsection{Trazabilidad}
+La trazabilidad se documenta por sprint, milestone, issues, HU, PRs, commits y evidencias visuales. Cuando GitHub no entrega relación directa, se declara el alcance exacto del dato.
+
+\subsection{Postmortem y estrella de mar}
+El postmortem sigue la guía del profesor: evaluar producto, esfuerzo y proceso; revisar datos de calidad; evaluar roles con hechos objetivos; identificar causas; preparar acciones de mejora; y usar Starfish.
+
+\section{Resumen comparativo de los 4 milestones}
+\begin{tabularx}{\linewidth}{Y r r r r Y}
+\toprule
+Milestone & HU & Issues & Commits & PRs & Estado\\
+\midrule
+M1 - Base funcional & 24 & 76 & 107 & 9 & Finalizado\\
+M2 - Gestión básica de flota & 14 & 37 & 164 & 1 & Finalizado\\
+M3 - Gestión documental y monitoreo & 14 & 38 & 82 & 0 & Finalizado\\
+M4 - Dashboard, alertas y cierre & 20 & 132 & 277 & 3 & Finalizado para issues; PR \#628 abierto\\
+\bottomrule
+\end{tabularx}
+
+\section{Sección individual por milestone}
+\subsection{Milestone 1 - Base funcional del sistema}
+M1 estableció stack, autenticación, dashboard base y GitFlow. Sus métricas son 76 issues cerradas, 24 HU, 107 commits y 9 PRs. El postmortem identifica como causa raíz la ausencia de Definition of Done verificable.
+
+\subsection{Milestone 2 - Gestión básica de flota}
+M2 consolidó flota, validaciones y patrones. Sus métricas son 37 issues cerradas, 14 HU, 164 commits y 1 PR. El postmortem identifica riesgos de nombres, alias y entornos heterogéneos.
+
+\subsection{Milestone 3 - Gestión documental y monitoreo}
+M3 fortaleció documentos, monitoreo, seguridad y QA. Sus métricas son 38 issues cerradas, 14 HU, 82 commits y 0 PRs con milestone asignado. El postmortem identifica gestión tardía de variables de entorno.
+
+\subsection{Milestone 4 - Dashboard, alertas y cierre del sistema}
+M4 cerró dashboard, alertas, CI/CD, Docker, SonarCloud, SMS y evidencia final. Sus métricas son 132 issues cerradas, 20 HU, 277 commits y 3 PRs. El postmortem identifica PR abierto, falta de releases/tags y dependencia excesiva del pipeline.
+
+\evidencia{../Entrega-Final/evidencias/25_agile_milestones_semestre.png}{Milestones funcionales del semestre.}
+\evidencia{../Entrega-Final/evidencias/26_agile_project_board.png}{Tablero del proyecto.}
+\evidencia{../Entrega-Final/evidencias/27_github_contributors_semestre.png}{Contributors del semestre.}
+\evidencia{../Entrega-Final/evidencias/28_github_commits_por_integrante.png}{Commits por integrante.}
+
+\section{Comparación del semestre}
+\subsection{Evolución del equipo}
+El equipo pasó de una base con DoD débil a un cierre con CI/CD, SonarCloud, Docker, SMS y documentación de rúbrica. La madurez creció en QA, configuración y seguimiento.
+
+\subsection{Tendencias}
+Los sprints finales tuvieron mayor volumen de commits por cierre técnico. El número de issues cerradas aumentó en M4 por la concentración de evidencia, CI/CD, SMS y documentación final.
+
+\subsection{Productividad}
+La productividad verificable se resume en 72 HU cerradas estrictas, 283 issues cerradas en M1-M4 y 630 commits en el corte académico.
+
+\subsection{Calidad}
+La calidad evolucionó desde validación local informal hacia SonarCloud, pruebas, Docker Compose, QA con pasos reproducibles y postmortem de causas raíz.
+
+\subsection{Participación}
+La participación se evidencia con issues asignadas, commits normalizados, PRs, revisiones disponibles y roles. Ninguna métrica se usa sola como juicio individual.
+
+\section{Postmortem general del semestre}
+\subsection{Producto}
+Se entregó una plataforma funcional para gestión de flota, documentos, alertas, métricas, despliegue y mensajería.
+
+\subsection{Esfuerzo}
+El esfuerzo fue alto y medible. Los roles aportaron de forma diferenciada: seguimiento Scrum, producto, configuración, DevOps y QA.
+
+\subsection{Proceso}
+El proceso mejoró de ciclo a ciclo. Los principales problemas fueron DoD incompleto, evidencia tardía, gestión de entornos y seguridad tratada tarde.
+
+\subsection{Roles}
+La evaluación se basa en hechos: issues, HU, commits, PRs, revisiones, QA, CI/CD y documentación.
+
+\section{Evaluación por roles}
+\begin{tabularx}{\linewidth}{Y Y Y}
+\toprule
+Rol & Hechos objetivos & Mejora recomendada\\
+\midrule
+Scrum Master & Seguimiento de milestones, documentación y trazabilidad final. & Automatizar exportes al cierre de cada sprint.\\
+Product Owner / Sprint Planner & Priorización de HU, producto y criterios de valor. & Definir criterios de aceptación y datos demo desde planning.\\
+Configuration Manager & Ramas, PRs, configuración y control de versiones. & Definir política de tags/releases desde el primer cierre.\\
+DevOps Engineer & Docker, CI/CD, SonarCloud y despliegue. & Monitorear quality gate durante todo el sprint.\\
+QA Lead & Reportes, pruebas, hallazgos y validación funcional. & Exigir prueba funcional local antes de PRs.\\
+\bottomrule
+\end{tabularx}
+
+\section{Retrospectiva estrella de mar general}
+\subsection{Comenzar a hacer}
+\begin{itemize}
+\item Definir DoD con evidencia, build local y revisión funcional.
+\item Automatizar exportes de GitHub al cierre de cada milestone.
+\item Planear releases/tags si se requiere trazabilidad por versión.
+\end{itemize}
+
+\subsection{Más de}
+\begin{itemize}
+\item Revisar PRs con foco funcional y de calidad.
+\item Capturar evidencia al momento de validar cada flujo.
+\item Usar Scrum Poker en historias con incertidumbre.
+\end{itemize}
+
+\subsection{Seguir haciendo}
+\begin{itemize}
+\item Mantener issues, PRs y commits trazables.
+\item Conservar postmortems por milestone.
+\item Usar GitHub como fuente objetiva de seguimiento.
+\end{itemize}
+
+\subsection{Menos de}
+\begin{itemize}
+\item Depender de cierres masivos al final.
+\item Usar métricas manuales sin criterio explícito.
+\item Abrir PRs de cierre sin validación local.
+\end{itemize}
+
+\subsection{Dejar de hacer}
+\begin{itemize}
+\item Contar milestones de taller como evidencia funcional.
+\item Presentar cifras sin separar issues, HU y PRs.
+\item Postergar seguridad, QA y evidencia para el final.
+\end{itemize}
+
+\section{Plan de mejora final}
+\begin{tabularx}{\linewidth}{Y Y Y Y}
+\toprule
+Acción & Responsable & Evidencia esperada & Criterio de éxito\\
+\midrule
+Automatizar métricas Agile & Scrum Master & Exportes \code{gh} versionados & Métricas listas al cierre\\
+Formalizar DoD & QA Lead & Checklist por HU & Cierres verificables\\
+Definir política de versión & Configuration Manager & Tag/release o decisión documentada & Trazabilidad por versión clara\\
+Monitorear calidad temprano & DevOps Engineer & Capturas SonarCloud por sprint & Menos presión final\\
+Definir datos demo & Product Owner & Guía de datos & Validaciones reproducibles\\
+\bottomrule
+\end{tabularx}
+
+\section{Conclusiones}
+La documentación Agile consolida evidencia suficiente para defender la aplicación rigurosa de metodología ágil y postmortem. Los cuatro milestones funcionales quedan centralizados, con métricas verificables, causas raíz, acciones concretas y pendientes explícitos.
+
+\section{Anexos}
+\begin{itemize}
+\item \code{reporte_final_sprints.md}: documento central del semestre.
+\item \code{milestone-*/postmortem-milestone.md}: postmortems individuales.
+\item \code{milestone-*/metricas-milestone.md}: métricas por milestone.
+\item \code{docs/Entrega-Final/anexos/}: exports de GitHub y Git local.
+\item Pendiente: exportación GraphQL de reviews completas si se exige detalle por PR.
+\end{itemize}
+\end{document}
