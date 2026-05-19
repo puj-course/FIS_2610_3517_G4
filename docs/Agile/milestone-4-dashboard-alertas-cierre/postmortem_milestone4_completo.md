@@ -176,7 +176,7 @@ El mayor aprendizaje del proyecto no es técnico: es que la calidad no es un atr
 
 ---
 
-## 9. Respuestas completas a las preguntas guía de la PPT de Postmortem
+## 9. Respuestas completas a las preguntas guía de la presentación de Postmortem
 
 Esta sección se agrega como matriz de verificación para dejar respondidas de forma explícita todas las preguntas guía de la presentación de Postmortem y Retrospectiva Starfish. Las respuestas se formulan con hechos del milestone, evitando evaluar personas y concentrándose en el desempeño del trabajo, el producto, el proceso y las oportunidades de mejora.
 
