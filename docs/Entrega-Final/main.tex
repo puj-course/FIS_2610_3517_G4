@@ -255,7 +255,7 @@ La siguiente matriz traduce la rubrica oficial a evidencia verificable del repos
 \endhead
 Implementacion de metricas de calidad & 20\% & 3 metricas propias en codigo, distintas de SonarQube, mas 2 o mas metricas SonarCloud con interpretacion, impacto y acciones. & \texttt{document-risk}, \texttt{operational-completeness} y \texttt{alert-criticality} en \path{apps/web/src/utils/qualityMetrics.js}; pruebas en \path{qualityMetrics.test.js}; SonarCloud en \texttt{main}. & \path{evidencias/17_metricas_calidad_app.png}; \path{evidencias/03_sonarcloud_coverage_main.png}. & \estadoOk & Las metricas dependen de los datos de la cuenta activa; una cuenta vacia puede mostrar 0\% o sin datos evaluables. & Se documentan formula, fuente, resultado, interpretacion, impacto y correccion por metrica propia; se separan de Coverage, Duplicidad y Seguridad.\\
 Despliegue y configuracion & 20\% & Dockerfile, Docker Compose, build, pruebas, publicacion versionada, despliegue Compose, red Docker y reproduccion documentada. & \texttt{Dockerfile}, \path{apps/web/Dockerfile}, \path{docker-compose.yml}, \path{docker-compose.prod.yml}, \texttt{make build}, \texttt{make up}, healthchecks y red \texttt{drivecontrol-net}. & \path{evidencias/08_make_build.png}; \path{evidencias/09_make_up.png}; \path{evidencias/11_docker_compose_ps.png}; \path{evidencias/12_docker_network_inspect.png}. & \estadoOk & DockerHub depende de secrets y de ejecuciones condicionadas; si no se muestra run verde, se debe explicar el alcance. & Se deja procedimiento reproducible, variables solo por nombre, red y limpieza con \texttt{docker compose down}. \\
-Pruebas unitarias & 20\% & Coverage mayor a 80\% evidenciado en SonarQube, pruebas criticas y ejecucion automatica en push/PR. & Vitest frontend con LCOV, backend con \texttt{node --test}, workflow \path{sonarcloud.yml}; captura SonarCloud de \texttt{main} con 93.1\% coverage. & \path{evidencias/03_sonarcloud_coverage_main.png}; \path{evidencias/05_frontend_tests_ok.png}; \path{evidencias/07_backend_tests_ok.png}. & \estadoOk & Backend se valida con tests Node, pero no esta dentro de \texttt{sonar.sources}; se explica el alcance frontend de SonarCloud. & Se conectan pruebas locales, LCOV, pipeline y SonarCloud; si coverage baja, se priorizan ramas criticas y adaptadores. \\
+Pruebas unitarias & 20\% & Coverage mayor a 80\% evidenciado en SonarQube, pruebas criticas y ejecucion automatica en push/PR. & Vitest frontend con LCOV, backend con \texttt{node --test}, workflow \path{sonarcloud.yml}; captura SonarCloud de \texttt{main} con 95.6\% coverage. & \path{evidencias/03_sonarcloud_coverage_main.png}; \path{evidencias/38_sonarcloud_measures_main.png}; \path{evidencias/05_frontend_tests_ok.png}; \path{evidencias/07_backend_tests_ok.png}. & \estadoOk & Backend se valida con tests Node, pero no esta dentro de \texttt{sonar.sources}; se explica el alcance frontend de SonarCloud. & Se conectan pruebas locales, LCOV, pipeline y SonarCloud; si coverage baja, se priorizan ramas criticas y adaptadores. \\
 Integracion servicio SMS & 10\% & Integracion funcional y comprobable con proveedor SMS, con evidencia de envio o recepcion exitosa. & Servicio Twilio en \path{backend/services/smsService.js}, OTP en backend, variables por nombre, pruebas mockeadas y capturas academicas controladas. & \path{evidencias/18_sms_app_verificacion.png}; \path{evidencias/19_sms_twilio_recibido.png}. & \estadoOk & Las capturas pueden contener datos sensibles; no se transcriben valores en texto ni se muestra \texttt{.env}. & Se documenta proveedor, flujo OTP, pruebas, manejo de credenciales y conservacion academica de \path{apps/web/.env}. \\
 Metodologias agiles y postmortem & 30\% & Milestones finalizados, HU trazables, HU por sprint, promedio HU/sprint, commits por sprint, participacion, PRs, ramas y postmortem profundo. & \path{docs/Agile/reporte_final_sprints.md}: 13 sprints, 88 HU, 375 issues, 405 commits, promedio 6.7 HU/sprint; M1-M4 cerrados; PR \#623 y \#625 mergeados. Git local: 698 commits en todas las ramas. & Milestones cerrados, tablero Project, contributors, issues \#618--\#622 y PRs finales. & \estadoOk & Issues/PRs/reviews por integrante requieren export completo con GitHub CLI; aliases de Git se normalizan. & Se enfoca el semestre completo y PRs finales quedan como cierre tecnico, no como unico eje agil. \\
 \bottomrule
@@ -651,17 +651,17 @@ El plan actual de SonarCloud analiza oficialmente la rama \texttt{main}. Por eso
 \textbf{Metrica} & \textbf{Que mide} & \textbf{Resultado observado} & \textbf{Interpretacion y accion de mejora} \\
 \midrule
 Quality Gate & Cumplimiento global de condiciones de calidad. & Passed. & Todas las condiciones configuradas pasan; si falla, no se debe integrar hasta corregir la condicion bloqueante. \\
-Coverage & Porcentaje de codigo medido ejecutado por pruebas. & 93.1\%. & Supera el umbral de excelencia de 80\%; si baja, agregar pruebas en ramas no cubiertas y revisar \path{lcov.info}. \\
+Coverage & Porcentaje de codigo medido ejecutado por pruebas. & 95.6\%. & Supera ampliamente el umbral de excelencia de 80\%; si baja, agregar pruebas en ramas no cubiertas y revisar \path{lcov.info}. \\
 Duplications & Bloques duplicados detectados por analisis CPD. & 0.0\%. & Duplicidad nula o muy baja reduce deuda y bugs repetidos; si sube, extraer helpers o componentes compartidos. \\
 Security Rating & Riesgo de vulnerabilidades detectadas por reglas de seguridad. & A. & Rating A indica estado saludable visible; si baja, corregir vulnerabilidades antes de merge. \\
 Security Issues & Issues de seguridad abiertos. & 0. & Cero issues abiertos reduce exposicion; si aparecen, revisar sanitizacion, autenticacion y dependencias. \\
-Open Issues & Issues abiertos del analisis estatico general. & 52. & No invalida por si solo el Quality Gate, pero permite priorizar deuda tecnica; se deben revisar por severidad y costo. \\
-Security Hotspots & Puntos que requieren revision manual de seguridad. & Pendiente de captura completa. & Si aparecen hotspots sin revisar, evaluarlos y registrar decision antes de la entrega. \\
-Maintainability & Code smells y deuda tecnica estimada. & Pendiente si no aparece en captura. & Si la calificacion baja de A, refactorizar funciones complejas y code smells priorizados. \\
-Reliability & Bugs potenciales detectados por analisis estatico. & Pendiente si no aparece en captura. & Si aparecen bugs, corregirlos y agregar prueba de regresion. \\
+Security Hotspots & Puntos que requieren revision manual de seguridad. & 0; Security Review Rating A. & No hay hotspots abiertos visibles en la captura complementaria; si aparecen en futuras iteraciones, deben revisarse y documentar la decision. \\
+Reliability & Bugs potenciales o riesgos de confiabilidad detectados por analisis estatico. & Reliability Rating A; 19 reliability issues de severidad baja. & La calificacion global A no bloquea el Quality Gate. Como mejora, se deben priorizar las observaciones por severidad y agregar pruebas de regresion si alguna representa riesgo funcional. \\
+Maintainability & Code smells y deuda tecnica estimada. & Maintainability Rating A; 52 maintainability issues. & La calificacion global A permite defender mantenibilidad saludable. Como mejora, se deben priorizar refactorizaciones de funciones complejas, deuda tecnica y code smells de mayor impacto. \\
+Open Issues & Issues abiertos del analisis estatico general. & 52. & No invalida por si solo el Quality Gate, pero permite priorizar deuda tecnica; se deben revisar por severidad, costo y relacion con mantenibilidad. \\
 \bottomrule
 \end{tabularx}
-\caption{Metricas SonarCloud interpretadas con resultados visibles y pendientes declarados.}
+\caption{Metricas SonarCloud actualizadas con evidencia complementaria de la rama \texttt{main}.}
 \end{table}
 
 \begin{table}[H]
@@ -674,7 +674,7 @@ Reliability & Bugs potenciales detectados por analisis estatico. & Pendiente si 
 Quality Gate & Demuestra que el analisis no quedo solo configurado, sino aprobado en el flujo de PR. & Captura de Quality Gate y checks del PR final. \\
 Coverage en \texttt{main} & Sustenta el criterio de pruebas y la importacion del reporte LCOV del frontend. & Captura de coverage en \texttt{main}. \\
 Duplicidad y seguridad & Sustentan dos metricas Sonar adicionales a coverage: duplicidad 0.0\%, Security Rating A y Security Issues 0. & Captura general de SonarCloud en \texttt{main}. \\
-Mantenibilidad y reliability & Deben explicarse si aparecen en el panel; si no aparecen, quedan como captura pendiente, no como valor inventado. & Placeholder o captura actualizada de Measures/Summary. \\
+Mantenibilidad y reliability & Se evidencian en la captura complementaria de SonarCloud en \texttt{main}: Reliability Rating A con 19 issues bajos y Maintainability Rating A con 52 issues. & Captura \path{evidencias/38_sonarcloud_measures_main.png}. \\
 \bottomrule
 \end{tabularx}
 \caption{Lectura de evidencia SonarCloud tomada de la rama \texttt{main}.}
@@ -1114,15 +1114,15 @@ Las principales limitaciones no estan en la existencia del codigo, sino en la co
 \toprule
 \textbf{Categoria} & \textbf{Archivos usados} \\
 \midrule
-SonarCloud & Capturas centralizadas de coverage y metricas generales en \path{evidencias/03_sonarcloud_coverage_main.png} y \path{evidencias/04_sonarcloud_metricas_generales.png}. \\
+SonarCloud & Capturas centralizadas de coverage y metricas generales en \path{evidencias/03_sonarcloud_coverage_main.png}, \path{evidencias/04_sonarcloud_metricas_generales.png} y \path{evidencias/38_sonarcloud_measures_main.png}. \\
 PRs y CI & Capturas de Quality Gate, checks de PR y validacion de GitHub Actions. \\
 Pruebas & Capturas de tests frontend, build frontend y tests backend. \\
 Docker & Capturas de Compose config, \texttt{make build}, \texttt{make up}, Compose ps, network inspect, DockerHub y Actions. \\
 SMS/Twilio & Capturas academicas controladas en \path{evidencias/18_sms_app_verificacion.png} y \path{evidencias/19_sms_twilio_recibido.png}; no transcribir telefono, OTP, SID, token o correo. \\
 Agile/Scrum & Capturas \path{evidencias/25_agile_milestones_semestre.png} y \path{evidencias/27_github_contributors_semestre.png}. \\
 Arquitectura & Diagrama de base de datos centralizado en \path{evidencias/32_diagrama_base_datos.png}. \\
-Metricas agiles finas & Placeholders \path{evidencias/33_github_issues_por_integrante.png} a \path{evidencias/37_github_reviews_por_integrante.png}; se completan solo con export real. \\
-SonarCloud complementario & Placeholder \path{evidencias/38_sonarcloud_measures_main.png} para vista Measures/Summary de \texttt{main}. \\
+Metricas agiles finas & Tablas calculadas desde \path{anexos/issues.json}, \path{anexos/pull_requests.json}, \path{anexos/commits_por_autor.txt} y \path{anexos/lineas_por_autor_resumen.tsv}. Las reviews por integrante quedan pendientes porque requieren export adicional por API o GraphQL. \\
+SonarCloud complementario & Captura real \path{evidencias/38_sonarcloud_measures_main.png} con vista Summary/Measures de \texttt{main}: Quality Gate aprobado, coverage 95.6\%, duplicidad 0.0\%, Security Rating A, Security Issues 0, Security Hotspots 0, Reliability Rating A y Maintainability Rating A. \\
 \bottomrule
 \end{tabularx}
 \caption{Resumen de evidencias anexadas al informe.}
