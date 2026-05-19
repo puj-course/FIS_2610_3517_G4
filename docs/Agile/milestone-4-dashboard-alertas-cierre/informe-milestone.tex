@@ -1,7 +1,11 @@
 \documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[spanish,es-tabla]{babel}
+\IfFileExists{spanish.ldf}{%
+  \usepackage[spanish,es-tabla]{babel}%
+}{%
+  \usepackage[english]{babel}%
+}
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{float}
@@ -21,11 +25,40 @@
 \fbox{\begin{minipage}[c][3cm][c]{0.82\linewidth}\centering Pendiente de captura: \texttt{\detokenize{#1}}\end{minipage}}}
 \caption{#2}
 \end{figure}}
+\newcommand{\insertjaverianalogo}{%
+\IfFileExists{img/javeriana.png}{%
+  \includegraphics[width=0.24\linewidth]{img/javeriana.png}%
+}{%
+  \IfFileExists{../img/javeriana.png}{%
+    \includegraphics[width=0.24\linewidth]{../img/javeriana.png}%
+  }{%
+    \IfFileExists{docs/Agile/img/javeriana.png}{%
+      \includegraphics[width=0.24\linewidth]{docs/Agile/img/javeriana.png}%
+    }{%
+      \IfFileExists{FIS_2610_3517_G4/docs/Agile/img/javeriana.png}{%
+        \includegraphics[width=0.24\linewidth]{FIS_2610_3517_G4/docs/Agile/img/javeriana.png}%
+      }{%
+        \fbox{%
+          \begin{minipage}[c][3cm][c]{0.34\linewidth}
+            \centering
+            \textbf{docs/Agile/img/javeriana.png}\\[0.4em]
+            Logo pendiente
+          \end{minipage}%
+        }%
+      }%
+    }%
+  }%
+}%
+}
 
 \begin{document}
+\hypersetup{pageanchor=false}
 \begin{titlepage}
 \centering
-\vspace*{1cm}
+\vspace*{0.5cm}
+\insertjaverianalogo
+\vspace{0.2cm}
+
 {\Large Pontificia Universidad Javeriana}\\
 {\large Fundamentos de Ingeniería de Software}\\[1.5cm]
 {\Huge \textbf{DriveControl / AutoMinder Enterprise}}\\[0.4cm]
@@ -38,6 +71,8 @@ Repositorio: & \url{https://github.com/puj-course/FIS_2610_3517_G4}\\
 \end{tabular}
 \vfill
 \end{titlepage}
+\hypersetup{pageanchor=true}
+\pagenumbering{arabic}
 
 \tableofcontents
 \newpage

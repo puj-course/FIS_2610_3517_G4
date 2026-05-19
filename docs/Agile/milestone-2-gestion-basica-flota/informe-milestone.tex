@@ -121,6 +121,31 @@
 \newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
 \newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
 \newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\insertjaverianalogo}{%
+\IfFileExists{img/javeriana.png}{%
+  \includegraphics[width=0.24\linewidth]{img/javeriana.png}%
+}{%
+  \IfFileExists{../img/javeriana.png}{%
+    \includegraphics[width=0.24\linewidth]{../img/javeriana.png}%
+  }{%
+    \IfFileExists{docs/Agile/img/javeriana.png}{%
+      \includegraphics[width=0.24\linewidth]{docs/Agile/img/javeriana.png}%
+    }{%
+      \IfFileExists{FIS_2610_3517_G4/docs/Agile/img/javeriana.png}{%
+        \includegraphics[width=0.24\linewidth]{FIS_2610_3517_G4/docs/Agile/img/javeriana.png}%
+      }{%
+        \fbox{%
+          \begin{minipage}[c][3cm][c]{0.34\linewidth}
+            \centering
+            \textbf{docs/Agile/img/javeriana.png}\\[0.4em]
+            Logo pendiente
+          \end{minipage}%
+        }%
+      }%
+    }%
+  }%
+}%
+}
 
 \begin{document}
 \hypersetup{pageanchor=false,pdftitle={Informe de Postmortem - Milestone 2}}
@@ -128,17 +153,7 @@
 \centering
 \vspace*{0.5cm}
 
-\IfFileExists{img/javeriana.png}{%
-  \includegraphics[width=0.24\linewidth]{img/javeriana.png}%
-}{%
-  \fbox{%
-    \begin{minipage}[c][3cm][c]{0.28\linewidth}
-      \centering
-      \textbf{img/javeriana.png}\\[0.4em]
-      Logo pendiente
-    \end{minipage}%
-  }%
-}
+\insertjaverianalogo
 \vspace{0.2cm}
 
 {\Large \textbf{Pontificia Universidad Javeriana}}\\
