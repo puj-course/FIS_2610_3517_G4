@@ -1,0 +1,173 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{array}
+\geometry{margin=2.5cm}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\evidencia}[2]{%
+\begin{figure}[H]\centering
+\IfFileExists{#1}{\includegraphics[width=0.88\linewidth]{#1}}{%
+\fbox{\begin{minipage}[c][3cm][c]{0.82\linewidth}\centering Pendiente de captura: \texttt{\detokenize{#1}}\end{minipage}}}
+\caption{#2}
+\end{figure}}
+
+\begin{document}
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+{\Large Pontificia Universidad Javeriana}\\
+{\large Fundamentos de Ingeniería de Software}\\[1.5cm]
+{\Huge \textbf{DriveControl / AutoMinder Enterprise}}\\[0.4cm]
+{\Large Equipo SYNTIX TECH}\\[1.2cm]
+{\LARGE \textbf{Milestone 3 - Gestión documental y monitoreo}}\\[1.2cm]
+\begin{tabular}{ll}
+Profesor: & Luis Gabriel Moreno Sandoval\\
+Fecha: & 19 de mayo de 2026\\
+Repositorio: & \url{https://github.com/puj-course/FIS_2610_3517_G4}\\
+\end{tabular}
+\vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Resumen ejecutivo del milestone}
+El Milestone 3 integró gestión documental, monitoreo, persistencia, seguridad y QA. GitHub live registra 38 issues cerradas, 14 HU cerradas estrictas y ningún PR con milestone asignado.
+
+\section{Objetivos del milestone}
+\begin{itemize}
+\item Integrar gestión SOAT y RTM.
+\item Fortalecer autenticación y seguridad.
+\item Validar persistencia y aislamiento de datos.
+\item Formalizar reportes QA y revisión de riesgos.
+\end{itemize}
+
+\section{Alcance funcional}
+El alcance incluye gestión documental, monitoreo, persistencia en nube, seguridad y responsividad. No incluye cierre final de CI/CD ni release.
+
+\section{Evidencia ágil}
+\begin{tabularx}{\linewidth}{l r Y}
+\toprule
+Elemento & Valor & Evidencia\\
+\midrule
+HU cerradas & 14 & Issues con patrón estricto de HU.\\
+Issues cerradas & 38 & Milestone cerrado en GitHub.\\
+PRs & 0 & GitHub no reporta PRs con milestone M3.\\
+Commits & 82 & Ventana S9-S10 en Git local.\\
+\bottomrule
+\end{tabularx}
+
+\evidencia{../../Entrega-Final/evidencias/01_agile_milestones_semestre.png}{Milestones del semestre.}
+\evidencia{../../Entrega-Final/evidencias/02_agile_project_board.png}{Tablero GitHub Project.}
+
+\section{Métricas del milestone}
+\begin{tabularx}{\linewidth}{Y r}
+\toprule
+Métrica & Valor\\
+\midrule
+HU cerradas & 14\\
+Issues cerradas & 38\\
+Issues abiertas & 0\\
+Commits por ventana de sprint & 82\\
+PRs asociados & 0\\
+\bottomrule
+\end{tabularx}
+
+Participación por issues asignadas: \code{solonlosada2006} 14, \code{samuelfl680} 11, \code{Juserora} 11, \code{juanvargax} 10 y \code{Sarm-m} 5.
+
+\section{Evaluación del producto}
+Se produjo gestión documental, mejoras de seguridad y monitoreo. La calidad mejoró por reportes QA y validación de persistencia, aunque quedó incompleta la trazabilidad por PR asignado.
+
+\section{Evaluación del proceso}
+Scrum Poker, QA y seguimiento por issues fortalecieron el proceso. El principal problema fue tratar variables de entorno y seguridad tarde.
+
+\section{Evaluación del esfuerzo}
+El esfuerzo fue medible con 82 commits y 38 issues cerradas. La participación se distribuyó entre seguridad, documentación, QA y producto.
+
+\section{Postmortem del milestone}
+\subsection{Qué salió bien}
+Se formalizó QA, se mejoró seguridad y se cerraron las issues del milestone.
+
+\subsection{Qué salió mal}
+La gestión de secretos se postergó y algunas HU visuales no tenían criterios responsivos explícitos.
+
+\subsection{Causas raíz}
+La causa raíz principal fue configurar variables de entorno tarde, lo que elevó el riesgo de credenciales hardcodeadas.
+
+\subsection{Impacto}
+El impacto fue retraso, riesgo de seguridad y presión sobre el pipeline.
+
+\subsection{Acciones correctivas}
+Configurar variables desde el día 1, incluir criterios mobile y registrar milestones en PRs.
+
+\subsection{Acciones preventivas y responsables sugeridos}
+Configuration Manager debe custodiar entorno; Scrum Master debe revisar riesgos; Product Owner debe exigir criterios responsive; QA Lead debe usar templates reproducibles.
+
+\section{Retrospectiva estrella de mar}
+\subsection{Comenzar a hacer}
+\begin{itemize}
+\item Configurar variables de entorno desde el primer día.
+\item Incluir criterios responsivos en HU visuales.
+\item Registrar milestone en PRs relevantes.
+\end{itemize}
+
+\subsection{Más de}
+\begin{itemize}
+\item Aplicar Scrum Poker en historias inciertas.
+\item Comunicar bloqueos de seguridad temprano.
+\item Validar flujos críticos antes de la presentación.
+\end{itemize}
+
+\subsection{Seguir haciendo}
+\begin{itemize}
+\item Documentar reportes QA con pasos de reproducción.
+\item Usar persistencia real para validar datos.
+\item Mantener trazabilidad por issues.
+\end{itemize}
+
+\subsection{Menos de}
+\begin{itemize}
+\item Posponer configuración de entornos.
+\item Redactar hallazgos sin evidencia.
+\item Depender de datos residuales en pruebas.
+\end{itemize}
+
+\subsection{Dejar de hacer}
+\begin{itemize}
+\item Incluir credenciales hardcodeadas.
+\item Tratar seguridad como actividad de cierre.
+\item Cerrar HU visuales sin prueba responsive.
+\end{itemize}
+
+\section{Plan de mejora del siguiente ciclo}
+\begin{tabularx}{\linewidth}{Y Y Y Y}
+\toprule
+Acción & Responsable & Evidencia esperada & Criterio de éxito\\
+\midrule
+Configurar entorno desde día 1 & Configuration Manager & Guía de variables & Sin secretos en código\\
+Revisar riesgos de seguridad & Scrum Master & Checklist & Riesgos tratados temprano\\
+Agregar criterios mobile & Product Owner & HU con criterios & Menos bugs visuales\\
+Formalizar QA reproducible & QA Lead & Issues con template & Corrección más rápida\\
+\bottomrule
+\end{tabularx}
+
+\section{Conclusión del milestone}
+M3 fue finalizado y elevó la madurez de seguridad, monitoreo y QA. Su aprendizaje central fue que seguridad y calidad no deben dejarse para el cierre.
+
+\section{Anexos o evidencias pendientes}
+\begin{itemize}
+\item Pendiente de exportación desde GitHub API: reviews completas por PR.
+\item No disponible: PRs con milestone M3 asignado.
+\end{itemize}
+\end{document}

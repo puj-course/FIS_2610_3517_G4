@@ -1,0 +1,174 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{array}
+\geometry{margin=2.5cm}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\evidencia}[2]{%
+\begin{figure}[H]\centering
+\IfFileExists{#1}{\includegraphics[width=0.88\linewidth]{#1}}{%
+\fbox{\begin{minipage}[c][3cm][c]{0.82\linewidth}\centering Pendiente de captura: \texttt{\detokenize{#1}}\end{minipage}}}
+\caption{#2}
+\end{figure}}
+
+\begin{document}
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+{\Large Pontificia Universidad Javeriana}\\
+{\large Fundamentos de Ingeniería de Software}\\[1.5cm]
+{\Huge \textbf{DriveControl / AutoMinder Enterprise}}\\[0.4cm]
+{\Large Equipo SYNTIX TECH}\\[1.2cm]
+{\LARGE \textbf{Milestone 2 - Gestión básica de flota}}\\[1.2cm]
+\begin{tabular}{ll}
+Profesor: & Luis Gabriel Moreno Sandoval\\
+Fecha: & 19 de mayo de 2026\\
+Repositorio: & \url{https://github.com/puj-course/FIS_2610_3517_G4}\\
+\end{tabular}
+\vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Resumen ejecutivo del milestone}
+El Milestone 2 consolidó la gestión básica de flota con interfaces de conductores y vehículos, validación RUNT, patrones de diseño y pruebas de flujos críticos. GitHub live registra 37 issues cerradas, 14 HU cerradas estrictas y 1 PR asociado.
+
+\section{Objetivos del milestone}
+\begin{itemize}
+\item Implementar flujos de conductores y vehículos.
+\item Integrar validación RUNT simulada.
+\item Aplicar separación de responsabilidades y patrones.
+\item Fortalecer pruebas funcionales de flota.
+\end{itemize}
+
+\section{Alcance funcional}
+El alcance cubre gestión básica de flota, validaciones, componentes visuales y soporte de pruebas. No incluye cierre CI/CD, SMS ni dashboard final.
+
+\section{Evidencia ágil}
+\begin{tabularx}{\linewidth}{l r Y}
+\toprule
+Elemento & Valor & Evidencia\\
+\midrule
+HU cerradas & 14 & Issues con patrón estricto de HU.\\
+Issues cerradas & 37 & Milestone cerrado en GitHub.\\
+PRs & 1 & PR \#233 mergeado.\\
+Commits & 164 & Ventana S5-S8 en Git local.\\
+\bottomrule
+\end{tabularx}
+
+\evidencia{../../Entrega-Final/evidencias/01_agile_milestones_semestre.png}{Milestones del semestre.}
+\evidencia{../../Entrega-Final/evidencias/02_agile_project_board.png}{Tablero GitHub Project.}
+
+\section{Métricas del milestone}
+\begin{tabularx}{\linewidth}{Y r}
+\toprule
+Métrica & Valor\\
+\midrule
+HU cerradas & 14\\
+Issues cerradas & 37\\
+Issues abiertas & 0\\
+Commits por ventana de sprint & 164\\
+PRs asociados & 1\\
+PRs mergeadas & 1\\
+\bottomrule
+\end{tabularx}
+
+Participación por issues asignadas: \code{solonlosada2006} 18, \code{Sarm-m} 9, \code{Juserora} 6, \code{juanvargax} 5 y \code{samuelfl680} 3.
+
+\section{Evaluación del producto}
+Se produjo gestión básica de flota, validación RUNT y pruebas de flujos críticos. El producto avanzó en mantenibilidad por separación de responsabilidades y reducción de código mezclado.
+
+\section{Evaluación del proceso}
+Mejoró la división en sub-issues, pero faltó mapa de dependencias e interoperabilidad entre entornos. GitHub sostuvo la trazabilidad del avance.
+
+\section{Evaluación del esfuerzo}
+El esfuerzo fue sostenido con 164 commits en S5-S8. La participación fue visible por issues asignadas, con carga fuerte en DevOps/flota y coordinación Scrum.
+
+\section{Postmortem del milestone}
+\subsection{Qué salió bien}
+Se cerraron las issues, se fortaleció la arquitectura y se validaron flujos críticos.
+
+\subsection{Qué salió mal}
+Hubo problemas por nombres, alias, diferencias de entorno y componentes construidos antes de infraestructura base.
+
+\subsection{Causas raíz}
+La falta de convenciones de nombres y de entorno homogéneo causó bugs de importación e integración.
+
+\subsection{Impacto}
+El impacto fue retrabajo, menor visibilidad de integración y validaciones tardías.
+
+\subsection{Acciones correctivas}
+Estandarizar nombres, mapear dependencias y validar flujos en más de un entorno.
+
+\subsection{Acciones preventivas y responsables sugeridos}
+Configuration Manager debe definir convenciones; DevOps debe guiar entorno; QA debe mapear dependencias; Scrum Master debe cuidar sub-issues.
+
+\section{Retrospectiva estrella de mar}
+\subsection{Comenzar a hacer}
+\begin{itemize}
+\item Estandarizar convenciones de nombres mediante reglas compartidas.
+\item Definir rutas y menús antes de construir componentes dependientes.
+\item Recolectar evidencia técnica durante el sprint.
+\end{itemize}
+
+\subsection{Más de}
+\begin{itemize}
+\item Comunicar cambios en esquemas y contratos.
+\item Revisar dependencias técnicas en kick-off.
+\item Realizar commits frecuentes para reducir conflictos.
+\end{itemize}
+
+\subsection{Seguir haciendo}
+\begin{itemize}
+\item Dividir el trabajo en sub-issues atómicas.
+\item Aplicar patrones de diseño cuando reduzcan deuda real.
+\item Usar pruebas de flujos críticos.
+\end{itemize}
+
+\subsection{Menos de}
+\begin{itemize}
+\item Asumir compatibilidad entre entornos sin verificación.
+\item Posponer feedback visual hasta el cierre.
+\item Depender de datos manuales no reproducibles.
+\end{itemize}
+
+\subsection{Dejar de hacer}
+\begin{itemize}
+\item Construir componentes sobre infraestructura inexistente.
+\item Duplicar archivos sin revisar componentes existentes.
+\item Ignorar conflictos de alias como problemas individuales.
+\end{itemize}
+
+\section{Plan de mejora del siguiente ciclo}
+\begin{tabularx}{\linewidth}{Y Y Y Y}
+\toprule
+Acción & Responsable & Evidencia esperada & Criterio de éxito\\
+\midrule
+Definir convenciones & Configuration Manager & Regla o documento & Menos errores de importación\\
+Mapear dependencias & QA Lead & Checklist & Menos retrabajo\\
+Validar entornos & DevOps Engineer & Guía reproducible & Resultado consistente\\
+Mantener sub-issues & Scrum Master & Issues enlazadas & Trazabilidad clara\\
+\bottomrule
+\end{tabularx}
+
+\section{Conclusión del milestone}
+M2 fue finalizado y fortaleció la flota. Su aprendizaje central fue que arquitectura y proceso necesitan convenciones y entornos homogéneos.
+
+\section{Anexos o evidencias pendientes}
+\begin{itemize}
+\item Pendiente de captura: flujos RUNT por escenario.
+\item Pendiente de auditoría: relación exacta commit por HU.
+\end{itemize}
+\end{document}

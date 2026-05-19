@@ -1,0 +1,177 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{array}
+\geometry{margin=2.5cm}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\evidencia}[2]{%
+\begin{figure}[H]\centering
+\IfFileExists{#1}{\includegraphics[width=0.88\linewidth]{#1}}{%
+\fbox{\begin{minipage}[c][3cm][c]{0.82\linewidth}\centering Pendiente de captura: \texttt{\detokenize{#1}}\end{minipage}}}
+\caption{#2}
+\end{figure}}
+
+\begin{document}
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+{\Large Pontificia Universidad Javeriana}\\
+{\large Fundamentos de Ingeniería de Software}\\[1.5cm]
+{\Huge \textbf{DriveControl / AutoMinder Enterprise}}\\[0.4cm]
+{\Large Equipo SYNTIX TECH}\\[1.2cm]
+{\LARGE \textbf{Milestone 4 - Dashboard, alertas y cierre del sistema}}\\[1.2cm]
+\begin{tabular}{ll}
+Profesor: & Luis Gabriel Moreno Sandoval\\
+Fecha: & 19 de mayo de 2026\\
+Repositorio: & \url{https://github.com/puj-course/FIS_2610_3517_G4}\\
+\end{tabular}
+\vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Resumen ejecutivo del milestone}
+El Milestone 4 cerró dashboard, alertas, CI/CD, Docker, SonarCloud, SMS/Twilio, métricas y evidencia final. GitHub live registra 132 issues cerradas, 20 HU cerradas estrictas y 3 PRs asociados, con el PR \#628 abierto.
+
+\section{Objetivos del milestone}
+\begin{itemize}
+\item Consolidar dashboard y alertas documentales.
+\item Evidenciar Docker, CI/CD, SonarCloud y SMS.
+\item Centralizar la entrega final de rúbrica.
+\item Cerrar postmortem técnico y de proceso.
+\end{itemize}
+
+\section{Alcance funcional}
+El alcance incluye cierre del sistema, métricas de calidad, despliegue, SMS, evidencia y documentación. No incluye releases/tags porque no existen verificables.
+
+\section{Evidencia ágil}
+\begin{tabularx}{\linewidth}{l r Y}
+\toprule
+Elemento & Valor & Evidencia\\
+\midrule
+HU cerradas & 20 & Issues con patrón estricto de HU.\\
+Issues cerradas & 132 & Milestone cerrado para issues.\\
+PRs & 3 & PRs \#232, \#488 y \#628.\\
+Commits & 277 & Ventana S11-S13 en Git local.\\
+\bottomrule
+\end{tabularx}
+
+\evidencia{../../Entrega-Final/evidencias/05_github_issues_sprint13.png}{Issues finales de Sprint 13.}
+\evidencia{../../Entrega-Final/evidencias/06_github_prs_finales.png}{PRs finales.}
+\evidencia{../../Entrega-Final/evidencias/01_agile_milestones_semestre.png}{Milestones del semestre.}
+
+\section{Métricas del milestone}
+\begin{tabularx}{\linewidth}{Y r}
+\toprule
+Métrica & Valor\\
+\midrule
+HU cerradas & 20\\
+Issues cerradas & 132\\
+Issues abiertas & 0\\
+Commits por ventana de sprint & 277\\
+PRs asociados & 3\\
+PRs mergeadas & 2\\
+PRs abiertas & 1\\
+\bottomrule
+\end{tabularx}
+
+Participación por issues asignadas: \code{samuelfl680} 56, \code{Sarm-m} 43, \code{solonlosada2006} 30, \code{juanvargax} 22 y \code{Juserora} 17.
+
+\section{Evaluación del producto}
+Se produjo el cierre funcional y documental del sistema con evidencia de calidad, despliegue, SMS y metodología. El PR \#628 queda explícitamente pendiente.
+
+\section{Evaluación del proceso}
+El proceso se enfocó en cierre de rúbrica, PRs, CI/CD y evidencia. Funcionó la respuesta asíncrona ante bloqueos, pero faltó planear releases/tags.
+
+\section{Evaluación del esfuerzo}
+El esfuerzo fue alto: 277 commits en S11-S13 y 132 issues cerradas. La participación estuvo concentrada en cierre técnico, DevOps, QA y documentación.
+
+\section{Postmortem del milestone}
+\subsection{Qué salió bien}
+Se centralizó evidencia final, se documentó CI/CD, Docker, SonarCloud y SMS, y se cerraron issues críticas.
+
+\subsection{Qué salió mal}
+Quedó abierto el PR \#628, no hay releases/tags y parte de la evidencia se recolectó bajo presión.
+
+\subsection{Causas raíz}
+La causa raíz principal fue tratar algunas validaciones funcionales y evidencias como actividades de cierre, no como parte del DoD permanente.
+
+\subsection{Impacto}
+El impacto es una integración pendiente y trazabilidad por versión limitada.
+
+\subsection{Acciones correctivas}
+Resolver o justificar PR \#628, documentar ausencia de releases y exigir prueba funcional local antes de PR.
+
+\subsection{Acciones preventivas y responsables sugeridos}
+QA Lead debe custodiar prueba funcional; Configuration Manager debe definir versión; Product Owner debe documentar datos demo; DevOps debe vigilar SonarCloud temprano.
+
+\section{Retrospectiva estrella de mar}
+\subsection{Comenzar a hacer}
+\begin{itemize}
+\item Definir política de releases o justificar su ausencia.
+\item Ejecutar pruebas funcionales locales antes de PRs de cierre.
+\item Documentar datos demo coherentes con el usuario activo.
+\end{itemize}
+
+\subsection{Más de}
+\begin{itemize}
+\item Monitorear SonarCloud durante todo el sprint.
+\item Revisar PRs con criterio funcional.
+\item Capturar evidencia al validar cada flujo.
+\end{itemize}
+
+\subsection{Seguir haciendo}
+\begin{itemize}
+\item Mantener trazabilidad entre issues, PRs, commits y capturas.
+\item Usar Docker Compose para reproducibilidad.
+\item Responder colaborativamente ante bloqueos de cierre.
+\end{itemize}
+
+\subsection{Menos de}
+\begin{itemize}
+\item Acumular evidencia para los últimos días.
+\item Depender del pipeline como única validación.
+\item Usar datos demo sin reglas de consistencia.
+\end{itemize}
+
+\subsection{Dejar de hacer}
+\begin{itemize}
+\item Abrir PRs de cierre sin validación funcional.
+\item Ignorar hotspots o coverage hasta el final.
+\item Presentar releases si no son verificables.
+\end{itemize}
+
+\section{Plan de mejora final}
+\begin{tabularx}{\linewidth}{Y Y Y Y}
+\toprule
+Acción & Responsable & Evidencia esperada & Criterio de éxito\\
+\midrule
+Resolver PR pendiente & QA Lead / equipo & PR cerrado o justificado & Cierre sin ambigüedad\\
+Definir política de versión & Configuration Manager & Tag/release o decisión & Trazabilidad clara\\
+Validar antes de PR & QA Lead & Checklist & Menos regresiones\\
+Documentar datos demo & Product Owner & Guía de datos & Alertas reproducibles\\
+\bottomrule
+\end{tabularx}
+
+\section{Conclusión del milestone}
+M4 cerró el sistema con evidencia técnica y metodológica suficiente. Los pendientes se declaran sin inventar datos: PR \#628 abierto y ausencia de releases/tags verificables.
+
+\section{Anexos o evidencias pendientes}
+\begin{itemize}
+\item Pendiente: cierre o justificación de PR \#628.
+\item No existen releases/tags verificables.
+\item Pendiente de exportación desde GitHub API: reviews completas por PR.
+\end{itemize}
+\end{document}

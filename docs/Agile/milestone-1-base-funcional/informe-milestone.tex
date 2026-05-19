@@ -1,0 +1,175 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{array}
+\geometry{margin=2.5cm}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.55em}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\evidencia}[2]{%
+\begin{figure}[H]\centering
+\IfFileExists{#1}{\includegraphics[width=0.88\linewidth]{#1}}{%
+\fbox{\begin{minipage}[c][3cm][c]{0.82\linewidth}\centering Pendiente de captura: \texttt{\detokenize{#1}}\end{minipage}}}
+\caption{#2}
+\end{figure}}
+
+\begin{document}
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+{\Large Pontificia Universidad Javeriana}\\
+{\large Fundamentos de Ingeniería de Software}\\[1.5cm]
+{\Huge \textbf{DriveControl / AutoMinder Enterprise}}\\[0.4cm]
+{\Large Equipo SYNTIX TECH}\\[1.2cm]
+{\LARGE \textbf{Milestone 1 - Base funcional del sistema}}\\[1.2cm]
+\begin{tabular}{ll}
+Profesor: & Luis Gabriel Moreno Sandoval\\
+Fecha: & 19 de mayo de 2026\\
+Repositorio: & \url{https://github.com/puj-course/FIS_2610_3517_G4}\\
+\end{tabular}
+\vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Resumen ejecutivo del milestone}
+El Milestone 1 estableció la base técnica y metodológica del sistema: stack MERN, autenticación inicial, dashboard base, estructura de ramas y primeras prácticas Scrum. GitHub live registra 76 issues cerradas, 24 HU cerradas estrictas y 9 PRs asociados al milestone.
+
+\section{Objetivos del milestone}
+\begin{itemize}
+\item Establecer la arquitectura base del producto.
+\item Implementar autenticación, registro y rutas protegidas.
+\item Crear el dashboard inicial y componentes base.
+\item Activar GitFlow y seguimiento con GitHub Issues.
+\end{itemize}
+
+\section{Alcance funcional}
+El alcance incluye base funcional, autenticación, dashboard inicial, componentes de estado y organización inicial de ramas. No incluye módulos avanzados de despliegue, alertas finales ni SMS.
+
+\section{Evidencia ágil}
+\begin{tabularx}{\linewidth}{l r Y}
+\toprule
+Elemento & Valor & Evidencia\\
+\midrule
+HU cerradas & 24 & Issues con patrón estricto de HU en GitHub.\\
+Issues cerradas & 76 & Milestone cerrado en GitHub.\\
+PRs & 9 & PRs \#130, \#168, \#170, \#171, \#172, \#173, \#174, \#177, \#208.\\
+Commits & 107 & Ventana S1-S4 en Git local.\\
+\bottomrule
+\end{tabularx}
+
+\evidencia{../../Entrega-Final/evidencias/01_agile_milestones_semestre.png}{Milestones del semestre.}
+\evidencia{../../Entrega-Final/evidencias/02_agile_project_board.png}{Tablero GitHub Project.}
+
+\section{Métricas del milestone}
+\begin{tabularx}{\linewidth}{Y r}
+\toprule
+Métrica & Valor\\
+\midrule
+HU cerradas & 24\\
+Issues cerradas & 76\\
+Issues abiertas & 0\\
+Commits por ventana de sprint & 107\\
+PRs asociados & 9\\
+PRs mergeadas & 8\\
+PRs cerradas sin merge & 1\\
+\bottomrule
+\end{tabularx}
+
+Participación por issues asignadas: \code{juanvargax} 42, \code{Sarm-m} 21, \code{Juserora} 21, \code{samuelfl680} 16 y \code{solonlosada2006} 11.
+
+\section{Evaluación del producto}
+Se produjo una base funcional que permitió autenticar usuarios, navegar por el dashboard inicial y comenzar el desarrollo incremental. La evidencia existe en issues, PRs y capturas generales de GitHub.
+
+\section{Evaluación del proceso}
+El equipo usó Scrum académico con GitHub Issues, ramas y PRs. Funcionó la adopción temprana de GitFlow, pero faltó un Definition of Done formal y una política uniforme de validación local.
+
+\section{Evaluación del esfuerzo}
+El esfuerzo fue distribuido entre los cinco integrantes. La carga se concentró en producto, Scrum y QA inicial. Los 107 commits de S1-S4 muestran actividad sostenida, aunque la trazabilidad commit-HU requiere auditoría manual si se necesita exactitud forense.
+
+\section{Postmortem del milestone}
+\subsection{Qué salió bien}
+Se consolidó la base técnica, se usó GitFlow y se cerraron las issues funcionales del milestone.
+
+\subsection{Qué salió mal}
+Se integró código sin validación local suficiente y algunas HU se cerraron sin criterios de aceptación homogéneos.
+
+\subsection{Causas raíz}
+La causa raíz principal fue la ausencia de un Definition of Done verificable, combinada con estimaciones optimistas y evidencia recolectada tarde.
+
+\subsection{Impacto}
+El impacto fue retrabajo, ambigüedad sobre terminado y pérdida de tiempo en integración.
+
+\subsection{Acciones correctivas}
+Definir DoD, exigir build local antes de PR y documentar evidencia mínima al cerrar issues.
+
+\subsection{Acciones preventivas y responsables sugeridos}
+QA Lead debe custodiar el DoD; Configuration Manager debe revisar integración; Product Owner debe ajustar capacidad; Scrum Master debe vigilar trazabilidad.
+
+\section{Retrospectiva estrella de mar}
+\subsection{Comenzar a hacer}
+\begin{itemize}
+\item Definir un Definition of Done verificable antes de cada sprint.
+\item Validar la compilación local antes de abrir un Pull Request.
+\item Registrar evidencia mínima al cerrar cada historia de usuario.
+\end{itemize}
+
+\subsection{Más de}
+\begin{itemize}
+\item Revisar criterios de aceptación con el Product Owner.
+\item Generar trazabilidad issue-commit-PR en cambios funcionales.
+\item Sincronizar impedimentos técnicos de forma temprana.
+\end{itemize}
+
+\subsection{Seguir haciendo}
+\begin{itemize}
+\item Mantener GitFlow como base del control de versiones.
+\item Usar GitHub Issues para dividir trabajo.
+\item Comunicar bloqueos por Discord cuando sea eficiente.
+\end{itemize}
+
+\subsection{Menos de}
+\begin{itemize}
+\item Aplazar tareas sin evaluar impacto.
+\item Depender de reuniones sincrónicas para desbloqueos simples.
+\item Estimar historias sin considerar carga académica.
+\end{itemize}
+
+\subsection{Dejar de hacer}
+\begin{itemize}
+\item Integrar código sin validación local.
+\item Cerrar HU sin criterios de aceptación explícitos.
+\item Postergar la creación de issues.
+\end{itemize}
+
+\section{Plan de mejora del siguiente ciclo}
+\begin{tabularx}{\linewidth}{Y Y Y Y}
+\toprule
+Acción & Responsable & Evidencia esperada & Criterio de éxito\\
+\midrule
+Definir DoD común & QA Lead & Checklist versionada & Toda HU cerrada referencia DoD\\
+Validar build local & Configuration Manager & Comentario o captura en PR & Menos fallos triviales\\
+Planear capacidad real & Product Owner & Tabla de disponibilidad & Menos arrastre\\
+Reforzar trazabilidad & Scrum Master & Issues enlazadas & Cambios con issue\\
+\bottomrule
+\end{tabularx}
+
+\section{Conclusión del milestone}
+M1 fue finalizado y sentó la base funcional. Su mayor aprendizaje fue que la calidad metodológica debía formalizarse para evitar deuda de proceso.
+
+\section{Anexos o evidencias pendientes}
+\begin{itemize}
+\item Pendiente de captura: evidencia granular por cada HU.
+\item Pendiente de auditoría: relación exacta commit por HU.
+\end{itemize}
+\end{document}
