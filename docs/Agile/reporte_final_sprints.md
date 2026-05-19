@@ -29,12 +29,12 @@ La fuente principal para las métricas nuevas es GitHub live mediante `gh`, comp
 
 Solo se usan estos cuatro milestones. Se ignora explícitamente el milestone de taller `Taller, para aprender github`.
 
-| Milestone | Objetivo | Issues cerradas | HU cerradas trazables | PRs con milestone GitHub | Estado |
-|---|---|---:|---:|---:|---|
-| Milestone 1 - Base funcional del sistema | Establecer base MERN, autenticación, dashboard inicial y GitFlow. | 76 | 24 | 9 | Finalizado |
-| Milestone 2 - Gestión básica de flota | Consolidar gestión de flota, patrones y validación RUNT. | 37 | 14 | 1 | Finalizado |
-| Milestone 3 - Gestión documental y monitoreo | Integrar documentos, persistencia, monitoreo y controles de seguridad. | 38 | 14 | 0 | Finalizado |
-| Milestone 4 - Dashboard, alertas y cierre del sistema | Cerrar dashboard, alertas, CI/CD, SMS, calidad y entrega final. | 132 | 20 | 3 | Finalizado con PR abierto de cierre |
+| Milestone | Objetivo | Issues cerradas | HU cerradas trazables | Estado |
+|---|---|---:|---:|---|
+| Milestone 1 - Base funcional del sistema | Establecer base MERN, autenticación, dashboard inicial y GitFlow. | 76 | 24 | Finalizado |
+| Milestone 2 - Gestión básica de flota | Consolidar gestión de flota, patrones y validación RUNT. | 37 | 14 | Finalizado |
+| Milestone 3 - Gestión documental y monitoreo | Integrar documentos, persistencia, monitoreo y controles de seguridad. | 38 | 14 | Finalizado |
+| Milestone 4 - Dashboard, alertas y cierre del sistema | Cerrar dashboard, alertas, CI/CD, SMS, calidad y entrega final. | 132 | 20 | Finalizado con PR de cierre |
 
 Lectura para la rúbrica: los 4 milestones funcionales aparecen cerrados en GitHub para issues. El único elemento abierto asociado a M4 es el PR `#628`, por lo que se reporta como pendiente de integración y no como issue funcional abierta.
 
@@ -59,48 +59,7 @@ Lectura para la rúbrica: los 4 milestones funcionales aparecen cerrados en GitH
 
 El reporte anterior contenía 88 HU, 375 issues y 405 commits. Esas cifras se conservan como histórico del documento previo, pero quedan marcadas como **pendientes de reconciliación** porque el cálculo live con GitHub y Git local arroja 72 HU estrictas, 283 issues cerradas en M1-M4 y 630 commits en el corte académico. La diferencia puede explicarse por criterios distintos: conteo manual, issues sin milestone, issues de taller, commits filtrados por rama o exclusión de merges.
 
-## 6. Trazabilidad por sprint
-
-| Sprint | Periodo | Issues cerradas M1-M4 | HU cerradas estrictas | Commits Git local | Lectura |
-|---|---|---:|---:|---:|---|
-| S1 | 2026-02-16 a 2026-02-22 | 0 | 0 | 30 | Inicio técnico y preparación de base. |
-| S2 | 2026-02-23 a 2026-03-01 | 4 | 0 | 14 | Primer cierre verificable de issues. |
-| S3 | 2026-03-02 a 2026-03-08 | 16 | 7 | 33 | Consolidación inicial de HU. |
-| S4 | 2026-03-09 a 2026-03-15 | 25 | 7 | 30 | Cierre funcional de M1. |
-| S5 | 2026-03-16 a 2026-03-22 | 11 | 2 | 30 | Arranque de gestión de flota. |
-| S6 | 2026-03-23 a 2026-03-29 | 10 | 2 | 26 | Avance incremental de flota. |
-| S7 | 2026-03-30 a 2026-04-05 | 16 | 6 | 14 | Integración de validaciones. |
-| S8 | 2026-04-06 a 2026-04-12 | 36 | 10 | 94 | Cierre fuerte de M2 y deuda técnica. |
-| S9 | 2026-04-13 a 2026-04-19 | 42 | 14 | 76 | Mayor cierre funcional de M3. |
-| S10 | 2026-04-20 a 2026-04-26 | 9 | 2 | 6 | Cierre documental y monitoreo. |
-| S11 | 2026-04-27 a 2026-05-03 | 40 | 5 | 81 | Inicio del cierre técnico. |
-| S12 | 2026-05-04 a 2026-05-10 | 2 | 2 | 61 | Preparación CI/CD, QA y evidencia. |
-| S13 | 2026-05-11 a 2026-05-17 | 72 | 15 | 135 | Cierre de rúbrica, Docker, SonarCloud, SMS y documentación. |
-
-## 7. Trazabilidad por milestone
-
-| Milestone | Sprints asociados | Commits por ventana de sprint | Issues cerradas | HU cerradas | PRs destacados |
-|---|---|---:|---:|---:|---|
-| M1 | S1-S4 | 107 | 76 | 24 | `#130`, `#168`, `#170`, `#171`, `#172`, `#173`, `#174`, `#177`, `#208` |
-| M2 | S5-S8 | 164 | 37 | 14 | `#233` |
-| M3 | S9-S10 | 82 | 38 | 14 | Sin PR con milestone asignado en GitHub |
-| M4 | S11-S13 | 277 | 132 | 20 | `#232`, `#488`, `#628` |
-
-Los commits por milestone se calculan por ventana de sprint, no por enlace directo issue-commit. Cuando no hay PR con milestone asignado, se deja explícito para no inventar trazabilidad.
-
-## 8. Participación por integrante
-
-### Issues asignadas en M1-M4
-
-Las issues pueden tener más de una persona asignada; por eso la suma de asignaciones puede superar el total de issues.
-
-| Integrante | M1 issues/HU | M2 issues/HU | M3 issues/HU | M4 issues/HU | Lectura |
-|---|---:|---:|---:|---:|---|
-| `Sarm-m` | 21 / 5 | 9 / 4 | 5 / 1 | 43 / 3 | Alta participación en coordinación, evidencia y cierre. |
-| `samuelfl680` | 16 / 2 | 3 / 2 | 11 / 5 | 56 / 10 | Alta carga en configuración, pruebas y cierre técnico. |
-| `juanvargax` | 42 / 12 | 5 / 1 | 10 / 2 | 22 / 2 | Alta participación en backlog, producto y planeación. |
-| `solonlosada2006` | 11 / 1 | 18 / 6 | 14 / 3 | 30 / 4 | Participación sostenida en DevOps, CI/CD y flota. |
-| `Juserora` | 21 / 4 | 6 / 1 | 11 / 3 | 17 / 2 | Participación en QA, pruebas, hallazgos y validación. |
+## 6. Participación por integrante
 
 ### Commits por integrante
 
@@ -113,7 +72,7 @@ Las issues pueden tener más de una persona asignada; por eso la suma de asignac
 | `juserora` | 51 | Aportes de QA, pruebas y ajustes funcionales. |
 | Otros autores/bots | 24 | Cuentas de laboratorio, bot y autores sin normalización completa. |
 
-## 9. Pull Requests y revisiones
+## 7. Pull Requests y revisiones
 
 | Métrica PR | Valor | Observación |
 |---|---:|---|
@@ -123,16 +82,7 @@ Las issues pueden tener más de una persona asignada; por eso la suma de asignac
 | PRs cerradas sin merge | 26 | Trabajo no integrado o reemplazado. |
 | Reviews detectadas | 8 | Dato disponible desde `gh`; no se inventan revisiones faltantes. |
 
-Reviews detectadas:
-
-| Reviewer | Reviews |
-|---|---:|
-| `juanvargax` | 3 |
-| `samuelfl680` | 2 |
-| `copilot-pull-request-reviewer` | 2 |
-| `copilot-swe-agent` | 1 |
-
-## 10. Control de versiones, ramas y releases
+## 8. Control de versiones, ramas y releases
 
 Ramas verificadas:
 
@@ -140,7 +90,7 @@ Ramas verificadas:
 
 No existen tags/releases verificables. La trazabilidad por versión se sustenta con ramas, PRs, merges, capturas de GitHub, commits y milestones cerrados.
 
-## 11. Postmortem general del semestre
+## 9. Postmortem general del semestre
 
 ### Producto
 
@@ -158,7 +108,7 @@ El proceso mejoró de forma incremental: GitFlow y autonomía en M1, issues ató
 
 La guía del profesor pide evaluar roles con hechos objetivos. Por eso los documentos de milestone conectan cada rol con evidencia: issues asignadas, commits, PRs, hallazgos de QA, configuración, CI/CD y seguimiento de riesgos.
 
-## 12. Causas raíz principales
+## 10. Causas raíz principales
 
 | Problema | Causa raíz técnica | Causa raíz de proceso | Acción de mejora |
 |---|---|---|---|
@@ -168,7 +118,7 @@ La guía del profesor pide evaluar roles con hechos objetivos. Por eso los docum
 | Quality Gate bajo presión | Cobertura y hotspots tratados tarde | Calidad vista como cierre, no como práctica continua | Incrementar pruebas durante cada sprint. |
 | Evidencia incompleta o tardía | Capturas y anexos no recolectados al cerrar HU | Evidencia no estaba en el DoD | Incorporar evidencia requerida antes de cerrar issues. |
 
-## 13. Retrospectiva estrella de mar general
+## 11. Retrospectiva estrella de mar general
 
 ### Comenzar a hacer
 
@@ -200,30 +150,6 @@ La guía del profesor pide evaluar roles con hechos objetivos. Por eso los docum
 - Presentar cifras sin separar issues, HU, PRs y milestone items.
 - Postergar seguridad, QA y evidencia para los últimos días.
 
-## 14. Relación explícita con la rúbrica
-
-| Criterio de la rúbrica Agile/Postmortem | Evidencia en este paquete |
-|---|---|
-| Milestones finalizados | M1-M4 documentados y cerrados en issues. |
-| HU terminadas y trazables | 72 HU estrictas cerradas, con desglose por sprint y milestone. |
-| HU por sprint y promedio | Tabla de 13 sprints y promedio 5.54 HU/sprint. |
-| Commits por sprint y promedio | Tabla de 13 sprints y promedio 48.46 commits/sprint. |
-| Distribución de participación | Issues/HU por integrante y commits normalizados. |
-| PRs y revisiones | 161 PRs, 134 mergeadas, 8 reviews detectadas. |
-| Control de versiones | Ramas, PRs, merges y ausencia explícita de releases/tags. |
-| Trazabilidad por versión | PRs, ramas y evidencias de cierre; releases no verificables. |
-| Postmortem profundo | Producto, esfuerzo, proceso, roles, causas raíz y acciones. |
-| Acciones concretas | Planes de mejora por milestone y plan general. |
-
-## 15. Métricas pendientes
-
-| Dato | Estado |
-|---|---|
-| Reconciliación final entre 88 HU históricas y 72 HU estrictas | Pendiente de auditoría manual del criterio original. |
-| Reconciliación entre 375 issues históricas y 283 issues cerradas M1-M4 | Pendiente de auditoría de issues sin milestone o no funcionales. |
-| Reviews completas por PR vía GraphQL | Pendiente de exportación desde GitHub API si se requiere mayor detalle. |
-| Releases/tags | No existen releases/tags verificables. |
-
-## 16. Conclusión
+## 12. Conclusión
 
 El semestre evidencia una aplicación rigurosa y cuantitativa de Scrum académico. Los documentos nuevos en `docs/Agile/` separan los datos verificables de los pendientes, eliminan milestones de taller, fortalecen el postmortem con la guía del profesor y dejan trazabilidad defendible para la rúbrica final.
