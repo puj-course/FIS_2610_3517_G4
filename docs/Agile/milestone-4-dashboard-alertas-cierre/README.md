@@ -50,7 +50,7 @@ El detalle por commit puede regenerarse con `git log --all --since="2026-04-27" 
 
 ## 7. Evidencias disponibles
 
-- Capturas Agile: `25_agile_milestones_semestre.png`, `26_agile_project_board.png`, `27_github_contributors_semestre.png`, `28_github_commits_por_integrante.png`.
+- Capturas Agile: `01_agile_milestones_semestre.png`, `02_agile_project_board.png`, `03_github_contributors_semestre.png`, `04_github_commits_por_integrante.png`.
 - Capturas de cierre técnico: issues `#618` a `#622`, PRs finales, Docker, SonarCloud, SMS.
 - Postmortem migrado: `postmortem-milestone.md`.
 

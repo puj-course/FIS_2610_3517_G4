@@ -45,9 +45,9 @@ El detalle por commit puede regenerarse con `git log --all --since="2026-04-13" 
 
 ## 7. Evidencias disponibles
 
-- Captura general de milestones: `docs/Entrega-Final/evidencias/25_agile_milestones_semestre.png`.
-- Captura de tablero: `docs/Entrega-Final/evidencias/26_agile_project_board.png`.
-- Capturas de contributors y commits: `docs/Entrega-Final/evidencias/27_github_contributors_semestre.png`, `docs/Entrega-Final/evidencias/28_github_commits_por_integrante.png`.
+- Captura general de milestones: `docs/Entrega-Final/evidencias/01_agile_milestones_semestre.png`.
+- Captura de tablero: `docs/Entrega-Final/evidencias/02_agile_project_board.png`.
+- Capturas de contributors y commits: `docs/Entrega-Final/evidencias/03_github_contributors_semestre.png`, `docs/Entrega-Final/evidencias/04_github_commits_por_integrante.png`.
 - Postmortem migrado: `postmortem-milestone.md`.
 
 ## 8. Métricas
