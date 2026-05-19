@@ -127,9 +127,9 @@ export default function ConductoresPage() {
               <tr>
                 <th className="px-6 py-4">Conductor</th>
                 <th className="px-6 py-4">Documento</th>
-                <th className="px-6 py-4">Contacto</th>
-                <th className="px-6 py-4">Licencia</th>
-                <th className="px-6 py-4">Vehículo asignado</th>
+                <th className="hidden md:table-cell px-6 py-4">Contacto</th>
+                <th className="hidden md:table-cell px-6 py-4">Licencia</th>
+                <th className="hidden lg:table-cell px-6 py-4">Vehículo asignado</th>
                 <th className="px-6 py-4 text-center">Editar</th>
                 <th className="px-6 py-4 text-right">Acciones</th>
               </tr>
@@ -149,14 +149,14 @@ export default function ConductoresPage() {
                       <span className={`font-bold ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{c.nombre}</span>
                     </td>
                     <td className="px-6 py-4 font-medium">{c.documento}</td>
-                    <td className="px-6 py-4">{c.telefono}</td>
-                    <td className="px-6 py-4">
+                    <td className="hidden md:table-cell px-6 py-4">{c.telefono}</td>
+                    <td className="hidden md:table-cell px-6 py-4">
                       <div className="flex flex-col gap-1 items-start">
                         <span className={`text-xs font-bold ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>Cat: {c.categoria}</span>
                         <StatusBadge status={c.estado} />
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="hidden lg:table-cell px-6 py-4">
                       <span
                         className={`block max-w-[240px] truncate text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-gray-700'}`}
                         title={assignedVehicleLabel}
@@ -182,7 +182,7 @@ export default function ConductoresPage() {
                       <button
                       type="button"
                       onClick={() => deleteConductor(c.id)}
-                      className={`rounded-lg p-2 transition-colors ${
+                      className={`inline-flex items-center justify-center rounded-lg p-3 touch-manipulation transition-colors ${
                         isDarkMode
                           ? 'text-slate-500 hover:bg-red-500/10 hover:text-red-300'
                           : 'text-gray-400 hover:bg-red-50 hover:text-syntix-red'

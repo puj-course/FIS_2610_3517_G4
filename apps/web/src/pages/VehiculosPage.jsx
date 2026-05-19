@@ -149,8 +149,8 @@ export default function VehiculosPage() {
               <tr>
                 <th className="px-6 py-4">Placa</th>
                 <th className="px-6 py-4">Vehiculo</th>
-                <th className="px-6 py-4">Usuario asociado</th>
-                <th className="px-6 py-4">Conductor asignado</th>
+                <th className="hidden md:table-cell px-6 py-4">Usuario asociado</th>
+                <th className="hidden md:table-cell px-6 py-4">Conductor asignado</th>
                 <th className="px-6 py-4">Estado general</th>
                 <th className="px-6 py-4 text-center">Editar</th>
                 <th className="px-6 py-4 text-right">Acciones</th>
@@ -164,15 +164,15 @@ export default function VehiculosPage() {
                     <div className={`font-medium ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>
                       {v.marca} {v.modelo}
                     </div>
-                    <div className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
+                    <div className={`hidden sm:block text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>
                       {v.tipo} - {v.anio}
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="hidden md:table-cell px-6 py-4">
                     <div className={`font-medium ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{v.ownerLabel}</div>
                     {v.ownerEmail && <div className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-gray-500'}`}>{v.ownerEmail}</div>}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="hidden md:table-cell px-6 py-4">
                     {v.conductor ? (
                       <span className={`font-medium ${isDarkMode ? 'text-slate-100' : 'text-gray-900'}`}>{v.conductor.nombre}</span>
                     ) : (
@@ -200,7 +200,7 @@ export default function VehiculosPage() {
                     <button
                       type="button"
                       onClick={() => deleteVehicle(v.id)}
-                      className={`rounded-lg p-2 transition-colors ${
+                      className={`inline-flex items-center justify-center rounded-lg p-3 touch-manipulation transition-colors ${
                         isDarkMode
                           ? 'text-slate-500 hover:bg-red-500/10 hover:text-red-300'
                           : 'text-gray-400 hover:bg-red-50 hover:text-syntix-red'
