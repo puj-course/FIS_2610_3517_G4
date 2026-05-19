@@ -1,197 +1,635 @@
 \documentclass[11pt,a4paper]{article}
+
+% --------------------------------------------------
+% PAQUETES
+% --------------------------------------------------
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[spanish,es-tabla]{babel}
+\IfFileExists{spanish.ldf}{%
+  \usepackage[spanish,es-tabla]{babel}%
+}{%
+  \usepackage[english]{babel}%
+}
+\usepackage{lmodern}
 \usepackage{geometry}
 \usepackage{graphicx}
-\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage[nopatch=footnote]{microtype}
 \usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{array}
 \usepackage{tabularx}
 \usepackage{booktabs}
-\usepackage{array}
 \usepackage{longtable}
-\geometry{margin=2.5cm}
-\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\usepackage{ragged2e}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage{colortbl}
+\usepackage{lastpage}
+\usepackage{pdflscape}
+\usepackage{pifont}
+\usepackage{url}
+
+% --------------------------------------------------
+% CONFIGURACION GENERAL
+% --------------------------------------------------
+\geometry{
+  top=2.6cm,
+  bottom=2.6cm,
+  left=2.6cm,
+  right=2.6cm,
+  headheight=15pt,
+  footskip=1.2cm
+}
+
+\definecolor{azulprincipal}{HTML}{1F3C88}
+\definecolor{azulsuave}{HTML}{EAF0FB}
+\definecolor{grislinea}{HTML}{D9DEE8}
+\definecolor{gristexto}{HTML}{333333}
+\definecolor{rojopendiente}{HTML}{B00020}
+\definecolor{verdesuave}{HTML}{EAF7EA}
+\definecolor{amarillosuave}{HTML}{FFF7E0}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=azulprincipal,
+  urlcolor=azulprincipal,
+  citecolor=azulprincipal,
+  pdftitle={Reporte final de sprints, milestones y postmortem},
+  pdfauthor={SYNTIX TECH - Pontificia Universidad Javeriana}
+}
+
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0.55em}
-\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlength{\parskip}{0.6em}
+\setstretch{1.12}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\emergencystretch}{2em}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+\renewcommand{\contentsname}{Tabla de contenido}
+\AtBeginDocument{%
+  \renewcommand{\contentsname}{Tabla de contenido}%
+  \renewcommand{\tablename}{Tabla}%
+  \renewcommand{\figurename}{Figura}%
+}
+
+% --------------------------------------------------
+% FORMATO DE TITULOS
+% --------------------------------------------------
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{azulprincipal}}
+  {\thesection.}{0.6em}{}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{azulprincipal}}
+  {\thesubsection.}{0.6em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{azulprincipal}}
+  {\thesubsubsection.}{0.6em}{}
+
+\titleformat{\paragraph}[block]
+  {\normalfont\normalsize\bfseries\color{azulprincipal}}
+  {\theparagraph.}{0.6em}{}
+
+\titlespacing*{\section}{0pt}{1.6em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+\titlespacing*{\paragraph}{0pt}{0.9em}{0.4em}
+
+% --------------------------------------------------
+% ENCABEZADO Y PIE DE PAGINA
+% --------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{azulprincipal}{Reporte final Agile/Postmortem}}
+\fancyhead[R]{\textcolor{azulprincipal}{DriveControl / AutoMinder Enterprise}}
+\fancyfoot[C]{\textcolor{gristexto}{Pagina \thepage\ de \pageref*{LastPage}}}
+\renewcommand{\headrulewidth}{0.6pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\captionsetup{
+  font=small,
+  labelfont=bf
+}
+
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+
 \newcommand{\code}[1]{\texttt{\detokenize{#1}}}
-\newcommand{\evidencia}[2]{%
-\begin{figure}[H]\centering
-\IfFileExists{#1}{\includegraphics[width=0.88\linewidth]{#1}}{%
-\fbox{\begin{minipage}[c][3cm][c]{0.82\linewidth}\centering Pendiente de captura: \texttt{\detokenize{#1}}\end{minipage}}}
-\caption{#2}
-\end{figure}}
 
 \begin{document}
+
+% --------------------------------------------------
+% PORTADA
+% --------------------------------------------------
+\hypersetup{pageanchor=false}
 \begin{titlepage}
 \centering
-\vspace*{1cm}
-{\Large Pontificia Universidad Javeriana}\\
-{\large Fundamentos de Ingeniería de Software}\\[1.4cm]
-{\Huge \textbf{DriveControl / AutoMinder Enterprise}}\\[0.4cm]
-{\Large Equipo SYNTIX TECH}\\[1.2cm]
-{\LARGE \textbf{Informe general de milestones y postmortem}}\\[1.2cm]
-\begin{tabular}{ll}
-Profesor: & Luis Gabriel Moreno Sandoval\\
-Fecha: & 19 de mayo de 2026\\
-Repositorio: & \url{https://github.com/puj-course/FIS_2610_3517_G4}\\
+\vspace*{1.2cm}
+{\Large \textbf{Pontificia Universidad Javeriana}}\\[0.4em]
+{\large Departamento de Ingenieria de Sistemas}\\[2.4cm]
+
+{\Huge \textbf{Reporte final de sprints, milestones y postmortem}}\\[0.7em]
+{\Large \textbf{DriveControl / AutoMinder Enterprise}}\\[1.2cm]
+
+\begin{tabular}{rl}
+\textbf{Proyecto:} & DriveControl / AutoMinder Enterprise \\
+\textbf{Equipo:} & SYNTIX TECH \\
+\textbf{Curso:} & Fundamentos de Ingenieria de Software \\
+\textbf{Profesor:} & Luis Gabriel Moreno Sandoval \\
+\textbf{Fecha de consolidacion:} & 19 de mayo de 2026 \\
+\textbf{Repositorio:} & \url{https://github.com/puj-course/FIS_2610_3517_G4} \\
 \end{tabular}
+
 \vfill
-\end{titlepage}
 
-\tableofcontents
-\newpage
-
-\section{Introducción}
-Este informe reúne los cuatro milestones funcionales del semestre y documenta la aplicación de Scrum académico, GitHub Issues, PRs, ramas, commits, métricas, trazabilidad y postmortem. Se construye con datos reales de GitHub live, Git local, anexos exportados y capturas disponibles. Si un dato no se puede verificar, se declara como pendiente.
-
-\section{Explicación metodológica}
-\subsection{Scrum académico}
-El equipo trabajó con planeación por sprint, división de HU en issues, seguimiento por tablero, revisión de avances y postmortem por ciclo. Los roles fueron Scrum Master, Product Owner / Sprint Planner, Configuration Manager, DevOps Engineer y QA Lead.
-
-\subsection{GitHub Issues y milestones}
-Las HU y tareas se gestionaron con issues y se agruparon en cuatro milestones válidos. Se ignora el milestone de taller porque no representa incremento funcional del producto.
-
-\subsection{Pull Requests, ramas y control de versiones}
-El flujo combinó ramas \code{main}, \code{develop} y ramas feature. Se verifican 161 PRs, 134 mergeadas, 1 abierta y 26 cerradas sin merge. No existen releases/tags verificables.
-
-\subsection{Trazabilidad}
-La trazabilidad se documenta por sprint, milestone, issues, HU, PRs, commits y evidencias visuales. Cuando GitHub no entrega relación directa, se declara el alcance exacto del dato.
-
-\subsection{Postmortem y estrella de mar}
-El postmortem sigue la guía del profesor: evaluar producto, esfuerzo y proceso; revisar datos de calidad; evaluar roles con hechos objetivos; identificar causas; preparar acciones de mejora; y usar Starfish.
-
-\section{Resumen comparativo de los 4 milestones}
-\begin{tabularx}{\linewidth}{Y r r r r Y}
+\begin{tabular}{lll}
 \toprule
-Milestone & HU & Issues & Commits & PRs & Estado\\
+\textbf{Nombre} & \textbf{Usuario} & \textbf{Rol} \\
 \midrule
-M1 - Base funcional & 24 & 76 & 107 & 9 & Finalizado\\
-M2 - Gestión básica de flota & 14 & 37 & 164 & 1 & Finalizado\\
-M3 - Gestión documental y monitoreo & 14 & 38 & 82 & 0 & Finalizado\\
-M4 - Dashboard, alertas y cierre & 20 & 132 & 277 & 3 & Finalizado para issues; PR \#628 abierto\\
+Sebastian Ramirez Maldonado & @Sarm-m & Scrum Master \\
+Samuel Freile & @samuelfl680 & Configuration Manager \\
+Sebastian Rodriguez Ramirez & @Juserora & Quality Assurance Lead \\
+Solon Losada & @solonlosada2006 & DevOps Engineer \\
+Sebastian Vargas & @juanvargax & Product Owner / Sprint Planner \\
 \bottomrule
-\end{tabularx}
+\end{tabular}
 
-\section{Sección individual por milestone}
-\subsection{Milestone 1 - Base funcional del sistema}
-M1 estableció stack, autenticación, dashboard base y GitFlow. Sus métricas son 76 issues cerradas, 24 HU, 107 commits y 9 PRs. El postmortem identifica como causa raíz la ausencia de Definition of Done verificable.
+\vfill
+{\small Informe generado a partir del reporte general en Markdown y adaptado al formato LaTeX academico.}
+\end{titlepage}
+\hypersetup{pageanchor=true}
 
-\subsection{Milestone 2 - Gestión básica de flota}
-M2 consolidó flota, validaciones y patrones. Sus métricas son 37 issues cerradas, 14 HU, 164 commits y 1 PR. El postmortem identifica riesgos de nombres, alias y entornos heterogéneos.
+\pagenumbering{roman}
+\tableofcontents
+\clearpage
 
-\subsection{Milestone 3 - Gestión documental y monitoreo}
-M3 fortaleció documentos, monitoreo, seguridad y QA. Sus métricas son 38 issues cerradas, 14 HU, 82 commits y 0 PRs con milestone asignado. El postmortem identifica gestión tardía de variables de entorno.
+\pagenumbering{arabic}
 
-\subsection{Milestone 4 - Dashboard, alertas y cierre del sistema}
-M4 cerró dashboard, alertas, CI/CD, Docker, SonarCloud, SMS y evidencia final. Sus métricas son 132 issues cerradas, 20 HU, 277 commits y 3 PRs. El postmortem identifica PR abierto, falta de releases/tags y dependencia excesiva del pipeline.
+\section*{Introduccion}
+\addcontentsline{toc}{section}{Introduccion}
 
-\evidencia{../Entrega-Final/evidencias/25_agile_milestones_semestre.png}{Milestones funcionales del semestre.}
-\evidencia{../Entrega-Final/evidencias/26_agile_project_board.png}{Tablero del proyecto.}
-\evidencia{../Entrega-Final/evidencias/27_github_contributors_semestre.png}{Contributors del semestre.}
-\evidencia{../Entrega-Final/evidencias/28_github_commits_por_integrante.png}{Commits por integrante.}
+Este informe general consolida el cierre metodologico y tecnico del semestre para el proyecto \textbf{DriveControl / AutoMinder Enterprise}. Su proposito es reunir en un solo documento la evidencia de Scrum academico, milestones, sprints, issues, historias de usuario, Pull Requests, commits, revisiones, control de versiones y postmortem general del equipo SYNTIX TECH.
 
-\section{Comparación del semestre}
-\subsection{Evolución del equipo}
-El equipo pasó de una base con DoD débil a un cierre con CI/CD, SonarCloud, Docker, SMS y documentación de rúbrica. La madurez creció en QA, configuración y seguimiento.
+El documento conserva el contenido del reporte general en Markdown y lo organiza en formato LaTeX para facilitar su entrega academica, su incorporacion en Overleaf y su lectura como informe final. La estructura mantiene las cifras verificadas, las aclaraciones sobre datos pendientes de reconciliacion y la relacion explicita con la rubrica de metodologias agiles y postmortem.
 
-\subsection{Tendencias}
-Los sprints finales tuvieron mayor volumen de commits por cierre técnico. El número de issues cerradas aumentó en M4 por la concentración de evidencia, CI/CD, SMS y documentación final.
+\section{1. Resumen ejecutivo}
 
-\subsection{Productividad}
-La productividad verificable se resume en 72 HU cerradas estrictas, 283 issues cerradas en M1-M4 y 630 commits en el corte académico.
+Este documento es la fuente central de la evidencia ágil del semestre. Consolida Scrum académico, GitHub Issues, milestones, Pull Requests, ramas, commits, revisiones disponibles, trazabilidad y postmortem técnico/de proceso para cubrir explícitamente el criterio \textbf{Metodologías ágiles y postmortem --- 30\%}.
 
-\subsection{Calidad}
-La calidad evolucionó desde validación local informal hacia SonarCloud, pruebas, Docker Compose, QA con pasos reproducibles y postmortem de causas raíz.
+La fuente principal para las métricas nuevas es GitHub live mediante \texttt{\detokenize{gh}}, complementada por Git local y anexos versionados en \texttt{\detokenize{docs/Entrega-Final/anexos/}}. Las cifras antiguas del reporte previo se conservan como histórico cuando no coinciden con GitHub live; no se usan para inflar artificialmente el desempeño.
 
-\subsection{Participación}
-La participación se evidencia con issues asignadas, commits normalizados, PRs, revisiones disponibles y roles. Ninguna métrica se usa sola como juicio individual.
+\section{2. Fuentes de datos usadas}
 
-\section{Postmortem general del semestre}
+\begingroup
+\small
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.313\linewidth}>{\RaggedRight\arraybackslash}p{0.313\linewidth}>{\RaggedRight\arraybackslash}p{0.313\linewidth}}
+\toprule
+\textbf{Fuente} & \textbf{Uso} & \textbf{Estado} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Fuente} & \textbf{Uso} & \textbf{Estado} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+GitHub CLI autenticado sobre \texttt{\detokenize{puj-course/FIS_2610_3517_G4}} & Issues, PRs, reviews, milestones & Verificado \\
+Git local \texttt{\detokenize{git log --all}} & Commits por sprint y por integrante & Verificado \\
+\texttt{\detokenize{docs/Entrega-Final/anexos/issues.json}} & Respaldo de issues exportadas & Disponible \\
+\texttt{\detokenize{docs/Entrega-Final/anexos/pull_requests.json}} & Respaldo de PRs exportados & Disponible \\
+\texttt{\detokenize{docs/Entrega-Final/anexos/commits_detalle.tsv}} & Respaldo de commits exportados & Disponible \\
+\texttt{\detokenize{docs/Entrega-Final/evidencias/}} & Capturas de milestones, tablero, contributors, PRs y commits & Disponible parcialmente \\
+\texttt{\detokenize{Sesión 2- Postmortem.pdf}} & Guía del profesor sobre producto, esfuerzo, proceso, datos de calidad, roles y Starfish & Verificado \\
+\end{longtable}
+\endgroup
+
+\section{3. Milestones válidos del semestre}
+
+Solo se usan estos cuatro milestones. Se ignora explícitamente el milestone de taller \texttt{\detokenize{Taller, para aprender github}}.
+
+\begin{landscape}
+\begingroup
+\scriptsize
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}}
+\toprule
+\textbf{Milestone} & \textbf{Objetivo} & \textbf{Issues cerradas} & \textbf{HU cerradas trazables} & \textbf{PRs con milestone GitHub} & \textbf{Estado} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Milestone} & \textbf{Objetivo} & \textbf{Issues cerradas} & \textbf{HU cerradas trazables} & \textbf{PRs con milestone GitHub} & \textbf{Estado} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{6}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+Milestone 1 - Base funcional del sistema & Establecer base MERN, autenticación, dashboard inicial y GitFlow. & 76 & 24 & 9 & Finalizado \\
+Milestone 2 - Gestión básica de flota & Consolidar gestión de flota, patrones y validación RUNT. & 37 & 14 & 1 & Finalizado \\
+Milestone 3 - Gestión documental y monitoreo & Integrar documentos, persistencia, monitoreo y controles de seguridad. & 38 & 14 & 0 & Finalizado \\
+Milestone 4 - Dashboard, alertas y cierre del sistema & Cerrar dashboard, alertas, CI/CD, SMS, calidad y entrega final. & 132 & 20 & 3 & Finalizado con PR abierto de cierre \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+Lectura para la rúbrica: los 4 milestones funcionales aparecen cerrados en GitHub para issues. El único elemento abierto asociado a M4 es el PR \texttt{\detokenize{#628}}, por lo que se reporta como pendiente de integración y no como issue funcional abierta.
+
+\section{4. Métricas consolidadas}
+
+\begingroup
+\small
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.313\linewidth}>{\RaggedRight\arraybackslash}p{0.313\linewidth}>{\RaggedRight\arraybackslash}p{0.313\linewidth}}
+\toprule
+\textbf{Métrica} & \textbf{Valor verificado} & \textbf{Interpretación} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Métrica} & \textbf{Valor verificado} & \textbf{Interpretación} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+Sprints académicos revisados & 13 & Cobertura del semestre completo, no solo Sprint 13. \\
+Issues cerradas en M1-M4 & 283 & Issues con milestone funcional válido y estado cerrado. \\
+HU cerradas trazables & 72 & Conteo estricto por patrón \texttt{\detokenize{HU-}}, \texttt{\detokenize{HU }}, \texttt{\detokenize{[HU-...]}} o \texttt{\detokenize{Historia de usuario}}. \\
+Promedio HU/sprint & 5.54 & 72 HU / 13 sprints. \\
+Commits en corte académico & 630 & \texttt{\detokenize{git log --all}} entre 2026-02-16 y 2026-05-17 23:59:59. \\
+Promedio commits/sprint & 48.46 & 630 commits / 13 sprints. \\
+Pull Requests totales & 161 & PRs en todos los estados. \\
+Pull Requests mergeadas & 134 & Evidencia de integración continua por PR. \\
+Pull Requests abiertas & 1 & PR \texttt{\detokenize{#628}}, asociado a M4. \\
+Pull Requests cerradas sin merge & 26 & Trabajo descartado, reemplazado o no integrado. \\
+Reviews detectadas & 8 & Dato disponible desde \texttt{\detokenize{gh pr list --json reviews}}. \\
+Tags/releases verificables & 0 & No existen releases/tags verificables en GitHub local/live. \\
+\end{longtable}
+\endgroup
+
+\section{5. Cifras históricas pendientes de reconciliación}
+
+El reporte anterior contenía 88 HU, 375 issues y 405 commits. Esas cifras se conservan como histórico del documento previo, pero quedan marcadas como \textbf{pendientes de reconciliación} porque el cálculo live con GitHub y Git local arroja 72 HU estrictas, 283 issues cerradas en M1-M4 y 630 commits en el corte académico. La diferencia puede explicarse por criterios distintos: conteo manual, issues sin milestone, issues de taller, commits filtrados por rama o exclusión de merges.
+
+\section{6. Trazabilidad por sprint}
+
+\begin{landscape}
+\begingroup
+\scriptsize
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}}
+\toprule
+\textbf{Sprint} & \textbf{Periodo} & \textbf{Issues cerradas M1-M4} & \textbf{HU cerradas estrictas} & \textbf{Commits Git local} & \textbf{Lectura} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Sprint} & \textbf{Periodo} & \textbf{Issues cerradas M1-M4} & \textbf{HU cerradas estrictas} & \textbf{Commits Git local} & \textbf{Lectura} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{6}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+S1 & 2026-02-16 a 2026-02-22 & 0 & 0 & 30 & Inicio técnico y preparación de base. \\
+S2 & 2026-02-23 a 2026-03-01 & 4 & 0 & 14 & Primer cierre verificable de issues. \\
+S3 & 2026-03-02 a 2026-03-08 & 16 & 7 & 33 & Consolidación inicial de HU. \\
+S4 & 2026-03-09 a 2026-03-15 & 25 & 7 & 30 & Cierre funcional de M1. \\
+S5 & 2026-03-16 a 2026-03-22 & 11 & 2 & 30 & Arranque de gestión de flota. \\
+S6 & 2026-03-23 a 2026-03-29 & 10 & 2 & 26 & Avance incremental de flota. \\
+S7 & 2026-03-30 a 2026-04-05 & 16 & 6 & 14 & Integración de validaciones. \\
+S8 & 2026-04-06 a 2026-04-12 & 36 & 10 & 94 & Cierre fuerte de M2 y deuda técnica. \\
+S9 & 2026-04-13 a 2026-04-19 & 42 & 14 & 76 & Mayor cierre funcional de M3. \\
+S10 & 2026-04-20 a 2026-04-26 & 9 & 2 & 6 & Cierre documental y monitoreo. \\
+S11 & 2026-04-27 a 2026-05-03 & 40 & 5 & 81 & Inicio del cierre técnico. \\
+S12 & 2026-05-04 a 2026-05-10 & 2 & 2 & 61 & Preparación CI/CD, QA y evidencia. \\
+S13 & 2026-05-11 a 2026-05-17 & 72 & 15 & 135 & Cierre de rúbrica, Docker, SonarCloud, SMS y documentación. \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+\section{7. Trazabilidad por milestone}
+
+\begin{landscape}
+\begingroup
+\scriptsize
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}}
+\toprule
+\textbf{Milestone} & \textbf{Sprints asociados} & \textbf{Commits por ventana de sprint} & \textbf{Issues cerradas} & \textbf{HU cerradas} & \textbf{PRs destacados} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Milestone} & \textbf{Sprints asociados} & \textbf{Commits por ventana de sprint} & \textbf{Issues cerradas} & \textbf{HU cerradas} & \textbf{PRs destacados} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{6}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+M1 & S1-S4 & 107 & 76 & 24 & \texttt{\detokenize{#130}}, \texttt{\detokenize{#168}}, \texttt{\detokenize{#170}}, \texttt{\detokenize{#171}}, \texttt{\detokenize{#172}}, \texttt{\detokenize{#173}}, \texttt{\detokenize{#174}}, \texttt{\detokenize{#177}}, \texttt{\detokenize{#208}} \\
+M2 & S5-S8 & 164 & 37 & 14 & \texttt{\detokenize{#233}} \\
+M3 & S9-S10 & 82 & 38 & 14 & Sin PR con milestone asignado en GitHub \\
+M4 & S11-S13 & 277 & 132 & 20 & \texttt{\detokenize{#232}}, \texttt{\detokenize{#488}}, \texttt{\detokenize{#628}} \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+Los commits por milestone se calculan por ventana de sprint, no por enlace directo issue-commit. Cuando no hay PR con milestone asignado, se deja explícito para no inventar trazabilidad.
+
+\section{8. Participación por integrante}
+
+\subsection{Issues asignadas en M1-M4}
+
+Las issues pueden tener más de una persona asignada; por eso la suma de asignaciones puede superar el total de issues.
+
+\begin{landscape}
+\begingroup
+\scriptsize
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}>{\RaggedRight\arraybackslash}p{0.153\linewidth}}
+\toprule
+\textbf{Integrante} & \textbf{M1 issues/HU} & \textbf{M2 issues/HU} & \textbf{M3 issues/HU} & \textbf{M4 issues/HU} & \textbf{Lectura} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Integrante} & \textbf{M1 issues/HU} & \textbf{M2 issues/HU} & \textbf{M3 issues/HU} & \textbf{M4 issues/HU} & \textbf{Lectura} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{6}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{\detokenize{Sarm-m}} & 21 / 5 & 9 / 4 & 5 / 1 & 43 / 3 & Alta participación en coordinación, evidencia y cierre. \\
+\texttt{\detokenize{samuelfl680}} & 16 / 2 & 3 / 2 & 11 / 5 & 56 / 10 & Alta carga en configuración, pruebas y cierre técnico. \\
+\texttt{\detokenize{juanvargax}} & 42 / 12 & 5 / 1 & 10 / 2 & 22 / 2 & Alta participación en backlog, producto y planeación. \\
+\texttt{\detokenize{solonlosada2006}} & 11 / 1 & 18 / 6 & 14 / 3 & 30 / 4 & Participación sostenida en DevOps, CI/CD y flota. \\
+\texttt{\detokenize{Juserora}} & 21 / 4 & 6 / 1 & 11 / 3 & 17 / 2 & Participación en QA, pruebas, hallazgos y validación. \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+\subsection{Commits por integrante}
+
+\begingroup
+\small
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.313\linewidth}>{\RaggedRight\arraybackslash}p{0.313\linewidth}>{\RaggedRight\arraybackslash}p{0.313\linewidth}}
+\toprule
+\textbf{Integrante normalizado} & \textbf{Commits en corte académico} & \textbf{Lectura} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Integrante normalizado} & \textbf{Commits en corte académico} & \textbf{Lectura} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{\detokenize{Sarm-m}} & 233 & Mayor volumen de commits, especialmente documentación, cierre y coordinación técnica. \\
+\texttt{\detokenize{samuelfl680}} & 136 & Participación fuerte en configuración, pruebas y soporte técnico. \\
+\texttt{\detokenize{juanvargax / juansebastianvd}} & 114 & Participación funcional y de producto con alias normalizados. \\
+\texttt{\detokenize{solonlosada2006}} & 72 & Aportes asociados a DevOps, pipelines y despliegue. \\
+\texttt{\detokenize{juserora}} & 51 & Aportes de QA, pruebas y ajustes funcionales. \\
+Otros autores/bots & 24 & Cuentas de laboratorio, bot y autores sin normalización completa. \\
+\end{longtable}
+\endgroup
+
+\section{9. Pull Requests y revisiones}
+
+\begingroup
+\small
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.313\linewidth}>{\RaggedRight\arraybackslash}p{0.313\linewidth}>{\RaggedRight\arraybackslash}p{0.313\linewidth}}
+\toprule
+\textbf{Métrica PR} & \textbf{Valor} & \textbf{Observación} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Métrica PR} & \textbf{Valor} & \textbf{Observación} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+PRs totales & 161 & Incluye todo el repositorio. \\
+PRs mergeadas & 134 & Evidencia de integración por ramas. \\
+PRs abiertas & 1 & \texttt{\detokenize{#628}}, M4, pendiente de integración. \\
+PRs cerradas sin merge & 26 & Trabajo no integrado o reemplazado. \\
+Reviews detectadas & 8 & Dato disponible desde \texttt{\detokenize{gh}}; no se inventan revisiones faltantes. \\
+\end{longtable}
+\endgroup
+
+Reviews detectadas:
+
+\begingroup
+\small
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.47\linewidth}>{\RaggedRight\arraybackslash}p{0.47\linewidth}}
+\toprule
+\textbf{Reviewer} & \textbf{Reviews} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Reviewer} & \textbf{Reviews} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+\texttt{\detokenize{juanvargax}} & 3 \\
+\texttt{\detokenize{samuelfl680}} & 2 \\
+\texttt{\detokenize{copilot-pull-request-reviewer}} & 2 \\
+\texttt{\detokenize{copilot-swe-agent}} & 1 \\
+\end{longtable}
+\endgroup
+
+\section{10. Control de versiones, ramas y releases}
+
+Ramas verificadas:
+
+\texttt{\detokenize{develop}}, \texttt{\detokenize{feature-Slosada}}, \texttt{\detokenize{feature-sarm-m}}, \texttt{\detokenize{main}}, \texttt{\detokenize{origin/copilot/check-web-functionality-errors}}, \texttt{\detokenize{origin/develop}}, \texttt{\detokenize{origin/feature-Slosada}}, \texttt{\detokenize{origin/feature-Vargas-J}}, \texttt{\detokenize{origin/feature-juserora}}, \texttt{\detokenize{origin/feature-samuelfl680}}, \texttt{\detokenize{origin/feature-sarm-m}}, \texttt{\detokenize{origin/feature/docker-deploy}}, \texttt{\detokenize{origin/feature/pipelines}}, \texttt{\detokenize{origin/main}}, \texttt{\detokenize{origin/revert-422-feature-Slosada}}.
+
+No existen tags/releases verificables. La trazabilidad por versión se sustenta con ramas, PRs, merges, capturas de GitHub, commits y milestones cerrados.
+
+\section{11. Postmortem general del semestre}
+
 \subsection{Producto}
-Se entregó una plataforma funcional para gestión de flota, documentos, alertas, métricas, despliegue y mensajería.
+
+Se produjo una plataforma MERN para gestión de flota, autenticación, documentos, alertas, métricas de calidad, SMS/Twilio, Docker Compose y CI/CD. El producto evolucionó desde una base funcional inicial hacia un sistema desplegable con evidencia de pruebas, SonarCloud, DockerHub y GitHub Actions.
 
 \subsection{Esfuerzo}
-El esfuerzo fue alto y medible. Los roles aportaron de forma diferenciada: seguimiento Scrum, producto, configuración, DevOps y QA.
+
+El esfuerzo fue medible por issues, HU, commits, PRs y roles. La participación no fue idéntica por volumen, pero sí tuvo contribuciones claras por especialidad: Scrum, producto, configuración, DevOps y QA.
 
 \subsection{Proceso}
-El proceso mejoró de ciclo a ciclo. Los principales problemas fueron DoD incompleto, evidencia tardía, gestión de entornos y seguridad tratada tarde.
+
+El proceso mejoró de forma incremental: GitFlow y autonomía en M1, issues atómicas en M2, QA y Scrum Poker en M3, y cierre con CI/CD, SonarCloud y evidencia en M4.
 
 \subsection{Roles}
-La evaluación se basa en hechos: issues, HU, commits, PRs, revisiones, QA, CI/CD y documentación.
 
-\section{Evaluación por roles}
-\begin{tabularx}{\linewidth}{Y Y Y}
+La guía del profesor pide evaluar roles con hechos objetivos. Por eso los documentos de milestone conectan cada rol con evidencia: issues asignadas, commits, PRs, hallazgos de QA, configuración, CI/CD y seguimiento de riesgos.
+
+\section{12. Causas raíz principales}
+
+\begingroup
+\scriptsize
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.235\linewidth}>{\RaggedRight\arraybackslash}p{0.235\linewidth}>{\RaggedRight\arraybackslash}p{0.235\linewidth}>{\RaggedRight\arraybackslash}p{0.235\linewidth}}
 \toprule
-Rol & Hechos objetivos & Mejora recomendada\\
+\textbf{Problema} & \textbf{Causa raíz técnica} & \textbf{Causa raíz de proceso} & \textbf{Acción de mejora} \\
 \midrule
-Scrum Master & Seguimiento de milestones, documentación y trazabilidad final. & Automatizar exportes al cierre de cada sprint.\\
-Product Owner / Sprint Planner & Priorización de HU, producto y criterios de valor. & Definir criterios de aceptación y datos demo desde planning.\\
-Configuration Manager & Ramas, PRs, configuración y control de versiones. & Definir política de tags/releases desde el primer cierre.\\
-DevOps Engineer & Docker, CI/CD, SonarCloud y despliegue. & Monitorear quality gate durante todo el sprint.\\
-QA Lead & Reportes, pruebas, hallazgos y validación funcional. & Exigir prueba funcional local antes de PRs.\\
+\endfirsthead
+\toprule
+\textbf{Problema} & \textbf{Causa raíz técnica} & \textbf{Causa raíz de proceso} & \textbf{Acción de mejora} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{4}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
 \bottomrule
-\end{tabularx}
+\endlastfoot
+Integraciones con fallos iniciales & Falta de validación local antes de merge & Definition of Done incompleto & Exigir build local y checklist antes de PR. \\
+Retrabajo por entornos distintos & Rutas, alias e infraestructura no homogéneos & Riesgo técnico no identificado al planear & Usar Docker Compose y reglas de naming desde el inicio. \\
+Credenciales expuestas temporalmente & Variables \texttt{\detokenize{.env}} configuradas tarde & Gestión de secretos tardía & Definir \texttt{\detokenize{.env.example}}, secrets y revisión de seguridad desde día 1. \\
+Quality Gate bajo presión & Cobertura y hotspots tratados tarde & Calidad vista como cierre, no como práctica continua & Incrementar pruebas durante cada sprint. \\
+Evidencia incompleta o tardía & Capturas y anexos no recolectados al cerrar HU & Evidencia no estaba en el DoD & Incorporar evidencia requerida antes de cerrar issues. \\
+\end{longtable}
+\endgroup
 
-\section{Retrospectiva estrella de mar general}
+\section{13. Retrospectiva estrella de mar general}
+
 \subsection{Comenzar a hacer}
-\begin{itemize}
-\item Definir DoD con evidencia, build local y revisión funcional.
-\item Automatizar exportes de GitHub al cierre de cada milestone.
-\item Planear releases/tags si se requiere trazabilidad por versión.
+
+\begin{itemize}[leftmargin=1.5em]
+\item Definir un Definition of Done con evidencia, build local, revisión y captura mínima antes de cerrar cada HU.
+\item Registrar datos de métricas ágiles al cierre de cada sprint para evitar reconciliaciones tardías.
+\item Automatizar exportaciones con \texttt{\detokenize{gh}} y anexarlas al repositorio después de cada milestone.
 \end{itemize}
 
 \subsection{Más de}
-\begin{itemize}
-\item Revisar PRs con foco funcional y de calidad.
-\item Capturar evidencia al momento de validar cada flujo.
-\item Usar Scrum Poker en historias con incertidumbre.
+
+\begin{itemize}[leftmargin=1.5em]
+\item Revisar PRs con foco funcional y no solo con foco de compilación.
+\item Usar Scrum Poker cuando haya historias con incertidumbre técnica.
+\item Capturar evidencia visual en el mismo momento en que se valida una funcionalidad.
 \end{itemize}
 
 \subsection{Seguir haciendo}
-\begin{itemize}
-\item Mantener issues, PRs y commits trazables.
-\item Conservar postmortems por milestone.
-\item Usar GitHub como fuente objetiva de seguimiento.
+
+\begin{itemize}[leftmargin=1.5em]
+\item Mantener issues, PRs y commits trazables para sustentar trabajo individual y de equipo.
+\item Conservar postmortems por milestone con causas raíz y acciones concretas.
+\item Usar GitHub como fuente objetiva de seguimiento académico.
 \end{itemize}
 
 \subsection{Menos de}
-\begin{itemize}
-\item Depender de cierres masivos al final.
-\item Usar métricas manuales sin criterio explícito.
-\item Abrir PRs de cierre sin validación local.
+
+\begin{itemize}[leftmargin=1.5em]
+\item Depender de cierres masivos al final del sprint.
+\item Usar métricas manuales sin explicar su criterio de cálculo.
+\item Abrir PRs de cierre sin validación funcional local previa.
 \end{itemize}
 
 \subsection{Dejar de hacer}
-\begin{itemize}
-\item Contar milestones de taller como evidencia funcional.
-\item Presentar cifras sin separar issues, HU y PRs.
-\item Postergar seguridad, QA y evidencia para el final.
+
+\begin{itemize}[leftmargin=1.5em]
+\item Contar milestones de taller como evidencia funcional del producto.
+\item Presentar cifras sin separar issues, HU, PRs y milestone items.
+\item Postergar seguridad, QA y evidencia para los últimos días.
 \end{itemize}
 
-\section{Plan de mejora final}
-\begin{tabularx}{\linewidth}{Y Y Y Y}
+\section{14. Relación explícita con la rúbrica}
+
+\begingroup
+\small
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.47\linewidth}>{\RaggedRight\arraybackslash}p{0.47\linewidth}}
 \toprule
-Acción & Responsable & Evidencia esperada & Criterio de éxito\\
+\textbf{Criterio de la rúbrica Agile/Postmortem} & \textbf{Evidencia en este paquete} \\
 \midrule
-Automatizar métricas Agile & Scrum Master & Exportes \code{gh} versionados & Métricas listas al cierre\\
-Formalizar DoD & QA Lead & Checklist por HU & Cierres verificables\\
-Definir política de versión & Configuration Manager & Tag/release o decisión documentada & Trazabilidad por versión clara\\
-Monitorear calidad temprano & DevOps Engineer & Capturas SonarCloud por sprint & Menos presión final\\
-Definir datos demo & Product Owner & Guía de datos & Validaciones reproducibles\\
+\endfirsthead
+\toprule
+\textbf{Criterio de la rúbrica Agile/Postmortem} & \textbf{Evidencia en este paquete} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
 \bottomrule
-\end{tabularx}
+\endlastfoot
+Milestones finalizados & M1-M4 documentados y cerrados en issues. \\
+HU terminadas y trazables & 72 HU estrictas cerradas, con desglose por sprint y milestone. \\
+HU por sprint y promedio & Tabla de 13 sprints y promedio 5.54 HU/sprint. \\
+Commits por sprint y promedio & Tabla de 13 sprints y promedio 48.46 commits/sprint. \\
+Distribución de participación & Issues/HU por integrante y commits normalizados. \\
+PRs y revisiones & 161 PRs, 134 mergeadas, 8 reviews detectadas. \\
+Control de versiones & Ramas, PRs, merges y ausencia explícita de releases/tags. \\
+Trazabilidad por versión & PRs, ramas y evidencias de cierre; releases no verificables. \\
+Postmortem profundo & Producto, esfuerzo, proceso, roles, causas raíz y acciones. \\
+Acciones concretas & Planes de mejora por milestone y plan general. \\
+\end{longtable}
+\endgroup
 
-\section{Conclusiones}
-La documentación Agile consolida evidencia suficiente para defender la aplicación rigurosa de metodología ágil y postmortem. Los cuatro milestones funcionales quedan centralizados, con métricas verificables, causas raíz, acciones concretas y pendientes explícitos.
+\section{15. Métricas pendientes}
 
-\section{Anexos}
-\begin{itemize}
-\item \code{reporte_final_sprints.md}: documento central del semestre.
-\item \code{milestone-*/postmortem-milestone.md}: postmortems individuales.
-\item \code{milestone-*/metricas-milestone.md}: métricas por milestone.
-\item \code{docs/Entrega-Final/anexos/}: exports de GitHub y Git local.
-\item Pendiente: exportación GraphQL de reviews completas si se exige detalle por PR.
-\end{itemize}
+\begingroup
+\small
+\setlength{\LTpre}{0.4em}
+\setlength{\LTpost}{0.8em}
+\begin{longtable}{>{\RaggedRight\arraybackslash}p{0.47\linewidth}>{\RaggedRight\arraybackslash}p{0.47\linewidth}}
+\toprule
+\textbf{Dato} & \textbf{Estado} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Dato} & \textbf{Estado} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r}{\small\textit{Continua en la siguiente pagina}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+Reconciliación final entre 88 HU históricas y 72 HU estrictas & Pendiente de auditoría manual del criterio original. \\
+Reconciliación entre 375 issues históricas y 283 issues cerradas M1-M4 & Pendiente de auditoría de issues sin milestone o no funcionales. \\
+Reviews completas por PR vía GraphQL & Pendiente de exportación desde GitHub API si se requiere mayor detalle. \\
+Releases/tags & No existen releases/tags verificables. \\
+\end{longtable}
+\endgroup
+
+\section{16. Conclusión}
+
+El semestre evidencia una aplicación rigurosa y cuantitativa de Scrum académico. Los documentos nuevos en \texttt{\detokenize{docs/Agile/}} separan los datos verificables de los pendientes, eliminan milestones de taller, fortalecen el postmortem con la guía del profesor y dejan trazabilidad defendible para la rúbrica final.
 \end{document}
