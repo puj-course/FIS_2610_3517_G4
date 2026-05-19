@@ -1,76 +1,229 @@
-# Reporte de Ingeniería: Metodologías Ágiles y Postmortem Detallado
+# Reporte final de sprints, milestones y postmortem
 
----
+Proyecto: DriveControl / AutoMinder Enterprise
+Equipo: SYNTIX TECH
+Curso: Fundamentos de Ingeniería de Software
+Profesor: Luis Gabriel Moreno Sandoval
+Fecha de consolidación: 19 de mayo de 2026
+Repositorio: <https://github.com/puj-course/FIS_2610_3517_G4>
 
-## 1. Cuadro de Control de Milestones (Estado Final)
+## 1. Resumen ejecutivo
 
-| Milestone | Descripción Técnica | Progreso | Estado |
-|-----------|---------------------|----------|--------|
-| **M1** | Base funcional del sistema. | 100% | ✅ Finalizado |
-| **M2** | Gestión básica de flotas. | 100% | ✅ Finalizado |
-| **M3** |  Gestión documental y monitoreo. | 100% | ✅ Finalizado |
-| **M4** | Dashboard, alertas y cierre del sistema. | 100% | ✅ Finalizado |
+Este documento es la fuente central de la evidencia ágil del semestre. Consolida Scrum académico, GitHub Issues, milestones, Pull Requests, ramas, commits, revisiones disponibles, trazabilidad y postmortem técnico/de proceso para cubrir explícitamente el criterio **Metodologías ágiles y postmortem — 30%**.
 
----
-## 2. Métricas de Productividad Sprint a Sprint
+La fuente principal para las métricas nuevas es GitHub live mediante `gh`, complementada por Git local y anexos versionados en `docs/Entrega-Final/anexos/`. Las cifras antiguas del reporte previo se conservan como histórico cuando no coinciden con GitHub live; no se usan para inflar artificialmente el desempeño.
 
-| Sprint | Periodo | HU Cerradas | Issues | Commits | Hito / Detalle Técnico |
-|--------|---------|-------------|--------|---------|------------------------|
-| **S1** | 16/02 - 22/02 | 5 | 44 | 20 | Estructura de carpetas y ESLint. |
-| **S2** | 23/02 - 01/03 | 2 | 12 | 7 | Modelos de Usuario y Roles. |
-| **S3** | 02/03 - 08/03 | 12 | 31 | 20 | Middleware de protección de rutas. |
-| **S4** | 09/03 - 15/03 | 18 | 57 | 38 | **Cierre M1:** Login funcional. |
-| **S5** | 16/03 - 22/03 | 6 | 33 | 22 | Integración Cloudinary (Imágenes). |
-| **S6** | 23/03 - 29/03 | 6 | 30 | 17 | Controladores de Flota y Lógica. |
-| **S7** | 30/03 - 05/04 | 4 | 28 | 10 | Optimización de índices en Mongo. |
-| **S8** | 06/04 - 12/04 | 5 | 42 | 55 | **Cierre M2:** CRUD validado. |
-| **S9** | 13/04 - 19/04 | 7 | 31 | 54 | Lógica de Semaforización (Alertas). |
-| **S10** | 20/04 - 26/04 | 5 | 26 | 15 | **Cierre M3:** Reportes PDF/Excel. |
-| **S11** | 27/04 - 03/05 | 5 | 23 | 41 | Dockerfile y Docker Compose. |
-| **S12** | 04/05 - 11/05 | 6 | 10 | 47 | GitHub Actions (CI) configurado. |
-| **S13** | 12/05 - 17/05 | 7 | 8 | 59 | **Cierre M4:** SonarCloud & Release. |
-| **TOTAL**| | **88** | **375** | **405** | **Promedio: 6.7 HU / Sprint** |
+## 2. Fuentes de datos usadas
 
-## 3. Dinámica Estrella de Mar por Milestones (Postmortem)
+| Fuente | Uso | Estado |
+|---|---|---|
+| GitHub CLI autenticado sobre `puj-course/FIS_2610_3517_G4` | Issues, PRs, reviews, milestones | Verificado |
+| Git local `git log --all` | Commits por sprint y por integrante | Verificado |
+| `docs/Entrega-Final/anexos/issues.json` | Respaldo de issues exportadas | Disponible |
+| `docs/Entrega-Final/anexos/pull_requests.json` | Respaldo de PRs exportados | Disponible |
+| `docs/Entrega-Final/anexos/commits_detalle.tsv` | Respaldo de commits exportados | Disponible |
+| `docs/Entrega-Final/evidencias/` | Capturas de milestones, tablero, contributors, PRs y commits | Disponible parcialmente |
+| `Sesión 2- Postmortem.pdf` | Guía del profesor sobre producto, esfuerzo, proceso, datos de calidad, roles y Starfish | Verificado |
 
-### Milestone 1: Base funcional del sistema
+## 3. Milestones válidos del semestre
 
-| Eje | Acción (Verbo + Frase) | Ejemplo / Justificación |
-|-----|-------------------------|-------------------------|
-| **Seguir haciendo** | 1. Consolidar el núcleo técnico.<br>2. Dividir historias de usuario.<br>3. Fomentar la autonomía individual.<br>4. Utilizar Discord para comunicación rápida.<br>5. Mantener el flujo de GitFlow. | El éxito del Login y Dashboard dio valor inmediato.<br>El uso de sub-issues facilitó la trazabilidad.<br>Se cumplieron tareas sin necesidad de micro-gestión.<br>Permitió resolver dudas técnicas en tiempo real.<br>Evitó conflictos mayores en la rama principal. |
-| **Empezar a hacer** | 1. Implementar checklists de pre-commit.<br>2. Adoptar política "1 issue = 1 cambio".<br>3. Planificar según capacidad real.<br>4. Documentar rutas de la API inicialmente.<br>5. Validar compilación local obligatoria. | Evitar errores al integrar código de diferentes miembros.<br>Mejorar la granularidad de los commits en GitHub.<br>Considerar la carga de parciales en la estimación.<br>Facilitar la integración entre frontend y backend.<br>Prevenir que el código roto llegue al repositorio. |
-| **Dejar de hacer** | 1. Desarrollar sin validar compilación.<br>2. Ignorar metodología por estrés.<br>3. Subir código con estados incompletos.<br>4. Postergar la creación de issues.<br>5. Realizar merges sin revisión previa. | Se integró código que rompió rutas al inicio.<br>El desorden metodológico acumuló trabajo al final.<br>Generó inconsistencias visuales en el frontend.<br>Dificultó el seguimiento del progreso real del sprint.<br>Introdujo bugs que pudieron evitarse con un par de ojos extra. |
-| **Más de** | 1. Rigor en procesos Scrum.<br>2. Trazabilidad intuitiva de sprints.<br>3. Aterrizar la planificación inicial.<br>4. Sesiones de Daily sincronizadas.<br>5. Revisión de criterios de aceptación. | Evitar que las tareas se aplacen a ciclos futuros.<br>No perder tiempo buscando entregables en el repo.<br>Asegurar que las metas sean realistas para todos.<br>Alineación total del equipo sobre bloqueos técnicos.<br>Garantizar que la funcionalidad cumpla lo solicitado. |
-| **Menos de** | 1. Aplazamiento de tareas pendientes.<br>2. Dependencia de reuniones sincrónicas.<br>3. Búsqueda dispersa de información.<br>4. Estimaciones excesivamente optimistas.<br>5. Uso de ramas personales sin push frecuente. | Se debieron pasar tareas del Sprint 3 al Sprint 4.<br>La autonomía y el trabajo asíncrono fueron más efectivos.<br>La desorganización inicial dificultó encontrar avances.<br>Causó frustración al no cumplir con el scope previsto.<br>Fragmentó el avance del código y generó silos. |
+Solo se usan estos cuatro milestones. Se ignora explícitamente el milestone de taller `Taller, para aprender github`.
 
-### Milestone 2: Gestión básica de flota
+| Milestone | Objetivo | Issues cerradas | HU cerradas trazables | PRs con milestone GitHub | Estado |
+|---|---|---:|---:|---:|---|
+| Milestone 1 - Base funcional del sistema | Establecer base MERN, autenticación, dashboard inicial y GitFlow. | 76 | 24 | 9 | Finalizado |
+| Milestone 2 - Gestión básica de flota | Consolidar gestión de flota, patrones y validación RUNT. | 37 | 14 | 1 | Finalizado |
+| Milestone 3 - Gestión documental y monitoreo | Integrar documentos, persistencia, monitoreo y controles de seguridad. | 38 | 14 | 0 | Finalizado |
+| Milestone 4 - Dashboard, alertas y cierre del sistema | Cerrar dashboard, alertas, CI/CD, SMS, calidad y entrega final. | 132 | 20 | 3 | Finalizado con PR abierto de cierre |
 
-| Eje | Acción (Verbo + Frase) | Ejemplo / Justificación |
-|-----|-------------------------|-------------------------|
-| **Seguir haciendo** | 1. Aplicar patrones GoF (Factory/Facade).<br>2. Mantener la división en sub-issues técnicas.<br>3. Utilizar simuladores para pruebas de borde.<br>4. Documentar UML en tiempo real.<br>5. Separar construcción de refactorización. | Limpió el "código espagueti" y mejoró la mantenibilidad.<br>Permitió un avance progresivo de AlertasPage.<br>El simulador detectó bugs críticos de fechas.<br>Evitó el desfase entre el código y el sustento académico.<br>Aseguró estabilidad antes de mejorar la arquitectura. |
-| **Empezar a hacer** | 1. Estandarizar convenciones de nombres.<br>2. Definir alcance de rutas y menús.<br>3. Involucrar al QA desde el inicio.<br>4. Configurar linters de forma estricta.<br>5. Definir la interoperabilidad de entornos. | Evitar confusiones entre hooks (useAlert vs useAlerts).<br>Asegurar acceso a vistas nuevas desde el Sidebar.<br>Definir casos de prueba en paralelo al desarrollo.<br>Mantener un estilo de código uniforme en todo el equipo.<br>Garantizar que el sistema compile igual en Windows y Linux. |
-| **Dejar de hacer** | 1. Probar flujos sin infraestructura base.<br>2. Mezclar responsabilidades en código.<br>3. Ignorar errores de arquitectura.<br>4. Subir archivos duplicados en layouts.<br>5. Ignorar conflictos con alias (`@/`). | Se probó Toasts antes de montar el ToasterLayout.<br>Dificultó la depuración al tener lógica mezclada.<br>Evitar confundir fallos de estado con fallos de UI.<br>Generó confusión sobre qué archivo era el definitivo.<br>Provocó errores de importación en el frontend. |
-| **Más de** | 1. Recolección de evidencias en tiempo real.<br>2. Commits y Merges frecuentes a `main`.<br>3. Checklist de integración para el Dashboard.<br>4. Comunicación sobre cambios en el esquema.<br>5. Feedback técnico entre compañeros. | No dejar las capturas de commits para el final.<br>Mitigar conflictos de versión al cierre del sprint.<br>Confirmar que cada acción actualice la vista relacionada.<br>Evitar que el frontend rompa al cambiar el backend.<br>Detección temprana de lógica ineficiente en el código. |
-| **Menos de** | 1. Ambigüedad en la estructura de archivos.<br>2. Descubrimiento de feedback visual tardío.<br>3. Retrabajo por desalineación de entornos.<br>4. Navegación por URL directa.<br>5. Dependencia de datos manuales. | Se requiere orden total para escalar el proyecto.<br>Definir qué acciones necesitan Toasts antes de codificar.<br>Los fallos de rutas en Windows consumieron mucho tiempo.<br>Las páginas deben estar conectadas al flujo de usuario.<br>Priorizar el uso de semillas de base de datos. |
+Lectura para la rúbrica: los 4 milestones funcionales aparecen cerrados en GitHub para issues. El único elemento abierto asociado a M4 es el PR `#628`, por lo que se reporta como pendiente de integración y no como issue funcional abierta.
 
-### Milestone 3: Gestión documental y monitoreo
+## 4. Métricas consolidadas
 
-| Eje | Acción (Verbo + Frase) | Ejemplo / Justificación |
-|-----|-------------------------|-------------------------|
-| **Seguir haciendo** | 1. Refactorizar modelos antes que rutas.<br>2. Realizar Peer Reviews rigurosos.<br>3. Ejecutar pruebas en diversos dispositivos.<br>4. Usar MongoDB Atlas para persistencia.<br>5. Trazabilidad por 5 sub-issues. | Ahorró tiempo de depuración en la autenticación.<br>Garantizó el cumplimiento del DoD en cada entrega.<br>Aseguró que la flota sea gestionable desde móviles.<br>Permitió el trabajo colaborativo con datos reales en nube.<br>Mantuvo el orden en la migración de datos. |
-| **Empezar a hacer** | 1. Configurar `.env` desde el día uno.<br>2. Fortalecer la validación de relaciones.<br>3. Usar middlewares globales de seguridad.<br>4. Implementar reportes de bugs estandarizados.<br>5. Automatizar la limpieza de bases de prueba. | Evitar deudas técnicas detectadas por SonarCloud.<br>Validar correctamente la relación Conductor-Vehículo.<br>Simplificar el cumplimiento de criterios de seguridad.<br>Para que todos entiendan severidad y pasos a reproducir.<br>Garantizar que cada prueba inicie con un estado limpio. |
-| **Dejar de hacer** | 1. Utilizar credenciales "hardcoded".<br>2. Depender de datos simulados.<br>3. Posponer ajustes en staging.<br>4. Ignorar inconsistencias en el `StatusBadge`.<br>5. Desarrollar flujos sin documentar pruebas. | SonarCloud detectó riesgos críticos de seguridad.<br>Las alertas deben reflejar información real del usuario.<br>Evitar cambios de última hora en interceptores.<br>QA detectó que los estados no siempre coincidían.<br>Causó pérdida de tiempo al ejecutar el aseguramiento. |
-| **Más de** | 1. Comunicación asertiva y división efectiva.<br>2. Uso de Scrum Poker para estimación.<br>3. Coherencia entre entidades y alertas.<br>4. Uso de herramientas de diseño responsivo.<br>5. Validación temprana de flujos complejos. | Se redujeron los percances y mejoró el ambiente.<br>Permitió un cumplimiento fluido de criterios INVEST.<br>Asegurar que cada alerta tenga una referencia verificable.<br>Logró que tablas y buscadores fueran realmente usables.<br>Detectó inconsistencias antes de la integración final. |
-| **Menos de** | 1. Inconsistencias en Buscadores.<br>2. Fallos de diseño en tablas responsivas.<br>3. Retrasos por gestión de credenciales.<br>4. Pérdida en el alcance del sprint.<br>5. Reportes de hallazgos vagos. | Se corrigieron comportamientos erráticos de búsqueda.<br>Se ajustaron para que no se cortara la información.<br>La detección de secretos detuvo el pipeline innecesariamente.<br>Fácil perderse probando cosas fuera del scope inicial.<br>Se migró a reportes claros con evidencia adjunta. |
+| Métrica | Valor verificado | Interpretación |
+|---|---:|---|
+| Sprints académicos revisados | 13 | Cobertura del semestre completo, no solo Sprint 13. |
+| Issues cerradas en M1-M4 | 283 | Issues con milestone funcional válido y estado cerrado. |
+| HU cerradas trazables | 72 | Conteo estricto por patrón `HU-`, `HU `, `[HU-...]` o `Historia de usuario`. |
+| Promedio HU/sprint | 5.54 | 72 HU / 13 sprints. |
+| Commits en corte académico | 630 | `git log --all` entre 2026-02-16 y 2026-05-17 23:59:59. |
+| Promedio commits/sprint | 48.46 | 630 commits / 13 sprints. |
+| Pull Requests totales | 161 | PRs en todos los estados. |
+| Pull Requests mergeadas | 134 | Evidencia de integración continua por PR. |
+| Pull Requests abiertas | 1 | PR `#628`, asociado a M4. |
+| Pull Requests cerradas sin merge | 26 | Trabajo descartado, reemplazado o no integrado. |
+| Reviews detectadas | 8 | Dato disponible desde `gh pr list --json reviews`. |
+| Tags/releases verificables | 0 | No existen releases/tags verificables en GitHub local/live. |
 
-### Milestone 4: Dashboard, alertas y cierre del sistema
+## 5. Cifras históricas pendientes de reconciliación
 
-| Eje | Acción (Verbo + Frase) | Ejemplo / Justificación |
-|-----|-------------------------|-------------------------|
-| **Seguir haciendo** | 1. Implementar pruebas con datos reales.<br>2. Mantener trazabilidad técnica total.<br>3. Utilizar publicación condicional en CI/CD.<br>4. Reutilizar componentes existentes.<br>5. Realizar el cierre progresivo de tareas. | Se validó el flujo completo con MongoDB Atlas.<br>Vinculación exitosa entre issues y cambios de código.<br>Evitó fallos en el pipeline ante falta de secretos.<br>Aceleró la implementación de edición de conductores.<br>Garantizó estabilidad antes de la sustentación final. |
-| **Empezar a hacer** | 1. Estandarizar `docker compose down -v`.<br>2. Ampliar cobertura de pruebas unitarias.<br>3. Validar formatos en tiempo real.<br>4. Revisar los límites de formularios.<br>5. Establecer guías para datos demo. | Mantener la higiene en entornos de prueba técnicos.<br>Superar el estado "Failed" del Quality Gate.<br>Evitar errores de base de datos (placa, SOAT, celular).<br>Prevenir fallos al cargar volúmenes masivos de datos.<br>Garantizar que el `OWNER_EMAIL` coincida con el usuario. |
-| **Dejar de hacer** | 1. Enviar código sin revisión funcional.<br>2. Usar datos demo sin coherencia.<br>3. Ignorar hotspots de SonarCloud.<br>4. Cargar información sin validación previa.<br>5. Ignorar el impacto de navegación nativa. | La integración continua no sustituye la validación humana.<br>Causó que las alertas no se mostraran al usuario correcto.<br>Riesgo de comprometer la confiabilidad final del sistema.<br>Provocó errores de inconsistencia de datos en el dashboard.<br>Se abusaba del botón 'atrás' del navegador. |
-| **Más de** | 1. Colaboración ante problemas emergentes.<br>2. Uso de navegación por componentes (`Link`).<br>3. Coherencia entre fuentes de información.<br>4. Monitoreo del desempeño del pipeline.<br>5. Pruebas funcionales de fin a fin (E2E). | El equipo estuvo unido ante bloqueos de último minuto.<br>Hizo que la plataforma se sienta como una app nativa.<br>Asegurar que reportes y dashboard usen la misma fuente.<br>Concluyó en el éxito de la publicación en DockerHub.<br>Validó que el flujo del usuario sea fluido y sin errores. |
-| **Menos de** | 1. Tiempo de uso del botón 'atrás'.<br>2. Dependencia de datos técnicos en alertas.<br>3. Retrabajos por fallos de integración.<br>4. Cobertura global de pruebas baja.<br>5. Alertas sin información útil. | La mejora en la navegación redujo la fricción significativamente.<br>Se logró mostrar información clara para el usuario final.<br>La falta de pruebas locales generó carga extra al corregir.<br>Se propone ampliar tests para mejorar el Quality Gate.<br>Se eliminaron avisos técnicos por mensajes de valor. |
----
+El reporte anterior contenía 88 HU, 375 issues y 405 commits. Esas cifras se conservan como histórico del documento previo, pero quedan marcadas como **pendientes de reconciliación** porque el cálculo live con GitHub y Git local arroja 72 HU estrictas, 283 issues cerradas en M1-M4 y 630 commits en el corte académico. La diferencia puede explicarse por criterios distintos: conteo manual, issues sin milestone, issues de taller, commits filtrados por rama o exclusión de merges.
 
+## 6. Trazabilidad por sprint
+
+| Sprint | Periodo | Issues cerradas M1-M4 | HU cerradas estrictas | Commits Git local | Lectura |
+|---|---|---:|---:|---:|---|
+| S1 | 2026-02-16 a 2026-02-22 | 0 | 0 | 30 | Inicio técnico y preparación de base. |
+| S2 | 2026-02-23 a 2026-03-01 | 4 | 0 | 14 | Primer cierre verificable de issues. |
+| S3 | 2026-03-02 a 2026-03-08 | 16 | 7 | 33 | Consolidación inicial de HU. |
+| S4 | 2026-03-09 a 2026-03-15 | 25 | 7 | 30 | Cierre funcional de M1. |
+| S5 | 2026-03-16 a 2026-03-22 | 11 | 2 | 30 | Arranque de gestión de flota. |
+| S6 | 2026-03-23 a 2026-03-29 | 10 | 2 | 26 | Avance incremental de flota. |
+| S7 | 2026-03-30 a 2026-04-05 | 16 | 6 | 14 | Integración de validaciones. |
+| S8 | 2026-04-06 a 2026-04-12 | 36 | 10 | 94 | Cierre fuerte de M2 y deuda técnica. |
+| S9 | 2026-04-13 a 2026-04-19 | 42 | 14 | 76 | Mayor cierre funcional de M3. |
+| S10 | 2026-04-20 a 2026-04-26 | 9 | 2 | 6 | Cierre documental y monitoreo. |
+| S11 | 2026-04-27 a 2026-05-03 | 40 | 5 | 81 | Inicio del cierre técnico. |
+| S12 | 2026-05-04 a 2026-05-10 | 2 | 2 | 61 | Preparación CI/CD, QA y evidencia. |
+| S13 | 2026-05-11 a 2026-05-17 | 72 | 15 | 135 | Cierre de rúbrica, Docker, SonarCloud, SMS y documentación. |
+
+## 7. Trazabilidad por milestone
+
+| Milestone | Sprints asociados | Commits por ventana de sprint | Issues cerradas | HU cerradas | PRs destacados |
+|---|---|---:|---:|---:|---|
+| M1 | S1-S4 | 107 | 76 | 24 | `#130`, `#168`, `#170`, `#171`, `#172`, `#173`, `#174`, `#177`, `#208` |
+| M2 | S5-S8 | 164 | 37 | 14 | `#233` |
+| M3 | S9-S10 | 82 | 38 | 14 | Sin PR con milestone asignado en GitHub |
+| M4 | S11-S13 | 277 | 132 | 20 | `#232`, `#488`, `#628` |
+
+Los commits por milestone se calculan por ventana de sprint, no por enlace directo issue-commit. Cuando no hay PR con milestone asignado, se deja explícito para no inventar trazabilidad.
+
+## 8. Participación por integrante
+
+### Issues asignadas en M1-M4
+
+Las issues pueden tener más de una persona asignada; por eso la suma de asignaciones puede superar el total de issues.
+
+| Integrante | M1 issues/HU | M2 issues/HU | M3 issues/HU | M4 issues/HU | Lectura |
+|---|---:|---:|---:|---:|---|
+| `Sarm-m` | 21 / 5 | 9 / 4 | 5 / 1 | 43 / 3 | Alta participación en coordinación, evidencia y cierre. |
+| `samuelfl680` | 16 / 2 | 3 / 2 | 11 / 5 | 56 / 10 | Alta carga en configuración, pruebas y cierre técnico. |
+| `juanvargax` | 42 / 12 | 5 / 1 | 10 / 2 | 22 / 2 | Alta participación en backlog, producto y planeación. |
+| `solonlosada2006` | 11 / 1 | 18 / 6 | 14 / 3 | 30 / 4 | Participación sostenida en DevOps, CI/CD y flota. |
+| `Juserora` | 21 / 4 | 6 / 1 | 11 / 3 | 17 / 2 | Participación en QA, pruebas, hallazgos y validación. |
+
+### Commits por integrante
+
+| Integrante normalizado | Commits en corte académico | Lectura |
+|---|---:|---|
+| `Sarm-m` | 233 | Mayor volumen de commits, especialmente documentación, cierre y coordinación técnica. |
+| `samuelfl680` | 136 | Participación fuerte en configuración, pruebas y soporte técnico. |
+| `juanvargax / juansebastianvd` | 114 | Participación funcional y de producto con alias normalizados. |
+| `solonlosada2006` | 72 | Aportes asociados a DevOps, pipelines y despliegue. |
+| `juserora` | 51 | Aportes de QA, pruebas y ajustes funcionales. |
+| Otros autores/bots | 24 | Cuentas de laboratorio, bot y autores sin normalización completa. |
+
+## 9. Pull Requests y revisiones
+
+| Métrica PR | Valor | Observación |
+|---|---:|---|
+| PRs totales | 161 | Incluye todo el repositorio. |
+| PRs mergeadas | 134 | Evidencia de integración por ramas. |
+| PRs abiertas | 1 | `#628`, M4, pendiente de integración. |
+| PRs cerradas sin merge | 26 | Trabajo no integrado o reemplazado. |
+| Reviews detectadas | 8 | Dato disponible desde `gh`; no se inventan revisiones faltantes. |
+
+Reviews detectadas:
+
+| Reviewer | Reviews |
+|---|---:|
+| `juanvargax` | 3 |
+| `samuelfl680` | 2 |
+| `copilot-pull-request-reviewer` | 2 |
+| `copilot-swe-agent` | 1 |
+
+## 10. Control de versiones, ramas y releases
+
+Ramas verificadas:
+
+`develop`, `feature-Slosada`, `feature-sarm-m`, `main`, `origin/copilot/check-web-functionality-errors`, `origin/develop`, `origin/feature-Slosada`, `origin/feature-Vargas-J`, `origin/feature-juserora`, `origin/feature-samuelfl680`, `origin/feature-sarm-m`, `origin/feature/docker-deploy`, `origin/feature/pipelines`, `origin/main`, `origin/revert-422-feature-Slosada`.
+
+No existen tags/releases verificables. La trazabilidad por versión se sustenta con ramas, PRs, merges, capturas de GitHub, commits y milestones cerrados.
+
+## 11. Postmortem general del semestre
+
+### Producto
+
+Se produjo una plataforma MERN para gestión de flota, autenticación, documentos, alertas, métricas de calidad, SMS/Twilio, Docker Compose y CI/CD. El producto evolucionó desde una base funcional inicial hacia un sistema desplegable con evidencia de pruebas, SonarCloud, DockerHub y GitHub Actions.
+
+### Esfuerzo
+
+El esfuerzo fue medible por issues, HU, commits, PRs y roles. La participación no fue idéntica por volumen, pero sí tuvo contribuciones claras por especialidad: Scrum, producto, configuración, DevOps y QA.
+
+### Proceso
+
+El proceso mejoró de forma incremental: GitFlow y autonomía en M1, issues atómicas en M2, QA y Scrum Poker en M3, y cierre con CI/CD, SonarCloud y evidencia en M4.
+
+### Roles
+
+La guía del profesor pide evaluar roles con hechos objetivos. Por eso los documentos de milestone conectan cada rol con evidencia: issues asignadas, commits, PRs, hallazgos de QA, configuración, CI/CD y seguimiento de riesgos.
+
+## 12. Causas raíz principales
+
+| Problema | Causa raíz técnica | Causa raíz de proceso | Acción de mejora |
+|---|---|---|---|
+| Integraciones con fallos iniciales | Falta de validación local antes de merge | Definition of Done incompleto | Exigir build local y checklist antes de PR. |
+| Retrabajo por entornos distintos | Rutas, alias e infraestructura no homogéneos | Riesgo técnico no identificado al planear | Usar Docker Compose y reglas de naming desde el inicio. |
+| Credenciales expuestas temporalmente | Variables `.env` configuradas tarde | Gestión de secretos tardía | Definir `.env.example`, secrets y revisión de seguridad desde día 1. |
+| Quality Gate bajo presión | Cobertura y hotspots tratados tarde | Calidad vista como cierre, no como práctica continua | Incrementar pruebas durante cada sprint. |
+| Evidencia incompleta o tardía | Capturas y anexos no recolectados al cerrar HU | Evidencia no estaba en el DoD | Incorporar evidencia requerida antes de cerrar issues. |
+
+## 13. Retrospectiva estrella de mar general
+
+### Comenzar a hacer
+
+- Definir un Definition of Done con evidencia, build local, revisión y captura mínima antes de cerrar cada HU.
+- Registrar datos de métricas ágiles al cierre de cada sprint para evitar reconciliaciones tardías.
+- Automatizar exportaciones con `gh` y anexarlas al repositorio después de cada milestone.
+
+### Más de
+
+- Revisar PRs con foco funcional y no solo con foco de compilación.
+- Usar Scrum Poker cuando haya historias con incertidumbre técnica.
+- Capturar evidencia visual en el mismo momento en que se valida una funcionalidad.
+
+### Seguir haciendo
+
+- Mantener issues, PRs y commits trazables para sustentar trabajo individual y de equipo.
+- Conservar postmortems por milestone con causas raíz y acciones concretas.
+- Usar GitHub como fuente objetiva de seguimiento académico.
+
+### Menos de
+
+- Depender de cierres masivos al final del sprint.
+- Usar métricas manuales sin explicar su criterio de cálculo.
+- Abrir PRs de cierre sin validación funcional local previa.
+
+### Dejar de hacer
+
+- Contar milestones de taller como evidencia funcional del producto.
+- Presentar cifras sin separar issues, HU, PRs y milestone items.
+- Postergar seguridad, QA y evidencia para los últimos días.
+
+## 14. Relación explícita con la rúbrica
+
+| Criterio de la rúbrica Agile/Postmortem | Evidencia en este paquete |
+|---|---|
+| Milestones finalizados | M1-M4 documentados y cerrados en issues. |
+| HU terminadas y trazables | 72 HU estrictas cerradas, con desglose por sprint y milestone. |
+| HU por sprint y promedio | Tabla de 13 sprints y promedio 5.54 HU/sprint. |
+| Commits por sprint y promedio | Tabla de 13 sprints y promedio 48.46 commits/sprint. |
+| Distribución de participación | Issues/HU por integrante y commits normalizados. |
+| PRs y revisiones | 161 PRs, 134 mergeadas, 8 reviews detectadas. |
+| Control de versiones | Ramas, PRs, merges y ausencia explícita de releases/tags. |
+| Trazabilidad por versión | PRs, ramas y evidencias de cierre; releases no verificables. |
+| Postmortem profundo | Producto, esfuerzo, proceso, roles, causas raíz y acciones. |
+| Acciones concretas | Planes de mejora por milestone y plan general. |
+
+## 15. Métricas pendientes
+
+| Dato | Estado |
+|---|---|
+| Reconciliación final entre 88 HU históricas y 72 HU estrictas | Pendiente de auditoría manual del criterio original. |
+| Reconciliación entre 375 issues históricas y 283 issues cerradas M1-M4 | Pendiente de auditoría de issues sin milestone o no funcionales. |
+| Reviews completas por PR vía GraphQL | Pendiente de exportación desde GitHub API si se requiere mayor detalle. |
+| Releases/tags | No existen releases/tags verificables. |
+
+## 16. Conclusión
+
+El semestre evidencia una aplicación rigurosa y cuantitativa de Scrum académico. Los documentos nuevos en `docs/Agile/` separan los datos verificables de los pendientes, eliminan milestones de taller, fortalecen el postmortem con la guía del profesor y dejan trazabilidad defendible para la rúbrica final.

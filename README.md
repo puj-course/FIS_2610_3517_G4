@@ -103,7 +103,8 @@ npm --prefix backend start
 ## Ejecucion con Docker
 
 ```bash
-docker compose up -d --build
+make build
+make up
 docker compose ps
 ```
 
@@ -114,11 +115,33 @@ Servicios expuestos:
 - Health backend/db: <http://localhost:5000/api/health/db>
 - Health por proxy frontend: <http://localhost:3000/api/health/db>
 
-Detener y limpiar:
+Detener el stack:
 
 ```bash
-docker compose down -v
+make down
 ```
+
+## Solución de conflictos Docker
+
+Si al ejecutar `make up` aparece un error indicando que ya existe el contenedor `drivectrl-mongodb`, `drivectrl-backend`, `drivectrl-frontend` o la red `drivecontrol-net`, se puede limpiar el entorno del proyecto con:
+
+```bash
+make clean
+make build
+make up
+```
+
+El comando `make clean` elimina contenedores y red asociados al proyecto, pero no elimina volúmenes ni imágenes.
+
+Si se necesita reiniciar completamente el entorno local, incluyendo los datos locales de MongoDB, usar:
+
+```bash
+make reset
+make build
+make up
+```
+
+Advertencia: `make reset` elimina volúmenes locales del proyecto, por lo que puede borrar datos almacenados en MongoDB local. Ninguno de estos comandos modifica `apps/web/.env`.
 
 ## Entrega final — Evidencia de rubrica
 

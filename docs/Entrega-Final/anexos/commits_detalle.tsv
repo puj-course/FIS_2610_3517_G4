@@ -1,0 +1,702 @@
+8d23c65	Sarm	2026-05-18	Merge pull request #629 from puj-course/feature-sarm-m
+9f6b0d9	Sarm-m	2026-05-18	docs(report): limpiar entrega final y reforzar evidencia de rubrica. Closes #618.
+10ea1c2	Sarm	2026-05-17	Merge pull request #627 from puj-course/feature-sarm-m
+168bfc6	Sarm-m	2026-05-17	arreglar docs
+b5a360d	Sarm-m	2026-05-17	entrega infome. Closes #618
+0126d8f	Sarm-m	2026-05-17	entrega infome. Closes #618
+1064cc5	Sarm-m	2026-05-17	agregar imaganes y latex . Closes #618
+c7cd81f	Sarm-m	2026-05-17	documentacion
+4b3f9c3	Sarm	2026-05-17	Merge pull request #626 from puj-course/feature-sarm-m
+f5687c5	Sarm-m	2026-05-17	Merge branch 'develop' into feature-sarm-m
+4211c21	Sarm-m	2026-05-17	rename docs, and images of report
+b821ef5	Juan Sebastian Vargas Dicelys	2026-05-16	Add files via upload
+65887e3	Juan Sebastian Vargas Dicelys	2026-05-16	Delete Docs/Agile/evidencias_finales/07_agil_postmortem_trazabilidad.md
+6a17fc6	Sarm-m	2026-05-15	docs(evidence): anexar capturas finales de entrega tecnica. Closes #618.
+e5c07e2	Sarm	2026-05-15	Merge pull request #625 from puj-course/develop
+9ee8301	Sarm	2026-05-15	Merge pull request #623 from puj-course/feature-sarm-m
+735c1fa	Sarm-m	2026-05-15	fix(sms): corregir configuracion de verificacion por mensajeria. Closes #622
+f0e90b2	Sarm-m	2026-05-15	docs(evaluation): consolidar paquete final de evidencia tecnica. Closes #622
+f6a9062	Sarm-m	2026-05-15	docs(cicd): documentar flujo de integracion y despliegue continuo. Closes #621
+c1fd64b	Sarm-m	2026-05-15	chore(docker): configurar red explicita para despliegue local. Closes #620
+24afa71	Sarm-m	2026-05-15	test(coverage): consolidar pruebas y metricas de calidad. Closes #619
+d2ef676	Juan Sebastian Vargas Dicelys	2026-05-14	Update reporte_final_sprints.md
+7a1d2d0	Juan Sebastian Vargas Dicelys	2026-05-14	Update reporte_final_sprints.md
+fd4da29	Juan Sebastian Vargas Dicelys	2026-05-14	Update reporte_final_sprints.md
+b81234d	Juan Sebastian Vargas Dicelys	2026-05-14	Update reporte_final_sprints.md
+f5bfd63	Juan Sebastian Vargas Dicelys	2026-05-14	Update reporte_final_sprints.md
+a54f91f	Sarm	2026-05-14	Merge pull request #603 from puj-course/develop
+b6716a6	Sarm	2026-05-14	Merge branch 'main' into develop
+6973c51	Sarm	2026-05-14	imagen sonar
+aaed26c	Juan Sebastian Vargas Dicelys	2026-05-14	Update 04_despliegue_docker_ci_cd.md
+72fb7ae	Juan Sebastian Vargas Dicelys	2026-05-14	Update 04_despliegue_docker_ci_cd.md
+6b9f3bb	Juan Sebastian Vargas Dicelys	2026-05-14	evidencias pendientes de Despliegue Docker y CI/CD
+9c2affa	samuelfl680	2026-05-14	Merge pull request #602 from puj-course/feature-sarm-m
+8322a2b	Sarm-m	2026-05-14	Fix Vite config import typo
+6aa2eb3	Sarm-m	2026-05-14	Fix Docker env loading for auth and database
+c8e6e8d	Sarm	2026-05-14	Replace placeholder values in .env file , colocae credenciales
+2aaa21f	Sarm-m	2026-05-14	 colocar crednciales
+2b20eb5	Sarm	2026-05-14	Merge pull request #601 from puj-course/feature-sarm-m
+245bbfc	unknown	2026-05-14	docs: prepare final rubric evidence package.
+57aebd7	Sarm-m	2026-05-14	fixes code. Closes #556
+e6946b5	solonlosada2006	2026-05-13	corrigiendo todo
+7275816	solonlosada2006	2026-05-13	añadiendo credenciales públicas
+cfbf709	samuelfl680	2026-05-13	Add environment variables for database and email
+3952f8d	samuelfl680	2026-05-13	Merge pull request #600 from puj-course/feature-Slosada
+bd8a586	solonlosada2006	2026-05-13	Update docker_ci_cd.yml
+f67d30d	solonlosada2006	2026-05-13	Update pipeline_hu454_auth_ci_cd.yml
+9fd7d33	solonlosada2006	2026-05-13	añadiendo mensajes para verificación de página
+98c074a	solonlosada2006	2026-05-13	Update and rename main.yml to notify_discord.yml
+fb46b6e	solonlosada2006	2026-05-13	cd_entrega.yml
+aedcf75	solonlosada2006	2026-05-13	docker_ci_cd.yml
+0fdaa25	solonlosada2006	2026-05-13	Notify_discord.yml
+81e71d6	juansebastianvd	2026-05-13	docs: consolidar reporte final de metodologías ágiles y postmortem (Closes #595)
+537f8a7	Juan Sebastian Vargas Dicelys	2026-05-13	Update reporte_final_sprints.md
+c6a0d66	Sarm	2026-05-13	Merge pull request #588 from puj-course/develop
+daa807e	Sarm-m	2026-05-13	refactor(metrics): reducir duplicacion reportada por sonar
+d76cbf4	Sarm-m	2026-05-13	ci(sonar): evitar timeout de quality gate en scanner
+c7dc7b4	Sarm-m	2026-05-13	Merge remote-tracking branch 'origin/main' into develop
+b220386	Sarm-m	2026-05-13	feat(qa): reforzar metricas de calidad y despliegue docker
+557a446	Sarm	2026-05-13	Merge pull request #586 from puj-course/feature-samuelfl680
+7b11dbf	Sarm	2026-05-13	Merge pull request #585 from puj-course/feature-samuelfl680
+163e647	juserora	2026-05-13	docs: mejoras para evaluacion final sin SMS
+3f5b71b	juserora	2026-05-12	test: expand RTM alert adapter tests
+f2ceebe	Juserora	2026-05-12	Merge pull request #587 from puj-course/feature-juserora
+2e14c75	samuelfl680	2026-05-12	ci: corregir sintaxis YAML de omisiones en workflows
+99722e7	juserora	2026-05-12	resolve merge conflicts from main: dark mode, onboarding, vite test config
+18ff027	samuelfl680	2026-05-12	ci: evitar skip de publicacion DockerHub en PR
+4b53156	samuelfl680	2026-05-12	ci: evitar skips en workflows y deploys HU-454
+243e9d4	samuelfl680	2026-05-12	ci: ampliar triggers de workflows para evitar skips
+cf44861	samuelfl680	2026-05-12	docs: documentar despliegue docker y sanitizar env examples
+0e5f7d4	Juan Sebastian Vargas Dicelys	2026-05-12	Update reporte_final_sprints.md
+fe9c90f	Juan Sebastian Vargas Dicelys	2026-05-12	Update reporte_final_sprints.md
+8d4546d	Juan Sebastian Vargas Dicelys	2026-05-12	Update reporte_final_sprints.md
+25f2575	Juan Sebastian Vargas Dicelys	2026-05-12	Merge pull request #583 from puj-course/feature-Vargas-J
+051a7e8	juansebastianvd	2026-05-12	docs: eliminar métrica de velocidad en pts del resumen de sprints
+810250e	Juan Sebastian Vargas Dicelys	2026-05-12	Merge pull request #582 from puj-course/feature-Vargas-J
+56df20a	juansebastianvd	2026-05-12	docs: actualizar reporte final con hitos, sprints 1-9 y retrospectivas estrella de mar
+738ac24	Sarm	2026-05-12	Merge pull request #581 from puj-course/develop
+c5aa943	Sarm	2026-05-12	Merge pull request #580 from puj-course/feature-sarm-m
+48e11ec	Sarm-m	2026-05-12	ci(sonar): ajustar analisis en ramas y pull requests. Refs #556.
+f530b0f	Sarm-m	2026-05-12	ci(sonar): ejecutar analisis en pushes y pull requests. Refs #556.
+d3f73bd	Sarm	2026-05-12	Merge pull request #579 from puj-course/feature-sarm-m
+9c9e4a1	Sarm-m	2026-05-12	fix(reliability): corregir accesibilidad y condicional redundante. Refs #556.
+722bfef	Sarm	2026-05-12	release: integrar ajustes de sonarcloud cobertura y calidad en main. Refs #556.
+f92738f	Sarm	2026-05-12	Merge pull request #577 from puj-course/feature-sarm-m
+37332e4	Sarm-m	2026-05-12	fix(reliability): agregar proptypes y asociar labels en modales. Refs #556.
+4f46742	Sarm-m	2026-05-12	fix(security): reemplazar regex sensibles en autenticacion y api. Refs #556.
+46e4048	Sarm-m	2026-05-12	chore(sonar): ajustar alcance defendible de cobertura y duplicacion. Refs #556.
+e588ca8	Sarm	2026-05-12	Merge pull request #576 from puj-course/develop
+16429bf	Sarm	2026-05-12	Merge pull request #575 from puj-course/feature-sarm-m
+2f202c8	Sarm-m	2026-05-12	fix(sonar): usar clases de digitos concisas en formatos colombianos. Refs #556.
+7b5aa7f	Sarm	2026-05-12	Merge pull request #572 from puj-course/feature-sarm-m
+8d71ddd	Sarm-m	2026-05-12	test(frontend): aumentar cobertura de adaptadores y utilidades
+68907b9	Sarm	2026-05-12	Update SonarCloud metrics and quality gate status
+660c7e9	Juan Sebastian Vargas Dicelys	2026-05-12	Merge pull request #570 from puj-course/feature-Vargas-J
+5e5fac7	Sarm	2026-05-12	release: integrar metricas de calidad y validaciones del sprint 13 en main. Closes #556. Closes #557. Closes #558.
+5ee75db	juansebastianvd	2026-05-12	docs: Integrar datos reales de GitHub en análisis de participación
+29305eb	Sarm	2026-05-12	feat(metrics): automatizar metricas propias de calidad y validar quality gate. Closes #557. Closes #558.
+d318a42	Sarm-m	2026-05-12	ci(sonar): eliminar workflow duplicado de analisis sonar. Closes #557.
+85daa6d	Sarm-m	2026-05-12	test(metrics): reforzar cobertura de metricas de calidad para sonarcloud
+cf976f0	Sarm-m	2026-05-12	docs(qa): actualizar evidencia de metricas y sonarcloud. Refs #556.
+0063cb9	Sarm-m	2026-05-12	fix(sonar): corregir observaciones de calidad en codigo nuevo. Closes #557.
+4f74125	Sarm-m	2026-05-12	test(metrics): aumentar cobertura de metricas propias de calidad. Closes #558.
+0d2acf8	Sarm-m	2026-05-12	Merge branch 'main' into feature-sarm-m
+3ab3fcb	Juan Pablo Arias Buitrago	2026-05-12	Create SONAR.yml
+6f9b35c	Sarm	2026-05-12	Merge pull request #561 from puj-course/feature-sarm-m
+ce04789	Sarm-m	2026-05-12	merge(develop): integrar develop y resolver conflictos de reportes
+fa4af19	Sarm-m	2026-05-12	fix code sonar
+0cd37d6	Sarm-m	2026-05-12	fix(reportes): resolver conflicto entre modo oscuro y metricas de calidad
+f87f2d5	Sarm-m	2026-05-12	test(metrics): validar y documentar metricas propias de calidad. Closes #558.
+79edfb9	Sarm-m	2026-05-12	feat(metrics): automatizar metricas propias de calidad en reportes. Closes #557.
+5d2ae63	samuelfl680	2026-05-12	Merge pull request #559 from puj-course/feature-Slosada
+f468247	solonlosada2006	2026-05-11	actualizando validación del RUNT. Closes #512
+a088cfd	solonlosada2006	2026-05-11	reemplazando localstorage por una API
+09b0b0e	solonlosada2006	2026-05-11	añadiendo esquema de historial de validación. Closes #510
+6794cdc	samuelfl680	2026-05-11	Merge pull request #555 from puj-course/develop
+26f18df	samuelfl680	2026-05-11	Merge pull request #554 from puj-course/feature-samuelfl680
+0a63ba9	samuelfl680	2026-05-11	docs: add detailed comments for auth and profile flows
+868f359	samuelfl680	2026-05-11	Merge pull request #550 from puj-course/develop
+7163b96	Sarm	2026-05-11	Merge pull request #549 from puj-course/feature-sarm-m
+ed87590	Sarm-m	2026-05-11	fixes code. Closes #492
+e46d5e8	samuelfl680	2026-05-11	Merge pull request #548 from puj-course/feature-samuelfl680
+b5fd5d6	samuelfl680	2026-05-11	fix: move theme toggle out of header and improve dark icon contrast
+ad483f3	samuelfl680	2026-05-11	feat: add user profile module and consistent dark mode
+bacfe4e	samuelfl680	2026-05-11	Merge pull request #543 from puj-course/feature-sarm-m
+643665d	Sarm-m	2026-05-11	fix docker
+29ea5e7	Sarm	2026-05-11	Merge pull request #541 from puj-course/feature-sarm-m
+cc918cb	Sarm-m	2026-05-11	feat(conductores): mostrar vehiculo asignado en tabla. CLoses #489
+af9fbb6	Sarm	2026-05-11	FIx doceker y reportes.
+ba017ea	unknown	2026-05-11	Merge remote-tracking branch 'origin/develop' into feature-sarm-m
+938ec3c	Sarm-m	2026-05-11	fix docke
+4ad1c99	Sarm-m	2026-05-11	fix docker
+daf5816	Juan Sebastian Vargas Dicelys	2026-05-11	Merge pull request #539 from puj-course/feature-Vargas-J
+4f6c18b	samuelfl680	2026-05-11	Merge pull request #538 from puj-course/feature-samuelfl680
+1545a1a	samuelfl680	2026-05-11	merge: integrar develop en feature-samuelfl680
+ad1bc55	samuelfl680	2026-05-11	Merge pull request #533 from puj-course/feature-sarm-m
+987e4f9	samuelfl680	2026-05-11	chore: cerrar issues de onboarding
+7112a62	samuelfl680	2026-05-11	feat: completar onboarding guiado para usuarios nuevos
+e5e095d	Sarm-m	2026-05-10	fix(validation): limitar placa documento telefono y selector de vehiculo. Closes #492.
+52c0481	samuelfl680	2026-05-10	feat(auth): recuperar acceso por correo registrado o SMS. Closes #526. Closes #527
+f581a81	Sarm-m	2026-05-10	test(alerts): validar escenarios documentales con datos demo. Closes #492.
+e6fd5ef	samuelfl680	2026-05-10	fix(auth): restaurar autenticacion con Google en entorno local. Closes #525
+c43b313	samuelfl680	2026-05-10	fix(auth): restaurar autenticacion con Google en entorno local. Closes #525
+d291b7b	Sarm-m	2026-05-10	feat(alerts): agrupar alertas por categoria y mostrar fechas de vencimiento. Closes #491
+e12d34b	Sarm-m	2026-05-10	mostrar fecha de vencimiento en alertas activas. Closes #490
+bf4ce75	Sarm	2026-05-10	Merge pull request #517 from puj-course/feature/docker-deploy
+2360e81	Sarm-m	2026-05-10	Datos mongo. Closes #489
+0b8977a	juansebastianvd	2026-05-10	test(sidebar): verify navigation consistency and clean up unused imports closes #521
+19a0f41	juansebastianvd	2026-05-10	style(sidebar): add hover effects and pointer cursor to brand Link closes #520
+f4689b7	juansebastianvd	2026-05-10	feat(sidebar): refactor brand logo to Link component for SPA navigation closes #519
+e542ce7	Sarm-m	2026-05-07	docs(qa): agregar datos demo para validacion de alertas.
+2f9ff3e	juserora	2026-05-07	Merge branch 'feature/docker-deploy' into develop
+ea22e51	juserora	2026-05-07	Merge branch 'develop' of https://github.com/puj-course/FIS_2610_3517_G4 into develop
+fb9c5aa	juserora	2026-05-07	Merge branch 'feature/docker-deploy' of https://github.com/puj-course/FIS_2610_3517_G4 into feature/docker-deploy
+c9f8f14	Sarm-m	2026-05-07	fix(docker): conectar Compose con la base compartida de MongoDB.
+393a18b	Sarm-m	2026-05-07	chore(docker): versionar variables compartidas para Compose.
+a986d9d	Sarm-m	2026-05-07	docs
+954013a	Sarm-m	2026-05-07	chore(docker): configurar proxy de API y documentar ejecucion con Compose.
+beb5446	juserora	2026-05-07	Merge branch 'feature/docker-deploy' of https://github.com/puj-course/FIS_2610_3517_G4 into feature/docker-deploy
+f89faa9	Sarm-m	2026-05-07	fix code
+cb36fad	samuelfl680	2026-05-07	Merge pull request #516 from puj-course/develop
+b841fc5	solonlosada2006	2026-05-07	Update cd_entrega.yml
+71de6ea	samuelfl680	2026-05-07	Merge pull request #515 from puj-course/feature-samuelfl680
+0087d74	samuelfl680	2026-05-07	Merge pull request #514 from puj-course/feature-samuelfl680
+2ee315f	samuelfl680	2026-05-07	fix(ci): corregir ruta de artefacto en cd_entrega
+7cf4d1e	samuelfl680	2026-05-07	Merge pull request #513 from puj-course/feature-samuelfl680
+9fb137b	samuelfl680	2026-05-07	Merge branch 'develop' of https://github.com/puj-course/FIS_2610_3517_G4 into feature-samuelfl680
+35923f4	samuelfl680	2026-05-07	fix(ci): corregir ruta del build frontend en Dockerfile
+2a488b4	samuelfl680	2026-05-07	feat(devops): completar taller docker con compose, pipeline y plantilla PDF
+041ba80	samuelfl680	2026-05-07	Merge pull request #508 from puj-course/feature-Slosada
+fe37839	solonlosada2006	2026-05-07	Resolviendo conflictos con develop
+b411550	solonlosada2006	2026-05-07	arreglando endpoints
+76ae54d	samuelfl680	2026-05-07	Update database and email configuration in .env.example
+0202385	samuelfl680	2026-05-07	Merge pull request #507 from puj-course/feautre-samuelfl680
+8ffd239	samuelfl680	2026-05-07	fix: mejorar diagnostico de errores MongoDB (#506)
+bb368ed	samuelfl680	2026-05-07	chore: alinear env.example con configuracion local (#505)
+ebbcdbe	samuelfl680	2026-05-07	fix: evitar registro local sin verificacion (#505)
+b799ff9	samuelfl680	2026-05-07	fix: ajustar defaults de mongo al cluster del proyecto (#503)
+f4e66ec	samuelfl680	2026-05-07	feat: integrar acceso Google en frontend (#504)
+f72916a	samuelfl680	2026-05-07	feat: agregar autenticacion Google en backend (#504)
+4c856ba	samuelfl680	2026-05-07	fix: corregir .env.example para auth doctor (#503)
+81cc8a5	samuelfl680	2026-05-07	Merge pull request #502 from puj-course/feautre-samuelfl680
+ed0a8e1	samuelfl680	2026-05-07	merge: resolver conflictos con develop
+2335990	samuelfl680	2026-05-07	fix: resolver conflicto de dateutils
+44b9f07	samuelfl680	2026-05-07	docs: comentar configuración y workflows (#498)
+3ddd9d1	samuelfl680	2026-05-07	docs: comentar lógica documental y alertas (#497)
+40f0b5b	samuelfl680	2026-05-07	docs: comentar rutas y servicios (#496)
+668ef6d	samuelfl680	2026-05-07	docs: comentar contextos y hooks (#495)
+0187b98	samuelfl680	2026-05-07	docs: comentar interfaz del frontend (#494)
+afcd994	samuelfl680	2026-05-07	Merge pull request #501 from puj-course/feature-sarm-m
+826655b	Sarm-m	2026-05-07	fix
+fc780f4	samuelfl680	2026-05-07	Merge pull request #500 from puj-course/feature-sarm-m
+2f302e9	Sarm-m	2026-05-07	fix(env): incluir configuracion compartida de desarrollo.
+97e691d	Sarm-m	2026-05-07	fix(env): incluir configuracion compartida de desarrollo.
+d651337	samuelfl680	2026-05-06	Merge pull request #499 from puj-course/feature-sarm-m
+588cc41	Sarm-m	2026-05-06	fix
+7d7c2c5	samuelfl680	2026-05-05	Merge pull request #488 from puj-course/feature-sarm-m
+a94244b	Sarm-m	2026-05-05	Unifica MongoDB y agrega recuperacion de cuenta. Closes #352
+f3a53f3	Aulas Ingenieria	2026-05-05	unificar BD
+0a57ddc	solonlosada2006	2026-05-03	añadiendo eliminar y actualizar en la tabla de DocumentosPage. Closes #437
+4dbc49c	solonlosada2006	2026-05-03	Añadiendo edit modal para SOAT y RTM. Closes #436
+2f7539a	solonlosada2006	2026-05-03	añadiendo PUT endpoints. Closes #435
+0f90527	solonlosada2006	2026-05-03	resolviendo conflictos del merge
+3a6f3e6	solonlosada2006	2026-05-03	arreglando cambios
+c749985	samuelfl680	2026-05-01	test(soat): agregar pruebas unitarias para validacion de vigencia
+dd2bc29	samuelfl680	2026-05-01	test(soat): agregar pruebas unitarias para validacion de vigencia
+545abf8	juserora	2026-05-01	test(rtm): agregar pruebas unitarias para revision tecnico mecanica
+ce1dc70	juserora	2026-05-01	test(rtm): agregar pruebas unitarias para revision tecnico mecanica
+8bf855e	juserora	2026-05-01	test(rtm): agregar pruebas unitarias para revision tecnico mecanica
+bd00e3a	juserora	2026-05-01	fix: optimización responsiva en tablas de conductores y vehículos
+0bee712	solonlosada2006	2026-05-01	Pruebas unitarias useRuntSimulator
+292a258	Sarm	2026-04-30	Merge pull request #476 from puj-course/develop
+499b191	Sarm	2026-04-30	Merge pull request #475 from puj-course/feature-sarm-m
+3497c30	Sarm-m	2026-04-30	ci(sonar): ejecutar analisis sonarcloud sobre rama main. Closes #472
+7e61842	Sarm	2026-04-30	Merge pull request #474 from puj-course/feature-sarm-m
+0977936	Sarm-m	2026-04-30	ci(sonar): ejecutar analisis sonarcloud en pull request hacia develop. Closes #472
+849655e	Sarm-m	2026-04-30	ci(sonar): integrar analisis de calidad con cobertura del frontend. Closes #472
+8254c99	samuelfl680	2026-04-30	Merge pull request #468 from puj-course/feautre-samuelfl680
+31d6455	samuelfl680	2026-04-30	Merge pull request #473 from puj-course/feature-sarm-m
+cb62a6d	Sarm-m	2026-04-30	chore(test): ignorar reportes de cobertura generados por vitest.
+e5e0289	Sarm-m	2026-04-30	test(fechas): agregar pruebas unitarias para estados documentales. Closes #472
+61489eb	juserora	2026-04-30	Merge branch 'main' of https://github.com/puj-course/FIS_2610_3517_G4 into feature-juserora
+252d0ed	samuelfl680	2026-04-29	Merge pull request #469 from puj-course/feature-samuelfl680
+6781378	samuelfl680	2026-04-29	fix: sincronizar usuarios y OTP en ambas bases de datos
+4b5c679	copilot-swe-agent[bot]	2026-04-29	Merge branch 'develop' into feautre-samuelfl680 - resolve conflicts
+68c7689	samuelfl680	2026-04-29	fix: correccion de errores de conexion backend en entornos cloud (proxy Vite)
+c469c42	samuelfl680	2026-04-28	chore: fijar credenciales en env example para setup automatico
+37d863e	samuelfl680	2026-04-28	Update .env.example with new database and email settings
+204cd6f	Sarm-m	2026-04-28	fixes. Closes #414
+e2cb971	samuelfl680	2026-04-28	fix(auth): corregir flujo registro OTP y auto-login tras verificacion
+d84fcae	Sarm-m	2026-04-28	feat(documentos): integrar gestion SOAT con MongoDB y edicion en app. Closes #413
+f57d319	samuelfl680	2026-04-28	chore: automatizar setup backend para dev en cualquier maquina
+e23ed84	samuelfl680	2026-04-28	fix: restore missing OTP constants, emailService imports, VerificacionOTP model and repair verificar-codigo endpoint after teammate merge
+7534e06	samuelfl680	2026-04-28	fix(auth): replace crypto.randomInt with backward-compatible fallback for older Node versions
+a8f62d9	juansebastianvd	2026-04-28	Merge pull request #467 from puj-course/feature-Vargas-J
+c1d8d4e	juansebastianvd	2026-04-28	Merge branch 'develop' into feature-Vargas-J
+bd20363	juansebastianvd	2026-04-28	chore: purga de registros en texto plano en Atlas y pruebas E2E exitosas. Closes #465
+0450de3	juansebastianvd	2026-04-28	feat: configurar interceptores de axios y fallback local para JWT. Closes #464
+84c7b18	juansebastianvd	2026-04-28	sec: integrar helmet y middleware manual de sanitización NoSQL. Closes #463
+463f5cb	juansebastianvd	2026-04-28	refactor: actualizar controladores de auth para soporte de hashes y JWT. Closes #462
+e34c017	juansebastianvd	2026-04-28	refactor: actualizar controladores de auth para soporte de hashes y JWT. Closes #462
+0f2d7ac	juansebastianvd	2026-04-28	feat: implementar cifrado bcryptjs en UsuarioSchema y agregar dependencias. Closes #461
+0dfd5aa	samuelfl680	2026-04-28	fix(auth): harden mongo diagnostics and automate auth preflight pipeline
+6f9d531	samuelfl680	2026-04-28	Merge pull request #459 from puj-course/feature-samuelfl680
+00c5f92	Juan Sebastian	2026-04-28	fix(auth): arreglo de bugs de autenticacion y envio OTP (Fixes #458)
+dbd43fc	samuelfl680	2026-04-28	Merge pull request #457 from puj-course/feature-samuelfl680
+b319ccd	samuelfl680	2026-04-28	chore: permitir .env.example en repo y agregar archivo de configuracion de ejemplo
+308ca2d	samuelfl680	2026-04-28	chore: agregar .env.example y scripts de setup para configuracion automatica
+7d8b6c8	samuelfl680	2026-04-28	ci: agregar pipeline HU-454 comentada y template de pruebas
+0f726eb	samuelfl680	2026-04-27	chore: comentar bloques de HU-440 (backend y frontend OTP)
+0d85e90	samuelfl680	2026-04-27	Merge pull request #453 from puj-course/feature-samuelfl680
+9cd65a5	samuelfl680	2026-04-27	revert: restaurar fallback URI original de compañero en server.js
+39de275	samuelfl680	2026-04-27	fix: eliminar credenciales hardcodeadas de server.js (sonarqube security)
+54934bb	samuelfl680	2026-04-27	chore: cerrar issue #452
+e71fb59	samuelfl680	2026-04-27	chore: cerrar issue #451
+7004aac	samuelfl680	2026-04-27	chore: cerrar issue #450
+9056741	samuelfl680	2026-04-27	chore: cerrar issue #449
+dd7977d	samuelfl680	2026-04-27	chore: cerrar issue #448
+39e7ea9	samuelfl680	2026-04-27	chore: cerrar issue #447
+1e96969	samuelfl680	2026-04-27	chore: cerrar issue #446
+856c038	samuelfl680	2026-04-27	chore: cerrar issue #445
+95f9a7c	samuelfl680	2026-04-27	chore: cerrar issue #444
+30b1abb	samuelfl680	2026-04-27	chore: cerrar issue #443
+9538922	samuelfl680	2026-04-27	chore: cerrar issue #442
+a66ef27	samuelfl680	2026-04-27	chore: cerrar issue #441
+f8ec4f4	samuelfl680	2026-04-27	chore: cerrar issue #440
+4c4bf04	samuelfl680	2026-04-27	fix: cargar backend/.env de forma explicita
+7fc7507	samuelfl680	2026-04-27	feat: agregar script dev unificado con concurrently (HU-440)
+a02c6f0	samuelfl680	2026-04-27	fix: corregir orden dotenv, bloquear auto-login sin OTP (HU-440)
+5f25fa1	samuelfl680	2026-04-27	feat: agregar pantalla OTP de verificacion en registro (HU-440)
+fcc476f	samuelfl680	2026-04-27	feat: implementar verificacion de registro por correo OTP (HU-440)
+5ab1143	samuelfl680	2026-04-27	Merge pull request #439 from puj-course/feature-samuelfl680
+4b1c6a8	samuelfl680	2026-04-27	fix: corregir navegacion campanita y logout a inicio (#438)
+92e3955	juansebastianvd	2026-04-27	Merge branch 'develop'
+314f354	juansebastianvd	2026-04-27	Finalizando el merge y resolviendo conflictos
+dfbc782	samuelfl680	2026-04-27	Merge pull request #432 from puj-course/feature-Slosada
+98da260	solonlosada2006	2026-04-27	Finalizando detalles de diseño. Closes #424
+ac6bfcd	solonlosada2006	2026-04-27	Mostrando RTM en Documentos, alertas y semáforo. Closes #427
+23f4f99	solonlosada2006	2026-04-27	Conectar RTM al frontend con contexto y formulario. Closes #426
+9a54f4b	solonlosada2006	2026-04-27	Endpoints creados y schema en Mongo. Closes #425
+03d0822	juserora	2026-04-22	Merge branch 'main' of https://github.com/puj-course/FIS_2610_3517_G4 into feature-juserora
+d0cb450	Sarm	2026-04-21	Revert "Agregación del botón de Documentos y conectado con la base de datos. …"
+a431e29	samuelfl680	2026-04-21	Merge pull request #423 from puj-course/feature-samuelfl680
+694852e	copilot-swe-agent[bot]	2026-04-21	merge: resolve conflicts with develop branch
+414d6b0	samuelfl680	2026-04-21	Merge pull request #422 from puj-course/feature-Slosada
+3deb138	solonlosada2006	2026-04-20	Agregación del botón de Documentos y conectado con la base de datos. Closes #355
+0181dbb	Juserora	2026-04-19	Merge pull request #411 from puj-course/feature-juserora
+776ae51	juserora	2026-04-19	test(qa): ejecutar casos de prueba flujos críticos closes #399
+b5b920b	Sarm	2026-04-19	Actualizar descripción del modelo de dominio general
+2af176e	Sarm	2026-04-19	Rename Modelo de dominio general to Modelo de dominio general.md
+e9bba6a	Sarm	2026-04-19	Ampliar el modelo de dominio con descripciones de patrones
+03d6314	Sarm	2026-04-19	Update general domain model formatting
+0ef2c21	Sarm	2026-04-19	Revise Factory Method documentation for modal creation
+89c2104	Juserora	2026-04-16	Diagrama DB .md
+bdc1ba0	juansebastianvd	2026-04-16	Delete Docs/DiagramaDB/DiagramaBaseDatos
+a1250de	juansebastianvd	2026-04-16	Create DiagramaBaseDatos
+00cef0d	Juserora	2026-04-16	Delete Docs/DiagramaDB/ex
+c6ebd01	Juserora	2026-04-16	Upload DiagramaDB
+bb36350	Juserora	2026-04-16	Create ex
+5f2c170	samuelfl680	2026-04-16	Merge pull request #399 from puj-course/develop
+521bfa4	samuelfl680	2026-04-16	Add files via upload
+5733575	Sarm	2026-04-16	Merge pull request #402 from puj-course/feature-sarm-m
+979fe2f	Sarm-m	2026-04-16	feat: Implementar la parte de editar mas Fix. Closes #350
+01fb16b	Samuel Freile	2026-04-16	fix: Arreglar problemas de registro y alertas #401
+6e46225	Sarm-m	2026-04-16	 fix
+a3b2a3a	Sarm	2026-04-16	Merge pull request #400 from puj-course/feature-sarm-m
+cde70fe	Sarm-m	2026-04-16	feat(conductores): completar flujo de registro y asignacion de conductores desde la gestion de conductores. Closes #350
+7c2787e	Sarm-m	2026-04-16	fix(validation): validar campos obligatorios y documento duplicado en registro de conductores. Closes #354
+62605eb	Sarm-m	2026-04-16	feat(flow): conectar registro de conductores con asignacion de vehiculo. Closes #353
+c9f228f	Sarm-m	2026-04-16	feat(conductores): agregar selector de vehiculo en la interfaz de registro. Closes #352
+e41efe0	Sarm-m	2026-04-16	fix(conductores): conectar boton nuevo conductor con apertura de modal. Closes #351
+c7c66c4	Sarm-m	2026-04-16	docs(patterns): documentar patrones gof por tipo con diagramas y matriz de trazabilidad. Closes #363
+a710e9b	solonlosada2006	2026-04-15	Update README.md
+7887d26	solonlosada2006	2026-04-15	Update Flujo y asignación dinámica.yml
+6d96e30	solonlosada2006	2026-04-15	Update Flujo y asignación dinámica.yml
+b750a9d	juansebastianvd	2026-04-15	Merge pull request #393 from puj-course/main
+bff122e	solonlosada2006	2026-04-15	Update Flujo y asignación dinámica.yml
+631bf92	solonlosada2006	2026-04-15	Merge pull request #387 from puj-course/develop
+e923735	solonlosada2006	2026-04-15	Delete .github/ISSUE_TEMPLATE/invest.md
+dd678e5	solonlosada2006	2026-04-15	Delete .github/ISSUE_TEMPLATE/definition-of-done.md
+d42e33f	solonlosada2006	2026-04-15	Delete .github/ISSUE_TEMPLATE/criterios-de-aceptacion.md
+d37fa49	juansebastianvd	2026-04-16	Merge branch 'develop' of https://github.com/puj-course/FIS_2610_3517_G4 into develop
+6428cda	juansebastianvd	2026-04-16	fix:package
+b561bf8	solonlosada2006	2026-04-15	Update ci_verificacion.yml
+3757dda	juansebastianvd	2026-04-15	Merge pull request #386 from puj-course/feature-juserora
+7e31e7d	juserora	2026-04-15	fix: corregir navegación de servicios y planes en el header público closes #383, #384, #385
+36cf1dd	solonlosada2006	2026-04-15	Update cd_entrega.yml
+db5a2a5	juansebastianvd	2026-04-15	Merge branch 'develop' of https://github.com/puj-course/FIS_2610_3517_G4 into develop
+62fed74	solonlosada2006	2026-04-15	Update and rename pipeline-to Estándares_de_calidad.yml
+59585ed	solonlosada2006	2026-04-15	Update and rename pipeline to Flujo y asignación dinámica.yml
+0735499	juansebastianvd	2026-04-15	Merge pull request #381 from puj-course/feature-Vargas-J
+d89cea5	juansebastianvd	2026-04-15	Merge branch 'develop' into feature-Vargas-J
+491cda0	juserora	2026-04-15	merge: resolve conflicts keeping remote UI components
+109b0a2	solonlosada2006	2026-04-15	Update and rename cd.yml to cd_entrega.yml
+0e21d5b	solonlosada2006	2026-04-15	Update and rename ci.yml to ci_verificacion.yml
+6a152cf	juansebastianvd	2026-04-15	fix: resolve merge conflict
+65e9f8c	juansebastianvd	2026-04-15	chore: actualizar dependencias (axios, cors, mongoose) closes #374
+bd4a6c0	juansebastianvd	2026-04-15	feat: hooks conectados a API con filtros de privacidad closes #373
+00b201e	juansebastianvd	2026-04-15	feat: manejo en LoginPage closes #372
+57ba945	juansebastianvd	2026-04-15	refactor: soporte asíncrono en AuthContext closes #371
+6a4a67a	juansebastianvd	2026-04-15	feat: implementar servidor y modelos mongoose closes #370
+f86e0c7	samuelfl680	2026-04-15	Merge pull request #346 from puj-course/develop
+46b6b84	copilot-swe-agent[bot]	2026-04-16	merge: resolver conflictos con origin/main - integrar HistorialValidacionesPage y nuevos componentes RUNT
+4dccdbc	copilot-swe-agent[bot]	2026-04-16	fix: apply PR review changes - LoginPage result.success, DocumentosPage Helmet and lowercase states
+33663b7	Sarm	2026-04-15	Merge pull request #368 from puj-course/feature-sarm-m
+2a9d2ab	Sarm-m	2026-04-15	docs(patterns): agregar diagramas de patrones gof implementados. Closes #363
+3658e2f	Sarm	2026-04-15	Merge pull request #366 from puj-course/feature-sarm-m
+5cae638	Sarm-m	2026-04-15	docs(patterns): agregar diagramas de patrones gof implementados. Closes #363
+788edbf	Sarm-m	2026-04-15	docs(patterns): agregar diagramas mermaid de patrones gof implementados. Closes #363
+d7c65bb	samuelfl680	2026-04-15	Merge pull request #365 from puj-course/feature-sarm-m
+213565a	Sarm-m	2026-04-15	fix(lint): corregir parametro no usado en estrategia base de alertas. Closes #363
+b9fd7bd	Sarm-m	2026-04-15	merge: resolver conflicto en DocumentsContext para integrar cambios de develop.
+d1ca5fb	Sarm-m	2026-04-15	feat(patterns): integrar facade, observer, adapter, strategy, singleton y factory method en el sistema. Closes #363
+c50bbed	Sarm-m	2026-04-15	feat(patterns): formalizar singleton y strategy en el sistema de alertas. Closes #363
+cce22bf	Sarm-m	2026-04-15	feat(patterns): adaptar fuentes de datos al modelo unificado de alertas. Closes #363
+af0fee2	Sarm-m	2026-04-15	fix(patterns): sincronizar facade y observer para mostrar alertas activas correctamente. Closes #363
+c7b39e5	Sarm-m	2026-04-15	feat(patterns): conectar documentos al hub de alertas para formalizar observer. Closes #363
+962fbe1	samuelfl680	2026-04-15	Merge pull request #364 from puj-course/feature-sarm-m
+c96326a	Sarm-m	2026-04-15	fix(patterns): integrar facade de alertas en el flujo real de la interfaz. Closes #363
+0b048c9	juansebastianvd	2026-04-14	fix: resolve merge conflict with feature-sarm-m
+3319396	copilot-swe-agent[bot]	2026-04-13	fix: use data-toast-close attribute (HTML5 convention)
+2d3bf09	copilot-swe-agent[bot]	2026-04-13	fix: create toast.jsx and fix import paths in toaster.jsx (case sensitivity)
+4e5e859	samuelfl680	2026-04-12	Update apps/web/src/contexts/DocumentsContext.jsx
+1d8beb7	juserora	2026-04-11	feat(toast): integrar sistema de toast notifications HU-345
+3cbe559	samuelfl680	2026-04-10	Merge pull request #342 from puj-course/feature-sarm-m
+ff79192	samuelfl680	2026-04-10	Merge pull request #308 from puj-course/feature-samuelfl680
+a69aeca	juansebastianvd	2026-04-10	feat(#340): Agregar mejoras, validaciones y tests a HU-03
+cc2f7f6	juansebastianvd	2026-04-10	feat(#339): Crear sistema de generación de reportes PDF/CSV
+4c1887d	juansebastianvd	2026-04-10	feat(#338): Integrar validación rápida RUNT en VehiculosPage
+a5abfcd	juansebastianvd	2026-04-10	feat(#337): Crear modal DetallesValidacionModal
+19053e6	juansebastianvd	2026-04-10	feat(#336): Crear página HistorialValidacionesPage
+f70776f	juansebastianvd	2026-04-10	feat(#335): Crear componente ValidacionResultadoCard
+ecd8bbd	juansebastianvd	2026-04-10	feat(#334): Mejorar ValidacionRUNTPage con búsqueda RUNT completa
+dc44adc	juansebastianvd	2026-04-10	feat(#39): Crear hook useValidationHistory para gestionar historial
+da4bd1d	juansebastianvd	2026-04-10	feat(#334): Crear hook useRUNTSimulator para consulta RUNT
+523f417	Sarm-m	2026-04-10	fix(routes): corregir navegación protegida y flujo de documentos desde dashboard. #290
+dd32d82	Sarm-m	2026-04-10	fixes. #290
+1ce7c23	Sarm-m	2026-04-10	fixes #290
+fc5914c	Sarm-m	2026-04-10	feat(model): asociar vehiculo con el usuario correspondiente. Closes #295
+6b9d4ad	Sarm-m	2026-04-10	feat(state): registrar vehiculo y mostrarlo en la seccion de vehiculos. Closes #294
+966fbe2	Sarm-m	2026-04-10	feat(ui): implementar apartado para agregar vehiculo. Closes #293
+6550664	Sarm-m	2026-04-10	feat(nav): ajustar navegacion desde dashboard hacia vehiculos. Closes #291
+6c935b4	Sarm-m	2026-04-10	Fixes code App.jsx
+2190de3	Sarm-m	2026-04-10	Merge branch 'develop' into feature-sarm-m
+fd5e4bc	Sarm-m	2026-04-09	feat: add Docs folder from main
+309b89d	Sarm-m	2026-04-09	Merge branch 'main' of https://github.com/puj-course/FIS_2610_3517_G4 into feature-sarm-m
+29dddea	Sarm-m	2026-04-09	fix(docs): corregir nombre de carpeta incompatible con Windows
+06d4d90	Sarm-m	2026-04-09	Merge branch 'develop' into feature-sarm-m
+bc95dc6	Sarm	2026-04-09	Merge pull request #329 from puj-course/feature/pipelines
+2868771	Sarm	2026-04-09	Rename Pipeline2.yml to pipeline-gestion.yml
+c689fe1	juansebastianvd	2026-04-09	Merge pull request #327 from puj-course/feature/pipelines
+7a1b58c	juansebastianvd	2026-04-09	fix: modificaciones pipeline
+fc88e5b	TuNombre	2026-04-09	fix: agregar configuración de eslint para pipeline
+dafaacf	Sarm	2026-04-09	Update branch name in workflow trigger
+017f9a5	solonlosada2006	2026-04-09	Merge pull request #323 from puj-course/feature/pipelines
+9e4fc6c	solonlosada2006	2026-04-09	Create Pipeline2.yml
+9c785aa	Sarm-m	2026-04-09	fix: resolver conflictos al actualizar rama feature/pipelines
+e6a0a4a	Sarm-m	2026-04-09	fixes
+208fce6	TuNombre	2026-04-09	fix: corregir versión de checkout y mejorar pipeline de integración
+d280270	Sarm-m	2026-04-09	fixes
+f0ab968	solonlosada2006	2026-04-09	Merge pull request #307 from puj-course/feature-Slosada
+2108b41	TuNombre	2026-04-09	mejora: actualizar acciones a v4 en los workflows
+6de73d2	solonlosada2006	2026-04-09	Delete .github/workflows/Pipeline-ci.yaml
+5d15b3e	Sarm-m	2026-04-09	fix: resolviendo conflictos para actualizar main
+707476e	TuNombre	2026-04-09	test: prueba de pipeline en español
+9f1ba97	juansebastianvd	2026-04-09	Merge pull request #322 from puj-course/feature-Vargas-J
+bd8411b	TuNombre	2026-04-09	fix: upgrade upload-artifact from v3 to v4
+fc44822	TuNombre	2026-04-09	fix: rename Workflows to workflows and Package.json to package.json for GitHub Actions
+d3aa0d1	Sarm	2026-04-09	Delete .github/Workflows directory PARA FIXES
+cf014fd	juansebastianvd	2026-04-09	Add issue templates for DoD, acceptance criteria, and INVEST
+5508ccb	solonlosada2006	2026-04-09	Update Pipeline-ci.yaml
+e46b2d3	solonlosada2006	2026-04-09	Rename Pipeline-ci.yaml to Pipeline-ci.yaml
+19992a2	samuelfl680	2026-04-09	Merge pull request #321 from puj-course/feature/pipeline
+b69cfd0	solonlosada2006	2026-04-09	Create workflows
+fd6c160	Sarm	2026-04-09	chore(actions): agregar pipeline de empaquetado del frontend.
+6a6c61b	solonlosada2006	2026-04-09	Create Pipeline-ci.yaml
+0e1c879	samuelfl680	2026-04-09	Add CI workflow for testing JavaScript project
+5704ac0	samuelfl680	2026-04-09	Add continuous deployment workflow for JS project
+f02beb2	samuelfl680	2026-04-09	Rename workflow and update job steps
+c37ada3	samuelfl680	2026-04-09	Add CI workflow for building JS project
+9c78835	samuelfl680	2026-04-09	Update build workflow steps for clarity and options
+efe8bef	samuelfl680	2026-04-09	Add GitHub Actions workflow for building JS project
+fddc454	Juserora	2026-04-08	fix: remove unused useAlert hook and restore useAlertsFacade
+26d9d93	Juserora	2026-04-07	docs: add observer pattern documentation, closes #315
+bb1eb6b	Juserora	2026-04-07	feat: sidebar uses centralized alert hub, closes #314
+4957c73	Juserora	2026-04-07	feat: documents emit alerts to hub, closes #313
+e0276b4	Juserora	2026-04-07	feat: vehicles emit alerts to hub, closes #312
+c65f19e	Juserora	2026-04-07	feat: conductors emit alerts to hub, closes #311
+b16afca	Juserora	2026-04-07	feat: add useAlertHub observer pattern, closes #310
+4893931	solonlosada2006	2026-04-07	Fix: Resolver conflictos e integrar rutas de develop en Strategy
+1b155f8	Aulas Ingenieria	2026-04-07	feat(toast): integrar Toaster para renderizado global Closes #305
+1bd3e92	Aulas Ingenieria	2026-04-07	feat(toast): agregar autocierre por duracion y limpieza Closes #306
+f379db9	Aulas Ingenieria	2026-04-07	feat(toast): implementar hook useToast conectado al store Closes #304
+2ff98bd	Aulas Ingenieria	2026-04-07	feat(toast): implementar toast y update de notificaciones Closes #303
+54c9e6a	Aulas Ingenieria	2026-04-07	feat(toast): crear generador global de ids Closes #302
+8de45ad	Aulas Ingenieria	2026-04-07	feat(toast): implementar setState centralizado Closes #300
+f8be3d5	Aulas Ingenieria	2026-04-07	feat(toast): implementar setState centralizado Closes #300
+ab47a6f	solonlosada2006	2026-04-07	Implementar Fallback Closes #281
+c6e0ab4	Aulas Ingenieria	2026-04-07	feat(toast): implementar getState del store Closes #299
+99fe5e6	Aulas Ingenieria	2026-04-07	feat(toast): agregar estructura state y listeners Closes #298
+fa5dca7	Aulas Ingenieria	2026-04-07	feat(toast): crear instancia singleton toastStore Closes #297
+2d7a30f	solonlosada2006	2026-04-07	implementación de función Closes #280
+d9536ff	solonlosada2006	2026-04-07	Implementación en app.jsx sustituyéndolo por el archivo de configuración Closes #279
+b8274e0	solonlosada2006	2026-04-07	archivo de configuración Closes #278
+c983559	solonlosada2006	2026-04-07	Diagrama UML del patrón strategy Closes #277
+bd8daab	juansebastianvd	2026-04-06	Merge pull request #275 from puj-course/feature-sarm-m
+361b925	Sarm-m	2026-04-06	docs(uml): documentar patron facade para alertas y sustento academico. Closes #274
+19e9ebe	Sarm-m	2026-04-06	refactor(ui): validar clientes del flujo de alertas tras integrar facade. Closes #273
+3bf9ba3	Sarm-m	2026-04-06	refactor(alerts): delegar agregacion de alertas a useAlertsFacade. Closes #272
+7a420a4	Sarm-m	2026-04-06	feat(facade): crear useAlertsFacade para centralizar la logica de alertas. Closes #271
+7fd623b	Sarm-m	2026-04-06	docs: fixes commit para cerrar. Closes #270
+ae6cef4	Sarm-m	2026-04-06	docs(facade): documentar analisis y roles del patron en alertas. Closes #270
+c9fb935	solonlosada2006	2026-04-06	Verificación de ProtectedRoute y limpieza del repo Closes #249
+70f4c7a	solonlosada2006	2026-04-06	Revisión del core para que todo esté funcionando de forma correcta Closes #248
+6a5b54e	solonlosada2006	2026-04-06	Merge branch 'main' into feature-Slosada
+3cbb0dc	Sarm-m	2026-04-06	Fixes conflictos
+ff0271a	juanvargax	2026-04-05	Merge branch 'develop' of https://github.com/puj-course/FIS_2610_3517_G4 into develop
+70a60b7	juanvargax	2026-04-05	feat: normalize props, add AddVehicleModal support, and document Factory Method, closes #267, closes #268, closes #269
+82e6580	juanvargax	2026-04-05	refactor: update TeamPage to use ModalFactory and useModalManager, closes #266
+db71a82	juanvargax	2026-04-05	refactor: update HomePage to use ModalFactory and useModalManager, closes #265
+06de3f9	juanvargax	2026-04-05	feat: add useModalManager hook for modal state management, closes #264
+b101f6d	juanvargax	2026-04-05	feat: add ModalFactory component for centralized modal rendering, closes #263
+8a69884	Sarm-m	2026-04-02	fixes
+b94eebe	Sarm	2026-04-02	Merge pull request #260 from puj-course/feature-sarm-m
+188aa03	Sarm	2026-04-02	Merge branch 'develop' into feature-sarm-m
+9c8719d	Sarm-m	2026-04-02	Merge remote-tracking branch 'origin' into feature-sarm-m
+42e7d50	Sarm-m	2026-04-02	Merge branch 'develop' into feature-sarm-m
+c992daf	juansebastianvd	2026-03-31	Merge pull request #233 from puj-course/feature-samuelfl680
+8d06d6e	juanvargax	2026-03-31	feat(routing): registrar ruta protegida de documentos en App.jsx. Closes #245
+753d254	juanvargax	2026-03-31	feat(docs): crear estructura inicial de DocumentosPage. Closes #244
+85c7220	Sarm-m	2026-03-26	Finalizando merge y sincronizando cambios remotos para HU-227
+e907a6a	Sarm-m	2026-03-26	feat: implementar componente UserSettingsPage y rutas de perfil closes #227
+c88d479	juansebastianvd	2026-03-26	Merge pull request #232 from puj-course/feature-sarm-m
+480885c	juansebastianvd	2026-03-25	fix: actualizar app.jsx para el correcto funcionamiento de las nuevas funciones
+363947b	juansebastianvd	2026-03-25	Merge pull request #225 from puj-course/feature-Slosada
+64f59f9	solonlosada2006	2026-03-23	Corrigiendo error de envío
+8eef0e0	solonlosada2006	2026-03-23	ConfiguraciónPage actualizada Closes#184
+795023f	solonlosada2006	2026-03-23	Actualización de Reportes Pages Closes#183
+354aa23	juanvargax	2026-03-23	feat(runt): implementar estructura de página y lógica de simulación de API. Closes #214, #215
+f5daa9f	juanvargax	2026-03-23	feat(logic): implementar simulador de consulta RUNT con estados de carga y búsqueda por placa Closes #215
+93bd288	juanvargax	2026-03-23	feat(ui): implementar interfaz de Validación RUNT con Tailwind y Lucide Icons Closes#214
+4539983	juansebastianvd	2026-03-23	Merge pull request #222 from puj-course/develop
+09321aa	Sarm	2026-03-23	Merge pull request #221 from puj-course/main
+d610825	juansebastianvd	2026-03-23	fix: problema nombre carpeta
+cea1fec	juansebastianvd	2026-03-23	fix: problema con nombre carpeta
+56ef1d3	Sarm-m	2026-03-23	feat(alertas): integrar AlertasPage final y registrar ruta privada. Closes #218
+76968f9	Sarm-m	2026-03-23	feat(alertas): aplicar diferenciacion visual por prioridad en las alertas. Closes #217
+ff24b7a	juansebastianvd	2026-03-23	fix: nombre carpeta que genera error
+5ee277c	Sarm-m	2026-03-23	feat(alertas): renderizar listado de alertas activas y estado vacio. Closes #216
+5be70e0	Sarm-m	2026-03-23	feat(alertas): implementar control de simulacion de fecha en AlertasPage. Closes #213
+9a1ea89	Sarm-m	2026-03-23	feat(alertas): maquetar encabezado y metadatos del centro de alertas. Closes #211
+7ff36f8	juansebastianvd	2026-03-23	Merge pull request #219 from puj-course/feature-Vargas-J
+4f31c33	juansebastianvd	2026-03-23	Merge branch 'main' into feature-Vargas-J
+7d9348e	juanvargax	2026-03-23	feat: configurar ruta /validacion-runt en el enrutador principal Closes #212
+add1a36	Sarm-m	2026-03-23	Merge branch 'main' into develop
+2b4cdc0	juansebastianvd	2026-03-23	TALLER_19_MARZO
+d62e4b4	Juserora	2026-03-20	Merge pull request #208 from puj-course/feature-juserora
+d7be0ce	juserora	2026-03-20	feat: Implementación de Interfaces de Gestión de Conductores y Vehículos
+d5f22ad	samuelfl680	2026-03-19	Adjunto diagramas de historia de usuario  1
+5f2a90f	juansebastianvd	2026-03-19	Diagrama de Componentes de la HU-02
+6df906b	solonlosada2006	2026-03-19	Add files via upload
+841853e	solonlosada2006	2026-03-19	Add files via upload
+34772e5	juansebastianvd	2026-03-19	Diagrama de Análisis (ECB)
+11e302b	Sarm	2026-03-19	Feat: Implementacion. Closes #197
+f97faba	Sarm	2026-03-19	Delete Docs/Taller de diagramas /HU-02/1.png
+a0210d0	Sarm	2026-03-19	1.
+b7f20ce	Sarm	2026-03-19	Create read.me
+d0cdde1	Sarm	2026-03-19	Delete Docs/Taller de diagramas /HU-03
+955bdd0	Sarm	2026-03-19	Create HU-03
+666101e	Sarm	2026-03-19	Create read.me
+9bcc1f2	Sarm	2026-03-19	Create read.me
+27350d8	Sarm	2026-03-19	Create read.me
+5edf1d8	Sarm	2026-03-19	Create Taller
+4f78e36	juanvargax	2026-03-17	fix: resolver conflictos de merge y estabilizar rutas
+0c76650	juansebastianvd	2026-03-17	Merge pull request #181 from puj-course/feature-Vargas-J
+301e639	juanvargax	2026-03-17	fix: reactivar rutas del dashboard y estructura de layouts
+cb69bb8	juansebastianvd	2026-03-17	Merge pull request #180 from puj-course/develop
+b796cc0	juansebastianvd	2026-03-17	Merge pull request #168 from puj-course/feature-sarm-m
+464aa8e	juansebastianvd	2026-03-17	Merge pull request #175 from puj-course/feature-Slosada
+5da7c81	juansebastianvd	2026-03-16	Merge pull request #179 from puj-course/develop
+2ce01ad	juanvargax	2026-03-16	feat: implementar postcss.config.js para procesamiento de estilos. Closes #154
+c8c4876	juanvargax	2026-03-16	feat: crear archivo de configuración tailwind.config.js. Closes #153
+6bd8bd4	juansebastianvd	2026-03-16	Merge pull request #178 from puj-course/feature-Vargas-J
+ed14584	juanvargax	2026-03-16	feat: configurar punto de entrada de estilos globales en index.css. Closes #152
+def7513	juanvargax	2026-03-16	fix: corregir errores de configuracion y estado introducidos en el ultimo merge
+9e7b7f7	juanvargax	2026-03-16	fix(dashboard): corregir ruta de importación de StatusBadge en DashboardPage
+cb3fac6	Samuel felipe	2026-03-14	feat: crear componente StatusBadge para mostrar estados. Closes #132
+ca713e9	solonlosada2006	2026-03-14	feat: Protected Route creado usando auth UseAuth. Closes#143
+04b52aa	solonlosada2006	2026-03-14	feat: Protected Route creado usando auth UseAuth. Closes#143
+20b2b91	Juserora	2026-03-14	Merge pull request #174 from puj-course/develop
+96eae8d	Juserora	2026-03-14	Merge branch 'main' into develop
+0be5667	Juserora	2026-03-14	Merge pull request #173 from puj-course/feature-juserora
+3aca660	Juserora	2026-03-14	Merge pull request #172 from puj-course/develop
+674b809	juserora	2026-03-14	feat: Verificacion y actualizacion de useConductors.js y useVehicles.js. Fixes #161
+938fc7e	juserora	2026-03-14	feat: Integracion y actualización de DashboardPage.jsx. Fixes #162
+dc05018	juserora	2026-03-14	feat: Integracion de modales de registro AddConductorModal.jsx y AddVehicleModel.jsx. Fixes #160
+68075da	Juserora	2026-03-13	Merge pull request #171 from puj-course/feature-juserora
+4891dbc	juserora	2026-03-13	feat: Integracion de componentes AddConductorModal.jsx y AddVehicleModel.jsx . Fixes #162
+b32504c	Juserora	2026-03-13	Merge pull request #170 from puj-course/develop
+5e38d10	juserora	2026-03-13	feat: Integracion de AlertCard.jsx. Fixes #159
+ea8bf69	Sarm-m	2026-03-12	Merge branch 'main' into develop
+6264c0f	Sarm-m	2026-03-12	feat: detallas graficos y QA. Closes #138
+5d8bb1d	Sarm-m	2026-03-12	fixes: arreglo del codigo #137
+6f34ffe	Sarm-m	2026-03-12	feat: grafioco para el datapanel. Closes #137
+7e3963d	Sarm-m	2026-03-12	feat: detalles de alertas amarillas en DataPanel. Closes #136
+06de060	Sarm-m	2026-03-12	feat: conteo de alertas amarillas de data panel. Closes #135
+136b61a	Sarm-m	2026-03-12	feat: metrica de cumplimiento en el datapanel. Closes #134
+72105d7	Sarm-m	2026-03-12	feat: Integrar DataPanel en Dashboard. Closes #133
+ebc2c5c	solonlosada2006	2026-03-11	Merge pull request #164 from puj-course/feature-juserora
+dc9dd7c	juserora	2026-03-11	chore: optimizacion de AlertCard y preparacion para PR
+f70f008	solonlosada2006	2026-03-11	Merge pull request #163 from puj-course/main
+c5e94cb	juserora	2026-03-11	feat: implementacion componente AlertCard.jsx. Fixes #162
+b2c8aea	juansebastianvd	2026-03-10	Merge pull request #130 from puj-course/develop
+12e1296	Sarm	2026-03-10	Merge pull request #115 from puj-course/feature-Slosada
+b794143	samuelfl680	2026-03-09	Merge pull request #129 from puj-course/feature-samuelfl680
+3950c7f	samuelfl680	2026-03-09	Merge branch 'develop' into feature-samuelfl680
+aca7c25	Samuel felipe	2026-03-07	chore: eliminar carpeta src duplicada closes #125
+babad19	Samuel felipe	2026-03-07	feat: agregar contexto de autenticacion para login registro y manejo de sesion closes #124
+07ab022	Samuel felipe	2026-03-06	feat: crear componente Toast closes #123
+a3c2ae9	Samuel felipe	2026-03-06	feat: Crear componente Button reutilizable closes #122
+67c3cf1	Samuel felipe	2026-03-06	feat: crear componente Button reutilizable closes #122
+0a0d543	Samuel felipe	2026-03-06	feat: implementar DashboardLayout con Header y Sidebar - closes #119
+2d5bfa4	Juserora	2026-03-05	Merge pull request #114 from puj-course/feature-juserora
+87497be	juserora	2026-03-05	feat: Integracion LoginHome.jsx. Closes #113
+501c816	juserora	2026-03-05	fix: branche
+7256175	solonlosada2006	2026-03-04	feat: agrego el wireframe para su aprobación #90
+18c3324	juansebastianvd	2026-03-04	Merge pull request #111 from puj-course/feature-Vargas-J
+61e3ef9	juanvargax	2026-03-04	Implementacion homepage
+92b5181	juanvargax	2026-03-04	fix: mock de useAlerts
+5174d0f	juansebastianvd	2026-03-04	merge: sincronizacion con main
+3ba3057	juanvargax	2026-03-04	chore: optimizar configuracion de vite y alias de rutas #108
+cff9814	Sarm	2026-03-03	Merge pull request #107 from puj-course/feature-sarm-m
+38eecda	Sarm-m	2026-03-03	feat: fixes code, borre una linea de codigo. Bug. #105
+07f0181	Sarm-m	2026-03-03	feat: enlazar Planes a /planes en desktop. Closes #105
+f1b8f68	Sarm	2026-03-03	Merge pull request #104 from puj-course/feature-sarm-m
+d664bfd	Sarm-m	2026-03-03	Merge branch 'main' into feature-sarm-m
+3955a71	Sarm-m	2026-03-03	Merge branch 'main' into develop
+fe2a5d1	Sarm-m	2026-03-03	bug: arreglo de archivo a carpeta que es. Fixes #97
+66e72b2	Sarm-m	2026-03-03	bug: archivo para la implemtacion y quie corra la pagina web con npm. Closes #103
+a232388	Sarm	2026-03-03	Merge pull request #102 from puj-course/develop
+dbab48a	Sarm-m	2026-03-03	feat: cards de integrantes (5). Closes #101 (#101)
+5651d17	Sarm-m	2026-03-03	feat: encabezado y descripción de sección. Closes #100 (#100)
+76aac24	Sarm-m	2026-03-03	feat: acceso a Nuestro Equipo desde PublicHeader. Closes #99 (#99)
+b81a464	Sarm	2026-03-03	Merge pull request #98 from puj-course/feature-juserora
+4933477	juserora	2026-03-03	Se creo LoginModal.jsx #97
+3fdc923	juserora	2026-03-03	Se creo LoginModal.jsx
+9a8242c	Sarm-m	2026-03-03	Merge branch 'main' into feature-sarm-m
+31ba3d5	Sarm-m	2026-03-03	Merge branch 'main' into feature-sarm-m
+115fdff	Sarm-m	2026-03-03	prueba
+498b928	solonlosada2006	2026-03-01	Merge pull request #94 from puj-course/develop
+49200ee	solonlosada2006	2026-03-01	Merge pull request #93 from puj-course/feature-Slosada
+f66947d	solonlosada2006	2026-03-01	feat:Heder del Dashboard antes del login (#73)
+d2a85d9	juansebastianvd	2026-02-26	Merge pull request #86 from puj-course/feature-Vargas-J
+988e8aa	juanvargax	2026-02-26	feat: implementacion de flujos de contenido y navegacion del header closes #74
+8b1a8c7	Sarm	2026-02-25	Merge pull request #85 from puj-course/develop
+f17b96b	Sarm	2026-02-25	Merge pull request #84 from puj-course/feature-juserora
+df3dcd4	juserora	2026-02-25	feat: implementacion main.jsx  . Closes #82
+43e067a	Sarm-m	2026-02-25	 Implementar el index para abrir pagina. Resolves #66
+2d75a05	Sarm-m	2026-02-25	Estructura inicial del proyecto
+7a04b98	Sarm	2026-02-25	Merge pull request #80 from puj-course/feature-sarm-m
+e9609f1	Sarm-m	2026-02-25	 Agregar estructra incial de forntedn. Resolves #66
+b54db11	Sarm-m	2026-02-25	chore(web): agregar estructura inicial del frontend (refs #66)
+ffec55c	Sarm-m	2026-02-25	 feat: Implementar gitignore para evitar ciertos archivos. Resolves #66
+e5bbc16	samuelfl680	2026-02-20	Merge pull request #63 from puj-course/feature-samuelfl680
+670fae2	Samuel felipe	2026-02-20	feat: completar estructura de carpetas y boilerplate del proyecto (#1)
+15afc81	Sarm	2026-02-20	Merge pull request #61 from puj-course/develop
+d4e4430	Samuel felipe	2026-02-20	Forzando la inclusion de carpetas Docs, temp y github
+ea25a7e	Sarm	2026-02-20	Revise README with new project name and team roles
+b44229d	Sarm	2026-02-20	Merge pull request #59 from puj-course/feature-Slosada
+59f7f0f	Samuel felipe	2026-02-20	Merge branch 'develop' of https://github.com/puj-course/FIS_2610_3517_G4 into feature-samuelfl680
+1c15e9d	Sarm	2026-02-20	Refactor README for clarity and formatting
+2f01723	solonlosada2006	2026-02-20	Merge pull request #58 from puj-course/feature-sarm-m
+dc00311	Sarm-m	2026-02-20	docs: Modificando readme para que quede completo
+fc8fe16	Samuel felipe	2026-02-20	Merge remote-tracking branch 'origin/develop' into feature-samuelfl680
+111675d	solonlosada2006	2026-02-20	probando cosas para el taller
+6483891	Sarm	2026-02-20	Merge pull request #57 from puj-course/feature-sarm-m
+8ba162d	Sarm-m	2026-02-20	Merge remote-tracking branch 'origin/develop' into feature-sarm-m
+019dc73	Sarm-m	2026-02-20	docs: update README para la rubrica
+fa3aba2	Samuel felipe	2026-02-20	feat: agregar boilerplate sin borrar archivos existentes (#1)
+0a12aa8	Sarm	2026-02-19	Update README with UML documentation details
+05beb53	Sarm	2026-02-19	Merge branch 'feature-sarm-m'
+8db3a4a	Sarm	2026-02-19	docs: Agregar read.me a la carpeta UML (#54)
+9b0fe9a	Sarm	2026-02-19	fix: arreglando commit
+61d439e	Sarm	2026-02-19	docs:Subir diagrama de secuencia UML (#51)
+875a875	Sarm	2026-02-19	docs:Subir diagrama de secuencia UML (#51)
+912f44e	Sarm	2026-02-19	docs: retirar diagrama de secuencia para re-subirlo correctamente (#51)
+1ed0d92	Sarm	2026-02-19	docs:Colocar diagrama de secuencia uml (#51)
+5ec75f1	Sarm	2026-02-19	docs: retirar diagrama de secuencia para re-subirlo correctamente
+9052bc3	Sarm	2026-02-19	Delete Docs/Arquitectura/UML/Diagrama de secuencia.png para hacerlo con el commit desde la terminal para la issuer
+9cc2b4f	Sarm	2026-02-19	Subir el diagrama de secuencia del caso de registar el vehiculo
+ff23b6d	juansebastianvd	2026-02-19	Merge pull request #53 from puj-course/develop
+4f7bbe4	juanvargax	2026-02-19	UML de Secuencia — Registro de Vehículo
+bb42671	samuelfl680	2026-02-17	Add general code compiler description to README
+d61d7c9	samuelfl680	2026-02-12	Add files via upload
+a922b83	samuelfl680	2026-02-12	Delete Docs/Presentaciones/presentacion grupo 4.pdf
+1b0f69b	samuelfl680	2026-02-12	Delete Docs/Presentaciones/p1
+650b7e2	samuelfl680	2026-02-12	Rename Docs/presentacion grupo 4.pdf to Docs/Presentaciones/presentacion grupo 4.pdf
+fd763dc	samuelfl680	2026-02-12	Rename Docs/Proyecto propuesta grupo 4..pdf to Docs/Presentaciones/Proyecto propuesta grupo 4..pdf
+a430a48	Sarm	2026-02-12	Create folder presentation
+5907286	samuelfl680	2026-02-12	Rename Docs/Reunión_1_ en _3517_G4_ .docx to Docs/Reuniones/Reunión_1_ en _3517_G4_ .docx
+acfac59	samuelfl680	2026-02-12	Create README.md
+7304ad1	samuelfl680	2026-02-12	Delete Reuniones directory
+162ab1c	samuelfl680	2026-02-12	Create README.md
+09d7158	solonlosada2006	2026-02-10	Add files via upload
+88f8f4b	samuelfl680	2026-02-10	Update README.md
+7615971	samuelfl680	2026-02-10	Update README.md
+06b5e15	samuelfl680	2026-02-10	Update README.md
+57fdfe0	samuelfl680	2026-02-10	Create CHANGELOG.md
+e0c6497	samuelfl680	2026-02-10	Create README.md
+1a5a2a5	samuelfl680	2026-02-10	Create README.md
+ae1a10f	samuelfl680	2026-02-10	Create README.md
+3e62f06	samuelfl680	2026-02-10	Delete tests directory
+e20b8d3	samuelfl680	2026-02-10	Create README.dm
+72d0f3e	samuelfl680	2026-02-10	Create README.md
+dd25965	samuelfl680	2026-02-10	Create README.md
+39d6290	samuelfl680	2026-02-10	Delete src
+ccfde10	samuelfl680	2026-02-10	src/
+500c038	Sarm	2026-02-10	Update team roles with GitHub usernames
+62e5149	Sarm	2026-02-10	Update role for Sebastian Rodriguez Ramirez
+75abb7d	Sarm	2026-02-10	Fix table formatting in README.md
+660bef6	Sarm	2026-02-10	Remove responsibility column from team roles
+f25536e	Sarm	2026-02-10	Se ajustaron las definiciones de roles.
+2f20fe3	solonlosada2006	2026-02-05	Delete Docs/envio9 docs
+aca6fba	solonlosada2006	2026-02-05	Add files via upload
+2feb581	solonlosada2006	2026-02-05	Add files via upload
+d4314a0	solonlosada2006	2026-02-05	Create envio9 docs
+24741b5	solonlosada2006	2026-02-05	Create cd.yml
+75fbc89	solonlosada2006	2026-02-05	Create ci.yml
+232185c	samuelfl680	2026-02-05	Update README.md
+297f13b	solonlosada2006	2026-02-05	Create PULL_REQUEST_TEMPLATE.md
+2c93609	samuelfl680	2026-02-05	Update README.md
+5e85777	juansebastianvd	2026-02-05	Create LICENSE
+68f1e6f	solonlosada2006	2026-02-05	Delete .github/ISSUE_TEMPLATE/.github/PULL_REQUEST_TEMPLATE.md
+67a9b4f	solonlosada2006	2026-02-05	Delete .github/.github/PULL_REQUEST_TEMPLATE.md
+f691f65	solonlosada2006	2026-02-05	Create PULL_REQUEST_TEMPLATE.md
+dd4b81c	solonlosada2006	2026-02-05	Create PULL_REQUEST_TEMPLATE.md
+327c8a8	solonlosada2006	2026-02-05	Create feature_request.md
+681a9ba	solonlosada2006	2026-02-05	Create README.md
+9192ba0	solonlosada2006	2026-02-05	Create bug_report.md
+d2f87ec	solonlosada2006	2026-02-05	Add files via upload
+f2a143f	solonlosada2006	2026-02-05	Delete test.sh
+4ed935a	solonlosada2006	2026-02-05	Delete temp_file.txt
+64388b9	samuelfl680	2026-02-05	Delete DriveControal directory
+e124f85	solonlosada2006	2026-02-05	Delete temp2.tmp
+46a2c2d	solonlosada2006	2026-02-05	Delete temp1.tmp
+1df0716	solonlosada2006	2026-02-05	Delete setup.sh
+f3278fe	solonlosada2006	2026-02-05	Delete settings.json
+5298406	solonlosada2006	2026-02-05	Delete exploration.ipynb
+650a028	solonlosada2006	2026-02-05	Delete docker-compose.yml
+cd6511c	solonlosada2006	2026-02-05	Delete deploy.sh
+b14b27d	solonlosada2006	2026-02-05	Delete data2.csv
+e7a9e51	solonlosada2006	2026-02-05	Delete data1.csv
+8b34efd	solonlosada2006	2026-02-05	Delete config.yaml
+4be8dfd	solonlosada2006	2026-02-05	Delete analysis.ipynb
+b0ce95d	solonlosada2006	2026-02-05	Delete README.md
+7fe3e7c	solonlosada2006	2026-02-05	Delete Makefile
+c0f1f42	solonlosada2006	2026-02-05	Delete LICENSE
+7fb2e50	solonlosada2006	2026-02-05	Delete Dockerfile
+6d8bd5d	solonlosada2006	2026-02-05	Delete CONTRIBUTING.md
+dab0e86	solonlosada2006	2026-02-05	Delete CHANGELOG.md
+6568986	solonlosada2006	2026-02-05	Create ejemplo
+27af163	solonlosada2006	2026-02-05	Add files via upload
+ff725b8	Juan Pablo Arias Buitrago	2026-01-29	Initial commit

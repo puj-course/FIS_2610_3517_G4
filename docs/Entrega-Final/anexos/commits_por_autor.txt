@@ -1,13 +1,13 @@
    128	Sarm-m <ramirezm.sa@javeriana.edu.co>
    109	solonlosada2006 <solon.losada2006@gmail.com>
     79	samuelfl680 <74272609+samuelfl680@users.noreply.github.com>
-    74	Sarm <ramirezm.sa@javeriana.edu.co>
+    77	Sarm <ramirezm.sa@javeriana.edu.co>
     64	samuelfl680 <freilesamuel3@gmail.com>
     48	juansebastianvd <86634505+juanvargax@users.noreply.github.com>
     28	juserora <rodriguezjuans@javeriana.edu.co>
     24	juansebastianvd <juansebastianvd@gmail.com>
     24	juanvargax <juansebastianvd@gmail.com>
-    22	Sarm-m <sebastirama@gmail.com>
+    23	Sarm-m <sebastirama@gmail.com>
     18	Juan Sebastian Vargas Dicelys <86634505+juanvargax@users.noreply.github.com>
     14	Juserora <jsrodriguezr12@gmail.com>
     13	Sarm <sebastirama@gmail.com>
