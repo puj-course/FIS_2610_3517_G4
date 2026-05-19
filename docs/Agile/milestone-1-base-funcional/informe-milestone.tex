@@ -1,175 +1,678 @@
+
 \documentclass[11pt,a4paper]{article}
+
+% --------------------------------------------------
+% PAQUETES
+% --------------------------------------------------
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[spanish,es-tabla]{babel}
+\IfFileExists{spanish.ldf}{%
+  \usepackage[spanish,es-tabla]{babel}%
+}{%
+  \usepackage[english]{babel}%
+}
+\usepackage{lmodern}
 \usepackage{geometry}
 \usepackage{graphicx}
-\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage[nopatch=footnote]{microtype}
 \usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{array}
 \usepackage{tabularx}
 \usepackage{booktabs}
-\usepackage{array}
-\geometry{margin=2.5cm}
-\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\usepackage{longtable}
+\usepackage{ragged2e}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage{colortbl}
+\usepackage{lastpage}
+\usepackage{pdflscape}
+
+% --------------------------------------------------
+% CONFIGURACION GENERAL
+% --------------------------------------------------
+\geometry{
+  top=2.6cm,
+  bottom=2.6cm,
+  left=2.6cm,
+  right=2.6cm,
+  headheight=15pt,
+  footskip=1.2cm
+}
+
+\definecolor{azulprincipal}{HTML}{1F3C88}
+\definecolor{azulsuave}{HTML}{EAF0FB}
+\definecolor{grislinea}{HTML}{D9DEE8}
+\definecolor{gristexto}{HTML}{333333}
+\definecolor{rojopendiente}{HTML}{B00020}
+\definecolor{verdesuave}{HTML}{EAF7EA}
+\definecolor{amarillosuave}{HTML}{FFF7E0}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=azulprincipal,
+  urlcolor=azulprincipal,
+  citecolor=azulprincipal,
+  pdfauthor={SYNTIX TECH - Pontificia Universidad Javeriana}
+}
+
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0.55em}
-\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlength{\parskip}{0.6em}
+\setstretch{1.12}
+\renewcommand{\arraystretch}{1.25}
+\setlength{\emergencystretch}{2em}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{3}
+\renewcommand{\contentsname}{Tabla de contenido}
+\AtBeginDocument{%
+  \renewcommand{\contentsname}{Tabla de contenido}%
+  \renewcommand{\tablename}{Tabla}%
+  \renewcommand{\figurename}{Figura}%
+}
+
+% --------------------------------------------------
+% FORMATO DE TITULOS
+% --------------------------------------------------
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{azulprincipal}}
+  {\thesection.}{0.6em}{}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{azulprincipal}}
+  {\thesubsection.}{0.6em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{azulprincipal}}
+  {\thesubsubsection.}{0.6em}{}
+
+\titleformat{\paragraph}[block]
+  {\normalfont\normalsize\bfseries\color{azulprincipal}}
+  {\theparagraph.}{0.6em}{}
+
+\titlespacing*{\section}{0pt}{1.6em}{0.8em}
+\titlespacing*{\subsection}{0pt}{1.2em}{0.6em}
+\titlespacing*{\subsubsection}{0pt}{1em}{0.5em}
+\titlespacing*{\paragraph}{0pt}{0.9em}{0.4em}
+
+% --------------------------------------------------
+% ENCABEZADO Y PIE DE PAGINA
+% --------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{azulprincipal}{Informe de Postmortem}}
+\fancyhead[R]{\textcolor{azulprincipal}{DriveControl / AutoMinder Enterprise}}
+\fancyfoot[C]{\textcolor{gristexto}{Pagina \thepage\ de \pageref*{LastPage}}}
+\renewcommand{\headrulewidth}{0.6pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\captionsetup{
+  font=small,
+  labelfont=bf
+}
+
+% --------------------------------------------------
+% COLUMNAS Y COMANDOS UTILES
+% --------------------------------------------------
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{P}[1]{>{\RaggedRight\arraybackslash}p{#1}}
 \newcommand{\code}[1]{\texttt{\detokenize{#1}}}
-\newcommand{\evidencia}[2]{%
-\begin{figure}[H]\centering
-\IfFileExists{#1}{\includegraphics[width=0.88\linewidth]{#1}}{%
-\fbox{\begin{minipage}[c][3cm][c]{0.82\linewidth}\centering Pendiente de captura: \texttt{\detokenize{#1}}\end{minipage}}}
-\caption{#2}
-\end{figure}}
 
 \begin{document}
+\hypersetup{pageanchor=false,pdftitle={Informe de Postmortem - Milestone 1}}
 \begin{titlepage}
 \centering
-\vspace*{1cm}
-{\Large Pontificia Universidad Javeriana}\\
-{\large Fundamentos de Ingeniería de Software}\\[1.5cm]
-{\Huge \textbf{DriveControl / AutoMinder Enterprise}}\\[0.4cm]
-{\Large Equipo SYNTIX TECH}\\[1.2cm]
-{\LARGE \textbf{Milestone 1 - Base funcional del sistema}}\\[1.2cm]
-\begin{tabular}{ll}
-Profesor: & Luis Gabriel Moreno Sandoval\\
-Fecha: & 19 de mayo de 2026\\
-Repositorio: & \url{https://github.com/puj-course/FIS_2610_3517_G4}\\
-\end{tabular}
+\vspace*{0.5cm}
+
+\IfFileExists{img/javeriana.png}{%
+  \includegraphics[width=0.24\linewidth]{img/javeriana.png}%
+}{%
+  \fbox{%
+    \begin{minipage}[c][3cm][c]{0.28\linewidth}
+      \centering
+      \textbf{img/javeriana.png}\\[0.4em]
+      Logo pendiente
+    \end{minipage}%
+  }%
+}
+\vspace{0.2cm}
+
+{\Large \textbf{Pontificia Universidad Javeriana}}\\
+{\large Facultad de Ingenieria}\\
+{\large Fundamentos de Ingenieria de Software}\\[1.2cm]
+
+{\Huge \textbf{\textcolor{azulprincipal}{Informe de Postmortem}}}\\[0.4cm]
+{\Large Reporte del ciclo, retrospectiva Starfish y PIP}\\[1.1cm]
+
+{\LARGE \textbf{Milestone 1: Base Funcional del Sistema}}\\[0.3cm]
+{\Large Equipo SYNTIX TECH}\\[1.1cm]
+
+\begin{tabularx}{0.86\linewidth}{P{4cm}Y}
+\toprule
+\textbf{Profesor} & Luis Gabriel Moreno Sandoval \\
+\textbf{Monitor} & Juan Pablo Arias Buitrago \\
+\textbf{Fecha} & 19 de mayo de 2026 \\
+\textbf{Repositorio} & \url{https://github.com/puj-course/FIS_2610_3517_G4} \\
+\bottomrule
+\end{tabularx}
+
 \vfill
+\textit{Documento construido a partir del postmortem original del milestone, sin recortar informacion, adaptado al formato institucional de la plantilla suministrada.}
 \end{titlepage}
+\hypersetup{pageanchor=true}
+\pagenumbering{arabic}
 
+\clearpage
+\section*{Integrantes}
+\phantomsection
+\addcontentsline{toc}{section}{Integrantes}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{P{5.2cm}P{3.4cm}Y}
+\toprule
+\textbf{Nombre} & \textbf{GitHub} & \textbf{Rol Scrum / tecnico} \\
+\midrule
+Sebastian Ramirez Maldonado & \texttt{@Sarm-m} & Scrum Master \\
+Sebastian Vargas & \texttt{@juanvargax} & Product Owner / Sprint Planner \\
+Samuel Freile & \texttt{@samuelfl680} & Configuration Manager \\
+Solon Losada & \texttt{@solonlosada2006} & DevOps Engineer \\
+Sebastian Rodriguez Ramirez & \texttt{@juserora} & QA Lead \\
+\bottomrule
+\end{tabularx}
+\caption{Integrantes y roles del equipo SYNTIX TECH.}
+\end{table}
+
+\clearpage
+\phantomsection
 \tableofcontents
-\newpage
+\clearpage
 
-\section{Resumen ejecutivo del milestone}
-El Milestone 1 estableció la base técnica y metodológica del sistema: stack MERN, autenticación inicial, dashboard base, estructura de ramas y primeras prácticas Scrum. GitHub live registra 76 issues cerradas, 24 HU cerradas estrictas y 9 PRs asociados al milestone.
+\clearpage
+\section{Introduccion}
 
-\section{Objetivos del milestone}
-\begin{itemize}
-\item Establecer la arquitectura base del producto.
-\item Implementar autenticación, registro y rutas protegidas.
-\item Crear el dashboard inicial y componentes base.
-\item Activar GitFlow y seguimiento con GitHub Issues.
-\end{itemize}
+Este informe presenta el postmortem del Milestone 1 del proyecto DriveControl / AutoMinder Enterprise, desarrollado por el equipo SYNTIX TECH en el marco de la asignatura Fundamentos de Ingenieria de Software. El documento conserva de forma integral la informacion del postmortem original y la reorganiza bajo el formato institucional suministrado, manteniendo el contenido de resumen ejecutivo, contexto, revision de calidad, evaluacion de roles, causa raiz, retrospectiva Starfish, plan de mejora y respuestas completas a las preguntas guia de la presentacion de postmortem.
 
-\section{Alcance funcional}
-El alcance incluye base funcional, autenticación, dashboard inicial, componentes de estado y organización inicial de ramas. No incluye módulos avanzados de despliegue, alertas finales ni SMS.
+El proposito de este reporte es dejar una evidencia clara del ciclo: que producto se produjo, que esfuerzo se invirtio, que proceso se siguio, que problemas aparecieron, cuales fueron sus causas, que aprendizajes surgieron y que acciones de mejora deben incorporarse en el ciclo siguiente o en proyectos futuros. La estructura facilita la lectura academica y permite defender el trabajo con trazabilidad metodologica, tecnica y de calidad.
 
-\section{Evidencia ágil}
-\begin{tabularx}{\linewidth}{l r Y}
+\clearpage
+\section{Postmortem -- Milestone 1: Base Funcional del Sistema}
+\textbf{Proyecto:} Drive Control / Syntix Tech
+\textbf{Stack:} MERN (MongoDB, Express, React, Node.js)
+\textbf{Equipo:}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.22\linewidth}P{0.34\linewidth}}
 \toprule
-Elemento & Valor & Evidencia\\
+\textbf{Nombre} & \textbf{Usuario} & \textbf{Rol} \\
 \midrule
-HU cerradas & 24 & Issues con patrón estricto de HU en GitHub.\\
-Issues cerradas & 76 & Milestone cerrado en GitHub.\\
-PRs & 9 & PRs \#130, \#168, \#170, \#171, \#172, \#173, \#174, \#177, \#208.\\
-Commits & 107 & Ventana S1-S4 en Git local.\\
-\bottomrule
-\end{tabularx}
-
-\evidencia{../../Entrega-Final/evidencias/01_agile_milestones_semestre.png}{Milestones del semestre.}
-\evidencia{../../Entrega-Final/evidencias/02_agile_project_board.png}{Tablero GitHub Project.}
-
-\section{Métricas del milestone}
-\begin{tabularx}{\linewidth}{Y r}
+\endfirsthead
 \toprule
-Métrica & Valor\\
+\textbf{Nombre} & \textbf{Usuario} & \textbf{Rol} \\
 \midrule
-HU cerradas & 24\\
-Issues cerradas & 76\\
-Issues abiertas & 0\\
-Commits por ventana de sprint & 107\\
-PRs asociados & 9\\
-PRs mergeadas & 8\\
-PRs cerradas sin merge & 1\\
+\endhead
 \bottomrule
-\end{tabularx}
+\endlastfoot
+Sebastián Ramírez Maldonado & @Sarm-m & Scrum Master \\
+Samuel Freile & @samuelfl680 & Configuration Manager \\
+Sebastián Rodríguez Ramírez & @Juserora & Quality Assurance Lead \\
+Solón Losada & @solonlosada2006 & DevOps Engineer \\
+Sebastián Vargas & @juanvargax & Product Owner / Sprint Planner \\
+\end{longtable}
+\endgroup
 
-Participación por issues asignadas: \code{juanvargax} 42, \code{Sarm-m} 21, \code{Juserora} 21, \code{samuelfl680} 16 y \code{solonlosada2006} 11.
+\vspace{0.6em}\hrule\vspace{0.8em}
 
-\section{Evaluación del producto}
-Se produjo una base funcional que permitió autenticar usuarios, navegar por el dashboard inicial y comenzar el desarrollo incremental. La evidencia existe en issues, PRs y capturas generales de GitHub.
+\subsection{1. Resumen Ejecutivo}
 
-\section{Evaluación del proceso}
-El equipo usó Scrum académico con GitHub Issues, ramas y PRs. Funcionó la adopción temprana de GitFlow, pero faltó un Definition of Done formal y una política uniforme de validación local.
+El Milestone 1 tuvo como objetivo establecer la base funcional del sistema sobre el stack MERN, asegurando el flujo de trabajo colaborativo mediante GitFlow, e implementando los módulos iniciales de autenticación (Login/Registro) y la estructura visual del Dashboard. El equipo logró entregar estos componentes, aunque con retrasos atribuibles a una subestimación del esfuerzo real y a la carga académica concurrente del calendario de parciales universitarios. Las lecciones de este hito sentaron las bases metodológicas y técnicas para los sprints siguientes.
 
-\section{Evaluación del esfuerzo}
-El esfuerzo fue distribuido entre los cinco integrantes. La carga se concentró en producto, Scrum y QA inicial. Los 107 commits de S1-S4 muestran actividad sostenida, aunque la trazabilidad commit-HU requiere auditoría manual si se necesita exactitud forense.
+\vspace{0.6em}\hrule\vspace{0.8em}
 
-\section{Postmortem del milestone}
-\subsection{Qué salió bien}
-Se consolidó la base técnica, se usó GitFlow y se cerraron las issues funcionales del milestone.
+\subsection{2. Contexto de Ingeniería y Negocio}
 
-\subsection{Qué salió mal}
-Se integró código sin validación local suficiente y algunas HU se cerraron sin criterios de aceptación homogéneos.
+El objetivo de negocio en este primer hito era demostrar la viabilidad técnica de la plataforma mediante el acceso controlado de usuarios y la visualización de la interfaz principal. Técnicamente, el reto consistió en alinear al equipo alrededor de un stack nuevo para varios de sus miembros y en establecer convenciones de trabajo colaborativo desde cero.
 
-\subsection{Causas raíz}
-La causa raíz principal fue la ausencia de un Definition of Done verificable, combinada con estimaciones optimistas y evidencia recolectada tarde.
+La prioridad del sprint fue el núcleo de autenticación segura y el Dashboard base. Sin embargo, la ausencia de un criterio de aceptación técnico unificado (Definition of Done) generó ambigüedad sobre cuándo una historia de usuario podía considerarse realmente terminada, lo que impactó directamente la velocidad de entrega.
 
-\subsection{Impacto}
-El impacto fue retrabajo, ambigüedad sobre terminado y pérdida de tiempo en integración.
+\vspace{0.6em}\hrule\vspace{0.8em}
 
-\subsection{Acciones correctivas}
-Definir DoD, exigir build local antes de PR y documentar evidencia mínima al cerrar issues.
+\subsection{3. Revisión de Datos del Proceso y Calidad}
 
-\subsection{Acciones preventivas y responsables sugeridos}
-QA Lead debe custodiar el DoD; Configuration Manager debe revisar integración; Product Owner debe ajustar capacidad; Scrum Master debe vigilar trazabilidad.
+\subsubsection{Desempeño real vs. planeado}
 
-\section{Retrospectiva estrella de mar}
-\subsection{Comenzar a hacer}
-\begin{itemize}
-\item Definir un Definition of Done verificable antes de cada sprint.
-\item Validar la compilación local antes de abrir un Pull Request.
-\item Registrar evidencia mínima al cerrar cada historia de usuario.
+\begin{itemize}[leftmargin=1.2em]
+\item Las historias de usuario relacionadas con Login y Registro fueron completadas, pero con un tiempo de ciclo mayor al estimado, principalmente por retrabajos derivados de rutas del frontend rotas al integrar código sin validación previa de compilación.
+\item El Dashboard base fue entregado en su versión mínima, sin alcanzar algunos criterios visuales inicialmente planteados.
+\item No se utilizó un criterio de aceptación formalizado, lo que generó discrepancias entre lo que cada integrante consideraba "listo" y lo que el Product Owner esperaba.
 \end{itemize}
 
-\subsection{Más de}
-\begin{itemize}
-\item Revisar criterios de aceptación con el Product Owner.
-\item Generar trazabilidad issue-commit-PR en cambios funcionales.
-\item Sincronizar impedimentos técnicos de forma temprana.
+\subsubsection{Lecciones aprendidas}
+
+\begin{itemize}[leftmargin=1.2em]
+\item La estimación de esfuerzo debe contemplar la capacidad real del equipo, incluyendo compromisos académicos externos.
+\item Integrar código directamente sobre el repositorio sin verificar la compilación local es una fuente recurrente de deuda técnica inmediata.
+\item La falta de un DoD unificado es equivalente a no tener criterios de calidad: cada miembro trabajó con su propia interpretación de "terminado".
 \end{itemize}
 
-\subsection{Seguir haciendo}
-\begin{itemize}
-\item Mantener GitFlow como base del control de versiones.
-\item Usar GitHub Issues para dividir trabajo.
-\item Comunicar bloqueos por Discord cuando sea eficiente.
-\end{itemize}
+\vspace{0.6em}\hrule\vspace{0.8em}
 
-\subsection{Menos de}
-\begin{itemize}
-\item Aplazar tareas sin evaluar impacto.
-\item Depender de reuniones sincrónicas para desbloqueos simples.
-\item Estimar historias sin considerar carga académica.
-\end{itemize}
+\subsection{4. Reporte de Roles}
 
-\subsection{Dejar de hacer}
-\begin{itemize}
-\item Integrar código sin validación local.
-\item Cerrar HU sin criterios de aceptación explícitos.
-\item Postergar la creación de issues.
-\end{itemize}
+\subsubsection{4.1 Reporte del Scrum Master -- Sebastián Ramírez Maldonado (@Sarm-m)}
 
-\section{Plan de mejora del siguiente ciclo}
-\begin{tabularx}{\linewidth}{Y Y Y Y}
+Durante este primer milestone, el Scrum Master enfrentó el reto de consolidar un equipo que aún estaba alineando sus ritmos de trabajo y sus herramientas de comunicación. Las Daily Standups no se realizaron con la frecuencia ni la consistencia requeridas, lo que generó silos de información entre los integrantes. Se logró mantener la estructura de GitFlow activa desde el inicio, lo cual fue un acierto significativo. Para el siguiente ciclo, se debe formalizar el canal de comunicación principal (Discord) y establecer una agenda mínima para las sesiones sincrónicas, garantizando que los impedimentos se escalen oportunamente y no bloqueen el avance del equipo por períodos prolongados.
+
+\subsubsection{4.2 Reporte del Product Owner / Sprint Planner -- Sebastián Vargas (@juanvargax)}
+
+La planeación del sprint inicial careció de amortiguadores de tiempo frente a la carga académica externa del equipo. Las historias de usuario fueron estimadas con optimismo sin considerar la capacidad real disponible en la semana de parciales. El valor de negocio entregado fue parcial: el flujo de autenticación quedó funcional, pero el Dashboard base no alcanzó los criterios visuales definidos en la refinación inicial. Para los siguientes milestones, el Sprint Planner debe incorporar un factor de capacidad real como insumo obligatorio de la planeación, y las historias de usuario deben descomponerse en sub-tareas técnicas verificables antes de iniciar el sprint.
+
+\subsubsection{4.3 Reporte del Configuration Manager -- Samuel Freile (@samuelfl680)}
+
+El Configuration Manager estableció exitosamente la estructura de GitFlow desde el inicio del proyecto, lo cual fue fundamental para evitar conflictos mayores durante la integración de ramas. Sin embargo, se detectaron casos en los que los integrantes subieron código con estados incompletos o realizaron merges sin revisión previa, lo que introdujo inestabilidades en la rama principal. Para el siguiente ciclo, se debe implementar una política explícita de protección de ramas y una checklist de pre-merge que impida integrar código sin que el flujo de compilación local haya sido verificado previamente.
+
+\subsubsection{4.4 Reporte del Quality Assurance Lead -- Sebastián Rodríguez Ramírez (@Juserora)}
+
+La ausencia de un Definition of Done unificado fue el principal hallazgo de calidad en este milestone. Sin un criterio claro de aceptación, las historias de usuario fueron marcadas como completas sin pasar por una verificación funcional estructurada. Se identificaron rutas del frontend rotas tras la integración de código no validado, lo que hubiera podido prevenirse con una checklist de pre-commit básica. Para el Milestone 2, el QA Lead debe liderar la definición formal del DoD del equipo y establecer un proceso mínimo de revisión funcional antes de cerrar cualquier historia de usuario.
+
+\subsubsection{4.5 Reporte del DevOps Engineer -- Solón Losada (@solonlosada2006)}
+
+En este primer milestone, el rol de DevOps se concentró en sentar las bases del entorno de desarrollo compartido. No se contó con un pipeline de integración continua activo, lo que permitió que código con errores de rutas llegara a la rama principal sin detección automática. La infraestructura de desarrollo fue configurada manualmente por cada integrante, generando inconsistencias entre entornos. Para el siguiente ciclo, se debe priorizar la configuración de al menos un paso básico de validación automática (build check) que actúe como primer filtro antes de que cualquier rama sea integrada.
+
+\vspace{0.6em}\hrule\vspace{0.8em}
+
+\subsection{5. Identificación de Causa Raíz}
+
+La causa raíz principal de los problemas del Milestone 1 fue la \textbf{ausencia de un Definition of Done unificado y verificable}, combinada con la \textbf{integración de código sin validación previa de compilación local}. Estas dos condiciones operaron de forma sinérgica: sin un DoD claro, no había un estándar que obligara a verificar la compilación antes de integrar, y sin esa verificación, los errores de rutas del frontend llegaron al repositorio compartido, generando retrabajos que consumieron tiempo del sprint.
+
+Como causa secundaria, la \textbf{estimación de esfuerzo no consideró la capacidad real del equipo}, al ignorar la carga académica concurrente del calendario de parciales universitarios. Esto resultó en compromisos de sprint que el equipo no pudo honrar dentro del tiempo disponible.
+
+\vspace{0.6em}\hrule\vspace{0.8em}
+
+\subsection{6. Retrospectiva}
+
+El primer sprint del proyecto fue, en esencia, un proceso de autodescubrimiento como equipo. Cada integrante llegó con supuestos distintos sobre cómo se trabajaría, qué herramientas se usarían y cuán rápido fluiría el desarrollo. La realidad del sprint reveló que esos supuestos no estaban alineados: mientras algunos miembros avanzaban de forma autónoma, otros esperaban coordinación que nunca llegó de forma explícita.
+
+El mayor aprendizaje no fue técnico sino metodológico: un equipo sin criterios compartidos de "terminado" no puede entregar con consistencia, independientemente de las habilidades individuales de sus miembros. La deuda metodológica acumulada en este hito fue tan costosa en tiempo como los propios errores técnicos.
+
+En términos positivos, la adopción de GitFlow desde el inicio fue una decisión que evitó conflictos de integración mayores. La autonomía individual de los integrantes permitió avanzar en paralelo, y la comunicación a través de Discord, aunque irregular, funcionó como canal de desbloqueo para dudas puntuales. Estos son los cimientos sobre los cuales el equipo puede construir una disciplina más sólida en los milestones siguientes.
+
+El equipo reconoce que la carga académica externa es una variable real que no puede ignorarse en la planeación. Incorporarla como factor explícito en la estimación de capacidad no es una excusa, sino una práctica de ingeniería de software responsable y realista.
+
+\vspace{0.6em}\hrule\vspace{0.8em}
+
+\subsection{7. Retrospectiva Starfish}
+
+\begin{quote}\itshape
+\textbf{Reglas aplicadas:} cada frase inicia con un verbo en infinitivo; ninguna frase se repite entre ejes.\\
+\end{quote}
+
+\subsubsection{Seguir haciendo Seguir Haciendo}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.06\linewidth}P{0.34\linewidth}P{0.54\linewidth}}
 \toprule
-Acción & Responsable & Evidencia esperada & Criterio de éxito\\
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
 \midrule
-Definir DoD común & QA Lead & Checklist versionada & Toda HU cerrada referencia DoD\\
-Validar build local & Configuration Manager & Comentario o captura en PR & Menos fallos triviales\\
-Planear capacidad real & Product Owner & Tabla de disponibilidad & Menos arrastre\\
-Reforzar trazabilidad & Scrum Master & Issues enlazadas & Cambios con issue\\
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endhead
 \bottomrule
-\end{tabularx}
+\endlastfoot
+1 & Mantener la estructura de GitFlow activa desde el inicio del proyecto. & Permitió aislar el trabajo de cada integrante en ramas propias y evitó conflictos directos en la rama principal durante el sprint. \\
+2 & Fomentar la autonomía individual de los integrantes para avanzar en paralelo. & Varios módulos pudieron desarrollarse de forma simultánea gracias a que cada miembro tenía claridad sobre su tarea asignada. \\
+3 & Usar Discord como canal principal de comunicación asíncrona del equipo. & Permitió resolver dudas puntuales y desbloquear a integrantes sin necesidad de convocar reuniones formales en cada ocasión. \\
+4 & Consolidar el núcleo técnico del stack MERN antes de agregar funcionalidades secundarias. & Establecer primero la autenticación y el Dashboard base como prioridades evitó dispersar el esfuerzo del equipo en features no críticas. \\
+5 & Dividir las historias de usuario en sub-tareas técnicas atómicas desde la planeación. & Facilita la asignación, el seguimiento y la verificación individual de cada componente del sprint. \\
+\end{longtable}
+\endgroup
 
-\section{Conclusión del milestone}
-M1 fue finalizado y sentó la base funcional. Su mayor aprendizaje fue que la calidad metodológica debía formalizarse para evitar deuda de proceso.
+\subsubsection{Comenzar a hacer Comenzar a Hacer}
 
-\section{Anexos o evidencias pendientes}
-\begin{itemize}
-\item Pendiente de captura: evidencia granular por cada HU.
-\item Pendiente de auditoría: relación exacta commit por HU.
-\end{itemize}
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.06\linewidth}P{0.34\linewidth}P{0.54\linewidth}}
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & Definir y documentar un Definition of Done unificado antes de iniciar cada sprint. & La ausencia de este criterio fue la causa raíz principal de los problemas de calidad e integración del milestone. \\
+2 & Implementar una checklist de pre-commit que incluya verificación de compilación local. & Hubiera prevenido la integración de código con rutas rotas que generó retrabajos durante el sprint. \\
+3 & Establecer una política explícita de "1 issue = 1 cambio" en el repositorio. & Permite trazabilidad directa entre cada modificación del código y la tarea que la originó. \\
+4 & Planificar la capacidad real del equipo considerando la carga académica del periodo. & La semana de parciales no fue contemplada en la estimación inicial, lo que resultó en compromisos que el equipo no pudo cumplir. \\
+5 & Documentar las rutas de la API y los contratos de interfaz antes de comenzar el desarrollo. & Evita que diferentes integrantes asuman estructuras distintas que luego generan conflictos de integración. \\
+6 & Validar la compilación local de cada rama antes de abrir un Pull Request. & Es el control más básico y efectivo para evitar que errores triviales lleguen a la rama principal. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{Dejar de hacer Dejar de Hacer}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.06\linewidth}P{0.34\linewidth}P{0.54\linewidth}}
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & Integrar código al repositorio sin haber verificado previamente que compila correctamente. & Esta práctica introdujo rutas del frontend rotas que bloquearon el avance de otros integrantes. \\
+2 & Subir ramas personales con estados incompletos o parcialmente funcionales sin avisarlo al equipo. & Genera confusión sobre el estado real del sprint y puede bloquear la integración de otras ramas dependientes. \\
+3 & Postergar la creación de issues en GitHub hasta después de haber comenzado el desarrollo. & Sin la issue creada, no hay trazabilidad del trabajo realizado ni forma de hacer seguimiento al progreso real del sprint. \\
+4 & Realizar merges sobre ramas principales sin revisión previa de al menos un integrante. & Un merge no revisado es una puerta abierta a errores que, una vez en la rama principal, afectan a todo el equipo. \\
+5 & Ignorar las prácticas metodológicas del equipo bajo el argumento del estrés académico. & El estrés externo es una razón para ajustar la capacidad del sprint, no para abandonar el proceso acordado. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{Mas de Más de}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.06\linewidth}P{0.34\linewidth}P{0.54\linewidth}}
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & Aplicar rigor en los procesos de Scrum, especialmente en la planeación y el cierre del sprint. & La falta de rigor en este milestone fue directamente proporcional a los retrasos y a la deuda metodológica acumulada. \\
+2 & Revisar los criterios de aceptación de cada historia de usuario en la sesión de refinación. & Evita que el equipo avance sobre supuestos distintos acerca de qué significa que una historia está terminada. \\
+3 & Realizar Dailies sincronizadas con una agenda mínima definida. & Mejora la visibilidad del estado del sprint y permite escalar impedimentos antes de que se conviertan en bloqueos. \\
+4 & Generar trazabilidad de los sprints vinculando commits, issues y Pull Requests explícitamente. & Permite al equipo y al instructor reconstruir la historia del desarrollo y evaluar el proceso con datos objetivos. \\
+5 & Aterrizar la planeación del sprint a escenarios realistas con base en la velocidad real del equipo. & Las estimaciones optimistas son la principal causa de sprints incompletos y de frustración en el equipo. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{Menos de Menos de}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.06\linewidth}P{0.34\linewidth}P{0.54\linewidth}}
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{\#} & \textbf{Frase} & \textbf{Justificación} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+1 & Aplazar tareas pendientes al siguiente sprint sin un análisis explícito del impacto. & Cada tarea aplazada sin análisis transfiere deuda técnica o funcional que se acumula y complica los sprints siguientes. \\
+2 & Depender de reuniones sincrónicas para resolver dudas que podrían resolverse de forma asíncrona. & Las reuniones no planificadas consumen tiempo valioso del sprint y no siempre generan el resultado esperado. \\
+3 & Generar estimaciones optimistas que no contemplan riesgos ni tiempos de retrabajo. & El retrabajo por rutas rotas en este milestone consumió una fracción significativa del tiempo disponible. \\
+4 & Mantener ramas personales sin push durante períodos prolongados. & El código que no está en el repositorio no puede ser revisado, integrado ni respaldado por el equipo. \\
+5 & Buscar información de forma dispersa sin una referencia técnica centralizada y acordada por el equipo. & Genera soluciones heterogéneas al mismo problema y dificulta la coherencia técnica del codebase. \\
+\end{longtable}
+\endgroup
+
+\vspace{0.6em}\hrule\vspace{0.8em}
+
+\subsection{8. Plan de Mejora para el Milestone 2}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.27\linewidth}P{0.30\linewidth}P{0.37\linewidth}}
+\toprule
+\textbf{Acción} & \textbf{Responsable} & \textbf{Criterio de éxito} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Acción} & \textbf{Responsable} & \textbf{Criterio de éxito} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Definir y documentar el DoD del equipo antes del inicio del M2. & QA Lead (@Juserora) & DoD aprobado por todo el equipo en la sesión de planeación. \\
+Implementar checklist de pre-commit con verificación de compilación local. & Configuration Manager (@samuelfl680) & Ningún PR abierto sin checklist completada. \\
+Planificar el sprint con factor de capacidad real (descontar parciales y compromisos). & Product Owner (@juanvargax) & Sprint planning incluye tabla de disponibilidad por integrante. \\
+Configurar un build check básico en el pipeline de CI. & DevOps Engineer (@solonlosada2006) & El pipeline rechaza automáticamente ramas que no compilan. \\
+Establecer política de 1 issue = 1 cambio y comunicarla al equipo. & Scrum Master (@Sarm-m) & Todos los commits del M2 referencian una issue activa. \\
+\end{longtable}
+\endgroup
+
+\vspace{0.6em}\hrule\vspace{0.8em}
+
+\subsection{9. Respuestas completas a las preguntas guía de la PPT de Postmortem}
+
+Esta sección se agrega como matriz de verificación para dejar respondidas de forma explícita todas las preguntas guía de la presentación de Postmortem y Retrospectiva Starfish. Las respuestas se formulan con hechos del milestone, evitando evaluar personas y concentrándose en el desempeño del trabajo, el producto, el proceso y las oportunidades de mejora.
+
+\subsubsection{9.1 Revisión del producto, esfuerzo y proceso}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.58\linewidth}}
+\toprule
+\textbf{Pregunta guía de la PPT} & \textbf{Respuesta aplicada al Milestone 1: Base Funcional del Sistema} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Pregunta guía de la PPT} & \textbf{Respuesta aplicada al Milestone 1: Base Funcional del Sistema} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+¿Qué producto se produjo? & Se produjo la base funcional del sistema: autenticación inicial con Login/Registro, estructura visual mínima del Dashboard y flujo colaborativo inicial con GitFlow. \\
+¿Qué esfuerzo se invirtió para hacerlo? & El esfuerzo se concentró en levantar el stack MERN, coordinar ramas, entender el dominio y entregar las primeras pantallas. El tiempo real fue mayor al estimado por retrabajos, rutas rotas y carga académica externa. \\
+¿Qué proceso se siguió para hacerlo? & Se trabajó con Scrum académico, asignación de historias, uso de ramas e integración en repositorio. El proceso todavía era inmaduro porque no existía un Definition of Done compartido ni validación local obligatoria antes de integrar. \\
+¿Cómo fue el desempeño real comparado con lo planeado? & El desempeño real fue parcial frente a lo planeado: Login y Registro quedaron funcionales, pero el Dashboard se entregó en versión mínima y con criterios visuales pendientes. La velocidad real fue menor que la planeada. \\
+¿Qué lecciones se aprendieron de esta experiencia? & El equipo aprendió que la planeación debe considerar capacidad real, que integrar sin compilar genera deuda inmediata y que una historia no puede cerrarse sin un criterio de aceptación común. \\
+¿Debería usarse un criterio diferente, a nivel individual o de equipo, para el futuro? & Sí. Para el futuro se debe usar un DoD obligatorio por historia, con compilación local, revisión de rutas, evidencia visual mínima y validación del Product Owner antes de cerrar. \\
+¿Dónde hay oportunidades para mejorar y por qué? & La mayor oportunidad está en formalizar el trabajo: dailies breves, issues atómicas, checklist de PR y definición de criterios de aceptación. Esto mejora trazabilidad y reduce retrabajo. \\
+¿Dónde hubo problemas que deben corregirse para el próximo ciclo? & Se deben corregir la integración sin validación local, la falta de Dailies consistentes, la estimación optimista y la ausencia de criterios de aceptación verificables. \\
+¿Qué hizo bien el equipo y en qué falló? & Hizo bien: adoptar GitFlow desde el inicio, avanzar en paralelo y construir el flujo base de autenticación. Falló en: estimar sin capacidad real, cerrar tareas con criterios ambiguos y depender de comunicación irregular \\
+¿Sirvieron las mejoras propuestas previamente? & Al ser el primer milestone, no existían mejoras previas formalizadas. Este reporte deja la línea base para evaluar si las mejoras sirven en el Milestone 2. \\
+¿Cómo ha sido el desempeño comparado con otros equipos? & No se cuenta con datos verificables de otros equipos, por lo que no se afirma una comparación externa. La comparación válida es interna: este milestone funciona como línea base; los ciclos siguientes deben superar su nivel de trazabilidad, calidad y disciplina de cierre. \\
+¿Se deben modificar los objetivos y las metas? & Sí. Las metas del siguiente ciclo deben ser menos amplias, más verificables y divididas en tareas técnicas pequeñas. \\
+¿Cómo se deben modificar los procesos? & Incluir DoD, checklist de pre-commit/pre-PR, definición de capacidad real y una sesión de sincronización mínima para impedimentos. \\
+¿Cuáles son las áreas de más alta prioridad para analizar? & Definition of Done, compilación local obligatoria, trazabilidad issue-commit-PR y planeación basada en disponibilidad real. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.2 Evaluación objetiva de roles}
+
+\begin{landscape}
+\begingroup
+\tiny
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.17\linewidth}P{0.20\linewidth}P{0.22\linewidth}P{0.22\linewidth}P{0.14\linewidth}}
+\toprule
+\textbf{Rol} & \textbf{¿Qué funcionó?} & \textbf{¿Dónde estuvieron los problemas?} & \textbf{¿Dónde se puede mejorar?} & \textbf{Objetivo de mejoramiento para el Milestone 2} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Rol} & \textbf{¿Qué funcionó?} & \textbf{¿Dónde estuvieron los problemas?} & \textbf{¿Dónde se puede mejorar?} & \textbf{Objetivo de mejoramiento para el Milestone 2} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Scrum Master / Liderazgo & Se sostuvo una estructura inicial de trabajo y se mantuvo el uso de GitFlow. & Las dailies no fueron consistentes y los impedimentos no siempre se escalaron a tiempo. & Formalizar agenda mínima, canal principal y seguimiento de bloqueos. & Garantizar una rutina de comunicación breve y verificable durante todo el M2. \\
+Product Owner / Planeación & Priorizó Login, Registro y Dashboard como base de valor. & La estimación no consideró parciales ni capacidad real. & Agregar factor de capacidad y criterios de aceptación claros. & Refinar cada historia con alcance, evidencia esperada y criterios de cierre. \\
+Configuration Manager / Soporte & Definió la estructura de ramas y evitó conflictos mayores. & Hubo integraciones sin validación previa y ramas con estados incompletos. & Crear checklist de integración y política de ramas. & No aceptar PR sin evidencia de compilación local. \\
+QA Lead / Calidad & Identificó rutas rotas y ambigüedad de cierre. & No existía proceso formal de inspección ni DoD. & Definir pruebas mínimas por historia. & Crear DoD y checklist funcional para todas las historias del M2. \\
+DevOps Engineer / Proceso de entrega & Se configuraron bases de entorno de desarrollo. & No había CI básico para detectar fallos tempranos. & Agregar build check automático. & Incorporar una validación automática mínima antes de integrar. \\
+Ingenieros / Desarrollo & El equipo logró implementar módulos iniciales en paralelo. & Cada integrante interpretó de forma distinta qué significaba terminar una tarea. & Trabajar con criterios de aceptación y pruebas locales antes de entregar. & Cerrar cada tarea con evidencia técnica y funcional. \\
+\end{longtable}
+\endgroup
+\end{landscape}
+
+\subsubsection{9.3 Reporte del ciclo por responsabilidades}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.58\linewidth}}
+\toprule
+\textbf{Responsabilidad solicitada en la PPT} & \textbf{Respuesta del milestone} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Responsabilidad solicitada en la PPT} & \textbf{Respuesta del milestone} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Resumen del ciclo & Ciclo de arranque que permitió construir base funcional, pero evidenció deuda de proceso en estimación, comunicación y cierre de calidad. \\
+Liderazgo: motivación, compromisos, reuniones y apoyo requerido & La motivación se mantuvo, pero los compromisos se afectaron por carga académica y falta de seguimiento frecuente. Se requiere guía más cercana en DoD y criterios de aceptación. \\
+Desarrollo: contenido producido frente a requisitos & El contenido producido cubrió autenticación y Dashboard mínimo; faltó mayor pulimiento visual y validación de rutas. \\
+Planeación: tareas, seguimiento y compromisos & La planeación fue optimista y no incorporó amortiguadores por parciales, por lo que el seguimiento tuvo desviaciones. \\
+Proceso: disciplina de trabajo, medición y seguimiento & El proceso existía de forma básica, pero sin medición real ni controles de calidad consistentes. \\
+Calidad: estándares, inspecciones, defectos y PIP & La calidad fue funcionalmente aceptable para la base, pero con defectos evitables por falta de compilación local y DoD. \\
+Soporte: logística, configuración, cambios y riesgos & GitFlow ayudó, pero la ausencia de checklist de configuración permitió integraciones inestables. \\
+Reporte de ingenieros: planeado vs. ejecutado y mejora personal & Los ingenieros ejecutaron tareas principales, pero deben contrastar mejor lo planeado contra lo ejecutado y documentar evidencias de cierre. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.4 Estrategia de desarrollo y atributos de calidad}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.58\linewidth}}
+\toprule
+\textbf{Pregunta guía} & \textbf{Respuesta} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Pregunta guía} & \textbf{Respuesta} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+¿La estrategia de desarrollo funcionó? & Funcionó parcialmente: empezar por autenticación y Dashboard fue correcto, pero la estrategia falló al no imponer controles mínimos de integración. \\
+¿Qué otros enfoques hubieran sido más adecuados? & Hubiera sido más adecuado iniciar con una checklist técnica, contratos de rutas y DoD antes de implementar pantallas. \\
+¿Cómo debería cambiarse la estrategia en el futuro? & Primero definir estándares de cierre, luego construir; cada historia debe incluir prueba local y evidencia antes de PR. \\
+¿Cómo se tuvo en cuenta la usabilidad? & Se consideró mediante la estructura inicial del Dashboard, aunque quedó limitada en detalle visual. \\
+¿Cómo se tuvo en cuenta la mantenibilidad? & GitFlow aportó orden, pero faltó separación más rigurosa de responsabilidades y documentación técnica. \\
+¿Cómo se tuvo en cuenta la compatibilidad? & No se validó suficientemente entre entornos ni navegadores; debe incluirse como criterio futuro. \\
+¿Cómo se tuvo en cuenta el desempeño? & No fue el foco del milestone; el desempeño se observó solo de forma manual. \\
+¿Cómo se tuvo en cuenta la seguridad? & Se inició con autenticación, pero faltó fortalecer criterios de configuración y manejo de datos desde el inicio. \\
+¿Cómo mejorar estos tópicos en el futuro? & Agregar criterios explícitos de usabilidad, mantenibilidad, compatibilidad, desempeño y seguridad en cada historia. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.5 Administración de configuración, riesgos y reutilización}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.58\linewidth}}
+\toprule
+\textbf{Pregunta guía} & \textbf{Respuesta} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Pregunta guía} & \textbf{Respuesta} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+¿Funcionó la administración de configuración? & Funcionó de forma básica por el uso de ramas, pero sin protección ni checklist formal. \\
+¿Funcionó el control de cambios? & Funcionó parcialmente: hubo control por Git, pero no suficiente control de calidad antes del merge. \\
+¿Cómo mejorarlos? & Usar ramas protegidas, checklist de PR, commits vinculados a issues y validación local obligatoria. \\
+¿Fue efectivo el manejo y seguimiento de riesgos? & El manejo de riesgos fue reactivo; la carga académica y los errores de integración se detectaron tarde. \\
+¿Fue buena la estrategia de reutilización? & Fue limitada porque el producto apenas iniciaba; debe crecer con componentes reutilizables del Dashboard. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.6 Reflexión del trabajo en grupo}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.36\linewidth}P{0.58\linewidth}}
+\toprule
+\textbf{Aspecto de reflexión} & \textbf{Respuesta} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Aspecto de reflexión} & \textbf{Respuesta} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Comunicación del grupo & La comunicación por Discord sirvió para dudas puntuales, pero no reemplazó una rutina de seguimiento. \\
+Calidad del trabajo de los integrantes & La calidad dependió demasiado del criterio individual. \\
+Planeación de tareas y seguimiento & La planeación no midió disponibilidad real ni riesgo de retrabajo. \\
+Mitigación de riesgos & Los riesgos se gestionaron después de aparecer, no antes. \\
+Relación con el cliente / stakeholder académico & El valor entregado fue comprensible para el stakeholder académico, pero faltó evidencia más sólida de cumplimiento visual. \\
+Relación con las tecnologías & El equipo empezó a alinearse con MERN, aunque con curva de aprendizaje evidente. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.7 Verificación Starfish: respuestas por eje}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.20\linewidth}P{0.38\linewidth}P{0.36\linewidth}}
+\toprule
+\textbf{Eje de la estrella} & \textbf{Pregunta de la PPT que responde} & \textbf{Respuesta concreta del milestone} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Eje de la estrella} & \textbf{Pregunta de la PPT que responde} & \textbf{Respuesta concreta del milestone} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+Comenzar a hacer & ¿Qué acciones deberíamos comenzar para lograr el éxito, resolver problemas, mitigar riesgos, mejorar calidad, aprender, usar herramientas, distribuir tiempo y comunicar mejor? & Definir DoD, checklist de compilación local, política de 1 issue = 1 cambio y criterios de aceptación antes de desarrollar. \\
+Más de & ¿Qué acciones que ya hacemos deberíamos hacer más para mejorar productividad, comunicación, calidad y aprendizaje? & Hacer más revisión de criterios, dailies sincronizadas, trazabilidad y planeación con velocidad real. \\
+Seguir haciendo & ¿Qué acciones que ya hacemos bien deberíamos continuar? & Mantener GitFlow, autonomía controlada, Discord como apoyo y foco en el núcleo funcional. \\
+Menos de & ¿Qué acciones deberíamos hacer menos porque causan inconvenientes o reducen calidad, comunicación o planeación? & Reducir estimaciones optimistas, aplazamientos sin análisis y ramas personales sin push. \\
+Dejar de hacer & ¿Qué acciones deberíamos dejar de hacer porque no son productivas o ya no se necesitan? & Dejar de integrar sin compilar, cerrar historias sin evidencia y hacer merges sin revisión. \\
+\end{longtable}
+\endgroup
+
+\subsubsection{9.8 PIP - Plan de Mejora del Proceso}
+
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{P{0.22\linewidth}P{0.24\linewidth}P{0.27\linewidth}P{0.21\linewidth}}
+\toprule
+\textbf{Mejora priorizada} & \textbf{Problema que ataca} & \textbf{Cambio concreto en el proceso} & \textbf{Evidencia esperada} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Mejora priorizada} & \textbf{Problema que ataca} & \textbf{Cambio concreto en el proceso} & \textbf{Evidencia esperada} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+DoD por historia & Cierres ambiguos & Crear plantilla de cierre con criterios funcionales, técnicos y visuales & Historias cerradas con checklist completo \\
+Validación local obligatoria & Rutas rotas e integración inestable & Exigir compilación y prueba manual antes del PR & Captura o comentario de validación en cada PR \\
+Planeación por capacidad real & Sobrecarga por parciales & Registrar disponibilidad del equipo antes de comprometer alcance & Backlog ajustado a capacidad real \\
+Trazabilidad issue-commit-PR & Dificultad para reconstruir decisiones & Referenciar issue en commits y PRs & Historial verificable en GitHub \\
+\end{longtable}
+\endgroup
 \end{document}
